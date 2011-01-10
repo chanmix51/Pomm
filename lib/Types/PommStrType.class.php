@@ -1,6 +1,7 @@
 <?php
+Namespace Pomm;
 
-class PgLookStrType extends PgLookBaseType
+class PommStrType extends PommBaseType
 {
   public static function toPg($data)
   {

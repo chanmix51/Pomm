@@ -1,6 +1,7 @@
 <?php
+Namespace Pomm;
 
-class PgLookTimestampType extends PgLookBaseType
+class PommTimestampType extends PommBaseType
 {
   public static function fromPg($data)
   {

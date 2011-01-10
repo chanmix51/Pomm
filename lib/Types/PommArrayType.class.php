@@ -1,6 +1,7 @@
 <?php
+Namespace Pomm;
 
-class PgLookArrayType extends PgLookBaseType
+class PommArrayType extends PommBaseType
 {
   protected static $subtype;
 

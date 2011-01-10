@@ -1,19 +1,20 @@
 <?php
+Namespace Pomm;
 
 /**
- * PgLookWhere 
+ * PommWhere 
  * 
  * This class represents a WHERE clause of a SQL statement. It deals with AND & 
  * OR operator you can add using handy methods. This allows you to build 
  * queries dynamically.
  *
- * @package sfPgLookPlugin
+ * @package PommPlugin
  * @version $id$
  * @copyright 2010 Grégoire HUBERT 
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class PgLookWhere
+class PommWhere
 {
   public $stack = array();
   public $element;
@@ -29,7 +30,7 @@ class PgLookWhere
    * @param array $values 
    * @static
    * @access public
-   * @return PgLookWhere
+   * @return PommWhere
    */
   public static function create($element = null, $values = array())
   {
@@ -62,7 +63,7 @@ class PgLookWhere
    *
    * @param string $operator 
    * @access public
-   * @return PgLookWhere
+   * @return PommWhere
    */
   public function setOperator($operator)
   {
@@ -87,11 +88,11 @@ class PgLookWhere
   /**
    * transmute 
    * 
-   * @param PgLookWhere $where 
+   * @param PommWhere $where 
    * @access public
    * @return void
    */
-  public function transmute(PgLookWhere $where)
+  public function transmute(PommWhere $where)
   {
     $this->stack = $where->stack;
     $this->element = $where->element;
@@ -108,11 +109,11 @@ class PgLookWhere
    * @param array $values 
    * @param string $operator 
    * @access public
-   * @return PgLookWhere
+   * @return PommWhere
    */
   public function addWhere($element, $values, $operator)
   {
-    if (!$element instanceof PgLookWhere)
+    if (!$element instanceof PommWhere)
     {
       $element = new self($element, $values);
     }
@@ -156,7 +157,7 @@ class PgLookWhere
    * @param string $element 
    * @param array $values 
    * @access public
-   * @return PgLookWhere
+   * @return PommWhere
    */
   public function andWhere($element, $values = array())
   {
@@ -171,7 +172,7 @@ class PgLookWhere
    * @param string $element 
    * @param array $values 
    * @access public
-   * @return PgLookWhere
+   * @return PommWhere
    */
   public function orWhere($element, $values = array())
   {
@@ -183,7 +184,7 @@ class PgLookWhere
    * 
    * @param Array $stack 
    * @access public
-   * @return PgLookWhere
+   * @return PommWhere
    */
   public function setStack(Array $stack)
   {

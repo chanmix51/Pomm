@@ -1,16 +1,17 @@
 <?php
+Namespace Pomm;
 
 /**
- * PgLookBaseObject 
+ * PommBaseObject 
  * 
  * @abstract
- * @package sfPgLookPlugin
+ * @package PommBundle
  * @version $id$
- * @copyright 2010 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT 
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-abstract class PgLookBaseObject
+abstract class PommBaseObject
 {
   const NONE     = 0;
   const EXIST    = 1;
@@ -24,7 +25,7 @@ abstract class PgLookBaseObject
 
   /**
    * __construct 
-   * The constructor. This shouldn't be called directly, see PgLookBaseObjectMap::createObject() instead
+   * The constructor. This shouldn't be called directly, see PommBaseObjectMap::createObject() instead
    * 
    * @param Array $pk the primary key definition
    * @param Array $fields_definition the fields declared to be stored in the database
@@ -88,7 +89,7 @@ abstract class PgLookBaseObject
       case 'add':
         return $this->add($attribute, $arguments[0]);
       default:
-        throw new PgLookException(sprintf('No such method "%s:%s()"', get_class($this), $method));
+        throw new PommException(sprintf('No such method "%s:%s()"', get_class($this), $method));
     }
   }
 
@@ -227,7 +228,7 @@ abstract class PgLookBaseObject
     }
     else
     {
-      throw new PgLookException(sprintf('"%s" field is not an array.', $var));
+      throw new PommException(sprintf('"%s" field is not an array.', $var));
     }
   }
 

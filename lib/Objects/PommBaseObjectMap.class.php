@@ -1,16 +1,17 @@
 <?php
+Namespace Pomm;
 
 /**
- * PgLookBaseObjectMap 
+ * PommBaseObjectMap 
  * 
  * @abstract
- * @package sfPgLookPlugin
+ * @package PommBundle
  * @version $id$
  * @copyright 2010 Grégoire HUBERT 
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-abstract class PgLookBaseObjectMap
+abstract class PommBaseObjectMap
 {
   protected $connection;
   protected $object_class;
@@ -45,7 +46,7 @@ abstract class PgLookBaseObjectMap
   {
     if (array_key_exists($name, $this->field_definitions))
     {
-      throw new PgLookException(sprintf('Field "%s" already set in class "%s".', $name, get_class($this)));
+      throw new PommException(sprintf('Field "%s" already set in class "%s".', $name, get_class($this)));
     }
 
     $this->field_definitions[$name] = $type;
@@ -56,7 +57,7 @@ abstract class PgLookBaseObjectMap
    * Return a new instance of the corresponding model class
    * 
    * @access public
-   * @return PgLookBaseObject
+   * @return PommBaseObject
    */
   public function createObject()
   {
@@ -79,7 +80,7 @@ abstract class PgLookBaseObjectMap
 
   /**
    * __construct 
-   * The constructor. Most of the time, you should use PgLook::getMapFor($class_name) to chain calls
+   * The constructor. Most of the time, you should use Pomm::getMapFor($class_name) to chain calls
    * 
    * @access public
    * @return void
@@ -90,15 +91,15 @@ abstract class PgLookBaseObjectMap
 
     if (is_null($this->connection))
     {
-      throw new PgLookException(sprintf('PDO connection not set after initializing db map "%s".', get_class($this)));
+      throw new PommException(sprintf('PDO connection not set after initializing db map "%s".', get_class($this)));
     }
     if (is_null($this->object_class))
     {
-      throw new PgLookException(sprintf('Missing object_class after initializing db map "%s".', get_class($this)));
+      throw new PommException(sprintf('Missing object_class after initializing db map "%s".', get_class($this)));
     }
     if (count($this->field_definitions) == 0)
     {
-      throw new PgLookException(sprintf('No fields after initializing db map "%s", don\'t you prefer anonymous objects ?', get_class($this)));
+      throw new PommException(sprintf('No fields after initializing db map "%s", don\'t you prefer anonymous objects ?', get_class($this)));
     }
   }
 
@@ -171,12 +172,12 @@ abstract class PgLookBaseObjectMap
     {
       if (!$stmt->execute())
       {
-        throw new PgLookSqlException($stmt, $sql);
+        throw new PommSqlException($stmt, $sql);
       }
     }
     catch(PDOException $e)
     {
-      throw new PgLookException('PDOException while performing SQL query «%s». The driver said "%s".', $sql, $e->getMessage());
+      throw new PommException('PDOException while performing SQL query «%s». The driver said "%s".', $sql, $e->getMessage());
     }
 
     return $stmt;
@@ -189,7 +190,7 @@ abstract class PgLookBaseObjectMap
    * @param string $sql 
    * @param mixed $values 
    * @access public
-   * @return PgLookCollection
+   * @return PommCollection
    */
   public function query($sql, $values = array())
   {
@@ -206,7 +207,7 @@ abstract class PgLookBaseObjectMap
    */
   protected function createSqlAndFrom($values)
   {
-    $where = new PgLookWhere();
+    $where = new PommWhere();
     foreach ($values as $key => $value)
     {
       $where->andWhere(sprintf('%s = ?', $key), array($value));
@@ -220,7 +221,7 @@ abstract class PgLookBaseObjectMap
    * 
    * @param PDOStatement $stmt 
    * @access protected
-   * @return PgLookCollection
+   * @return PommCollection
    */
   protected function createObjectsFromStmt(PDOStatement $stmt)
   {
@@ -229,12 +230,12 @@ abstract class PgLookBaseObjectMap
     {
       $object = $this->createObject();
       $object->hydrate($this->convertPg($values, 'fromPg'));
-      $object->_setStatus(PgLookBaseObject::EXIST);
+      $object->_setStatus(PommBaseObject::EXIST);
 
       $objects[] = $object;
     }
 
-    return new PgLookCollection($objects);
+    return new PommCollection($objects);
   }
 
   /**
@@ -242,7 +243,7 @@ abstract class PgLookBaseObjectMap
    * The simplest query on a table
    * 
    * @access public
-   * @return PgLookCollection
+   * @return PommCollection
    */
   public function findAll()
   {
@@ -255,7 +256,7 @@ abstract class PgLookBaseObjectMap
    * @param string $where 
    * @param array $values 
    * @access public
-   * @return PgLookCollection
+   * @return PommCollection
    */
   public function findWhere($where, $values)
   {
@@ -278,13 +279,13 @@ abstract class PgLookBaseObjectMap
    * 
    * @param Array $values 
    * @access public
-   * @return PgLookBaseObject
+   * @return PommBaseObject
    */
   public function findByPk(Array $values)
   {
     if (count(array_diff(array_keys($values), $this->getPrimaryKey())) != 0)
     {
-      throw new PgLookException(sprintf('Given values "%s" do not match PK definition "%s" using class "%s".', print_r($values, true), print_r($this->getPrimaryKey(), true), get_class($this)));
+      throw new PommException(sprintf('Given values "%s" do not match PK definition "%s" using class "%s".', print_r($values, true), print_r($this->getPrimaryKey(), true), get_class($this)));
     }
 
     $result = $this->findWhere($this->createSqlAndFrom($values), array_values($values));
@@ -316,7 +317,7 @@ abstract class PgLookBaseObjectMap
 
       if (!preg_match('/([a-z]+)(?:\[([a-z]+)\])?/i', $converter, $matchs))
       {
-        throw new PgLookException(sprintf('Error, bad type converter expression "%s".', $converter));
+        throw new PommException(sprintf('Error, bad type converter expression "%s".', $converter));
       }
       $type = $matchs[1];
       $subtype = count($matchs) > 2 ? $matchs[2] : '';
@@ -336,16 +337,16 @@ abstract class PgLookBaseObjectMap
    * checkObject 
    * Check if the instance is from the expected class or throw an exception
    *
-   * @param PgLookBaseObject $object 
+   * @param PommBaseObject $object 
    * @param string $message 
    * @access protected
    * @return void
    */
-  protected function checkObject(PgLookBaseObject $object, $message)
+  protected function checkObject(PommBaseObject $object, $message)
   {
     if (get_class($object) !== $this->object_class)
     {
-      throw new PgLookException($message);
+      throw new PommException($message);
     }
   }
 
@@ -354,7 +355,7 @@ abstract class PgLookBaseObjectMap
    * 
    * @param Array $pk 
    * @access public
-   * @return PgLookCollection
+   * @return PommCollection
    */
   public function deleteByPk(Array $pk)
   {
@@ -366,22 +367,22 @@ abstract class PgLookBaseObjectMap
    * saveOne 
    * Save an instance. Use this to insert or update an object
    *
-   * @param PgLookBaseObject $object 
+   * @param PommBaseObject $object 
    * @access public
-   * @return PgLookCollection
+   * @return PommCollection
    */
-  public function saveOne(PgLookBaseObject &$object)
+  public function saveOne(PommBaseObject &$object)
   {
     $this->checkObject($object, sprintf('"%s" class does not know how to save "%s" objects.', get_class($this), get_class($object)));
 
-    if ($object->_getStatus() & PgLookBaseObject::EXIST)
+    if ($object->_getStatus() & PommBaseObject::EXIST)
     {
       $sql = sprintf('UPDATE %s SET %s WHERE %s', $this->object_name, $this->parseForUpdate($object), $this->createSqlAndFrom($object->getPrimaryKey()));
 
       $this->beginTransaction()->query($sql, array_values($object->getPrimaryKey()));
       $object = $this->findByPk($object->getPrimaryKey());
       $this->commitTransaction();
-      $object->_setStatus(PgLookBaseObject::EXIST);
+      $object->_setStatus(PommBaseObject::EXIST);
     }
     else
     {
@@ -390,14 +391,14 @@ abstract class PgLookBaseObjectMap
 
       $collection = $this->query($sql, array());
       $object = $collection[0];
-      $object->_setStatus(PgLookBaseObject::EXIST);
+      $object->_setStatus(PommBaseObject::EXIST);
     }
   }
 
   /**
    * parseForInsert 
    * 
-   * @param PgLookBaseObject $object 
+   * @param PommBaseObject $object 
    * @access protected
    * @return array
    */
@@ -416,7 +417,7 @@ abstract class PgLookBaseObjectMap
   /**
    * parseForUpdate 
    * 
-   * @param PgLookBaseObject $object 
+   * @param PommBaseObject $object 
    * @access protected
    * @return string
    */
@@ -459,14 +460,14 @@ abstract class PgLookBaseObjectMap
   /**
    * deleteOne 
    * 
-   * @param PgLookBaseObject $object 
+   * @param PommBaseObject $object 
    * @access public
    * @return void
    */
-  public function deleteOne(PgLookBaseObject $object)
+  public function deleteOne(PommBaseObject $object)
   {
     $this->deleteByPk($object->getPrimaryKey());
-    $object->_setStatus(PgLookBaseObject::NONE);
+    $object->_setStatus(PommBaseObject::NONE);
   }
 
   /**
@@ -479,7 +480,7 @@ abstract class PgLookBaseObjectMap
   {
     if (!$this->connection->getPdo()->beginTransaction())
     {
-      throw new PgLookException(sprintf('Error while trying to start a transaction. SQL said "%s".', $this->connection->getPdo()->errorInfo()));
+      throw new PommException(sprintf('Error while trying to start a transaction. SQL said "%s".', $this->connection->getPdo()->errorInfo()));
     }
 
     return $this;
@@ -495,7 +496,7 @@ abstract class PgLookBaseObjectMap
   {
     if (!$this->connection->getPdo()->commit())
     {
-      throw new PgLookException(sprintf('Error while trying to commit a transaction. SQL said "%s".', $this->connection->getPdo()->errorInfo()));
+      throw new PommException(sprintf('Error while trying to commit a transaction. SQL said "%s".', $this->connection->getPdo()->errorInfo()));
     }
 
     return $this;
@@ -511,13 +512,13 @@ abstract class PgLookBaseObjectMap
   {
     if (!$this->connection->getPdo()->rollback())
     {
-      throw new PgLookException(sprintf('Error while trying to rollback a transaction. SQL said "%s".', $this->connection->getPdo()->errorInfo()));
+      throw new PommException(sprintf('Error while trying to rollback a transaction. SQL said "%s".', $this->connection->getPdo()->errorInfo()));
     }
 
     return $this;
   }
 
-  public function findPgLookWhere(PgLookWhere $where)
+  public function findPommWhere(PommWhere $where)
   {
     return $this->findWhere($where, $where->getValues());
   }

@@ -1,22 +1,27 @@
 <?php
+Namespace Pomm;
 
 /**
- * sfPgLookDatabase 
+ * PommDatabase 
  * 
- * @uses sfDatabase
- * @package sfPgLookPlugin
+ * @package PommBundle
  * @version $id$
- * @copyright 2010 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT 
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class sfPgLookDatabase extends sfDatabase
+class PommDatabase 
 {
+  protected $parameters = array();
   protected $_handler;
 
   /**
    * __construct 
-   * The constructor, see @sfDatabase
+   *
+   * Parameters that can be sent :
+   * dsn : an url like psql://user:pass@host:port/dbname
+   * name : the connection name for this database (optionnal)
+   * persistant : a boolean to use persistant connections or not (default true)
    *
    * @param array $parameters 
    * @access public
@@ -24,7 +29,7 @@ class sfPgLookDatabase extends sfDatabase
    */
   public function __construct($parameters = array())
   {
-    parent::initialize($parameters);
+    $this->initialize($parameters);
 
     if (null !== $this->_handler)
     {
@@ -35,8 +40,13 @@ class sfPgLookDatabase extends sfDatabase
 
     if (!$this->hasParameter('persistant'))
     {
-      $this->setParameter('persistant', false);
+      $this->setParameter('persistant', true);
     }
+  }
+
+  public function __destruct()
+  {
+      $this->shutdown();
   }
 
   /**
@@ -52,33 +62,33 @@ class sfPgLookDatabase extends sfDatabase
 
     if (!preg_match('#([a-z]+):(?://(\w+)(?::(\w+))?@(\w+)(?::(\w+))?)?/(\w+)#', $dsn, $matchs))
     {
-      throw new sfConfigurationException(sprintf('Cound not parse DSN "%s".', $dsn));
+      throw new PommException(sprintf('Cound not parse DSN "%s".', $dsn));
     }
 
 
     if ($matchs[1] == null)
     {
-      throw sfConfigurationException(sprintf('No protocol information in dsn "%s".', $dsn));
+      throw PommException(sprintf('No protocol information in dsn "%s".', $dsn));
     }
     $adapter = $matchs[1];
 
     if ($matchs[2] == null)
     {
-      throw sfConfigurationException(sprintf('No user information in dsn "%s".', $dsn));
+      throw PommException(sprintf('No user information in dsn "%s".', $dsn));
     }
     $user = $matchs[2];
     $pass = $matchs[3];
 
     if ($matchs[4] == null)
     {
-      throw sfConfigurationException(sprintf('No hostname name in dsn "%s".', $dsn));
+      throw PommException(sprintf('No hostname name in dsn "%s".', $dsn));
     }
     $host = $matchs[4];
     $port = $matchs[5];
 
     if ($matchs[6] == null)
     {
-      throw sfConfigurationException(sprintf('No database name in dsn "%s".', $dsn));
+      throw PommException(sprintf('No database name in dsn "%s".', $dsn));
     }
     $database = $matchs[6];
 
@@ -92,7 +102,6 @@ class sfPgLookDatabase extends sfDatabase
 
   /**
    * connect 
-   * see @sfDatabase
    *
    * @access public
    * @return void
@@ -115,13 +124,12 @@ class sfPgLookDatabase extends sfDatabase
     }
     catch (PDOException $e)
     {
-      throw new PgLookException(sprintf('Error connecting to the database with dsn «%s». Driver said "%s".', $connect_string, $e->getMessage()));
+      throw new PommException(sprintf('Error connecting to the database with dsn «%s». Driver said "%s".', $connect_string, $e->getMessage()));
     }
   }
 
   /**
    * shutdown 
-   * see @sfDatabase
    * 
    * @access public
    * @return void
@@ -146,5 +154,30 @@ class sfPgLookDatabase extends sfDatabase
     }
 
     return $this->_handler;
+  }
+
+  protected function setParameter($name, $value) 
+  {
+      $this->parameters[$name] = $value;
+  }
+
+  protected function hasParameter($name)
+  {
+      return array_key_exists($name, $this->parameters);
+  }
+
+  protected function getParameter($name, $default = null)
+  {
+      return $this->hasParameter($name) ? $this->parameters[$name] : $default;
+  }
+
+  protected function initialize($parameters = array())
+  {
+      $this->parameters = $parameters;
+
+      if ($this->hasParameter('dsn'))
+      {
+          throw new PommException('No dsn given');
+      }
   }
 }

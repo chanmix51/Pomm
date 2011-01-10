@@ -1,6 +1,8 @@
 <?php
+Namespace Pomm;
 
-class PgLookBoolType extends PgLookBaseType
+
+class PommBoolType extends PommBaseType
 {
   public static function fromPg($data)
   {

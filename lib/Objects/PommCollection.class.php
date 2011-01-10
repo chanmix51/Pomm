@@ -1,18 +1,19 @@
 <?php
+Namespace Pomm;
 
 /**
- * PgLookCollection 
+ * PommCollection 
  * 
  * @uses ArrayAccess
  * @uses Iterator
  * @uses Countable
- * @package sfPgLookPlugin
+ * @package PommBundle
  * @version $id$
- * @copyright 2010 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT 
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class PgLookCollection implements ArrayAccess, Iterator, Countable 
+class PommCollection implements ArrayAccess, Iterator, Countable 
 {
   protected $collection = array();
   protected $position;

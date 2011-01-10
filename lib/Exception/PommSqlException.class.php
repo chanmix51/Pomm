@@ -1,21 +1,22 @@
 <?php
+Namespace Pomm
 
 /**
- * PgLookSqlException 
+ * PommSqlException 
  * 
  * SQL exceptions
  * get error from the rdbms with the PDOStatement object
  * see http://www.postgresql.org/docs/8.4/static/errcodes-appendix.html
  *
- * @uses PgLookException
- * @package sfPgLookPlugin
+ * @uses PommException
+ * @package PommBundle
  * @version $id$
- * @copyright 2010 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT 
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */
 
-class PgLookSqlException extends PgLookException
+class PommSqlException extends PommException
 {
   protected $error_state;
 
