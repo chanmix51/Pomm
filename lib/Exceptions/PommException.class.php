@@ -1,5 +1,5 @@
 <?php
-Namespace Pomm
+Namespace Pomm;
 
 /**
  * PommException 
@@ -7,7 +7,7 @@ Namespace Pomm
  * @uses sfException
  * @package PommBundle
  * @version $id$
- * @copyright 2010 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT 
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */

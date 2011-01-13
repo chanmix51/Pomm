@@ -1,6 +1,6 @@
 <?php
 
-Namespace Pomm
+Namespace Pomm;
 /**
  * Pomm 
  * 
