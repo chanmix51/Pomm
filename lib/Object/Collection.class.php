@@ -1,8 +1,8 @@
 <?php
-Namespace Pomm;
+namespace Pomm\Object;
 
 /**
- * PommCollection 
+ * Collection 
  * 
  * @uses ArrayAccess
  * @uses Iterator
@@ -13,7 +13,7 @@ Namespace Pomm;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class PommCollection implements ArrayAccess, Iterator, Countable 
+class Collection implements ArrayAccess, Iterator, Countable 
 {
   protected $collection = array();
   protected $position;

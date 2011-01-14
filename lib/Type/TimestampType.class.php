@@ -1,7 +1,7 @@
 <?php
-Namespace Pomm;
+namespace Pomm\Type;
 
-class PommTimestampType extends PommBaseType
+class TimestampType extends BaseType
 {
   public static function fromPg($data)
   {

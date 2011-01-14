@@ -1,14 +1,14 @@
 <?php
-Namespace Pomm
+namespace Pomm\Exception;
 
 /**
- * PommSqlException 
+ * SqlException 
  * 
  * SQL exceptions
  * get error from the rdbms with the PDOStatement object
  * see http://www.postgresql.org/docs/8.4/static/errcodes-appendix.html
  *
- * @uses PommException
+ * @uses Exception
  * @package PommBundle
  * @version $id$
  * @copyright 2011 Grégoire HUBERT 
@@ -16,7 +16,7 @@ Namespace Pomm
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */
 
-class PommSqlException extends PommException
+class SqlException extends Exception
 {
   protected $error_state;
 

@@ -1,8 +1,8 @@
 <?php
-Namespace Pomm;
+namespace Pomm\Exception;
 
 /**
- * PommException 
+ * Exception 
  * 
  * @uses sfException
  * @package PommBundle
@@ -11,6 +11,6 @@ Namespace Pomm;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class PommException extends \Exception
+class Exception extends \Exception
 {
 }

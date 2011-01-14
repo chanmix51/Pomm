@@ -1,6 +1,7 @@
 <?php
-
-Namespace Pomm;
+namespace Pomm;
+use Pomm\Connection;
+use Pomm\Exception;
 /**
  * Pomm 
  * 
@@ -20,14 +21,14 @@ class Pomm
      * save the connection in a static attribute
      * 
      * @param String name the connection name
-     * @param Array parameters for PommDatabase
+     * @param Array parameters for Database
      * @static
      * @access public
      * @return void
      */
     static public function createConnection($name, Array $parameters)
     {
-        self::$connections[$name] = new PommDatabase($parameters);
+        self::$connections[$name] = new Connection\Database($parameters);
     }
 
     /**

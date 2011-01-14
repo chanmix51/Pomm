@@ -1,7 +1,7 @@
 <?php
-Namespace Pomm;
+namespace Pomm\Type;
 
-class PommIntType extends PommBaseType
+class IntType extends BaseType
 {
   public static function fromPg($data)
   {

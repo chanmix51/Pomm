@@ -1,7 +1,7 @@
 <?php
-Namespace Pomm;
+namespace Pomm\Type;
 
-class PommStrType extends PommBaseType
+class StrType extends BaseType
 {
   public static function toPg($data)
   {

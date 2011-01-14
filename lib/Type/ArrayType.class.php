@@ -1,7 +1,7 @@
 <?php
-Namespace Pomm;
+namespace Pomm\Type;
 
-class PommArrayType extends PommBaseType
+class ArrayType extends BaseType
 {
   protected static $subtype;
 

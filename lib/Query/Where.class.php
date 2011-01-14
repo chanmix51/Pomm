@@ -1,8 +1,8 @@
 <?php
-Namespace Pomm;
+Namespace Pomm\Query;
 
 /**
- * PommWhere 
+ * Where 
  * 
  * This class represents a WHERE clause of a SQL statement. It deals with AND & 
  * OR operator you can add using handy methods. This allows you to build 
@@ -14,7 +14,7 @@ Namespace Pomm;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class PommWhere
+class Where
 {
   public $stack = array();
   public $element;
@@ -30,7 +30,7 @@ class PommWhere
    * @param array $values 
    * @static
    * @access public
-   * @return PommWhere
+   * @return Where
    */
   public static function create($element = null, $values = array())
   {
@@ -63,7 +63,7 @@ class PommWhere
    *
    * @param string $operator 
    * @access public
-   * @return PommWhere
+   * @return Where
    */
   public function setOperator($operator)
   {
@@ -88,11 +88,11 @@ class PommWhere
   /**
    * transmute 
    * 
-   * @param PommWhere $where 
+   * @param Where $where 
    * @access public
    * @return void
    */
-  public function transmute(PommWhere $where)
+  public function transmute(Where $where)
   {
     $this->stack = $where->stack;
     $this->element = $where->element;
@@ -109,11 +109,11 @@ class PommWhere
    * @param array $values 
    * @param string $operator 
    * @access public
-   * @return PommWhere
+   * @return Where
    */
   public function addWhere($element, $values, $operator)
   {
-    if (!$element instanceof PommWhere)
+    if (!$element instanceof Where)
     {
       $element = new self($element, $values);
     }
@@ -157,7 +157,7 @@ class PommWhere
    * @param string $element 
    * @param array $values 
    * @access public
-   * @return PommWhere
+   * @return Where
    */
   public function andWhere($element, $values = array())
   {
@@ -172,7 +172,7 @@ class PommWhere
    * @param string $element 
    * @param array $values 
    * @access public
-   * @return PommWhere
+   * @return Where
    */
   public function orWhere($element, $values = array())
   {
@@ -184,7 +184,7 @@ class PommWhere
    * 
    * @param Array $stack 
    * @access public
-   * @return PommWhere
+   * @return Where
    */
   public function setStack(Array $stack)
   {

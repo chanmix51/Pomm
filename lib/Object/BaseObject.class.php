@@ -1,8 +1,9 @@
 <?php
-Namespace Pomm;
+namespace Pomm\Object;
+use Pomm\Exception;
 
 /**
- * PommBaseObject 
+ * BaseObject 
  * 
  * @abstract
  * @package PommBundle
@@ -11,7 +12,7 @@ Namespace Pomm;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-abstract class PommBaseObject
+abstract class BaseObject
 {
   const NONE     = 0;
   const EXIST    = 1;
@@ -25,7 +26,7 @@ abstract class PommBaseObject
 
   /**
    * __construct 
-   * The constructor. This shouldn't be called directly, see PommBaseObjectMap::createObject() instead
+   * The constructor. This shouldn't be called directly, see BaseObjectMap::createObject() instead
    * 
    * @param Array $pk the primary key definition
    * @param Array $fields_definition the fields declared to be stored in the database
@@ -89,7 +90,7 @@ abstract class PommBaseObject
       case 'add':
         return $this->add($attribute, $arguments[0]);
       default:
-        throw new PommException(sprintf('No such method "%s:%s()"', get_class($this), $method));
+        throw new Exception(sprintf('No such method "%s:%s()"', get_class($this), $method));
     }
   }
 
@@ -228,7 +229,7 @@ abstract class PommBaseObject
     }
     else
     {
-      throw new PommException(sprintf('"%s" field is not an array.', $var));
+      throw new Exception(sprintf('"%s" field is not an array.', $var));
     }
   }
 

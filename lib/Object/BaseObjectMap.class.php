@@ -1,17 +1,20 @@
 <?php
-Namespace Pomm;
+namespace Pomm\Object;
+use Pomm\Exception;
+use Pomm\Connection;
+use Pomm\Type;
 
 /**
- * PommBaseObjectMap 
+ * BaseObjectMap 
  * 
  * @abstract
  * @package PommBundle
  * @version $id$
- * @copyright 2010 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT 
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-abstract class PommBaseObjectMap
+abstract class BaseObjectMap
 {
   protected $connection;
   protected $object_class;
@@ -46,7 +49,7 @@ abstract class PommBaseObjectMap
   {
     if (array_key_exists($name, $this->field_definitions))
     {
-      throw new PommException(sprintf('Field "%s" already set in class "%s".', $name, get_class($this)));
+      throw new Exception(sprintf('Field "%s" already set in class "%s".', $name, get_class($this)));
     }
 
     $this->field_definitions[$name] = $type;
@@ -57,7 +60,7 @@ abstract class PommBaseObjectMap
    * Return a new instance of the corresponding model class
    * 
    * @access public
-   * @return PommBaseObject
+   * @return BaseObject
    */
   public function createObject()
   {
@@ -91,15 +94,15 @@ abstract class PommBaseObjectMap
 
     if (is_null($this->connection))
     {
-      throw new PommException(sprintf('PDO connection not set after initializing db map "%s".', get_class($this)));
+      throw new Exception(sprintf('PDO connection not set after initializing db map "%s".', get_class($this)));
     }
     if (is_null($this->object_class))
     {
-      throw new PommException(sprintf('Missing object_class after initializing db map "%s".', get_class($this)));
+      throw new Exception(sprintf('Missing object_class after initializing db map "%s".', get_class($this)));
     }
     if (count($this->field_definitions) == 0)
     {
-      throw new PommException(sprintf('No fields after initializing db map "%s", don\'t you prefer anonymous objects ?', get_class($this)));
+      throw new Exception(sprintf('No fields after initializing db map "%s", don\'t you prefer anonymous objects ?', get_class($this)));
     }
   }
 
@@ -172,12 +175,12 @@ abstract class PommBaseObjectMap
     {
       if (!$stmt->execute())
       {
-        throw new PommSqlException($stmt, $sql);
+        throw new SqlException($stmt, $sql);
       }
     }
     catch(PDOException $e)
     {
-      throw new PommException('PDOException while performing SQL query «%s». The driver said "%s".', $sql, $e->getMessage());
+      throw new Exception('PDOException while performing SQL query «%s». The driver said "%s".', $sql, $e->getMessage());
     }
 
     return $stmt;
@@ -190,7 +193,7 @@ abstract class PommBaseObjectMap
    * @param string $sql 
    * @param mixed $values 
    * @access public
-   * @return PommCollection
+   * @return Collection
    */
   public function query($sql, $values = array())
   {
@@ -207,7 +210,7 @@ abstract class PommBaseObjectMap
    */
   protected function createSqlAndFrom($values)
   {
-    $where = new PommWhere();
+    $where = new Where();
     foreach ($values as $key => $value)
     {
       $where->andWhere(sprintf('%s = ?', $key), array($value));
@@ -221,7 +224,7 @@ abstract class PommBaseObjectMap
    * 
    * @param PDOStatement $stmt 
    * @access protected
-   * @return PommCollection
+   * @return Collection
    */
   protected function createObjectsFromStmt(PDOStatement $stmt)
   {
@@ -230,12 +233,12 @@ abstract class PommBaseObjectMap
     {
       $object = $this->createObject();
       $object->hydrate($this->convertPg($values, 'fromPg'));
-      $object->_setStatus(PommBaseObject::EXIST);
+      $object->_setStatus(BaseObject::EXIST);
 
       $objects[] = $object;
     }
 
-    return new PommCollection($objects);
+    return new Collection($objects);
   }
 
   /**
@@ -243,7 +246,7 @@ abstract class PommBaseObjectMap
    * The simplest query on a table
    * 
    * @access public
-   * @return PommCollection
+   * @return Collection
    */
   public function findAll()
   {
@@ -256,7 +259,7 @@ abstract class PommBaseObjectMap
    * @param string $where 
    * @param array $values 
    * @access public
-   * @return PommCollection
+   * @return Collection
    */
   public function findWhere($where, $values)
   {
@@ -279,13 +282,13 @@ abstract class PommBaseObjectMap
    * 
    * @param Array $values 
    * @access public
-   * @return PommBaseObject
+   * @return BaseObject
    */
   public function findByPk(Array $values)
   {
     if (count(array_diff(array_keys($values), $this->getPrimaryKey())) != 0)
     {
-      throw new PommException(sprintf('Given values "%s" do not match PK definition "%s" using class "%s".', print_r($values, true), print_r($this->getPrimaryKey(), true), get_class($this)));
+      throw new Exception(sprintf('Given values "%s" do not match PK definition "%s" using class "%s".', print_r($values, true), print_r($this->getPrimaryKey(), true), get_class($this)));
     }
 
     $result = $this->findWhere($this->createSqlAndFrom($values), array_values($values));
@@ -317,7 +320,7 @@ abstract class PommBaseObjectMap
 
       if (!preg_match('/([a-z]+)(?:\[([a-z]+)\])?/i', $converter, $matchs))
       {
-        throw new PommException(sprintf('Error, bad type converter expression "%s".', $converter));
+        throw new Exception(sprintf('Error, bad type converter expression "%s".', $converter));
       }
       $type = $matchs[1];
       $subtype = count($matchs) > 2 ? $matchs[2] : '';
@@ -337,16 +340,16 @@ abstract class PommBaseObjectMap
    * checkObject 
    * Check if the instance is from the expected class or throw an exception
    *
-   * @param PommBaseObject $object 
+   * @param BaseObject $object 
    * @param string $message 
    * @access protected
    * @return void
    */
-  protected function checkObject(PommBaseObject $object, $message)
+  protected function checkObject(BaseObject $object, $message)
   {
     if (get_class($object) !== $this->object_class)
     {
-      throw new PommException($message);
+      throw new Exception($message);
     }
   }
 
@@ -355,7 +358,7 @@ abstract class PommBaseObjectMap
    * 
    * @param Array $pk 
    * @access public
-   * @return PommCollection
+   * @return Collection
    */
   public function deleteByPk(Array $pk)
   {
@@ -367,22 +370,22 @@ abstract class PommBaseObjectMap
    * saveOne 
    * Save an instance. Use this to insert or update an object
    *
-   * @param PommBaseObject $object 
+   * @param BaseObject $object 
    * @access public
-   * @return PommCollection
+   * @return Collection
    */
-  public function saveOne(PommBaseObject &$object)
+  public function saveOne(BaseObject &$object)
   {
     $this->checkObject($object, sprintf('"%s" class does not know how to save "%s" objects.', get_class($this), get_class($object)));
 
-    if ($object->_getStatus() & PommBaseObject::EXIST)
+    if ($object->_getStatus() & BaseObject::EXIST)
     {
       $sql = sprintf('UPDATE %s SET %s WHERE %s', $this->object_name, $this->parseForUpdate($object), $this->createSqlAndFrom($object->getPrimaryKey()));
 
       $this->beginTransaction()->query($sql, array_values($object->getPrimaryKey()));
       $object = $this->findByPk($object->getPrimaryKey());
       $this->commitTransaction();
-      $object->_setStatus(PommBaseObject::EXIST);
+      $object->_setStatus(BaseObject::EXIST);
     }
     else
     {
@@ -391,14 +394,14 @@ abstract class PommBaseObjectMap
 
       $collection = $this->query($sql, array());
       $object = $collection[0];
-      $object->_setStatus(PommBaseObject::EXIST);
+      $object->_setStatus(BaseObject::EXIST);
     }
   }
 
   /**
    * parseForInsert 
    * 
-   * @param PommBaseObject $object 
+   * @param BaseObject $object 
    * @access protected
    * @return array
    */
@@ -417,7 +420,7 @@ abstract class PommBaseObjectMap
   /**
    * parseForUpdate 
    * 
-   * @param PommBaseObject $object 
+   * @param BaseObject $object 
    * @access protected
    * @return string
    */
@@ -460,14 +463,14 @@ abstract class PommBaseObjectMap
   /**
    * deleteOne 
    * 
-   * @param PommBaseObject $object 
+   * @param BaseObject $object 
    * @access public
    * @return void
    */
-  public function deleteOne(PommBaseObject $object)
+  public function deleteOne(BaseObject $object)
   {
     $this->deleteByPk($object->getPrimaryKey());
-    $object->_setStatus(PommBaseObject::NONE);
+    $object->_setStatus(BaseObject::NONE);
   }
 
   /**
@@ -480,7 +483,7 @@ abstract class PommBaseObjectMap
   {
     if (!$this->connection->getPdo()->beginTransaction())
     {
-      throw new PommException(sprintf('Error while trying to start a transaction. SQL said "%s".', $this->connection->getPdo()->errorInfo()));
+      throw new Exception(sprintf('Error while trying to start a transaction. SQL said "%s".', $this->connection->getPdo()->errorInfo()));
     }
 
     return $this;
@@ -496,7 +499,7 @@ abstract class PommBaseObjectMap
   {
     if (!$this->connection->getPdo()->commit())
     {
-      throw new PommException(sprintf('Error while trying to commit a transaction. SQL said "%s".', $this->connection->getPdo()->errorInfo()));
+      throw new Exception(sprintf('Error while trying to commit a transaction. SQL said "%s".', $this->connection->getPdo()->errorInfo()));
     }
 
     return $this;
@@ -512,13 +515,13 @@ abstract class PommBaseObjectMap
   {
     if (!$this->connection->getPdo()->rollback())
     {
-      throw new PommException(sprintf('Error while trying to rollback a transaction. SQL said "%s".', $this->connection->getPdo()->errorInfo()));
+      throw new Exception(sprintf('Error while trying to rollback a transaction. SQL said "%s".', $this->connection->getPdo()->errorInfo()));
     }
 
     return $this;
   }
 
-  public function findPommWhere(PommWhere $where)
+  public function findPommWhere(Where $where)
   {
     return $this->findWhere($where, $where->getValues());
   }

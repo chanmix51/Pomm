@@ -1,8 +1,9 @@
 <?php
-Namespace Pomm;
+namespace Pomm\Connection;
+use \Pomm\Exception;
 
 /**
- * PommDatabase 
+ * Database 
  * 
  * @package PommBundle
  * @version $id$
@@ -10,7 +11,7 @@ Namespace Pomm;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class PommDatabase 
+class Database 
 {
   protected $parameters = array();
   protected $_handler;
@@ -57,33 +58,33 @@ class PommDatabase
 
     if (!preg_match('#([a-z]+):(?://(\w+)(?::(\w+))?@(\w+)(?::(\w+))?)?/(\w+)#', $dsn, $matchs))
     {
-      throw new PommException(sprintf('Cound not parse DSN "%s".', $dsn));
+      throw new \Pomm\Exception\Exception(sprintf('Cound not parse DSN "%s".', $dsn));
     }
 
 
     if ($matchs[1] == null)
     {
-      throw PommException(sprintf('No protocol information in dsn "%s".', $dsn));
+      throw Pomm\Exception\Exception(sprintf('No protocol information in dsn "%s".', $dsn));
     }
     $adapter = $matchs[1];
 
     if ($matchs[2] == null)
     {
-      throw PommException(sprintf('No user information in dsn "%s".', $dsn));
+      throw Pomm\Exception\Exception(sprintf('No user information in dsn "%s".', $dsn));
     }
     $user = $matchs[2];
     $pass = $matchs[3];
 
     if ($matchs[4] == null)
     {
-      throw PommException(sprintf('No hostname name in dsn "%s".', $dsn));
+      throw Pomm\Exception\Exception(sprintf('No hostname name in dsn "%s".', $dsn));
     }
     $host = $matchs[4];
     $port = $matchs[5];
 
     if ($matchs[6] == null)
     {
-      throw PommException(sprintf('No database name in dsn "%s".', $dsn));
+      throw Pomm\Exception\Exception(sprintf('No database name in dsn "%s".', $dsn));
     }
     $database = $matchs[6];
 
@@ -115,11 +116,11 @@ class PommDatabase
 
     try
     {
-      $this->_handler = new PDO($connect_string);
+      $this->_handler = new \PDO($connect_string);
     }
-    catch (PDOException $e)
+    catch (\PDOException $e)
     {
-      throw new PommException(sprintf('Error connecting to the database with dsn «%s». Driver said "%s".', $connect_string, $e->getMessage()));
+      throw new Pomm\Exception\Exception(sprintf('Error connecting to the database with dsn «%s». Driver said "%s".', $connect_string, $e->getMessage()));
     }
   }
 

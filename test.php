@@ -3,22 +3,22 @@
 function __autoload($name) 
 {
     $libs = array(
-        'lib/Query/PommWhere.class.php',
-        'lib/Exceptions/PommSqlException.class.php',
-        'lib/Exceptions/PommException.class.php',
-        'lib/Types/PommStrType.class.php',
-        'lib/Types/PommBoolType.class.php',
-        'lib/Types/PommIntType.class.php',
-        'lib/Types/PommTimestampType.class.php',
-        'lib/Types/PommHStoreType.class.php',
-        'lib/Types/PommBaseType.class.php',
-        'lib/Types/PommLTreeType.class.php',
-        'lib/Types/PommArrayType.class.php',
-        'lib/Objects/PommCollection.class.php',
-        'lib/Objects/PommBaseObject.class.php',
-        'lib/Objects/PommBaseObjectMap.class.php',
+        'lib/Query/Where.class.php',
+        'lib/Exception/SqlException.class.php',
+        'lib/Exception/Exception.class.php',
+        'lib/Type/StrType.class.php',
+        'lib/Type/BoolType.class.php',
+        'lib/Type/IntType.class.php',
+        'lib/Type/TimestampType.class.php',
+        'lib/Type/HStoreType.class.php',
+        'lib/Type/BaseType.class.php',
+        'lib/Type/LTreeType.class.php',
+        'lib/Type/ArrayType.class.php',
+        'lib/Object/Collection.class.php',
+        'lib/Object/BaseObject.class.php',
+        'lib/Object/BaseObjectMap.class.php',
         'lib/Pomm.class.php',
-        'lib/Connection/PommDatabase.class.php',
+        'lib/Connection/Database.class.php', 
 );
     $class_name = array_pop(preg_split('/\\\/', $name));
 
@@ -26,10 +26,14 @@ function __autoload($name)
     {
         if (strstr($lib, sprintf('/%s.class.php', $class_name)))
         {
+            printf("Loading class '%s' in '%s'\n", $class_name, $lib);
             include($lib);
             return;
         }
     }
 }
 
-Pomm\Pomm::createConnection("default", array('dsn' => 'pgsql://greg@localhost/greg'));
+Pomm\Pomm::createConnection("default", array('dsn' => 'pgsql://greg/greg'));
+$result = Pomm\Pomm::executeAnonymousQuery('SELECT 4');
+
+
