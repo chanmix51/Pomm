@@ -74,7 +74,7 @@ class Pomm
      */
     public static function executeAnonymousQuery($sql, $connection = null)
     {
-        return self::getConnection($connection)->getPdo()->query($sql, PDO::FETCH_LAZY);
+        return self::getConnection($connection)->getPdo()->query($sql, \PDO::FETCH_LAZY);
     }
 
     /**

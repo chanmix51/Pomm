@@ -33,7 +33,22 @@ function __autoload($name)
     }
 }
 
-Pomm\Pomm::createConnection("default", array('dsn' => 'pgsql://greg/greg'));
-$result = Pomm\Pomm::executeAnonymousQuery('SELECT 4');
+Pomm\Pomm::createConnection("local", array('dsn' => 'pgsql://greg/greg'));
+Pomm\Pomm::createConnection("host", array('dsn' => 'pgsql://greg@localhost/greg'));
 
+$result = Pomm\Pomm::executeAnonymousQuery('SELECT 4', 'local');
+print_r($result->fetch());
+
+try
+{
+    $result = Pomm\Pomm::executeAnonymousQuery('SELECT 4', 'host');
+    Pomm\Pomm::createConnection("host", array('dsn' => 'pgsql://test:test0!@localhost/greg'));
+}
+catch(\Pomm\Exception\Exception $e)
+{
+    printf("Pomm Exception caught with message '%s'\n", $e->getMessage());
+}
+Pomm\Pomm::createConnection("host", array('dsn' => 'pgsql://test:test0!@localhost/greg'));
+$result = Pomm\Pomm::executeAnonymousQuery('SELECT 4<>1', 'host');
+print_r($result->fetch());
 

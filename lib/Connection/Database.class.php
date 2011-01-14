@@ -56,7 +56,7 @@ class Database
   {
     $dsn = $this->getParameter('dsn');
 
-    if (!preg_match('#([a-z]+):(?://(\w+)(?::(\w+))?@(\w+)(?::(\w+))?)?/(\w+)#', $dsn, $matchs))
+    if (!preg_match('#([a-z]+)://(\w+)(?::([^@]+))?(?:@(\w+)(?::(\w+))?)?/(\w+)#', $dsn, $matchs))
     {
       throw new \Pomm\Exception\Exception(sprintf('Cound not parse DSN "%s".', $dsn));
     }
@@ -64,27 +64,22 @@ class Database
 
     if ($matchs[1] == null)
     {
-      throw Pomm\Exception\Exception(sprintf('No protocol information in dsn "%s".', $dsn));
+      throw \Pomm\Exception\Exception(sprintf('No protocol information in dsn "%s".', $dsn));
     }
     $adapter = $matchs[1];
 
     if ($matchs[2] == null)
     {
-      throw Pomm\Exception\Exception(sprintf('No user information in dsn "%s".', $dsn));
+      throw \Pomm\Exception\Exception(sprintf('No user information in dsn "%s".', $dsn));
     }
     $user = $matchs[2];
     $pass = $matchs[3];
-
-    if ($matchs[4] == null)
-    {
-      throw Pomm\Exception\Exception(sprintf('No hostname name in dsn "%s".', $dsn));
-    }
     $host = $matchs[4];
     $port = $matchs[5];
 
     if ($matchs[6] == null)
     {
-      throw Pomm\Exception\Exception(sprintf('No database name in dsn "%s".', $dsn));
+      throw \Pomm\Exception\Exception(sprintf('No database name in dsn "%s".', $dsn));
     }
     $database = $matchs[6];
 
@@ -104,13 +99,13 @@ class Database
    */
   public function connect()
   {
-    $connect_string = sprintf('%s:host=%s dbname=%s user=%s', 
+    $connect_string = sprintf('%s:dbname=%s user=%s', 
         $this->getParameter('adapter'),
-        $this->getParameter('host'),
         $this->getParameter('database'),
         $this->getParameter('user') 
         );
 
+    $connect_string .= $this->getParameter('host') !== '' ? sprintf(' host=%s', $this->getParameter('host')) : '';
     $connect_string .= $this->getParameter('port') !== '' ? sprintf(' port=%d', $this->getParameter('port')) : '';
     $connect_string .= $this->getParameter('pass') !== '' ? sprintf(' password=%s', $this->getParameter('pass')) : '';
 
@@ -120,7 +115,7 @@ class Database
     }
     catch (\PDOException $e)
     {
-      throw new Pomm\Exception\Exception(sprintf('Error connecting to the database with dsn «%s». Driver said "%s".', $connect_string, $e->getMessage()));
+      throw new \Pomm\Exception\Exception(sprintf('Error connecting to the database with dsn «%s». Driver said "%s".', $connect_string, $e->getMessage()));
     }
   }
 
@@ -208,7 +203,7 @@ class Database
 
       if (!$this->hasParameter('dsn'))
       {
-          throw new PommException('No dsn given');
+          throw new \Pomm\Exception\Exception('No dsn given');
       }
       $this->processDsn();
 
