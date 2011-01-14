@@ -26,7 +26,6 @@ function __autoload($name)
     {
         if (strstr($lib, sprintf('/%s.class.php', $class_name)))
         {
-            printf("Loading class '%s' in file '%s'.\n", $name, $lib);
             include($lib);
             return;
         }

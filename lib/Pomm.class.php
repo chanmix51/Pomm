@@ -13,7 +13,7 @@ Namespace Pomm;
 class Pomm
 {
     const VERSION = 'BETA - 1';
-    static $connections = array();
+    static protected $connections = array();
 
     /**
      * createConnection 
@@ -25,7 +25,7 @@ class Pomm
      * @access public
      * @return void
      */
-    public static function createConnection($name, Array $parameters)
+    static public function createConnection($name, Array $parameters)
     {
         self::$connections[$name] = new PommDatabase($parameters);
     }
@@ -39,7 +39,7 @@ class Pomm
      * @access public
      * @return PommDatabase 
      */
-    public static function getConnection($name = null)
+    static public function getConnection($name = null)
     {
         if (is_null($name))
         {

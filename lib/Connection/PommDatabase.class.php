@@ -30,20 +30,15 @@ class PommDatabase
   public function __construct($parameters = array())
   {
     $this->initialize($parameters);
-
-    if (null !== $this->_handler)
-    {
-      return;
-    }
-
-    $this->processDsn();
-
-    if (!$this->hasParameter('persistant'))
-    {
-      $this->setParameter('persistant', true);
-    }
   }
 
+  /*
+   * __destruct
+   *
+   * The destructor
+   * @access public
+   * @return void
+   */
   public function __destruct()
   {
       $this->shutdown();
@@ -156,28 +151,69 @@ class PommDatabase
     return $this->_handler;
   }
 
-  protected function setParameter($name, $value) 
+  /*
+   * setParameter
+   *
+   * Set a parameter
+   * @access public
+   * @param string name the parameter's name
+   * @param string value the parameter's value
+   * @return void
+   * */
+  public function setParameter($name, $value) 
   {
       $this->parameters[$name] = $value;
   }
 
-  protected function hasParameter($name)
+  /*
+   * hasParameter
+   *
+   * check if parameter exists
+   * @access public
+   * @param string name the parameter's name
+   * @return boolean
+   * */
+  public function hasParameter($name)
   {
       return array_key_exists($name, $this->parameters);
   }
 
-  protected function getParameter($name, $default = null)
+  /*
+   * getParameter
+   *
+   * Returns the parameter "name" or "default" if not set
+   * @access public
+   * @param string name the parameter's name
+   * @param string default optionnal default value if name not set
+   * @return string the parameter's value or default
+   * */
+  public function getParameter($name, $default = null)
   {
       return $this->hasParameter($name) ? $this->parameters[$name] : $default;
   }
 
+  /**
+   * initialize
+   *
+   * This method initializes the parameters for our connection. It can be 
+   * overloaded
+   * @access protected
+   * @param array parameters the parameters passed to the contructor
+   * @return void
+   * */
   protected function initialize($parameters = array())
   {
       $this->parameters = $parameters;
 
-      if ($this->hasParameter('dsn'))
+      if (!$this->hasParameter('dsn'))
       {
           throw new PommException('No dsn given');
+      }
+      $this->processDsn();
+
+      if (!$this->hasParameter('persistant'))
+      {
+          $this->setParameter('persistant', true);
       }
   }
 }
