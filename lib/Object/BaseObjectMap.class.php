@@ -1,8 +1,16 @@
 <?php
 namespace Pomm\Object;
-use Pomm\Exception;
-use Pomm\Connection;
-use Pomm\Type;
+use Pomm\Exception\Exception;
+use Pomm\Exception\SqlException;
+
+use PommType\Array;
+use PommType\Base;
+use PommType\Bool;
+use PommType\HStore;
+use PommType\Int;
+use PommType\LTree;
+use PommType\Str;
+use PommType\Timestamp;
 
 /**
  * BaseObjectMap 
@@ -178,7 +186,7 @@ abstract class BaseObjectMap
         throw new SqlException($stmt, $sql);
       }
     }
-    catch(PDOException $e)
+    catch(\PDOException $e)
     {
       throw new Exception('PDOException while performing SQL query «%s». The driver said "%s".', $sql, $e->getMessage());
     }

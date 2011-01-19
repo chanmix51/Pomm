@@ -42,7 +42,6 @@ print_r($result->fetch());
 try
 {
     $result = Pomm\Pomm::executeAnonymousQuery('SELECT 4', 'host');
-    Pomm\Pomm::createConnection("host", array('dsn' => 'pgsql://test:test0!@localhost/greg'));
 }
 catch(\Pomm\Exception\Exception $e)
 {

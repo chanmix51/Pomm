@@ -1,7 +1,7 @@
 <?php
 namespace Pomm;
-use Pomm\Connection;
-use Pomm\Exception;
+use Pomm\Connection\Database;
+use Pomm\Exception\Exception;
 /**
  * Pomm 
  * 
@@ -28,7 +28,7 @@ class Pomm
      */
     static public function createConnection($name, Array $parameters)
     {
-        self::$connections[$name] = new Connection\Database($parameters);
+        self::$connections[$name] = new Database($parameters);
     }
 
     /**
@@ -46,7 +46,7 @@ class Pomm
         {
             if (count(self::$connections) == 0)
             {
-                throw new PommException(sprintf('No database connections.'));
+                throw new Exception(sprintf('No database connections.'));
             }
             else
             {
@@ -59,7 +59,7 @@ class Pomm
             return self::$connections[$name];
         }
 
-        throw new PommException(sprintf('No database connection with this name "%s".', $name));
+        throw new Exception(sprintf('No database connection with this name "%s".', $name));
     }
 
     /**
