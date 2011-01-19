@@ -1,9 +1,11 @@
 <?php
 namespace Pomm;
+use Pomm\Query\Where;
+
 include __DIR__.'/../lib/External/lime.php';
 include "autoload.php";
 
-class WhereTest extends lime_test
+class WhereTest extends \lime_test
 {
   protected $where;
 
@@ -40,7 +42,7 @@ class WhereTest extends lime_test
     $this->diag('Checking Where constructors and element methods');
 
     $this->resetWhere($element);
-    $this->isa_ok($this->where, 'Where', 'Where::create() returns a Where instance');
+    $this->isa_ok($this->where, 'Pomm\Query\Where', 'Where::create() returns a Where instance');
     if (is_null($element))
     {
       $this->ok(!$this->where->hasElement(), 'Which has no elements');
