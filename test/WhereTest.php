@@ -1,16 +1,11 @@
 <?php
+namespace Pomm;
+include __DIR__.'/../lib/External/lime.php';
+include "autoload.php";
 
-include dirname(__FILE__).'/../bootstrap/unit.php';
-
-class PgLookWhereTest
+class WhereTest extends lime_test
 {
-  protected $test;
   protected $where;
-
-  public function __construct()
-  {
-    $this->test = new lime_test();
-  }
 
   public function orWhere($element, $values = array())
   {
@@ -28,32 +23,32 @@ class PgLookWhereTest
 
   public function resetWhere($element = null, $values = array())
   {
-    $this->where = PgLookWhere::create($element, $values);
+    $this->where = Where::create($element, $values);
 
     return $this;
   }
 
   public function checkToString($expected)
   {
-    $this->test->is((string) $this->where, $expected, sprintf('The parsed string matched "%s".', $expected));
+    $this->is((string) $this->where, $expected, sprintf('The parsed string matched "%s".', $expected));
 
     return $this;
   }
 
   public function checkConstructors($element = null)
   {
-    $this->test->diag('Checking PgLookWhere constructors and element methods');
+    $this->diag('Checking Where constructors and element methods');
 
     $this->resetWhere($element);
-    $this->test->isa_ok($this->where, 'PgLookWhere', 'PgLookWhere::create() returns a PgLookWhere instance');
+    $this->isa_ok($this->where, 'Where', 'Where::create() returns a Where instance');
     if (is_null($element))
     {
-      $this->test->ok(!$this->where->hasElement(), 'Which has no elements');
+      $this->ok(!$this->where->hasElement(), 'Which has no elements');
     }
     else
     {
-      $this->test->ok($this->where->hasElement(), 'Which has an element');
-      $this->test->is($this->where->getElement(), $element, sprintf('Which is "%s"', $element));
+      $this->ok($this->where->hasElement(), 'Which has an element');
+      $this->is($this->where->getElement(), $element, sprintf('Which is "%s"', $element));
     }
 
     return $this;
@@ -61,7 +56,7 @@ class PgLookWhereTest
 
   public function testParse()
   {
-    $this->test->diag('Testing simple andWhere and orWhere calls and structure');
+    $this->diag('Testing simple andWhere and orWhere calls and structure');
 
     $this->checkConstructors()
       ->checkToString('true')
@@ -84,7 +79,7 @@ class PgLookWhereTest
       ->checkToString('((A OR B OR C) AND D)')
       ;
 
-    $where = PgLookWhere::create('a')
+    $where = Where::create('a')
       ->orWhere('b')
       ->andWhere('c');
 
@@ -93,10 +88,10 @@ class PgLookWhereTest
       ->resetWhere()
       ->orWhere($where)
       ->checkToString('((a OR b) AND c)')
-      ->andWhere(PgLookWhere::create())
+      ->andWhere(Where::create())
       ->checkToString('((a OR b) AND c)')
       ->resetWhere()
-      ->andWhere(PgLookWhere::create())
+      ->andWhere(Where::create())
       ->checkToString('true')
       ;
 
@@ -105,14 +100,14 @@ class PgLookWhereTest
 
   protected function testValues($good_values = array())
   {
-    $this->test->is_deeply($this->where->getValues(), $good_values, 'Values are what is expected');
+    $this->is_deeply($this->where->getValues(), $good_values, 'Values are what is expected');
 
     return $this;
   }
 
   public function testGetValues()
   {
-    $where = PgLookWhere::create('a', array('a'))
+    $where = Where::create('a', array('a'))
       ->andWhere('b', array('b', 'c'))
       ->orWhere('c', array('d', 'e', 'f'))
       ;
@@ -132,7 +127,7 @@ class PgLookWhereTest
 
 }
 
-$my_test = new PgLookWhereTest();
+$my_test = new WhereTest();
 $my_test->testParse()
   ->testGetValues()
   ;

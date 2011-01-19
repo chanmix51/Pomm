@@ -1,5 +1,5 @@
 <?php
-Namespace Pomm\Query;
+namespace Pomm\Query;
 
 /**
  * Where 
