@@ -3,14 +3,14 @@ namespace Pomm\Object;
 use Pomm\Exception\Exception;
 use Pomm\Exception\SqlException;
 
-use PommType\Array;
-use PommType\Base;
-use PommType\Bool;
-use PommType\HStore;
-use PommType\Int;
-use PommType\LTree;
-use PommType\Str;
-use PommType\Timestamp;
+use Pomm\Type\ArrayType;
+use Pomm\Type\BaseType;
+use Pomm\Type\BoolType;
+use Pomm\Type\HStoreType;
+use Pomm\Type\IntType;
+use Pomm\Type\LTreeType;
+use Pomm\Type\StrType;
+use Pomm\Type\TimestampType;
 
 /**
  * BaseObjectMap 
@@ -72,8 +72,8 @@ abstract class BaseObjectMap
    */
   public function createObject()
   {
-    $class_name = $this->object_class;
-
+    $reflection = new \ReflectionClass(get_class($this));
+    $class_name = sprintf("%s\\%s", $reflection->getNamespaceName(), $this->object_class);
     return new $class_name($this->pk_fields, $this->field_definitions);
   }
 
