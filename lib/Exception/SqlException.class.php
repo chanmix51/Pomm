@@ -28,7 +28,7 @@ class SqlException extends Exception
    * @access public
    * @return void
    */
-  public function __construct(PDOStatement $stmt, $sql)
+  public function __construct(\PDOStatement $stmt, $sql)
   {
     $this->error_state = $stmt->errorInfo();
     $this->message = sprintf("«%s».\n\nSQL error state '%s'\nextended status '%s'\n====\n%s\n====", $sql, $this->error_state[0], $this->error_state[1], $this->error_state[2]);

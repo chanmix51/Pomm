@@ -4,29 +4,8 @@ use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
 
 include __DIR__.'/../lib/External/lime.php';
+include 
 include "autoload.php";
-
-class TestTableMap extends BaseObjectMap
-{
-    protected function initialize()
-    {
-        $this->connection   = Pomm::getConnection();
-        $this->object_class =  'TestTable';
-        $this->object_name  =  'no_table';
-        $this->field_definitions  = array(
-            'id'               =>    'IntType',
-            'field_timestamp'  =>    'TimeStampType',
-            'title'            =>    'StrType',
-            'authors'          =>    'ArrayType[StrType]',
-            'field_boolean'    =>    'BoolType',
-        );
-        $this->pk_fields    = array('id');
-    }
-}
-
-class TestTable extends BaseObject
-{
-}
 
 class my_test extends \lime_test
 {
