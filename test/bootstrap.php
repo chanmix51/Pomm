@@ -24,7 +24,7 @@ class TestTableMap extends BaseObjectMap
 
     public function createTable()
     {
-        $sql = "CREATE TABLE book (id SERIAL PRIMARY KEY, created_at TIMESTAMP NOT NULL DEFAULT now(), title VARCHAR(255) NOT NULL, authors VARCHAR(255)[] NOT NULL, is_available BOOLEAN NOT NULL DEFAULT true)";
+        $sql = "CREATE TABLE book (id SERIAL PRIMARY KEY, created_at TIMESTAMP NOT NULL DEFAULT now(), title VARCHAR(256) NOT NULL, authors VARCHAR(255)[] NOT NULL, is_available BOOLEAN NOT NULL DEFAULT true)";
         Pomm::executeAnonymousQuery($sql);
     }
 

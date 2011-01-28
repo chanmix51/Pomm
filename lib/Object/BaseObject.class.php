@@ -1,5 +1,7 @@
 <?php
+
 namespace Pomm\Object;
+
 use Pomm\Exception;
 
 /**

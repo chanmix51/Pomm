@@ -14,25 +14,25 @@ use Pomm\Exception\Exception;
 class Pomm
 {
     const VERSION = 'BETA - 1';
-    static protected $connections = array();
+    static protected $databases = array();
 
     /**
-     * createConnection 
-     * save the connection in a static attribute
-     * 
-     * @param String name the connection name
-     * @param Array parameters for Database
+     * setDatabase
+     * save the Database in a static attribute
+     *
      * @static
      * @access public
+     * @param String name the database name
+     * @param Array parameters for Database
      * @return void
      */
-    static public function createConnection($name, Array $parameters)
+    static public function setDatabase($name, Array $parameters)
     {
-        self::$connections[$name] = new Database($parameters);
+        self::$databases[$name] = new Database($parameters);
     }
 
     /**
-     * getConnection 
+     * getDatabase 
      * Returns the corresponding PommDatabase or the first one if no name is provided
      * 
      * @param mixed $name 
@@ -40,26 +40,26 @@ class Pomm
      * @access public
      * @return PommDatabase 
      */
-    static public function getConnection($name = null)
+    static public function getDatabase($name = null)
     {
         if (is_null($name))
         {
-            if (count(self::$connections) == 0)
+            if (count(self::$databases) == 0)
             {
-                throw new Exception(sprintf('No database connections.'));
+                throw new Exception(sprintf('No database registered.'));
             }
             else
             {
-                $cnx = array_values(self::$connections);
-                return $cnx[0];
+                $db = array_values(self::$databases);
+                return $db[0];
             }
         }
-        if (array_key_exists($name, self::$connections))
+        if (array_key_exists($name, self::$databases))
         {
-            return self::$connections[$name];
+            return self::$databases[$name];
         }
 
-        throw new Exception(sprintf('No database connection with this name "%s".', $name));
+        throw new Exception(sprintf('No database with this name "%s".', $name));
     }
 
     /**
@@ -67,29 +67,13 @@ class Pomm
      * Performs a raw SQL query
      * 
      * @param string $sql 
-     * @param string $connection 
+     * @param string $database 
      * @static
      * @access public
      * @return PDOStatement
      */
-    public static function executeAnonymousQuery($sql, $connection = null)
+    public static function executeAnonymousQuery($sql, $database = null)
     {
-        return self::getConnection($connection)->getPdo()->query($sql, \PDO::FETCH_LAZY);
-    }
-
-    /**
-     * getMapFor 
-     * Returns a Map instance of the given model name
-     * 
-     * @param string $class 
-     * @static
-     * @access public
-     * @return PommBaseObjectMap
-     */
-    public static function getMapFor($class)
-    {
-        $class_name = $class.'Map';
-
-        return new $class_name();
+        return self::getDatabase($database)->createConnection()->getPdo()->query($sql, \PDO::FETCH_LAZY);
     }
 }

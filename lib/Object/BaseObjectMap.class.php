@@ -4,14 +4,8 @@ namespace Pomm\Object;
 use Pomm\Exception\Exception;
 use Pomm\Exception\SqlException;
 use Pomm\Query\Where;
-use Pomm\Type\ArrayType;
-use Pomm\Type\BaseType;
-use Pomm\Type\BoolType;
-use Pomm\Type\HStoreType;
-use Pomm\Type\IntType;
-use Pomm\Type\LTreeType;
-use Pomm\Type\StrType;
-use Pomm\Type\TimestampType;
+use Pomm\Connection\TransactionConnection;
+use Pomm\Type as Type;
 
 /**
  * BaseObjectMap 
@@ -25,7 +19,7 @@ use Pomm\Type\TimestampType;
  */
 abstract class BaseObjectMap
 {
-    protected $connection;
+    protected $database;
     protected $object_class;
     protected $object_name;
     protected $field_definitions = array();
@@ -34,7 +28,7 @@ abstract class BaseObjectMap
     /**
      * initialize 
      * This method is called by the constructor, use it to declare
-     * - connection the database name to use to query on this model objects
+     * - database the database name to use to query on this model objects
      * - fields_definitions (mandatory)
      * - object_class The class name of the corresponding model (mandatory)
      * - primary key (optional)
@@ -96,13 +90,14 @@ abstract class BaseObjectMap
      * @access public
      * @return void
      */
-    public function __construct()
+    public function __construct(TransactionConnection $connection)
     {
+        $this->connection = $connection;
         $this->initialize();
 
-        if (is_null($this->connection))
+        if (is_null($this->database))
         {
-            throw new Exception(sprintf('PDO connection not set after initializing db map "%s".', get_class($this)));
+            throw new Exception(sprintf('PDO database not set after initializing db map "%s".', get_class($this)));
         }
         if (is_null($this->object_class))
         {
@@ -342,8 +337,8 @@ abstract class BaseObjectMap
             {
                 throw new Exception(sprintf('Error, bad type converter expression "%s".', $converter));
             }
-            $type = "Pomm\\Type\\".$matchs[1];
-            $subtype = count($matchs) > 2 ?  "Pomm\\Type\\".$matchs[2] : '';
+            $type = "Type\\".$matchs[1];
+            $subtype = count($matchs) > 2 ?  "Type\\".$matchs[2] : '';
 
             if ($subtype !== '')
             {

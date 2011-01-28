@@ -1,5 +1,6 @@
 <?php
 namespace Pomm\Test;
+
 use Pomm\Pomm;
 use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
