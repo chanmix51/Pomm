@@ -1,6 +1,6 @@
 <?php
 
-namespace Pomm\Tools\ParameterHolder;
+namespace Pomm\Tools;
 
 use Pomm\Exception\Exception;
 

@@ -33,7 +33,10 @@ class TransactionConnection extends \PDO
     {
         $this->parameter_holder = $parameter_holder;
         $this->parameter_holder->setDefaultValue('isolation', self::ISOLATION_READ_COMMITTED);
+    }
 
+    protected function launch()
+    {
         $connect_string = sprintf('%s:dbname=%s user=%s', 
             $this->parameter_holder['adapter'],
             $this->parameter_holder['database'],
@@ -75,7 +78,12 @@ class TransactionConnection extends \PDO
    */
   public function getPdo()
   {
-    return $this->handler;
+      if (!isset($this->handler))
+      {
+          $this->launch();
+      }
+
+      return $this->handler;
   }
 
   /**
@@ -86,7 +94,7 @@ class TransactionConnection extends \PDO
    **/
   public function begin()
   {
-      $this->pdo->exec(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->parameter_holder['isolation']));
+      $this->getPdo()->exec(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->parameter_holder['isolation']));
   }
 
   /**
@@ -97,7 +105,7 @@ class TransactionConnection extends \PDO
    **/
   public function commit()
   {
-      $this->pdo->commitTransaction();
+      $this->getPdo()->exec('COMMIT');
   }
 
   /**
@@ -113,11 +121,11 @@ class TransactionConnection extends \PDO
   {
       if (is_null($name))
       {
-          $this->pdo->rollback();
+          $this->getPdo()->rollback();
       }
       else
       {
-          $this->pdo->exec(sprintf("ROLLBACK TO SAVEPOINT %s", $name));
+          $this->getPdo()->exec(sprintf("ROLLBACK TO SAVEPOINT %s", $name));
       }
   }
 
@@ -130,7 +138,7 @@ class TransactionConnection extends \PDO
    **/
   public function setSavepoint($name)
   {
-      $this->pdo->exec(sprintf("SAVEPOINT %s"));
+      $this->getPdo()->exec(sprintf("SAVEPOINT %s", $name));
   }
 
   /**
@@ -142,7 +150,7 @@ class TransactionConnection extends \PDO
    **/
   public function releaseSavepoint($name)
   {
-      $this->pdo->exec(sprintf("RELEASE SAVEPOINT %s", $name));
+      $this->getPdo()->exec(sprintf("RELEASE SAVEPOINT %s", $name));
   }
 
     /**
@@ -153,15 +161,10 @@ class TransactionConnection extends \PDO
      * @access public
      * @return PommBaseObjectMap
      */
-    public static function getMapFor($class)
+    public function getMapFor($class)
     {
         $class_name = $class.'Map';
-        $object = new $class_name();
-
-        if ($object->getDatabase() != $this->database)
-        {
-            throw new Exception(sprintf('This connection cannot handle "%s" instance. It belongs to database "%s".', $class, $object->getDatabase()));
-        }
+        $object = new $class_name($this);
 
         return $object;
     }

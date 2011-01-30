@@ -19,7 +19,7 @@ use Pomm\Type as Type;
  */
 abstract class BaseObjectMap
 {
-    protected $database;
+    protected $connection;
     protected $object_class;
     protected $object_name;
     protected $field_definitions = array();
@@ -28,7 +28,7 @@ abstract class BaseObjectMap
     /**
      * initialize 
      * This method is called by the constructor, use it to declare
-     * - database the database name to use to query on this model objects
+     * - connection the connection name to use to query on this model objects
      * - fields_definitions (mandatory)
      * - object_class The class name of the corresponding model (mandatory)
      * - primary key (optional)
@@ -95,9 +95,9 @@ abstract class BaseObjectMap
         $this->connection = $connection;
         $this->initialize();
 
-        if (is_null($this->database))
+        if (is_null($this->connection))
         {
-            throw new Exception(sprintf('PDO database not set after initializing db map "%s".', get_class($this)));
+            throw new Exception(sprintf('PDO connection not set after initializing db map "%s".', get_class($this)));
         }
         if (is_null($this->object_class))
         {
@@ -337,8 +337,8 @@ abstract class BaseObjectMap
             {
                 throw new Exception(sprintf('Error, bad type converter expression "%s".', $converter));
             }
-            $type = "Type\\".$matchs[1];
-            $subtype = count($matchs) > 2 ?  "Type\\".$matchs[2] : '';
+            $type = sprintf('Pomm\Type\%s', $matchs[1]);
+            $subtype = count($matchs) > 2 ?  sprintf('Pomm\Type\%s', $matchs[2]) : '';
 
             if ($subtype !== '')
             {
@@ -397,10 +397,9 @@ abstract class BaseObjectMap
         {
             $sql = sprintf('UPDATE %s SET %s WHERE %s', $this->object_name, $this->parseForUpdate($object), $this->createSqlAndFrom($object->getPrimaryKey()));
 
-            $this->beginTransaction()->query($sql, array_values($object->getPrimaryKey()));
+            $this->query($sql, array_values($object->getPrimaryKey()));
             $object = $this->findByPk($object->getPrimaryKey());
-            $this->commitTransaction();
-            $object->_setStatus(BaseObject::EXIST);
+            //$object->_setStatus(BaseObject::EXIST);
         }
         else
         {
@@ -486,53 +485,5 @@ abstract class BaseObjectMap
     {
         $this->deleteByPk($object->getPrimaryKey());
         $object->_setStatus(BaseObject::NONE);
-    }
-
-    /**
-     * beginTransaction 
-     * 
-     * @access public
-     * @return void
-     */
-    public function beginTransaction()
-    {
-        if (!$this->connection->getPdo()->beginTransaction())
-        {
-            throw new Exception(sprintf('Error while trying to start a transaction. SQL said "%s".', $this->connection->getPdo()->errorInfo()));
-        }
-
-        return $this;
-    }
-
-    /**
-     * commitTransaction 
-     * 
-     * @access public
-     * @return void
-     */
-    public function commitTransaction()
-    {
-        if (!$this->connection->getPdo()->commit())
-        {
-            throw new Exception(sprintf('Error while trying to commit a transaction. SQL said "%s".', $this->connection->getPdo()->errorInfo()));
-        }
-
-        return $this;
-    }
-
-    /**
-     * rollbackTransaction 
-     * 
-     * @access public
-     * @return void
-     */
-    public function rollbackTransaction()
-    {
-        if (!$this->connection->getPdo()->rollback())
-        {
-            throw new Exception(sprintf('Error while trying to rollback a transaction. SQL said "%s".', $this->connection->getPdo()->errorInfo()));
-        }
-
-        return $this;
     }
 }

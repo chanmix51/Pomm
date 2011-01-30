@@ -1,5 +1,7 @@
 <?php
+
 namespace Pomm\Test;
+
 use Pomm\Pomm;
 use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
@@ -9,8 +11,7 @@ class TestTableMap extends BaseObjectMap
 {
     protected function initialize()
     {
-        $this->connection   = Pomm::getConnection();
-        $this->object_class =  'Pomm\\Test\\TestTable';
+        $this->object_class =  'Pomm\Test\TestTable';
         $this->object_name  =  'book';
         $this->field_definitions  = array(
             'id'               =>    'IntType',

@@ -19,8 +19,10 @@ function __autoload($name)
         'lib/Object/BaseObjectMap.class.php',
         'lib/Pomm.class.php',
         'lib/Connection/Database.class.php', 
+        'lib/Connection/TransactionConnection.class.php', 
         'lib/External/sfInflector.class.php',
         'lib/External/sfToolkit.class.php',
+        'lib/Tools/ParameterHolder.class.php',
 );
     $class_name = array_pop(preg_split('/\\\/', $name));
 

@@ -4,18 +4,20 @@ use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
 
 include __DIR__.'/../lib/External/lime.php';
-include 
 include "autoload.php";
+include "bootstrap.php";
 
 class my_test extends \lime_test
 {
     protected $map;
+    protected $transaction;
     protected $obj;
 
     public function initialize()
     {
-        Pomm::createConnection('plop', array('dsn' => 'pgsql://user@localhost/nobase'));
-        $this->map = Pomm::getMapFor('Pomm\TestTable');
+        Pomm::setDatabase('plop', array('dsn' => 'pgsql://user@localhost/nobase'));
+        $this->transaction = Pomm::getDatabase()->createConnection();
+        $this->map = $this->transaction->getMapFor('Pomm\Test\TestTable');
  //       $this->map->createTable();
 
         return $this;

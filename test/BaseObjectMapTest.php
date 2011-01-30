@@ -16,11 +16,13 @@ class my_test extends \lime_test
 {
     protected $map;
     protected $obj;
+    protected $transac;
 
     public function initialize()
     {
-        Pomm::createConnection('default', array('dsn' => 'pgsql://greg/greg'));
-        Pomm::getMapFor('Pomm\Test\TestTable')->createTable();
+        Pomm::setDatabase('default', array('dsn' => 'pgsql://greg/greg'));
+        $this->transac = Pomm::getDatabase()->createConnection();
+        $this->transac->getMapFor('Pomm\Test\TestTable')->createTable();
 
         return $this;
     }
@@ -34,6 +36,7 @@ class my_test extends \lime_test
     {
         $this->map = null;
         $this->obj = null;
+        $this->transac = null;
 
         return $this;
     }
@@ -41,7 +44,7 @@ class my_test extends \lime_test
     public function testCreate()
     {
         $this->diag('TestTableMap::createObject()');
-        $this->map = Pomm::getMapFor('Pomm\Test\TestTable');
+        $this->map = $this->transac->getMapFor('Pomm\Test\TestTable');
         $this->obj = $this->map->createObject();
 
         $this->isa_ok($this->obj, 'Pomm\\Test\\TestTable', 'TestTableMap::createObject() returns a Pomm\\Test\\TestTable instance');
@@ -92,7 +95,14 @@ class my_test extends \lime_test
     {
         $this->diag('TestTableMap::findByPk()');
         $object = $this->map->findByPk($values);
-        $this->testObjectFields($object->extract());
+        if (!$object)
+        {
+            $this->fail('No record found');
+        }
+        else
+        {
+            $this->testObjectFields($object->extract());
+        }
 
         return $this;
     }
@@ -132,6 +142,45 @@ class my_test extends \lime_test
 
         return $this;
     }
+
+    public function beginTransaction()
+    {
+        $this->info('Starting transaction');
+        $this->transac->begin();
+
+        return $this;
+    }
+
+    public function setSavepoint($name)
+    {
+        $this->info(sprintf('Seting savepoint "%s"', $name));
+        $this->transac->setSavepoint($name);
+
+        return $this;
+    }
+
+    public function rollback($name = null)
+    {
+        $this->transac->rollback($name);
+        if (is_null($name))
+        {
+            $this->info('Rollback whole transaction.');
+        }
+        else
+        {
+            $this->info(sprintf('Rollback to savepoint "%s".', $name));
+        }
+
+        return $this;
+    }
+
+    public function commit()
+    {
+        $this->transac->commit();
+        $this->info('Commit transaction.');
+
+        return $this;
+    }
 }
 
 $test = new my_test();
@@ -150,4 +199,14 @@ $test->initialize()
     ->testDeleteOne()
     ->testQuery('SELECT * FROM book', array(), 0)
     ->testFindWhere(0)
+    ->beginTransaction()
+    ->testHydrate(array('id' => 2, 'title' => 'the NO book', 'authors' => array('one', 'two'), 'is_available' => true), array('id' => 2, 'title' => 'the NO book', 'authors' => array('one', 'two'), 'is_available' => true))
+    ->testSaveOne()
+    ->setSavepoint('a')
+    ->testDeleteOne()
+    ->testFindWhere(0)
+    ->rollback('a')
+    ->testRetreiveByPk(array('id' => 2))
+    ->commit()
+    ->testFindWhere(1)
     ;
