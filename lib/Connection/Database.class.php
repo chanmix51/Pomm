@@ -107,8 +107,13 @@ class Database
    * @access public
    * @return Connection
    **/
+  public function createTransaction()
+  {
+      return new Transaction($this->parameter_holder);
+  }
+
   public function createConnection()
   {
-      return new TransactionConnection($this->parameter_holder);
+      return new Connection($this->parameter_holder);
   }
 }

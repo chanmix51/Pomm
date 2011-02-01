@@ -4,7 +4,7 @@ namespace Pomm\Object;
 use Pomm\Exception\Exception;
 use Pomm\Exception\SqlException;
 use Pomm\Query\Where;
-use Pomm\Connection\TransactionConnection;
+use Pomm\Connection\Connection;
 use Pomm\Type as Type;
 
 /**
@@ -68,6 +68,7 @@ abstract class BaseObjectMap
     public function createObject()
     {
         $class_name = $this->object_class;
+
         return new $class_name($this->pk_fields, $this->field_definitions);
     }
 
@@ -90,7 +91,7 @@ abstract class BaseObjectMap
      * @access public
      * @return void
      */
-    public function __construct(TransactionConnection $connection)
+    public function __construct(Connection $connection)
     {
         $this->connection = $connection;
         $this->initialize();

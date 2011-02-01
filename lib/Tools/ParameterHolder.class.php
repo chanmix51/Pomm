@@ -92,6 +92,22 @@ class ParameterHolder implements \ArrayAccess, \Iterator
   }
 
   /**
+   * mustBeOneOf()
+   *
+   * Check if the given parameter is one of the values passed as argument
+   * @access public
+   * @param String $name the parameter's name
+   * @param Array $value;
+   * @return Boolean true if it's ok
+   * @throw Pomm\Exception\Exception if not ok
+   **/
+
+  public function mustBeOneOf($name, Array $values)
+  {
+      return in_array($this[$name], $values);
+  }
+
+  /**
    * unsetParameter()
    *
    * unset a parameter

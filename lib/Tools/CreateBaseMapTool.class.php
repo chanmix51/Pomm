@@ -12,7 +12,7 @@ class CreateBaseMapTool extends BaseTool
     protected $attributes = array();
 
     /**
-     * confifure()
+     * configure()
      *
      * mandatory options :
      * * dir   the directory base classes will be generated in
@@ -25,7 +25,7 @@ class CreateBaseMapTool extends BaseTool
         $this->checkOption('table', true);
         $this->checkOption('dsn', true);
 
-        $this->db = Pomm::createConnection(array('dsn' => $this->options['dsn']));
+        Pomm::setDatabase(array('dsn' => $this->options['dsn']));
     }
 
     /**
@@ -34,7 +34,7 @@ class CreateBaseMapTool extends BaseTool
      * Set the general informations about a table (oid, name ...)
      * @access protected
      **/
-    protected getGeneralInfo()
+    protected function getGeneralInfo()
     {
         $sql = sprintf("SELECT c.oid, n.nspname, c.relname FROM pg_catalog.pg_class c LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.relname ~ '^(%s)$' AND pg_catalog.pg_table_is_visible(c.oid) ORDER BY 2, 3;", $this->options['table']);
         $class = Pomm::executeAnonymousQuery($sql)->fetch();
@@ -59,19 +59,14 @@ class CreateBaseMapTool extends BaseTool
         }
     }
 
+    /**
+     * execute
+     * @see BaseTool
+     **/
     public function execute()
     {
-        Pomm::beginTransaction();
-
+        $this->trans = Pomm::getDatabase()->createTransactionConnection();
         $this->getGeneralInfo();
         $this->getAttributesInfo();
     }
-
-
-
-
-
-
-
-
 }

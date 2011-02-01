@@ -146,14 +146,16 @@ class my_test extends \lime_test
     public function beginTransaction()
     {
         $this->info('Starting transaction');
-        $this->transac->begin();
+        $this->transac = Pomm::getDatabase()->createTransaction()->begin();
+        $this->map = $this->transac->getMapFor('Pomm\Test\TestTable');
+        $this->obj = $this->map->createObject();
 
         return $this;
     }
 
     public function setSavepoint($name)
     {
-        $this->info(sprintf('Seting savepoint "%s"', $name));
+        $this->info(sprintf('Setting savepoint "%s"', $name));
         $this->transac->setSavepoint($name);
 
         return $this;
@@ -161,7 +163,6 @@ class my_test extends \lime_test
 
     public function rollback($name = null)
     {
-        $this->transac->rollback($name);
         if (is_null($name))
         {
             $this->info('Rollback whole transaction.');
@@ -170,14 +171,15 @@ class my_test extends \lime_test
         {
             $this->info(sprintf('Rollback to savepoint "%s".', $name));
         }
+        $this->transac->rollback($name);
 
         return $this;
     }
 
     public function commit()
     {
-        $this->transac->commit();
         $this->info('Commit transaction.');
+        $this->transac->commit();
 
         return $this;
     }
