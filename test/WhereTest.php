@@ -2,7 +2,7 @@
 namespace Pomm;
 use Pomm\Query\Where;
 
-include __DIR__.'/../lib/External/lime.php';
+include __DIR__.'/../Pomm/External/lime.php';
 include "autoload.php";
 
 class WhereTest extends \lime_test

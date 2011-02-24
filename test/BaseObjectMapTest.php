@@ -8,7 +8,7 @@ use Pomm\Object\Collection;
 use Pomm\Query\Where;
 use Pomm\Exception\Exception;
 
-include __DIR__.'/../lib/External/lime.php';
+include __DIR__.'/../Pomm/External/lime.php';
 include "autoload.php";
 include "bootstrap.php";
 

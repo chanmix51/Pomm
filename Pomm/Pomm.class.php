@@ -1,11 +1,14 @@
 <?php
+
 namespace Pomm;
+
 use Pomm\Connection\Database;
 use Pomm\Exception\Exception;
+
 /**
  * Pomm 
  * 
- * @package PommPlugin
+ * @package PommBundle
  * @version $id$
  * @copyright 2011 Grégoire HUBERT 
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
@@ -14,6 +17,7 @@ use Pomm\Exception\Exception;
 class Pomm
 {
     const VERSION = 'BETA - 1';
+
     static protected $databases = array();
 
     /**

@@ -1,9 +1,15 @@
 <?php
+
 namespace Pomm\Type;
 
 class ArrayType extends BaseType
 {
   protected static $subtype;
+
+  public function getTypeMatch()
+  {
+      return 'ARRAY(%s)';
+  }
 
   public static function setSubType($type)
   {
