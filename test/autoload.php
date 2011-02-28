@@ -3,35 +3,35 @@
 function __autoload($name) 
 {
     $libs = array(
-        'Pomm/Query/Where.class.php',
-        'Pomm/Exception/SqlException.class.php',
-        'Pomm/Exception/Exception.class.php',
-        'Pomm/Type/StrType.class.php',
-        'Pomm/Type/BoolType.class.php',
-        'Pomm/Type/IntType.class.php',
-        'Pomm/Type/TimestampType.class.php',
-        'Pomm/Type/HStoreType.class.php',
-        'Pomm/Type/BaseType.class.php',
-        'Pomm/Type/LTreeType.class.php',
-        'Pomm/Type/ArrayType.class.php',
-        'Pomm/Object/Collection.class.php',
-        'Pomm/Object/BaseObject.class.php',
-        'Pomm/Object/BaseObjectMap.class.php',
-        'Pomm/Pomm.class.php',
-        'Pomm/Connection/Database.class.php', 
-        'Pomm/Connection/Transaction.class.php', 
-        'Pomm/Connection/Connection.class.php', 
-        'Pomm/External/sfInflector.class.php',
-        'Pomm/External/sfToolkit.class.php',
-        'Pomm/Tools/ParameterHolder.class.php',
-        'Pomm/Tools/BaseTool.class.php',
-        'Pomm/Tools/CreateBaseMapTool.class.php',
+        'Pomm/Query/Where.php',
+        'Pomm/Exception/SqlException.php',
+        'Pomm/Exception/Exception.php',
+        'Pomm/Type/StrType.php',
+        'Pomm/Type/BoolType.php',
+        'Pomm/Type/IntType.php',
+        'Pomm/Type/TimestampType.php',
+        'Pomm/Type/HStoreType.php',
+        'Pomm/Type/BaseType.php',
+        'Pomm/Type/LTreeType.php',
+        'Pomm/Type/ArrayType.php',
+        'Pomm/Object/Collection.php',
+        'Pomm/Object/BaseObject.php',
+        'Pomm/Object/BaseObjectMap.php',
+        'Pomm/Pomm.php',
+        'Pomm/Connection/Database.php', 
+        'Pomm/Connection/Transaction.php', 
+        'Pomm/Connection/Connection.php', 
+        'Pomm/External/sfInflector.php',
+        'Pomm/External/sfToolkit.php',
+        'Pomm/Tools/ParameterHolder.php',
+        'Pomm/Tools/BaseTool.php',
+        'Pomm/Tools/CreateBaseMapTool.php',
 );
     $class_name = array_pop(preg_split('/\\\/', $name));
 
     foreach ($libs as $lib)
     {
-        if (strstr($lib, sprintf('/%s.class.php', $class_name)))
+        if (strstr($lib, sprintf('/%s.php', $class_name)))
         {
             printf("Loading class '%s' in '%s'\n", $class_name, $lib);
             include(__DIR__."/../".$lib);
