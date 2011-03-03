@@ -3,6 +3,7 @@
 namespace Pomm\Tools;
 
 use Pomm\Pomm;
+use Pomm\Exception\Exception;
 
 class CreateBaseMapTool extends BaseTool
 {
@@ -67,14 +68,15 @@ class CreateBaseMapTool extends BaseTool
         $sql = sprintf("SELECT a.attname, pg_catalog.format_type(a.atttypid, a.atttypmod), (SELECT substring(pg_catalog.pg_get_expr(d.adbin, d.adrelid) for 128) FROM pg_catalog.pg_attrdef d WHERE d.adrelid = a.attrelid AND d.adnum = a.attnum AND a.atthasdef) as defaultval, a.attnotnull as notnull, a.attnum as index FROM pg_catalog.pg_attribute a WHERE a.attrelid = '%d' AND a.attnum > 0 AND NOT a.attisdropped ORDER BY a.attnum;", $this->oid);
 
         $pdo = $this->transaction->getPdo()->query($sql);
+        $this->attribute = array();
         while ($class = $pdo->fetch(\PDO::FETCH_LAZY))
         {
-            $this->attributes[] = $class;
+            $this->attributes[] = array('attname' => $class->attname, 'format_type' => $class->format_type);
         }
     }
 
     /**
-     * execute
+     * execute()
      * @see BaseTool
      **/
     public function execute()
@@ -95,6 +97,7 @@ class CreateBaseMapTool extends BaseTool
         $extends     = $this->options['extends'];
         $primary_key = $this->getPrimaryKey();
         $fields_definitions = $this->generateFieldsDefinition();
+        $map_name   =  sprintf("%sMap", $class_name);
 
         $php = <<<EOD
 <?php
@@ -137,6 +140,7 @@ EOD;
         $fields_definition = "";
         foreach ($this->attributes as $attribute)
         {
+            printf("Getting attribute named '%s' with type '%s'\n", $attribute['attname'], $attribute['format_type']);
             $field_name = $attribute['attname'];
             $field_type = $this->guessFromType($attribute['format_type']);
 
@@ -145,4 +149,30 @@ EOD;
 
         return $fields_definition;
     }
+
+    public function guessFromType($type)
+    {
+        $types = array('IntType' => 'integer', 'BoolType' => 'boolean', 'StrType' => 'character|text', 'TimestampType' => 'timestamp', 'LTreeType' => 'ltree', 'HStoreType' => 'hstore');
+
+        foreach ($types as $pomm_type => $pattern)
+        {
+            $regexp = sprintf("/%s/i", $pattern);
+            if (preg_match($regexp, $type))
+            {
+                return $pomm_type;
+            }
+        }
+
+        throw new Exception(sprintf("Unknown type '%s'.", $type));
+    }
+
+    public function saveMapFile($content)
+    {
+        $filename = sprintf("%s/Base%sMap.php",$this->options['dir'], $this->options['class_name']);
+        $fh = fopen($filename, 'w');
+        fputs($fh, $content);
+        fclose($fh);
+        printf("Writing file '%s'.\n", $filename);
+    }
+
 }
