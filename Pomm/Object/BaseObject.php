@@ -2,7 +2,8 @@
 
 namespace Pomm\Object;
 
-use Pomm\Exception;
+use Pomm\Exception\Exception;
+use Pomm\External\sfInflector;
 
 /**
  * BaseObject 
@@ -79,7 +80,7 @@ abstract class BaseObject
   public function __call($method, $arguments)
   {
     $operation = substr(strtolower($method), 0, 3);
-    $attribute = \sfInflector::underscore(substr($method, 3));
+    $attribute = sfInflector::underscore(substr($method, 3));
 
     switch($operation)
     {

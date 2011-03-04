@@ -4,6 +4,7 @@ namespace Pomm\Tools;
 
 use Pomm\Pomm;
 use Pomm\Exception\Exception;
+use Pomm\Exception\External\sfInflector;
 
 class CreateBaseMapTool extends BaseTool
 {
@@ -26,9 +27,9 @@ class CreateBaseMapTool extends BaseTool
         $this->options->mustHave('dir');
         $this->options->mustHave('table');
         $this->options->mustHave('dsn');
-        $this->options->setDefaultValue('class_name', \sfInflector::camelize($this->options['table']));
+        $this->options->setDefaultValue('class_name', sfInflector::camelize($this->options['table']));
         $this->options->setDefaultValue('namespace', 'Model\Pomm\Map');
-        $this->options->setDefaultValue('extends', 'Pomm\Object\BaseObjectMap');
+        $this->options->setDefaultValue('extends', 'BaseObjectMap');
         $this->options->setDefaultValue('schema', 'public');
 
         Pomm::setDatabase('default', array('dsn' => $this->options['dsn']));
@@ -97,7 +98,7 @@ class CreateBaseMapTool extends BaseTool
         $extends     = $this->options['extends'];
         $primary_key = $this->getPrimaryKey();
         $fields_definitions = $this->generateFieldsDefinition();
-        $map_name   =  sprintf("%sMap", $class_name);
+        $map_name   =  sprintf("Base%sMap", $class_name);
 
         $php = <<<EOD
 <?php
@@ -114,6 +115,7 @@ class $map_name extends $extends
     {
         \$this->object_class =  '$class_name';
         \$this->object_name  =  '$table_name';
+
 $fields_definitions
         \$this->primary_key = array($primary_key);
     }
@@ -130,7 +132,7 @@ EOD;
         $pkey = $this->transaction->getPdo()->query($sql)->fetch(\PDO::FETCH_NAMED);
 
         $pkey = preg_split('/, /', trim($pkey['pkey'], '["{}]'));
-        array_walk(&$pkey, function($value) { return sprintf('"%s"', $value); }); 
+        array_walk(&$pkey, function(&$value) { $value = sprintf("'%s'", $value); }); 
 
         return join($pkey, ", ");
     }
