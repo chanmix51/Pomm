@@ -4,7 +4,8 @@ namespace Pomm\Tools;
 
 use Pomm\Pomm;
 use Pomm\Exception\Exception;
-use Pomm\Exception\External\sfInflector;
+use Pomm\External\sfInflector;
+use Pomm\Connection\Database;
 
 class CreateBaseMapTool extends BaseTool
 {
@@ -26,14 +27,11 @@ class CreateBaseMapTool extends BaseTool
     {
         $this->options->mustHave('dir');
         $this->options->mustHave('table');
-        $this->options->mustHave('dsn');
+        $this->options->mustHave('connection');
         $this->options->setDefaultValue('class_name', sfInflector::camelize($this->options['table']));
         $this->options->setDefaultValue('namespace', 'Model\Pomm\Map');
         $this->options->setDefaultValue('extends', 'BaseObjectMap');
         $this->options->setDefaultValue('schema', 'public');
-
-        Pomm::setDatabase('default', array('dsn' => $this->options['dsn']));
-        $this->transaction = Pomm::getDatabase()->createTransaction()->begin();
     }
 
     /**
@@ -44,7 +42,6 @@ class CreateBaseMapTool extends BaseTool
      **/
     protected function getGeneralInfo()
     {
-        echo "getGeneralInfo()\n";
         $sql = sprintf("SELECT c.oid, c.relname FROM pg_catalog.pg_class c LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = '%s' AND c.relname ~ '^(%s)$' AND pg_catalog.pg_table_is_visible(c.oid) ORDER BY 2;", $this->options['schema'], $this->options['table']);
         $class = $this->transaction->getPdo()->query($sql)->fetch(\PDO::FETCH_LAZY);
 
@@ -65,7 +62,6 @@ class CreateBaseMapTool extends BaseTool
      **/
     protected function getAttributesInfo()
     {
-        echo "getAttributesInfo()\n";
         $sql = sprintf("SELECT a.attname, pg_catalog.format_type(a.atttypid, a.atttypmod), (SELECT substring(pg_catalog.pg_get_expr(d.adbin, d.adrelid) for 128) FROM pg_catalog.pg_attrdef d WHERE d.adrelid = a.attrelid AND d.adnum = a.attnum AND a.atthasdef) as defaultval, a.attnotnull as notnull, a.attnum as index FROM pg_catalog.pg_attribute a WHERE a.attrelid = '%d' AND a.attnum > 0 AND NOT a.attisdropped ORDER BY a.attnum;", $this->oid);
 
         $pdo = $this->transaction->getPdo()->query($sql);
@@ -82,6 +78,12 @@ class CreateBaseMapTool extends BaseTool
      **/
     public function execute()
     {
+        if (!($this->options['connection'] instanceof Database))
+        {
+            throw new \InvalidArgumentException(sprintf('The connection must be a "Pomm\Connection\Database" instance, "%s" given.', get_class($this->options['connection'])));
+        }
+
+        $this->transaction = $this->options['connection']->createTransaction();
         $this->getGeneralInfo();
         $this->getAttributesInfo();
 
@@ -91,7 +93,6 @@ class CreateBaseMapTool extends BaseTool
 
     protected function generateMapFile()
     {
-        echo "generateMapFile()\n";
         $namespace   = $this->options['namespace'];
         $class_name  = $this->options['class_name'];
         $table_name  = sprintf("%s.%s", $this->options['schema'], $this->options['table']);
@@ -127,7 +128,6 @@ EOD;
 
     protected function getPrimaryKey()
     {
-        echo "getPrimaryKey()\n";
         $sql = sprintf("SELECT regexp_matches(pg_catalog.pg_get_indexdef(i.indexrelid, 0, true), e'\\\\((.*)\\\\)', 'gi') AS pkey FROM pg_catalog.pg_class c, pg_catalog.pg_class c2, pg_catalog.pg_index i WHERE c.oid = '%d' AND c.oid = i.indrelid AND i.indexrelid = c2.oid ORDER BY i.indisprimary DESC, i.indisunique DESC, c2.relname", $this->oid);
         $pkey = $this->transaction->getPdo()->query($sql)->fetch(\PDO::FETCH_NAMED);
 
@@ -142,7 +142,6 @@ EOD;
         $fields_definition = "";
         foreach ($this->attributes as $attribute)
         {
-            printf("Getting attribute named '%s' with type '%s'\n", $attribute['attname'], $attribute['format_type']);
             $field_name = $attribute['attname'];
             $field_type = $this->guessFromType($attribute['format_type']);
 
@@ -174,7 +173,6 @@ EOD;
         $fh = fopen($filename, 'w');
         fputs($fh, $content);
         fclose($fh);
-        printf("Writing file '%s'.\n", $filename);
     }
 
 }

@@ -487,4 +487,28 @@ abstract class BaseObjectMap
         $this->deleteByPk($object->getPrimaryKey());
         $object->_setStatus(BaseObject::NONE);
     }
+
+    /**
+     * getGroupByFields
+     *
+     * When grouping by all fields, this returns the fields with 
+     * the given alias (default empty string).
+     *
+     * @param String $alias the table alias in the query
+     * @access public
+     * @return String
+     **/
+    public function getGroupByFields($alias = '')
+    {
+        $fields = array();
+        $alias  = "" === $alias ? $alias : $alias.".";
+
+        foreach ($this->field_definitions as $name => $type)
+        {
+            $fields[] = sprintf("%s%s", $alias, $name);
+        }
+
+        return join(", ", $fields);
+    }
+
 }
