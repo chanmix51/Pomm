@@ -17,11 +17,12 @@ class CreateBaseMapTool extends BaseTool
 
     /**
      * configure()
+     * @see BaseTool
      *
      * mandatory options :
-     * * dir   the directory base classes will be generated in
-     * * table the db table to be mapped
-     * * dsn   the database connection to use
+     * * dir        the directory base classes will be generated in
+     * * table      the db table to be mapped
+     * * connection a Connection instance
      **/
     protected function configure()
     {
@@ -42,7 +43,7 @@ class CreateBaseMapTool extends BaseTool
      **/
     protected function getGeneralInfo()
     {
-        $sql = sprintf("SELECT c.oid, c.relname FROM pg_catalog.pg_class c LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = '%s' AND c.relname ~ '^(%s)$' AND pg_catalog.pg_table_is_visible(c.oid) ORDER BY 2;", $this->options['schema'], $this->options['table']);
+        $sql = sprintf("SELECT c.oid, c.relname FROM pg_catalog.pg_class c LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = '%s' AND c.relname ~ '^(%s)$' ORDER BY 2;", $this->options['schema'], $this->options['table']);
         $class = $this->transaction->getPdo()->query($sql)->fetch(\PDO::FETCH_LAZY);
 
         if (!$class)
@@ -94,7 +95,7 @@ class CreateBaseMapTool extends BaseTool
     protected function generateMapFile()
     {
         $namespace   = $this->options['namespace'];
-        $class_name  = $this->options['class_name'];
+        $class_name  = $this->options['schema'] == 'public' ? $this->options['class_name'] : sfInflector::camelize($this->options['schema']).$this->options['class_name'];
         $table_name  = sprintf("%s.%s", $this->options['schema'], $this->options['table']);
         $extends     = $this->options['extends'];
         $primary_key = $this->getPrimaryKey();
@@ -169,10 +170,10 @@ EOD;
 
     public function saveMapFile($content)
     {
-        $filename = sprintf("%s/Base%sMap.php",$this->options['dir'], $this->options['class_name']);
+        $schema_prefix = $this->options['schema'] == 'public' ? '' : sfInflector::camelize($this->options['schema']);
+        $filename = sprintf("%s/Base%s%sMap.php",$this->options['dir'], $schema_prefix, $this->options['class_name']);
         $fh = fopen($filename, 'w');
         fputs($fh, $content);
         fclose($fh);
     }
-
 }

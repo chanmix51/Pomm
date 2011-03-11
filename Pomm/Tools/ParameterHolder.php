@@ -61,6 +61,17 @@ class ParameterHolder implements \ArrayAccess, \Iterator
   }
 
   /**
+   * getParameters()
+   *
+   * Return the parameters as array
+   * @return Array the parameterrs
+   **/
+  public function getParameters()
+  {
+      return $this->parameters;
+  }
+
+  /**
    * mustHave()
    *
    * Throw an exception if a param is not set
