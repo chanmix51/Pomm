@@ -8,7 +8,7 @@
 -- @return BOOLEAN 
 CREATE OR REPLACE FUNCTION is_email(email VARCHAR) RETURNS BOOLEAN AS $$
 BEGIN
-      RETURN email ~* '^([^@s]+)@((?:[-a-z0-9]+.)+[a-z]{2,})$';
+      RETURN email ~* e'^([^@\\s]+)@((?:[a-z0-9-]+\\.)+[a-z]{2,})$';
 END;
 $$ LANGUAGE plpgsql
 
