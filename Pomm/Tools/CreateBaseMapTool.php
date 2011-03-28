@@ -119,7 +119,7 @@ class $map_name extends $extends
         \$this->object_name  =  '$table_name';
 
 $fields_definitions
-        \$this->primary_key = array($primary_key);
+        \$this->pk_fields = array($primary_key);
     }
 }
 EOD;
