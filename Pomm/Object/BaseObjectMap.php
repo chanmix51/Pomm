@@ -254,7 +254,7 @@ abstract class BaseObjectMap
      */
     public function findAll()
     {
-        return $this->query(sprintf('SELECT %s FROM %s;', $this->getSelectFields(), $this->object_name), array());
+        return $this->query(sprintf('SELECT %s FROM %s;', join(', ', $this->getSelectFields()), $this->object_name), array());
     }
 
     /**
@@ -279,7 +279,7 @@ abstract class BaseObjectMap
             }
         }
 
-        return $this->query(sprintf('SELECT %s FROM %s WHERE %s;', $this->getSelectFields(), $this->object_name, $where), $values);
+        return $this->query(sprintf('SELECT %s FROM %s WHERE %s;', join(', ', $this->getSelectFields()), $this->object_name, $where), $values);
     }
 
     /**
@@ -496,7 +496,7 @@ abstract class BaseObjectMap
      *
      * @param String $alias the table alias in the query
      * @access public
-     * @return String
+     * @return Array
      **/
     public function getGroupByFields($alias = '')
     {
@@ -508,7 +508,7 @@ abstract class BaseObjectMap
             $fields[] = sprintf("%s%s", $alias, $name);
         }
 
-        return join(", ", $fields);
+        return $fields;
     }
 
     /**
@@ -518,7 +518,7 @@ abstract class BaseObjectMap
      *
      * @param String $alias the table alias in the query
      * @access public
-     * @return String
+     * @return Array
      **/
     public function getSelectFields($alias = '')
     {
