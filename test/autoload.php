@@ -26,6 +26,7 @@ function __autoload($name)
         'Pomm/Tools/ParameterHolder.php',
         'Pomm/Tools/BaseTool.php',
         'Pomm/Tools/CreateBaseMapTool.php',
+        'Pomm/Tools/ScanSchemaTool.php',
 );
     $class_name = array_pop(preg_split('/\\\/', $name));
 
