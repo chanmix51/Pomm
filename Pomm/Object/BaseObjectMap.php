@@ -500,15 +500,7 @@ abstract class BaseObjectMap
      **/
     public function getGroupByFields($alias = '')
     {
-        $fields = array();
-        $alias  = "" === $alias ? $alias : $alias.".";
-
-        foreach ($this->field_definitions as $name => $type)
-        {
-            $fields[] = sprintf("%s%s", $alias, $name);
-        }
-
-        return $fields;
+        $this->getFields($alias);
     }
 
     /**
@@ -522,6 +514,28 @@ abstract class BaseObjectMap
      **/
     public function getSelectFields($alias = '')
     {
-        return $this->getGroupByFields($alias);
+        return $this->getFields($alias);
+    }
+
+    /**
+     * getFields
+     *
+     * When selecting all fields, this is better than *
+     *
+     * @param String $alias the table alias in the query
+     * @access public
+     * @return Array
+     **/
+    public function getFields($alias = '')
+    {
+        $fields = array();
+        $alias  = "" === $alias ? $alias : $alias.".";
+
+        foreach ($this->field_definitions as $name => $type)
+        {
+            $fields[] = sprintf("%s%s", $alias, $name);
+        }
+
+        return $fields;
     }
 }
