@@ -6,14 +6,6 @@ function __autoload($name)
         'Pomm/Query/Where.php',
         'Pomm/Exception/SqlException.php',
         'Pomm/Exception/Exception.php',
-        'Pomm/Type/StrType.php',
-        'Pomm/Type/BoolType.php',
-        'Pomm/Type/IntType.php',
-        'Pomm/Type/TimestampType.php',
-        'Pomm/Type/HStoreType.php',
-        'Pomm/Type/BaseType.php',
-        'Pomm/Type/LTreeType.php',
-        'Pomm/Type/ArrayType.php',
         'Pomm/Object/Collection.php',
         'Pomm/Object/BaseObject.php',
         'Pomm/Object/BaseObjectMap.php',
@@ -27,6 +19,13 @@ function __autoload($name)
         'Pomm/Tools/BaseTool.php',
         'Pomm/Tools/CreateBaseMapTool.php',
         'Pomm/Tools/ScanSchemaTool.php',
+        'Pomm/Converter/ConverterInterface.php',
+        'Pomm/Converter/PgBoolean.php',
+        'Pomm/Converter/PgHStore.php',
+        'Pomm/Converter/PgInteger.php',
+        'Pomm/Converter/PgLTree.php',
+        'Pomm/Converter/PgString.php',
+        'Pomm/Converter/PgTimestamp.php',
 );
     $class_name = array_pop(preg_split('/\\\/', $name));
 
