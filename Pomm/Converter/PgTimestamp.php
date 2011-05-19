@@ -5,12 +5,12 @@ use Pomm\Converter\ConverterInterface;
 
 class PgTimestamp implements ConverterInterface
 {
-  public static function fromPg($data)
+  public function fromPg($data)
   {
     return new \DateTime($data);
   }
 
-  public static function toPg($data)
+  public function toPg($data)
   {
     if (!$data instanceof \DateTime)
     {

@@ -326,27 +326,35 @@ abstract class BaseObjectMap
         $out_values = array();
         foreach ($values as $name => $value)
         {
-            $converter = array_key_exists($name, $this->field_definitions) ? $this->field_definitions[$name] : null;
-            if (is_null($converter))
+            if (is_null($value)) continue;
+
+            $converter_name = array_key_exists($name, $this->field_definitions) ? $this->field_definitions[$name] : null;
+
+            if (is_null($converter_name))
             {
                 $out_values[$name] = $value;
                 continue;
             }
-            if (is_null($value)) continue;
 
-            if (!preg_match('/([a-z]+)(?:\[([a-z]+)\])?/i', $converter, $matchs))
+            if (!preg_match('/([a-z]+)(\[\])?/i', $converter_name, $matchs))
             {
                 throw new Exception(sprintf('Error, bad type converter expression "%s".', $converter));
             }
-            $type = sprintf('Pomm\Type\%s', $matchs[1]);
-            $subtype = count($matchs) > 2 ?  sprintf('Pomm\Type\%s', $matchs[2]) : '';
 
-            if ($subtype !== '')
+            if (count($matchs) > 2)
             {
-                call_user_func(array($type, 'setSubType'), $subtype);
+                $field_value = array();
+                foreach(preg_split('/[,\s]*"([^"]+)"[,\s]*|[,\s]+/', $value, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE) as $elt)
+                {
+                    $field_value[] = $this->connection->getConverterFor($converter_name)->$method($elt);
+                }
+            }
+            else
+            {
+                $field_value = $this->connection->getConverterFor($converter_name)->$method($value);
             }
 
-            $out_values[$name] = call_user_func(array($type, $method), $value);
+            $out_values[$name] = $field_value;
         }
 
         return $out_values;

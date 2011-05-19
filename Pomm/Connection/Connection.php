@@ -3,10 +3,11 @@
 namespace Pomm\Connection;
 
 use Pomm\Exception\Exception;
-use Pomm\Tools\ParameterHolder;
+use Pomm\Connection\Database;
 class Connection
 {
     protected $handler;
+    protected $database;
     protected $parameter_holder;
 
     /**
@@ -16,9 +17,10 @@ class Connection
      * @access public
      * @param ParameterHolder $parameter_holder the db parameters
      **/
-    public function __construct(ParameterHolder $parameter_holder)
+    public function __construct(Database $database)
     {
-        $this->parameter_holder = $parameter_holder;
+        $this->database = $database;
+        $this->parameter_holder = $database->getParameterHolder();
     }
 
     protected function launch()
@@ -43,34 +45,34 @@ class Connection
         }
     }
 
-  /*
-   * __destruct
-   *
-   * The destructor
-   * @access public
-   * @return void
-   */
-  public function __destruct()
-  {
-    unset($this->handler);
-  }
+    /*
+     * __destruct
+     *
+     * The destructor
+     * @access public
+     * @return void
+     */
+    public function __destruct()
+    {
+        unset($this->handler);
+    }
 
-  /**
-   * getPdo 
-   * Returns the PDO instance of the associated connection
-   * 
-   * @access public
-   * @return PDO
-   */
-  public function getPdo()
-  {
-      if (!isset($this->handler))
-      {
-          $this->launch();
-      }
+    /**
+     * getPdo 
+     * Returns the PDO instance of the associated connection
+     * 
+     * @access public
+     * @return PDO
+     */
+    public function getPdo()
+    {
+        if (!isset($this->handler))
+        {
+            $this->launch();
+        }
 
-      return $this->handler;
-  }
+        return $this->handler;
+    }
 
     /**
      * getMapFor 
@@ -88,4 +90,15 @@ class Connection
         return $object;
     }
 
+  /**
+   * getDatabase
+   * Returns the connection's database
+   *
+   * @access public
+   * @return Database
+   **/
+    public function getDatabase()
+    {
+        return $this->database;
+    }
 }

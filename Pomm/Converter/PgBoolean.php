@@ -10,12 +10,12 @@ use Pomm\Converter\ConverterInterface;
 
 class PgBoolean implements ConverterInterface
 {
-    public static function fromPg($data)
+    public function fromPg($data)
     {
         return ($data == 't');
     }
 
-    public static function toPg($data)
+    public function toPg($data)
     {
         return $data ? "'true'" : "'false'";
     }

@@ -12,7 +12,7 @@ namespace Pomm\Converter;
 
 interface ConverterInterface
 {
-    public static function fromPg($data);
+    public function fromPg($data);
 
-    public static function toPg($data);
+    public function toPg($data);
 }
