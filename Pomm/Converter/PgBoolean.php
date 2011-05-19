@@ -1,14 +1,15 @@
 <?php
-namespace Pomm\Type;
 
+namespace Pomm\Converter;
 
-class BoolType extends BaseType
+use Pomm\Converter\ConverterInterface;
+
+/**
+ * Pomm Boolean converter for Postgresql
+ **/
+
+class PgBoolean implements ConverterInterface
 {
-    public function getTypeMatch()
-    {
-        return 'boolean';
-    }
-
     public static function fromPg($data)
     {
         return ($data == 't');

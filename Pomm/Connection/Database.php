@@ -17,6 +17,7 @@ class Database
 {
   protected $parameter_holder = array();
   protected $_handler;
+  protected $types = array();
 
   /**
    * __construct 
@@ -115,5 +116,10 @@ class Database
   public function createConnection()
   {
       return new Connection($this->parameter_holder);
+  }
+
+  public function registerType($name, $pattern)
+  {
+      $this->types[$name] = $pattern;
   }
 }

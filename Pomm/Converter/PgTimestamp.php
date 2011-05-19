@@ -1,7 +1,9 @@
 <?php
-namespace Pomm\Type;
+namespace Pomm\Converter;
 
-class TimestampType extends BaseType
+use Pomm\Converter\ConverterInterface;
+
+class PgTimestamp implements ConverterInterface
 {
   public static function fromPg($data)
   {
