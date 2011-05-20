@@ -4,6 +4,7 @@ namespace Pomm\Connection;
 
 use Pomm\Tools\ParameterHolder;
 use Pomm\Exception\Exception;
+use Pomm\Connection\Database;
 
 /**
  * Connection
@@ -19,9 +20,9 @@ class Transaction extends Connection
     const ISOLATION_READ_COMMITTED = "READ COMMITTED";
     const ISOLATION_SERIALIZABLE = "SERIALIZABLE";
 
-    public function __construct(ParameterHolder $parameter_holder)
+    public function __construct(Database $database)
     {
-        parent::__construct($parameter_holder);
+        parent::__construct($database);
 
         $this->parameter_holder->setDefaultValue('isolation', self::ISOLATION_READ_COMMITTED);
         $this->parameter_holder->mustBeOneOf('isolation', 

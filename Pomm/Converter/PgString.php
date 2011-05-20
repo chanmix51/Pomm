@@ -8,8 +8,9 @@ class PgString implements ConverterInterface
   public function toPg($data)
   {
     $data = str_replace("'", "''", $data);
+    $data = sprintf("'%s'", $data);
 
-    return sprintf("'%s'", $data);
+    return $data;
   }
 
   public function fromPg($data)

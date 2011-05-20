@@ -141,11 +141,12 @@ EOD;
     public function generateFieldsDefinition()
     {
         $fields_definition = "";
+
         foreach ($this->attributes as $attribute)
         {
             $field_name = $attribute['attname'];
 
-            if (preg_match('/^([\w ])+\[\]$/', $attribute['format_type'], $matchs))
+            if (preg_match('/^(.+)\[\]$/', $attribute['format_type'], $matchs))
             {
                 $array_modifier = '[]';
                 $format_type = $matchs[1];
@@ -156,7 +157,7 @@ EOD;
                 $format_type = $attribute['format_type'];
             }
 
-            $field_type = $this->connection->getDatabase()->getConverterNameForType($format_type).$array_modifier;
+            $field_type = $this->transaction->getDatabase()->getConverterNameForType($format_type).$array_modifier;
 
             $fields_definition .= sprintf("        \$this->addField('%s', '%s');\n", $field_name, $field_type);
         }
