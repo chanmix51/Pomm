@@ -2,6 +2,7 @@
 namespace Pomm\Test;
 
 use Pomm\Pomm;
+use Pomm\Connection\Database;
 use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
 use Pomm\Object\Collection;
@@ -20,7 +21,7 @@ class my_test extends \lime_test
 
     public function initialize()
     {
-        Pomm::setDatabase('default', array('dsn' => 'pgsql://greg/greg'));
+        Pomm::setDatabase('default', new Database(array('dsn' => 'pgsql://greg/greg')));
         $this->transac = Pomm::getDatabase()->createConnection();
         $this->transac->getMapFor('Pomm\Test\TestTable')->createTable();
 
@@ -55,6 +56,7 @@ class my_test extends \lime_test
 
     protected function testObjectFields($values)
     {
+        $this->diag('TestTableMap::testObjectFields');
         foreach ($this->obj->extract() as $name => $value)
         {
             if (gettype($value) == 'object') continue;
@@ -194,9 +196,9 @@ $test->initialize()
     ->testQuery('SELECT * FROM book WHERE id < ?', array(10), 1)
     ->testHydrate(array(), array('id' => 1, 'title' => 'title test', 'authors' => array('pika chu'), 'is_available' => true))
     ->testRetreiveByPk(array('id' => 1))
-    ->testHydrate(array('title' => 'modified title', 'authors' => array('pika chu', 'john doe')), array('id' => 1, 'title' => 'modified title', 'authors' => array('pika chu', 'john doe'), 'is_available' => true))
+    ->testHydrate(array('title' => 'modified title', 'last_out' => '1975-06-17 21:13', 'last_in' => '2010-04-01 7:59', 'authors' => array('pika chu', 'john doe')), array('id' => 1, 'title' => 'modified title', 'last_out' => '1975-06-17 21:13', 'last_in' => '2010-04-01 7:59', 'authors' => array('pika chu', 'john doe'), 'is_available' => true))
     ->testSaveOne()
-    ->testHydrate(array(), array('id' => 1, 'title' => 'modified title', 'authors' => array('pika chu', 'john doe'), 'is_available' => true))
+    ->testHydrate(array(), array('id' => 1, 'title' => 'modified title', 'authors' => array('pika chu', 'john doe'), 'is_available' => true, 'last_out' => '1975-06-17 21:13:00', 'last_in' => '2010-04-01 7:59:00'))
     ->testRetreiveByPk(array('id' => 1))
     ->testDeleteOne()
     ->testQuery('SELECT * FROM book', array(), 0)

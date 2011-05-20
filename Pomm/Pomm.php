@@ -27,12 +27,12 @@ class Pomm
      * @static
      * @access public
      * @param String name the database name
-     * @param Array parameters for Database
+     * @param Database the database instance
      * @return void
      */
-    static public function setDatabase($name, Array $parameters)
+    static public function setDatabase($name, Database $database)
     {
-        self::$databases[$name] = new Database($parameters);
+        self::$databases[$name] = $database;
     }
 
     /**
@@ -55,6 +55,7 @@ class Pomm
             else
             {
                 $db = array_values(self::$databases);
+
                 return $db[0];
             }
         }

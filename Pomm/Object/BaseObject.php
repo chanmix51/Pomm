@@ -219,7 +219,7 @@ abstract class BaseObject
    */
   public function add($var, $value)
   {
-    if (preg_match('/array/i', $this->fields_definition[$var]))
+    if (preg_match('/\[\]$/', $this->fields_definition[$var]))
     {
       if ($this->has($var) && is_array($this->fields[$var]))
       {
@@ -232,7 +232,7 @@ abstract class BaseObject
     }
     else
     {
-      throw new Exception(sprintf('"%s" field is not an array.', $var));
+      throw new Exception(sprintf("'%s' field is not defined as an array ('%s').", $var, $this->fields_definition[$var]));
     }
   }
 

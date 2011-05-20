@@ -259,7 +259,7 @@ abstract class BaseObjectMap
 
     /**
      * findWhere 
-     * g
+     * 
      * @param string $where 
      * @param array $values 
      * @access public
@@ -347,6 +347,7 @@ abstract class BaseObjectMap
                 if ($method === 'fromPg')
                 {
                     $field_value = array();
+                    $value = trim($value, "{}");
                     foreach(preg_split('/[,\s]*"([^"]+)"[,\s]*|[,\s]+/', $value, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE) as $elt)
                     {
                         $field_value[] = $this->connection->getDatabase()->getConverterFor($converter_name)->$method($elt);

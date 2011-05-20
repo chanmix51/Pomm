@@ -2,6 +2,7 @@
 namespace Pomm;
 use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
+use Pomm\Connection\Database;
 
 include __DIR__.'/../Pomm/External/lime.php';
 include "autoload.php";
@@ -15,7 +16,7 @@ class my_test extends \lime_test
 
     public function initialize()
     {
-        Pomm::setDatabase('plop', array('dsn' => 'pgsql://user@localhost/nobase'));
+        Pomm::setDatabase('plop', new Database(array('dsn' => 'pgsql://user@localhost/nobase')));
         $this->transaction = Pomm::getDatabase()->createConnection();
         $this->map = $this->transaction->getMapFor('Pomm\Test\TestTable');
  //       $this->map->createTable();
