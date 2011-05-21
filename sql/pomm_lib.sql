@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION is_email(email VARCHAR) RETURNS BOOLEAN AS $$
 BEGIN
       RETURN email ~* e'^([^@\\s]+)@((?:[a-z0-9-]+\\.)+[a-z]{2,})$';
 END;
-$$ LANGUAGE plpgsql
+$$ LANGUAGE plpgsql;
 
 -- is_url
 -- Check if the given string is a valid URL format
@@ -20,7 +20,7 @@ CREATE OR REPLACE FUNCTION is_url(url VARCHAR) RETURNS BOOLEAN AS $$
 BEGIN
       RETURN url ~* e'(https?|ftps?)://((([a-z0-9-]+\\.)+[a-z]{2,6})|(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}))(:[0-9]+)?(/\\S*)*$';
 END;
-$$ LANGUAGE plpgsql
+$$ LANGUAGE plpgsql;
 
 -- transliterate
 -- transform all non US chars to ASCII

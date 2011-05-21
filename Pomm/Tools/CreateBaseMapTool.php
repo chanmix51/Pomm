@@ -165,21 +165,6 @@ EOD;
         return $fields_definition;
     }
 
-    public function guessFromType($type)
-    {
-        $types = array('IntType' => 'integer', 'BoolType' => 'boolean', 'StrType' => 'character|text', 'TimestampType' => 'timestamp', 'LTreeType' => 'ltree', 'HStoreType' => 'hstore');
-
-        foreach ($types as $pomm_type => $pattern)
-        {
-            $regexp = sprintf("/%s/i", $pattern);
-            if (preg_match($regexp, $type))
-            {
-                return $pomm_type;
-            }
-        }
-
-        throw new Exception(sprintf("Unknown type '%s'.", $type));
-    }
 
     public function saveMapFile($content)
     {
