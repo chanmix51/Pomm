@@ -30,7 +30,7 @@ class CreateBaseMapTool extends BaseTool
         $this->options->mustHave('table');
         $this->options->mustHave('connection');
         $this->options->setDefaultValue('class_name', sfInflector::camelize($this->options['table']));
-        $this->options->setDefaultValue('namespace', 'Model\Pomm\Map');
+        $this->options->setDefaultValue('namespace', 'Model\Pomm\Entity');
         $this->options->setDefaultValue('extends', 'BaseObjectMap');
         $this->options->setDefaultValue('schema', 'public');
     }
@@ -94,7 +94,7 @@ class CreateBaseMapTool extends BaseTool
 
     protected function generateMapFile()
     {
-        $namespace   = $this->options['namespace'];
+        $namespace   = sprintf("%s\\%s\\Base", $this->options['namespace'], sfInflector::camelize($this->options['schema']));
         $class_name  = $this->options['schema'] == 'public' ? $this->options['class_name'] : sfInflector::camelize($this->options['schema']).$this->options['class_name'];
         $table_name  = sprintf("%s.%s", $this->options['schema'], $this->options['table']);
         $extends     = $this->options['extends'];
@@ -108,7 +108,6 @@ class CreateBaseMapTool extends BaseTool
 namespace $namespace;
 
 use Pomm\\Object\\BaseObjectMap;
-use Pomm\\Object\\BaseObject;
 use Pomm\\Exception\\Exception;
 
 class $map_name extends $extends
@@ -168,8 +167,7 @@ EOD;
 
     public function saveMapFile($content)
     {
-        $schema_prefix = $this->options['schema'] == 'public' ? '' : sfInflector::camelize($this->options['schema']);
-        $filename = sprintf("%s/Base%s%sMap.php",$this->options['dir'], $schema_prefix, $this->options['class_name']);
+        $filename = sprintf("%s/%s/Base/%sMap.php",$this->options['dir'], $this->options['schema'], $this->options['class_name']);
         $fh = fopen($filename, 'w');
         fputs($fh, $content);
         fclose($fh);
