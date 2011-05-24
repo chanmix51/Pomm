@@ -94,13 +94,14 @@ class CreateBaseMapTool extends BaseTool
 
     protected function generateMapFile()
     {
-        $namespace   = sprintf("%s\\%s\\Base", $this->options['namespace'], sfInflector::camelize($this->options['schema']));
-        $class_name  = $this->options['schema'] == 'public' ? $this->options['class_name'] : sfInflector::camelize($this->options['schema']).$this->options['class_name'];
+        $std_namespace   = sprintf("%s\\Entity\\%s", $this->options['namespace'], sfInflector::camelize($this->options['schema']));
+        $namespace       = $std_namespace."\\Base";
+        $class_name  = $this->options['class_name'];
         $table_name  = sprintf("%s.%s", $this->options['schema'], $this->options['table']);
         $extends     = $this->options['extends'];
         $primary_key = $this->getPrimaryKey();
         $fields_definitions = $this->generateFieldsDefinition();
-        $map_name   =  sprintf("Base%sMap", $class_name);
+        $map_name   =  sprintf("%sMap", $class_name);
 
         $php = <<<EOD
 <?php
@@ -114,7 +115,7 @@ class $map_name extends $extends
 {
     public function initialize()
     {
-        \$this->object_class =  '$class_name';
+        \$this->object_class =  '$std_namespace\\$class_name';
         \$this->object_name  =  '$table_name';
 
 $fields_definitions
@@ -167,7 +168,7 @@ EOD;
 
     public function saveMapFile($content)
     {
-        $filename = sprintf("%s/%s/Base/%sMap.php",$this->options['dir'], $this->options['schema'], $this->options['class_name']);
+        $filename = sprintf("%s/Entity/%s/Base/%sMap.php",$this->options['dir'], sfInflector::camelize($this->options['schema']), $this->options['class_name']);
         $fh = fopen($filename, 'w');
         fputs($fh, $content);
         fclose($fh);
