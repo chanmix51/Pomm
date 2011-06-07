@@ -150,7 +150,7 @@ class my_test extends \lime_test
     public function beginTransaction()
     {
         $this->info('Starting transaction');
-        $this->transac = $this->service->getDatabase()->createTransaction()->begin();
+        $this->transac = $this->service->getDatabase()->createConnection()->begin();
         $this->map = $this->transac->getMapFor('Pomm\Test\TestTable');
         $this->obj = $this->map->createObject();
 

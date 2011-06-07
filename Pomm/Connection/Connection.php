@@ -7,6 +7,7 @@ use Pomm\Connection\Database;
 
 /**
  * Pomm\Connection\Connection
+ * Manage a connection and related transactions
  * 
  * @package Pomm
  * @version $id$
@@ -16,6 +17,9 @@ use Pomm\Connection\Database;
  */
 class Connection
 {
+    const ISOLATION_READ_COMMITTED = "READ COMMITTED";
+    const ISOLATION_SERIALIZABLE = "SERIALIZABLE";
+
     protected $handler;
     protected $database;
     protected $parameter_holder;
@@ -30,7 +34,13 @@ class Connection
     public function __construct(Database $database)
     {
         $this->database = $database;
+
         $this->parameter_holder = $database->getParameterHolder();
+
+        $this->parameter_holder->setDefaultValue('isolation', self::ISOLATION_READ_COMMITTED);
+        $this->parameter_holder->mustBeOneOf('isolation', 
+            array(self::ISOLATION_READ_COMMITTED, self::ISOLATION_SERIALIZABLE)
+        );
     }
 
     protected function launch()
@@ -111,4 +121,82 @@ class Connection
     {
         return $this->database;
     }
+
+  /**
+   * begin
+   * Starts a new transaction
+   *
+   * @return Pomm\Connection\Connection
+   **/
+  public function begin()
+  {
+      $this->getPdo()->exec(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->parameter_holder['isolation']));
+
+      return $this;
+  }
+
+  /**
+   * commit
+   * Commits a transaction in the database
+   *
+   * @return Pomm\Connection\Connection
+   **/
+  public function commit()
+  {
+      $this->getPdo()->exec('COMMIT');
+
+      return $this;
+  }
+
+  /**
+   * rollback
+   * rollback a transaction. This can be the whole transaction
+   * or if a savepoint name is specified only the queries since
+   * this savepoint.
+   *
+   * @param String $name the name of the savepoint (optionnal)
+   * @return Pomm\Connection\Connection
+   **/
+  public function rollback($name = null)
+  {
+      if (is_null($name))
+      {
+          $this->getPdo()->rollback();
+      }
+      else
+      {
+          $this->getPdo()->exec(sprintf("ROLLBACK TO SAVEPOINT %s", $name));
+      }
+
+      return $this;
+  }
+
+
+  /**
+   * setSavepoint
+   * Set a new savepoint with the given name
+   *
+   * @param String $name the savepoint's name
+   * @return Pomm\Connection\Connection
+   **/
+  public function setSavepoint($name)
+  {
+      $this->getPdo()->exec(sprintf("SAVEPOINT %s", $name));
+
+      return $this;
+  }
+
+  /**
+   * releaseSavepoint
+   * forget the specified savepoint
+   *
+   * @param String $name the savepoint's name
+   * @return Pomm\Connection\Connection
+   **/
+  public function releaseSavepoint($name)
+  {
+      $this->getPdo()->exec(sprintf("RELEASE SAVEPOINT %s", $name));
+
+      return $this;
+  }
 }
