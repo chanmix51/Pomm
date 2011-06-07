@@ -6,13 +6,13 @@ use Pomm\Tools\ParameterHolder;
 use Pomm\Converter;
 
 /**
- * Database 
+ * Pomm\Connection\Database
  * 
- * @package PommBundle
+ * @package Pomm
  * @version $id$
  * @copyright 2011 Grégoire HUBERT 
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
- * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
+ * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
 class Database 
 {

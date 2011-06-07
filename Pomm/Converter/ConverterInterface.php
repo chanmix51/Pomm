@@ -3,12 +3,14 @@
 namespace Pomm\Converter;
 
 /**
- * ConverterInterface
- *
- * This interface implements 2 methods to convert data from and to postgresql 
- * types
- *
- **/
+ * Pomm\Converter\ConverterInterface - Interface for converters
+ * 
+ * @package Pomm
+ * @version $id$
+ * @copyright 2011 Grégoire HUBERT 
+ * @author Grégoire HUBERT <hubert.greg@gmail.com>
+ * @license X11 {@link http://opensource.org/licenses/mit-license.php}
+ */
 
 interface ConverterInterface
 {

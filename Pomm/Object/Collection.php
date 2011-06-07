@@ -4,10 +4,7 @@ namespace Pomm\Object;
 /**
  * Collection 
  * 
- * @uses ArrayAccess
- * @uses Iterator
- * @uses Countable
- * @package PommBundle
+ * @package Pomm
  * @version $id$
  * @copyright 2011 Grégoire HUBERT 
  * @author Grégoire HUBERT <hubert.greg@gmail.com>

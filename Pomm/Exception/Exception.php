@@ -2,14 +2,14 @@
 namespace Pomm\Exception;
 
 /**
- * Exception 
+ * Pomm\Exception - Pomm's Exception class
  * 
- * @uses sfException
- * @package PommBundle
+ * @package Pomm
+ * @uses \Exception
  * @version $id$
  * @copyright 2011 Grégoire HUBERT 
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
- * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
+ * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
 class Exception extends \Exception
 {

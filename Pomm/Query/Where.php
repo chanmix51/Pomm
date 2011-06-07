@@ -8,7 +8,7 @@ namespace Pomm\Query;
  * OR operator you can add using handy methods. This allows you to build 
  * queries dynamically.
  *
- * @package PommBundle
+ * @package Pomm
  * @version $id$
  * @copyright 2011 Grégoire HUBERT 
  * @author Grégoire HUBERT <hubert.greg@gmail.com>

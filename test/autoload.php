@@ -9,7 +9,7 @@ function __autoload($name)
         'Pomm/Object/Collection.php',
         'Pomm/Object/BaseObject.php',
         'Pomm/Object/BaseObjectMap.php',
-        'Pomm/Pomm.php',
+        'Pomm/Service.php',
         'Pomm/Connection/Database.php', 
         'Pomm/Connection/Transaction.php', 
         'Pomm/Connection/Connection.php', 
@@ -34,7 +34,8 @@ function __autoload($name)
         if (strstr($lib, sprintf('/%s.php', $class_name)))
         {
             printf("Loading class '%s' in '%s'\n", $class_name, $lib);
-            include(__DIR__."/../".$lib);
+            require(__DIR__."/../".$lib);
+
             return;
         }
     }

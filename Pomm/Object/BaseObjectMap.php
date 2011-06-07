@@ -11,7 +11,7 @@ use Pomm\Type as Type;
  * BaseObjectMap 
  * 
  * @abstract
- * @package PommBundle
+ * @package Pomm
  * @version $id$
  * @copyright 2011 Grégoire HUBERT 
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
@@ -86,7 +86,7 @@ abstract class BaseObjectMap
 
     /**
      * __construct 
-     * The constructor. Most of the time, you should use Pomm::getMapFor($class_name) to chain calls
+     * The constructor. Most of the time, you should use Pomm\Connection\Connection::getMapFor($class_name) to chain calls
      * 
      * @access public
      * @return void

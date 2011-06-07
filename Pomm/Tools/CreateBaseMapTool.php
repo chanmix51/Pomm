@@ -7,6 +7,17 @@ use Pomm\Exception\Exception;
 use Pomm\External\sfInflector;
 use Pomm\Connection\Database;
 
+/**
+ * Pomm\Tools\CreateBaseMapTool - Create a BaseMap class from the database.
+ *
+ * 
+ * @uses Pomm\Tools\BaseTool
+ * @package Pomm
+ * @version $id$
+ * @copyright 2011 Grégoire HUBERT 
+ * @author Grégoire HUBERT <hubert.greg@gmail.com>
+ * @license X11 {@link http://opensource.org/licenses/mit-license.php}
+ */
 class CreateBaseMapTool extends BaseTool
 {
     protected $db;
@@ -17,12 +28,13 @@ class CreateBaseMapTool extends BaseTool
 
     /**
      * configure()
-     * @see BaseTool
-     *
      * mandatory options :
      * * dir        the directory base classes will be generated in
      * * table      the db table to be mapped
      * * connection a Connection instance
+     *
+     * @see Pomm\Tools\BaseTool
+     *
      **/
     protected function configure()
     {
@@ -37,9 +49,10 @@ class CreateBaseMapTool extends BaseTool
 
     /**
      * getGeneralInfo()
-     *
      * Set the general informations about a table (oid, name ...)
-     * @access protected
+     *
+     * @protected
+     * @return void
      **/
     protected function getGeneralInfo()
     {
@@ -59,7 +72,8 @@ class CreateBaseMapTool extends BaseTool
      * getAttributesInfo()
      *
      * get the columns informations
-     * @access protected
+     * @protected
+     * @return void
      **/
     protected function getAttributesInfo()
     {
@@ -75,7 +89,8 @@ class CreateBaseMapTool extends BaseTool
 
     /**
      * execute()
-     * @see BaseTool
+     *
+     * @see Pomm\Tools\BaseTool
      **/
     public function execute()
     {
@@ -92,6 +107,12 @@ class CreateBaseMapTool extends BaseTool
         $this->saveMapFile($map_file);
     }
 
+    /**
+     * generateMapFile - Generate Map file PHP code
+     *
+     * @protected
+     * @return string the PHP code
+     **/
     protected function generateMapFile()
     {
         $std_namespace   = sprintf("%s\\Entity\\%s", $this->options['namespace'], sfInflector::camelize($this->options['schema']));
@@ -127,6 +148,12 @@ EOD;
         return $php;
     }
 
+    /**
+     * getPrimaryKey - Return the primary key
+     *
+     * @protected
+     * @return Array  The primary key
+     **/
     protected function getPrimaryKey()
     {
         $sql = sprintf("SELECT regexp_matches(pg_catalog.pg_get_indexdef(i.indexrelid, 0, true), e'\\\\((.*)\\\\)', 'gi') AS pkey FROM pg_catalog.pg_class c, pg_catalog.pg_class c2, pg_catalog.pg_index i WHERE c.oid = '%d' AND c.oid = i.indrelid AND i.indexrelid = c2.oid ORDER BY i.indisprimary DESC, i.indisunique DESC, c2.relname", $this->oid);
@@ -138,6 +165,13 @@ EOD;
         return join($pkey, ", ");
     }
 
+    /**
+     * generateFieldsDefinition - Generate the Pomm field definition for a 
+     * column
+     *
+     * @public
+     * @return string definiion
+     **/
     public function generateFieldsDefinition()
     {
         $fields_definition = "";
@@ -165,7 +199,13 @@ EOD;
         return $fields_definition;
     }
 
-
+    /**
+     * saveMapFile - Save the file
+     *
+     * @public
+     * @param string the content to be saved
+     * @return void
+     **/
     public function saveMapFile($content)
     {
         $filename = sprintf("%s/Entity/%s/Base/%sMap.php",$this->options['dir'], sfInflector::camelize($this->options['schema']), $this->options['class_name']);

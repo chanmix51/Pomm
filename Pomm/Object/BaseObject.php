@@ -6,10 +6,10 @@ use Pomm\Exception\Exception;
 use Pomm\External\sfInflector;
 
 /**
- * BaseObject 
+ * BaseObject - Parent for entity classes 
  * 
  * @abstract
- * @package PommBundle
+ * @package Pomm
  * @version $id$
  * @copyright 2011 Grégoire HUBERT 
  * @author Grégoire HUBERT <hubert.greg@gmail.com>

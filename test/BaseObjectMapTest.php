@@ -1,7 +1,7 @@
 <?php
 namespace Pomm\Test;
 
-use Pomm\Pomm;
+use Pomm\Service;
 use Pomm\Connection\Database;
 use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
@@ -18,11 +18,13 @@ class my_test extends \lime_test
     protected $map;
     protected $obj;
     protected $transac;
+    protected $service;
 
     public function initialize()
     {
-        Pomm::setDatabase('default', new Database(array('dsn' => 'pgsql://greg/greg')));
-        $this->transac = Pomm::getDatabase()->createConnection();
+        $this->service = new Service();
+        $this->service->setDatabase('default', new Database(array('dsn' => 'pgsql://greg/greg')));
+        $this->transac = $this->service->getDatabase()->createConnection();
         $this->transac->getMapFor('Pomm\Test\TestTable')->createTable();
 
         return $this;
@@ -148,7 +150,7 @@ class my_test extends \lime_test
     public function beginTransaction()
     {
         $this->info('Starting transaction');
-        $this->transac = Pomm::getDatabase()->createTransaction()->begin();
+        $this->transac = $this->service->getDatabase()->createTransaction()->begin();
         $this->map = $this->transac->getMapFor('Pomm\Test\TestTable');
         $this->obj = $this->map->createObject();
 

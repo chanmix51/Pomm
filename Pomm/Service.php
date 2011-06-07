@@ -6,23 +6,23 @@ use Pomm\Connection\Database;
 use Pomm\Exception\Exception;
 
 /**
- * Pomm 
+ * Service
+ * This is the service for the Pomm API.
  * 
- * @package PommBundle
+ * @package Pomm
  * @version $id$
  * @copyright 2011 Grégoire HUBERT 
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class Pomm
+class Service
 {
-    const VERSION = 'BETA - 1';
 
-    static protected $databases = array();
+    protected $databases = array();
 
     /**
      * setDatabase
-     * save the Database in a static attribute
+     * save the Database
      *
      * @static
      * @access public
@@ -30,38 +30,38 @@ class Pomm
      * @param Database the database instance
      * @return void
      */
-    static public function setDatabase($name, Database $database)
+
+    public function setDatabase($name, Database $database)
     {
-        self::$databases[$name] = $database;
+        $this->databases[$name] = $database;
     }
 
     /**
      * getDatabase 
-     * Returns the corresponding PommDatabase or the first one if no name is provided
+     * Returns the corresponding Database or the first one if no name is provided
      * 
      * @param mixed $name 
-     * @static
      * @access public
      * @return PommDatabase 
      */
-    static public function getDatabase($name = null)
+    public function getDatabase($name = null)
     {
         if (is_null($name))
         {
-            if (count(self::$databases) == 0)
+            if (count($this->databases) == 0)
             {
                 throw new Exception(sprintf('No database registered.'));
             }
             else
             {
-                $db = array_values(self::$databases);
+                $db = array_values($this->databases);
 
                 return $db[0];
             }
         }
-        if (array_key_exists($name, self::$databases))
+        if (array_key_exists($name, $this->databases))
         {
-            return self::$databases[$name];
+            return $this->databases[$name];
         }
 
         throw new Exception(sprintf('No database with this name "%s".', $name));
@@ -73,12 +73,11 @@ class Pomm
      * 
      * @param string $sql 
      * @param string $database 
-     * @static
      * @access public
      * @return PDOStatement
      */
-    public static function executeAnonymousQuery($sql, $database = null)
+    public function executeAnonymousQuery($sql, $name = null)
     {
-        return self::getDatabase($database)->createConnection()->getPdo()->query($sql, \PDO::FETCH_LAZY);
+        return $this->getDatabase($name)->createConnection()->getPdo()->query($sql, \PDO::FETCH_LAZY);
     }
 }

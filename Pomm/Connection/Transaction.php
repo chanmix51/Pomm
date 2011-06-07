@@ -7,13 +7,13 @@ use Pomm\Exception\Exception;
 use Pomm\Connection\Database;
 
 /**
- * Connection
+ * Pomm\Connection\Transaction
  * 
- * @package PommBundle
+ * @package Pomm
  * @version $id$
  * @copyright 2011 Grégoire HUBERT 
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
- * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
+ * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
 class Transaction extends Connection
 {

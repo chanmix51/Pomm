@@ -49,7 +49,7 @@ $$ LANGUAGE plpgsql;
 -- @return VARCHAR string
 CREATE OR REPLACE FUNCTION slugify(string VARCHAR) RETURNS varchar AS $$
     BEGIN
-          RETURN trim(both '-' from regexp_replace(lower(transliterate(string)), '[^a-z0-9]+', '-', 'g'));
+          RETURN trim(both '-' from regexp_replace(lower(transliterate(string::varchar)), '[^a-z0-9]+', '-', 'g'));
     END;
 $$ LANGUAGE plpgsql;
 

@@ -2,18 +2,15 @@
 namespace Pomm\Exception;
 
 /**
- * SqlException 
+ * Pomm\SqlException - errors from the rdbms with the PDOStatement object
  * 
- * SQL exceptions
- * get error from the rdbms with the PDOStatement object
- * see http://www.postgresql.org/docs/8.4/static/errcodes-appendix.html
- *
- * @uses Exception
- * @package PommBundle
+ * @link http://www.postgresql.org/docs/8.4/static/errcodes-appendix.html
+ * @package Pomm
+ * @uses Pomm\Exception
  * @version $id$
  * @copyright 2011 Grégoire HUBERT 
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
- * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
+ * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
 
 class SqlException extends Exception
@@ -26,7 +23,6 @@ class SqlException extends Exception
    * @param PDOStatement $stmt 
    * @param mixed $sql 
    * @access public
-   * @return void
    */
   public function __construct(\PDOStatement $stmt, $sql)
   {
@@ -37,9 +33,8 @@ class SqlException extends Exception
   /**
    * getSQLErrorState 
    * Returns the SQLSTATE of the last SQL error
-   * The list of SQLSTATEs is available at 
-   * http://www.postgresql.org/docs/8.4/interactive/errcodes-appendix.html
    *
+   * @link http://www.postgresql.org/docs/8.4/interactive/errcodes-appendix.html
    * @access public
    * @return string
    */

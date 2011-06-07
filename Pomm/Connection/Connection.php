@@ -4,6 +4,16 @@ namespace Pomm\Connection;
 
 use Pomm\Exception\Exception;
 use Pomm\Connection\Database;
+
+/**
+ * Pomm\Connection\Connection
+ * 
+ * @package Pomm
+ * @version $id$
+ * @copyright 2011 Grégoire HUBERT 
+ * @author Grégoire HUBERT <hubert.greg@gmail.com>
+ * @license X11 {@link http://opensource.org/licenses/mit-license.php}
+ */
 class Connection
 {
     protected $handler;

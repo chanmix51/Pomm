@@ -1,5 +1,7 @@
 <?php
-namespace Pomm;
+namespace Pomm\Test;
+
+use Pomm\Service;
 use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
 use Pomm\Connection\Database;
@@ -13,11 +15,13 @@ class my_test extends \lime_test
     protected $map;
     protected $transaction;
     protected $obj;
+    protected $service;
 
     public function initialize()
     {
-        Pomm::setDatabase('plop', new Database(array('dsn' => 'pgsql://user@localhost/nobase')));
-        $this->transaction = Pomm::getDatabase()->createConnection();
+        $this->service = new Service();
+        $this->service->setDatabase('plop', new Database(array('dsn' => 'pgsql://user@localhost/nobase')));
+        $this->transaction = $this->service->getDatabase()->createConnection();
         $this->map = $this->transaction->getMapFor('Pomm\Test\TestTable');
  //       $this->map->createTable();
 
