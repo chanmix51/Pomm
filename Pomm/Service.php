@@ -90,6 +90,6 @@ class Service
      **/
     public function createConnection($name = null)
     {
-        return $this->getDatabase($name)->getConnection();
+        return $this->getDatabase($name)->createConnection();
     }
 }
