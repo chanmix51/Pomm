@@ -42,7 +42,7 @@ class Service
      * 
      * @param mixed $name 
      * @access public
-     * @return PommDatabase 
+     * @return Pomm\Connection\Database 
      */
     public function getDatabase($name = null)
     {
@@ -74,10 +74,22 @@ class Service
      * @param string $sql 
      * @param string $database 
      * @access public
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     public function executeAnonymousQuery($sql, $name = null)
     {
         return $this->getDatabase($name)->createConnection()->getPdo()->query($sql, \PDO::FETCH_LAZY);
+    }
+
+    /**
+     * createConnection 
+     * Shortcut to get a connection from a database
+     *
+     * @param string the database name
+     * @return Pomm\Connection\Connection
+     **/
+    public function createConnection($name = null)
+    {
+        return $this->getDatabase($name)->getConnection();
     }
 }
