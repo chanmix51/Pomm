@@ -20,11 +20,29 @@ class Service
 
     protected $databases = array();
 
+
+    /**
+     * __construct
+     * Set the databases with parameters
+     *
+     * @access public
+     * @param Array databases and parameters
+     * @return void
+     */
+
+    public function __construct(Array $databases = array())
+    {
+        foreach ($databases as $name => $parameters)
+        {
+            $db_class = array_key_exists('class', $parameters) ? $parameters['class'] : 'Pomm\Connection\Database';
+            $this->setDatabase($name, new $db_class($parameters));
+        }
+    }
+
     /**
      * setDatabase
-     * save the Database
+     * save a Database
      *
-     * @static
      * @access public
      * @param String name the database name
      * @param Database the database instance
