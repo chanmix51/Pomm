@@ -23,6 +23,7 @@ class Connection
     protected $handler;
     protected $database;
     protected $parameter_holder;
+    protected $isolation;
 
     /**
      * __construct()
@@ -41,6 +42,8 @@ class Connection
         $this->parameter_holder->mustBeOneOf('isolation', 
             array(self::ISOLATION_READ_COMMITTED, self::ISOLATION_SERIALIZABLE)
         );
+
+        $this->isolation = $this->parameter_holder['isolation'];
     }
 
     protected function launch()
@@ -130,7 +133,7 @@ class Connection
    **/
   public function begin()
   {
-      $this->getPdo()->exec(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->parameter_holder['isolation']));
+      $this->getPdo()->exec(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->isolation));
 
       return $this;
   }

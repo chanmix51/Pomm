@@ -132,7 +132,7 @@ namespace $namespace;
 use Pomm\\Object\\BaseObjectMap;
 use Pomm\\Exception\\Exception;
 
-class $map_name extends $extends
+abstract class $map_name extends $extends
 {
     public function initialize()
     {
