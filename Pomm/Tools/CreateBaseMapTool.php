@@ -2,7 +2,7 @@
 
 namespace Pomm\Tools;
 
-use Pomm\Pomm;
+use Pomm\Service;
 use Pomm\Exception\Exception;
 use Pomm\External\sfInflector;
 use Pomm\Connection\Database;
@@ -99,12 +99,14 @@ class CreateBaseMapTool extends BaseTool
             throw new \InvalidArgumentException(sprintf('The connection must be a "Pomm\Connection\Database" instance, "%s" given.', get_class($this->options['connection'])));
         }
 
-        $this->transaction = $this->options['connection']->createTransaction();
+        $this->transaction = $this->options['connection']->createConnection();
         $this->getGeneralInfo();
         $this->getAttributesInfo();
 
         $map_file = $this->generateMapFile();
+        $this->createDirIfNotExist();
         $this->saveMapFile($map_file);
+        $this->createEmptyFilesIfNotExist();
     }
 
     /**
@@ -208,9 +210,43 @@ EOD;
      **/
     public function saveMapFile($content)
     {
-        $filename = sprintf("%s/Entity/%s/Base/%sMap.php",$this->options['dir'], sfInflector::camelize($this->options['schema']), $this->options['class_name']);
+        $filename = sprintf("%s/Model/Pomm/Entity/%s/Base/%sMap.php",$this->options['dir'], sfInflector::camelize($this->options['schema']), $this->options['class_name']);
         $fh = fopen($filename, 'w');
         fputs($fh, $content);
         fclose($fh);
+    }
+
+    /**
+     * createDirIfNotExist
+     * Create Entity model directory structure if it does no exist
+     *
+     * @return void;
+     **/
+    protected function createDirIfNotExist()
+    {
+        $dir = sprintf("%s/Model/Pomm/Entity/%s/Base", $this->options['dir'], sfInflector::camelize($this->options['schema']));
+        if (file_exists($dir)) return;
+        mkdir($dir, 0755, true);
+    }
+
+    /**
+     * createEmptyFilesIfNotExist
+     * Create empty map and entity class if they do not exist
+     **/
+    protected function createEmptyFilesIfNotExist()
+    {
+       $file = sprintf("%s/Model/Pomm/Entity/%s/%s.php", $this->options['dir'], sfInflector::camelize($this->options['schema']), $this->options['class_name']);
+       if (!file_exists($file))
+       {
+           $tool = new CreateEntityTool(array('dir' => $this->options['dir'], 'class' => $this->options['class_name'], 'namespace' => $this->options['namespace'], 'schema' => $this->options['schema']));
+           $tool->execute();
+       }
+
+       $file = sprintf("%s/Model/Pomm/Entity/%s/%sMap.php", $this->options['dir'], sfInflector::camelize($this->options['schema']), $this->options['class_name']);
+       if (!file_exists($file))
+       {
+           $tool = new CreateMapTool(array('dir' => $this->options['dir'], 'class' => $this->options['class_name'], 'namespace' => $this->options['namespace'], 'schema' => $this->options['schema']));
+           $tool->execute();
+       }
     }
 }

@@ -130,6 +130,65 @@ If your database has a lot of custom types, it is a better idea to create your o
 
 This way, converters will be automatically registered at instantiation.
 
+Converters and types
+====================
+
+Composite types are particularly useful to store complex set of data. In fact, with Postgresql, defining a table automatically defines the according type. Hydrating type instances with postgresql values are the work of your custom converters. Let's take an example: electrical transformers windings::
+
+  -- SQL
+  CREATE TYPE winding_power AS (
+      voltage numeric(4,1),
+      current numeric(5,3)
+  );
+
+Tables containing a field with this type will return a tuple. A good way to manipulate that kind of data would be to create a *WindingPower* type class::
+
+  <?php
+  
+  namespace Model\Pomm\Type;
+   
+  class WindingPower
+  {
+      public $voltage;
+      public $current;
+   
+      public function __construct($voltage, $current)
+      {
+          $this->voltage = $voltage;
+          $this->current = $current;
+      }
+   
+      public getPowerMax()
+      {
+        return $this->voltage * $this->current;
+      }
+  }
+
+Here, we can see the very good side of this method: we can implement a *getPowerMax()* method and make our type richer. The last thing is we need a converter to translate between PHP and Postgresql::
+
+  <?php
+  
+  namespace Model\Pomm\Converter;
+   
+  use Pomm\Converter\ConverterInterface;
+  use Model\Pomm\Type\WindingPower as WindingPowerType;
+   
+  class WindingPower implements ConverterInterface
+  {
+      public function fromPg($data)
+      {
+          $data = trim($data, "()");
+          $values = preg_split('/,/', $data);
+   
+          return new WindingPowerType($values[0], $values[1]);
+      }
+   
+      public function toPg($data)
+      {
+          return sprintf("(%4.1f,%4.3f)", $data->voltage, $data->current);
+      }
+  }
+
 Map classes
 -----------
 
@@ -221,12 +280,12 @@ Querying the database
 Create finders
 ==============
 
-By default, no Map files are generated. For now, you must create your own map files:::
+The first time you generate the *BaseMap* classes, it will also generate the map classes and the entity classes. Using the example with student, the empty map file should look like this::
 
   <?php
   namespace Model\Pomm\Entity\School;
 
-  use Model\Pomm\Entity\School\Map\BaseStudentMap;
+  use Model\Pomm\Entity\School\Base\StudentMap as BaseStudentMap;
   use Pomm\Exception\Exception;
 
   class StudentMap extends BaseStudentMap
@@ -235,33 +294,49 @@ By default, no Map files are generated. For now, you must create your own map fi
 
 This is the place you are going to create your own finder methods in. As it extends *BaseObjectMap* via *BaseStudentMap* it already has some useful finders:
 
- * *findAll* return all entities
- * *findByPK* return a single entity
+ * *findAll()* return all entities
+ * *findByPK()* return a single entity
 
 These finders work whatever your entities are. In this class we can declare finders more specific.
 
 Conditions: the Where clause
 ============================
 
-The simplest way to create a finder with Pomm is to use the *BaseObjectMap*'s method *findWhere*:
+The simplest way to create a finder with Pomm is to use the *BaseObjectMap*'s method *findWhere()*:
 
- * *findWhere($where)* return a set of entities based on the where clause
+findWhere($where)
+  return a set of entities based on the given where clause. This clause can be a string or a *Where* instance.
 
-It is possible to use it directly because we are in a Map class hence Pomm knows what table and fields to use in the query.::
+It is possible to use it directly because we are in a Map class hence Pomm knows what table and fields to use in the query.
 
-  // SELECT reference, first_name, last_name, birthdate FROM shool.student WHERE birthdate > '1980-01-01'
+::
+
+  /* SELECT 
+       reference, 
+       first_name, 
+       last_name, 
+       birthdate 
+     FROM 
+       shool.student 
+     WHERE 
+         birthdate > '1980-01-01'
+  */
   $students = $this->findWhere("birthdate > '1980-01-01'"); 
+  
+  
 
-There are a lot to be said on the example above, a finder *getYoungerThan* by example would be:::
+Of course, this is not very useful, a finder *getYoungerThan* would be::
 
   public function getYoungerThan(DateTime $date)
   {
     return $this->findWhere("birthdate > ?", array($date->format('Y-m-d')));
   }
 
-All queries are prepared this might increase the performance but it certainly increases the security. The argument here will automatically be escaped by the database and ovoid SQL-injection attacks.
+All queries are prepared, this might increase the performance but it certainly increases the security. The argument here will automatically be escaped by the database and ovoid SQL-injection attacks.
 
-Sometimes, you do not know in advance what will be the clause of your query because it depends on other factors. You can use the *Where* class to do so and chain logical statements.::
+Sometimes, you do not know in advance what will be the clause of your query because it depends on other factors. You can use the *Where* class to do so and chain logical statements.
+
+::
 
   public function getYoungerThan(DateTime $date, $level = 0)
   {
@@ -271,7 +346,7 @@ Sometimes, you do not know in advance what will be the clause of your query beca
     return $this->findWhere($where);
   }
 
-The *Where* class has two very handy methods: *andWhere* and *orWhere* which can take string or another *Where* instance as argument. All methods return a *Where* instance so it is possible to chain the calls. The example above can be rewritten this way:::
+The *Where* class has two very handy methods: *andWhere* and *orWhere* which can take string or another *Where* instance as argument. All methods return a *Where* instance so it is possible to chain the calls. The example above can be rewritten this way::
 
   public function getYoungerThan(DateTime $date, $level = 0)
   {
@@ -286,7 +361,7 @@ Custom queries
 
 Although it is possible to write whole plain queries by hand in the finders, the Map class owns the following methods to help you in that task: *getSelectFields*, *getGroupByFields* and *getFields*.::
 
-  // Model\Pomm\Entity\Whatever\PostMap Class
+  // Model\Pomm\Entity\Blog\PostMap Class
   public function getBlogPostsWithCommentCount(Pomm\Query\Where $where)
   {
     $sql = 'SELECT %s, COUNT(c.id) as "comment_count" FROM blog.post p JOIN blog.comment c ON p.id = c.post_id WHERE %s GROUP BY %s'
@@ -312,19 +387,59 @@ The *query* method return a *Collection* instance that holds all the *Entity* in
 Entities
 --------
 
+Accessors
+=========
+
+Internally, all values are stored in an array. The methods *set()* and *get()* are the interface to this array::
+
+  $entity = $map->createObject()
+  $entity->has('pika'); // false
+  $entity->set('pika', 'chu');
+  $entity->has('pika'); // true
+  $entity->get('pika'); // chu
+
+*BaseObject* uses magic getters and setters to dynamically build the according methods. The example below is equivalent::
+
+  $entity = $map->createObject()
+  $entity->has('pika'); // false
+  $entity->setPika('chu');
+  $entity->has('pika'); // true
+  $entity->getPika()    // chu
+
+This allow developers to overload accessors. The methods *set* and *get* are only used within the class definition and should not be used outside unless you want to bypass any overload that could exist.
 
 Life cycle
 ==========
 
-Entities are the end of the process, they are the data. Unlike Active Record where entities know how to manage themselves, with Pomm, entities are just data container that may embed processes. Nevertheless, these data container must be formatted to know about their structure and state. This is why entities all inherit from *BaseObject* class and cannot be instantiated directly.::
+Entities are the end of the process, they are the data. Unlike Active Record where entities know how to manage themselves, with Pomm, entities are just data container that may embed processes. Nevertheless, these data container must be formatted to know about their structure and state. This is why entities all inherit from *BaseObject* class and cannot be instantiated directly.
 
-  $entity = $map->createObject()
-  $entity->isNew()            // true
-  $entity->isModified()       // false
+::
+
+  $entity = $map->createObject();
+  $entity->isNew();           // true
+  $entity->isModified();      // false
   $entity->setPika('chu');
-  $entity->getPika()          // chu
-  $entity->isNew()            // true
-  $entity->isModified()       // true
+  $entity->isNew();           // true
+  $entity->isModified();      // true
+
+  $map->saveOne($entity);
+
+  $entity->isNew();           // false
+  $entity->isModified();      // false
+  $entity->setPika('no');
+  $entity->isNew();           // false
+  $entity->isModified();      // true
+
+  $map->saveOne($entity);
+
+  $entity->isNew();           // false
+  $entity->isModified();      // false
+
+  $map->deleteOne($entity);
+
+  $entity->isNew();           // true
+  $entity->isModify();        // false
+
 
 Connections
 -----------
@@ -340,7 +455,7 @@ The entities are stored in a particular database. This is why only connections t
 
   $map = $service->createConnection()
     ->getMapFor('Model\Pomm\Entity\School\Student'); 
-
+  
 
 Transactions
 ============
@@ -384,6 +499,44 @@ Tools
 PHP tools
 =========
 
-Pomm comes with *Tools* classes to assist the user in some common tasks. The most used tool is the *BaseMap* classes generation from database inspection. 
+Pomm comes with *Tools* classes to assist the user in some common tasks. The most used tool is the *BaseMap* classes generation from database inspection. Here is a way you can use this tool to generate all the model files based on the database structure::
+
+  <?php
+
+  require __DIR__.'/vendor/pomm/test/autoload.php';
+
+  $service = new Pomm\Service(array(
+      'default' => array(
+          'dsn' => 'pgsql://nss_user:nss_password@localhost/nss_db'
+  )));
+
+  $scan = new Pomm\Tools\ScanSchemaTool(array(
+      'dir'=> __DIR__,
+      'schema' => 'transfo',
+      'connection' => $service->getDatabase(),
+  ));
+
+  $scan->execute();
+
+This will parse the postgresql's schema named *transfo* to scan it for tables and views. Then it will generate automatically the *BaseMap* files with the class structure and if map files or entity files do not exist, will create them. 
+
 Database tools
 ==============
+
+Pomm comes with a handy set of SQL tools. These functions are coded with PlPgsql so need that language to be created in the database. 
+
+is_email(varchar)
+  This function returns true if the parameter is a valid email and false otherwise
+is_url(varchar)
+  This function returns true if the parameter is a valid url and false otherwise
+transliterate(varchar)
+  This function replace all accentuated characters by non accentuated Latin equivalent.
+slugify(varchar)
+  This returns the given string but transliterated, lowered, and all non alphanumerical characters replaced by a dash. This is useful to create meaningful urls.
+cut_nicely(varchar, length)
+  This function cut a string after a certain length but only on non alphanumerical characters not to cut words.
+array_merge(anyelement[], anyelement[])
+  Return the merge of both arrays but similar values are present only once in the result.
+update_updated_at
+  This is for triggers to keep the *updated_at* fields updated.
+

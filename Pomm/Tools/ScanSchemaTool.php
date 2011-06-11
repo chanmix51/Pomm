@@ -50,7 +50,7 @@ class ScanSchemaTool extends BaseTool
             throw new \InvalidArgumentException(sprintf('The connection must be a "Pomm\Connection\Database" instance, "%s" given.', get_class($this->options['connection'])));
         }
 
-        $this->transaction = $this->options['connection']->createTransaction();
+        $this->transaction = $this->options['connection']->createConnection();
 
         foreach ($this->getTables() as $table)
         {
