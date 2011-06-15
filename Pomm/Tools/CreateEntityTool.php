@@ -58,7 +58,7 @@ class CreateEntityTool extends BaseTool
      **/
     protected function generateMapFile()
     {
-        $namespace = sprintf("%s\\Entity\\%s", $this->options['namespace'], $this->options['schema']);
+        $namespace = sprintf("%s\\%s", $this->options['namespace'], $this->options['schema']);
         $class =     $this->options['class'];
 
         $php = <<<EOD
@@ -85,7 +85,7 @@ EOD;
      **/
     protected function saveFile($content)
     {
-        $filename = sprintf("%s/Model/Pomm/Entity/%s/%s.php", $this->options['dir'], sfInflector::camelize($this->options['schema']), $this->options['class']);
+        $filename = sprintf("%s/%s/%s.php", $this->options['dir'], sfInflector::camelize($this->options['schema']), $this->options['class']);
         $fh = fopen($filename, 'w');
         fputs($fh, $content);
         fclose($fh);

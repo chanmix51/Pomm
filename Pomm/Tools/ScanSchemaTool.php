@@ -31,10 +31,9 @@ class ScanSchemaTool extends BaseTool
      **/
     protected function configure()
     {
-        $this->options->mustHave('dir');
-        $this->options->mustHave('schema');
+        $this->options->mustHave('prefix_dir');
         $this->options->mustHave('connection');
-        $this->options->setDefaultValue('namespace', 'Model\Pomm\Map');
+        $this->options->setDefaultValue('schema', 'public');
         $this->options->setDefaultValue('extends', 'BaseObjectMap');
     }
 

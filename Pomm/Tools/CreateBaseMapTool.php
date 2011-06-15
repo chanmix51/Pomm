@@ -38,13 +38,16 @@ class CreateBaseMapTool extends BaseTool
      **/
     protected function configure()
     {
-        $this->options->mustHave('dir');
+        $this->options->mustHave('prefix_dir');
         $this->options->mustHave('table');
         $this->options->mustHave('connection');
+
         $this->options->setDefaultValue('class_name', sfInflector::camelize($this->options['table']));
-        $this->options->setDefaultValue('namespace', 'Model\Pomm\Entity');
         $this->options->setDefaultValue('extends', 'BaseObjectMap');
         $this->options->setDefaultValue('schema', 'public');
+
+        $this->options['dir'] = $this->options['prefix_dir'].'/Model/Pomm/Entity';
+        $this->options['namespace'] = $this->options->hasParameter('prefix_namespace') ? $this->options['prefix_namespace'].'\Model\Pomm\Entity' : 'Model\Pomm\Entity';
     }
 
     /**
@@ -117,7 +120,7 @@ class CreateBaseMapTool extends BaseTool
      **/
     protected function generateMapFile()
     {
-        $std_namespace   = sprintf("%s\\Entity\\%s", $this->options['namespace'], sfInflector::camelize($this->options['schema']));
+        $std_namespace   = sprintf("%s\\%s", $this->options['namespace'], sfInflector::camelize($this->options['schema']));
         $namespace       = $std_namespace."\\Base";
         $class_name  = $this->options['class_name'];
         $table_name  = sprintf("%s.%s", $this->options['schema'], $this->options['table']);
@@ -210,7 +213,7 @@ EOD;
      **/
     public function saveMapFile($content)
     {
-        $filename = sprintf("%s/Model/Pomm/Entity/%s/Base/%sMap.php",$this->options['dir'], sfInflector::camelize($this->options['schema']), $this->options['class_name']);
+        $filename = sprintf("%s/%s/Base/%sMap.php",$this->options['dir'], sfInflector::camelize($this->options['schema']), $this->options['class_name']);
         $fh = fopen($filename, 'w');
         fputs($fh, $content);
         fclose($fh);
@@ -224,7 +227,7 @@ EOD;
      **/
     protected function createDirIfNotExist()
     {
-        $dir = sprintf("%s/Model/Pomm/Entity/%s/Base", $this->options['dir'], sfInflector::camelize($this->options['schema']));
+        $dir = sprintf("%s/%s/Base", $this->options['dir'], sfInflector::camelize($this->options['schema']));
         if (file_exists($dir)) return;
         mkdir($dir, 0755, true);
     }
@@ -235,14 +238,14 @@ EOD;
      **/
     protected function createEmptyFilesIfNotExist()
     {
-       $file = sprintf("%s/Model/Pomm/Entity/%s/%s.php", $this->options['dir'], sfInflector::camelize($this->options['schema']), $this->options['class_name']);
+       $file = sprintf("%s/%s/%s.php", $this->options['dir'], sfInflector::camelize($this->options['schema']), $this->options['class_name']);
        if (!file_exists($file))
        {
            $tool = new CreateEntityTool(array('dir' => $this->options['dir'], 'class' => $this->options['class_name'], 'namespace' => $this->options['namespace'], 'schema' => $this->options['schema']));
            $tool->execute();
        }
 
-       $file = sprintf("%s/Model/Pomm/Entity/%s/%sMap.php", $this->options['dir'], sfInflector::camelize($this->options['schema']), $this->options['class_name']);
+       $file = sprintf("%s/%s/%sMap.php", $this->options['dir'], sfInflector::camelize($this->options['schema']), $this->options['class_name']);
        if (!file_exists($file))
        {
            $tool = new CreateMapTool(array('dir' => $this->options['dir'], 'class' => $this->options['class_name'], 'namespace' => $this->options['namespace'], 'schema' => $this->options['schema']));
