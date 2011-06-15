@@ -58,7 +58,7 @@ class CreateMapTool extends BaseTool
      **/
     protected function generateMapFile()
     {
-        $namespace = sprintf("%s\\%s", $this->options['namespace'], $this->options['schema']);
+        $namespace = sprintf("%s\\%s", $this->options['namespace'], sfInflector::camelize($this->options['schema']));
         $class =     $this->options['class'];
 
         $php = <<<EOD

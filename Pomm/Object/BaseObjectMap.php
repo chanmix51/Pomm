@@ -356,7 +356,7 @@ abstract class BaseObjectMap
                 else
                 {
                     $converter = $this->connection->getDatabase()->getConverterFor($converter_name);
-                    array_walk(&$value, function(&$a) use ($converter) { $a = $converter->toPg($a);});
+                    array_walk($value, function(&$a) use ($converter) { $a = $converter->toPg($a);});
                     $field_value = sprintf("ARRAY[%s]", join(', ', $value));
                 }
             }

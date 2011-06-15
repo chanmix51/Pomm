@@ -46,7 +46,7 @@ class CreateBaseMapTool extends BaseTool
         $this->options->setDefaultValue('extends', 'BaseObjectMap');
         $this->options->setDefaultValue('schema', 'public');
 
-        $this->options['dir'] = $this->options['prefix_dir'].'/Model/Pomm/Entity';
+        $this->options['dir'] = $this->options['prefix_dir'] != '' ? $this->options['prefix_dir'].'/Model/Pomm/Entity' : 'Model/Pomm/Entity';
         $this->options['namespace'] = $this->options->hasParameter('prefix_namespace') ? $this->options['prefix_namespace'].'\Model\Pomm\Entity' : 'Model\Pomm\Entity';
     }
 
@@ -101,7 +101,6 @@ class CreateBaseMapTool extends BaseTool
         {
             throw new \InvalidArgumentException(sprintf('The connection must be a "Pomm\Connection\Database" instance, "%s" given.', get_class($this->options['connection'])));
         }
-
         $this->transaction = $this->options['connection']->createConnection();
         $this->getGeneralInfo();
         $this->getAttributesInfo();
@@ -165,7 +164,7 @@ EOD;
         $pkey = $this->transaction->getPdo()->query($sql)->fetch(\PDO::FETCH_NAMED);
 
         $pkey = preg_split('/, /', trim($pkey['pkey'], '["{}]'));
-        array_walk(&$pkey, function(&$value) { $value = sprintf("'%s'", $value); }); 
+        array_walk($pkey, function(&$value) { $value = sprintf("'%s'", $value); }); 
 
         return join($pkey, ", ");
     }
