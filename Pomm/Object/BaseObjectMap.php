@@ -262,10 +262,11 @@ abstract class BaseObjectMap
      * 
      * @param string $where 
      * @param array $values 
+     * @param sring $order_by
      * @access public
      * @return Collection
      */
-    public function findWhere($where, $values = array())
+    public function findWhere($where, $values = array(), $order_by = null)
     {
         if (is_object($where))
         {
@@ -279,7 +280,14 @@ abstract class BaseObjectMap
             }
         }
 
-        return $this->query(sprintf('SELECT %s FROM %s WHERE %s;', join(', ', $this->getSelectFields()), $this->object_name, $where), $values);
+        $sql = sprintf('SELECT %s FROM %s WHERE %s', join(', ', $this->getSelectFields()), $this->object_name, $where); 
+
+        if (!is_null($order_by)) 
+        {
+            $sql .= " ORDER BY ".$order_by;
+        }
+
+        return $this->query($sql, $values);
     }
 
     /**
