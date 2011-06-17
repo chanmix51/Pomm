@@ -357,9 +357,9 @@ Sometimes, you do not know in advance what will be the clause of your query beca
   public function getYoungerThan(DateTime $date, $level = 0)
   {
     $where = new Pomm\Query\Where("birthdate > ?", array($date->format('Y-m-d')));
-    $where->andWhere('level >= ?', array($level), 'ORDER BY birthdate DESC LIMIT 10');
+    $where->andWhere('level >= ?', array($level));
 
-    return $this->findWhere($where);
+    return $this->findWhere($where, null, 'ORDER BY birthdate DESC LIMIT 10');
   }
 
 The *Where* class has two very handy methods: *andWhere* and *orWhere* which can take string or another *Where* instance as argument. All methods return a *Where* instance so it is possible to chain the calls. The example above can be rewritten this way::
