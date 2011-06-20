@@ -17,7 +17,7 @@ class PgPoint implements ConverterInterface
 {
     protected $class_name;
 
-    public function __construct($class_name = Pomm\Type\Point)
+    public function __construct($class_name = 'Pomm\Type\Point')
     {
         $this->class_name = $class_name;
     }
