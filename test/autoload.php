@@ -23,7 +23,7 @@ function __autoload($name)
         'Pomm/Converter/ConverterInterface.php',
         'Pomm/Converter/PgBoolean.php',
         'Pomm/Converter/PgHStore.php',
-        'Pomm/Converter/PgInteger.php',
+        'Pomm/Converter/PgNumber.php',
         'Pomm/Converter/PgLTree.php',
         'Pomm/Converter/PgString.php',
         'Pomm/Converter/PgTimestamp.php',

@@ -15,7 +15,7 @@ use Pomm\External\sfInflector;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-abstract class BaseObject
+abstract class BaseObject implements \ArrayAccess 
 {
   const NONE     = 0;
   const EXIST    = 1;
@@ -107,7 +107,26 @@ abstract class BaseObject
    */
   public function hydrate(Array $values)
   {
-    $this->fields = array_merge($this->fields, $values);
+      $this->fields = array_merge($this->fields, $values);
+  }
+
+  /**
+   * convert 
+   * Make all keys lowercase and hydrate the object
+   * 
+   * @param Array $values 
+   * @access public
+   * @return void
+   */
+  public function convert(Array $values)
+  {
+      $tmp = array();
+      foreach ($values as $key => $values)
+      {
+          $tmp[strtolower($key)] = $values;
+      }
+
+      $this->hydrate($tmp);
   }
 
   /**
@@ -258,5 +277,43 @@ abstract class BaseObject
   public function isModified()
   {
     return $this->status & self::MODIFIED;
+  }
+
+  /**
+   * offsetExists
+   * @see ArrayAccess
+   **/
+  public function offsetExists($offset)
+  {
+      return $this->has($offset);
+  }
+
+  /**
+   * offsetSet
+   * @see ArrayAccess
+   **/
+  public function offsetSet($offset, $value)
+  {
+      $method_name = "set".sfInflector::camelize($offset);
+      $this->$method_name($value);
+  }
+
+  /**
+   * offsetGet
+   * @see ArrayAccess
+   **/
+  public function offsetGet($offset)
+  {
+      $method_name = "get".sfInflector::camelize($offset);
+      return $this->$method_name();
+  }
+
+  /**
+   * offsetUnset
+   * @see ArrayAccess
+   **/
+  public function offsetUnset($offset)
+  {
+      $this->offsetSet($offset, null);
   }
 }

@@ -203,7 +203,7 @@ class Database
   protected function registerBaseConverters()
   {
       $this->registerConverter('Boolean', new Converter\PgBoolean(), array('boolean'));
-      $this->registerConverter('Integer', new Converter\PgInteger(), array('smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial'));
+      $this->registerConverter('Integer', new Converter\PgNumber(), array('smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial'));
       $this->registerConverter('String', new Converter\PgString(), array('character', 'text'));
       $this->registerConverter('Timestamp', new Converter\PgTimestamp(), array('timestamp', 'date', 'time'));
       $this->registerConverter('Point', new Converter\PgPoint(), array('point'));

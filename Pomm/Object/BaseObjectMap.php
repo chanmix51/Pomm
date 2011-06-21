@@ -451,7 +451,6 @@ abstract class BaseObjectMap
         $tmp = array();
         foreach ($this->convertPg($object->extract(), 'toPg') as $field_name => $field_value)
         {
-            if (array_key_exists($field_name, $object->getPrimaryKey())) continue;
             $tmp[$field_name] = $field_value;
         }
 

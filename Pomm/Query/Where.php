@@ -13,7 +13,7 @@ namespace Pomm\Query;
  * @copyright 2011 Grégoire HUBERT 
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
- */
+ **/
 class Where
 {
   public $stack = array();
@@ -31,11 +31,31 @@ class Where
    * @static
    * @access public
    * @return Where
-   */
+   **/
   public static function create($element = null, $values = array())
   {
     return new self($element, $values);
   }
+
+  /**
+   * createWhereIn
+   * create an escaped IN clause
+   *
+   * @param string element
+   * @param array values
+   * @static
+   * @return Where
+   **/
+    public static function createWhereIn($element, $values)
+    {
+        $escaped_values = array();
+        for ($index = 1; $index <= count($values); $index++)
+        {
+            $escaped_values[] = '?';
+        }
+
+        return new self(sprintf("%s IN (%s)", $element, join(", ", $escaped_values)), $values);
+    }
 
   /**
    * __construct 
@@ -44,7 +64,7 @@ class Where
    * @param array $values 
    * @access public
    * @return void
-   */
+   **/
   public function __construct($element = null, $values = array())
   {
     if (!is_null($element))
@@ -64,7 +84,7 @@ class Where
    * @param string $operator 
    * @access public
    * @return Where
-   */
+   **/
   public function setOperator($operator)
   {
     $this->operator = $operator;
@@ -79,7 +99,7 @@ class Where
    *
    * @access public
    * @return boolean
-   */
+   **/
   public function isEmpty()
   {
     return (is_null($this->element) and count($this->stack) == 0);
@@ -91,7 +111,7 @@ class Where
    * @param Where $where 
    * @access public
    * @return void
-   */
+   **/
   public function transmute(Where $where)
   {
     $this->stack = $where->stack;
@@ -110,7 +130,7 @@ class Where
    * @param string $operator 
    * @access public
    * @return Where
-   */
+   **/
   public function addWhere($element, $values, $operator)
   {
     if (!$element instanceof Where)
@@ -158,7 +178,7 @@ class Where
    * @param array $values 
    * @access public
    * @return Where
-   */
+   **/
   public function andWhere($element, $values = array())
   {
      return $this->addWhere($element, $values, 'AND');
@@ -173,7 +193,7 @@ class Where
    * @param array $values 
    * @access public
    * @return Where
-   */
+   **/
   public function orWhere($element, $values = array())
   {
     return $this->addWhere($element, $values, 'OR');
@@ -185,7 +205,7 @@ class Where
    * @param Array $stack 
    * @access public
    * @return Where
-   */
+   **/
   public function setStack(Array $stack)
   {
     $this->stack = $stack;
@@ -200,7 +220,7 @@ class Where
    *
    * @access public
    * @return string
-   */
+   **/
   public function __toString()
   {
     if ($this->isEmpty())
@@ -218,7 +238,7 @@ class Where
    * 
    * @access public
    * @return boolean
-   */
+   **/
   public function hasElement()
   {
     return ! is_null($this->element);
@@ -229,7 +249,7 @@ class Where
    * 
    * @access public
    * @return string
-   */
+   **/
   public function getElement()
   {
     return $this->element;
@@ -240,7 +260,7 @@ class Where
    * 
    * @access protected
    * @return string
-   */
+   **/
   protected function parse()
   {
     if ($this->hasElement())
@@ -264,7 +284,7 @@ class Where
    * 
    * @access public
    * @return void
-   */
+   **/
   public function getValues()
   {
     if ($this->isEmpty())

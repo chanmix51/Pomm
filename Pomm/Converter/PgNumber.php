@@ -4,7 +4,7 @@ namespace Pomm\Converter;
 use Pomm\Converter\ConverterInterface;
 
 /**
- * Pomm\Converter\PgInteger - Integer converter
+ * Pomm\Converter\PgNumber - Number converter
  * 
  * @package Pomm
  * @version $id$
@@ -12,14 +12,14 @@ use Pomm\Converter\ConverterInterface;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class PgInteger implements ConverterInterface
+class PgNumber implements ConverterInterface
 {
     /**
      * @see ConverterInterface
      **/
     public function fromPg($data)
     {
-        return (integer) $data;
+        return $data;
     }
 
     /**
@@ -27,6 +27,6 @@ class PgInteger implements ConverterInterface
      **/
     public function toPg($data)
     {
-        return (integer) $data;
+        return $data;
     }
 }
