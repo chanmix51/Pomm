@@ -190,9 +190,11 @@ class my_test extends \lime_test
 }
 
 $test = new my_test();
+$location = new \Pomm\Type\Point(3,2);
+
 $test->initialize()
     ->testCreate()
-    ->testHydrate(array('title' => 'title test', 'authors' => array('pika chu'), 'is_available' => true), array('title' => 'title test', 'authors' => array('pika chu'), 'is_available' => true))
+    ->testHydrate(array('title' => 'title test', 'authors' => array('pika chu'), 'is_available' => true, 'position' => $location), array('title' => 'title test', 'authors' => array('pika chu'), 'is_available' => true, 'location' => $location))
     ->testSaveOne()
     ->testFindWhere(1)
     ->testQuery('SELECT * FROM book WHERE id < ?', array(10), 1)

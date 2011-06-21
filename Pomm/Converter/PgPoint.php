@@ -28,7 +28,7 @@ class PgPoint implements ConverterInterface
     public function fromPg($data)
     {
         $data = trim($data, "()");
-        $values = preg_split(",", $data);
+        $values = preg_split("/,/", $data);
 
         return new $this->class_name($values[0], $values[1]);
     }
@@ -38,7 +38,7 @@ class PgPoint implements ConverterInterface
      **/
     public function toPg($data)
     {
-        if (! $data instanceof Pomm\Type\Point)
+        if (! $data instanceof $this->class_name)
         {
             if (!is_object($data)) 
             {

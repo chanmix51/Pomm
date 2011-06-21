@@ -27,8 +27,11 @@ function __autoload($name)
         'Pomm/Converter/PgLTree.php',
         'Pomm/Converter/PgString.php',
         'Pomm/Converter/PgTimestamp.php',
+        'Pomm/Converter/PgPoint.php',
+        'Pomm/Type/Point.php',
 );
-    $class_name = array_pop(preg_split('/\\\/', $name));
+    $name = preg_split('/\\\/', $name);
+    $class_name = array_pop($name);
 
     foreach ($libs as $lib)
     {

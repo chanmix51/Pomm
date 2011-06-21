@@ -340,7 +340,6 @@ abstract class BaseObjectMap
 
             if (is_null($converter_name))
             {
-                $out_values[$name] = $value;
                 continue;
             }
 
