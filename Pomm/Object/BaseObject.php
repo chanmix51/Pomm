@@ -105,7 +105,7 @@ abstract class BaseObject implements \ArrayAccess
    * @access public
    * @return void
    */
-  public function hydrate(Array $values)
+  public final function hydrate(Array $values)
   {
       $this->fields = array_merge($this->fields, $values);
   }

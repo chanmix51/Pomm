@@ -91,6 +91,13 @@ The *setDatabase* method is used internally by the constructor. The parameters m
 
 Once registered, you can retrieve the databases with their name by calling the *getDatabase* method passing the name as argument. If no name is given, the first declared *Database* will be returned.
 
+The **dsn** parameter format is important because it interacts with the server's access policy.
+
+ * *pgsql://user/database* Connect *user* to the db *database* without password through the Unix socket system. This is the minimal form.
+ * *pgsql://user:pass/database* The same but with password.
+ * *pgsql://user@host/database* Connect *user* to the db *database* on host *host* using TCP/IP.
+ * *pgsql://user:pass@host:port/database* The same but with password and TCP port specified. This is the maximal form.
+
 Database and converters
 =======================
 
@@ -177,12 +184,19 @@ Here, we can see the very good side of this method: we can implement a *getPower
    
   class WindingPower implements ConverterInterface
   {
+      protected $class_name;
+
+      public function __contruct($class_name = 'Model\\Pomm\\Type\\WindingPowerType')
+      {
+          $this->class_name = $class_name;
+      }
+
       public function fromPg($data)
       {
           $data = trim($data, "()");
           $values = preg_split('/,/', $data);
    
-          return new WindingPowerType($values[0], $values[1]);
+          return new $this->class_name($values[0], $values[1]);
       }
    
       public function toPg($data)
@@ -190,6 +204,8 @@ Here, we can see the very good side of this method: we can implement a *getPower
           return sprintf("(%4.1f,%4.3f)", $data->voltage, $data->current);
       }
   }
+
+Of course you can hardcode the class to be returned by the converter but it prevents others to extends your type.
 
 Map classes
 -----------
@@ -260,7 +276,7 @@ The according generated structure will be:::
           $this->addField('first_name', 'String');
           $this->addField('last_name', 'String');
           $this->addField('birthdate', 'Timestamp');
-          $this->addField('level', 'Integer');
+          $this->addField('level', 'Number');
   
           $this->pk_fields = array('reference');
       }
@@ -372,17 +388,33 @@ The *Where* class has two very handy methods: *andWhere* and *orWhere* which can
     return $this->findWhere($where, null, 'ORDER BY birthdate DESC LIMIT 10');
   }
 
+Because the WHERE ... IN clause needs to declare as many '?' as given parameters, it has its own constructor:
+
+::
+
+    // SELECT all_fields FROM some_table WHERE station_id IN ( list of ids );
+    
+    $this->findWhere(Pomm\Query\Where::createIn("station_id", $array_of_ids))
+
 Custom queries
 ==============
 
-Although it is possible to write whole plain queries by hand in the finders, the Map class owns the following methods to help you in that task: *getSelectFields*, *getGroupByFields* and *getFields*.::
+Although it is possible to write whole plain queries by hand in the finders, this may induce coupling between your classes and the database structure. To ovoid coupling, the Map class owns the following methods: *getSelectFields*, *getGroupByFields* and *getFields*.
+
+::
 
   // Model\Pomm\Entity\Blog\PostMap Class
   public function getBlogPostsWithCommentCount(Pomm\Query\Where $where)
   {
-    $sql = 'SELECT %s, COUNT(c.id) as "comment_count" FROM blog.post p JOIN blog.comment c ON p.id = c.post_id WHERE %s GROUP BY %s'
+    $sql = sprintf('SELECT %s, COUNT(c.id) as "comment_count" FROM %s p JOIN %s c ON p.id = c.post_id WHERE %s GROUP BY %s',
+        join(', ', $this->getSelectFields('p')),
+        $this->getTableName('p'),
+        $this->Connection->getMapFor('Model\Pomm\Entity\Blog\Comment')->getTableName(),
+        $where,
+        join(', ', $this->getGroupByFields('p'))
+        );
 
-    return $this->query($sql, $this->getSelectFields('p'), $where, $this->getGroupByFields(), $where->getValues());
+    return $this->query($sql, $where->getValues());
   }
 
 The *query* method is available for your custom queries. It takes 2 parameters, the SQL statement and an optional array of values to be escaped. Keep in mind, the number of values must match the '?' Occurrences in the query.
@@ -424,6 +456,29 @@ Internally, all values are stored in an array. The methods *set()* and *get()* a
 
 This allow developers to overload accessors. The methods *set* and *get* are only used within the class definition and should not be used outside unless you want to bypass any overload that could exist.
 
+Entities implement PHP's *ArrayAccess* interface to use the accessors if any. This means you can have easy access to your entity's data in your templates without bypassing accessors !
+
+::
+
+  $entity['pika'];    // chu
+  $entity->getPika(); // chu
+
+Of course you can extend your entities providing new accessors. If by example you have an entity with a weight in grams and you would like to have an accessor that return it in ounces::
+
+  public function getWeightInOunce()
+  {
+    return round($this->getWeight() * 0.0352739619, 2);
+  }
+
+In your templates, you can directly benefit from this accessor while using the entity as an array::
+
+  // in PHP
+  <?php echo $thing['weight_in_ounce'] ?>
+
+  // with Twig
+  {{ thing.weight_in_ounce }}
+
+
 Life cycle
 ==========
 
@@ -456,6 +511,11 @@ Entities are the end of the process, they are the data. Unlike Active Record whe
   $entity->isNew();           // true
   $entity->isModify();        // false
 
+
+Hydrate and convert
+===================
+
+It may happen you need to create objects with data as array. *Pomm* uses this mechanism internally to hydrate the entities with database values. The *hydrate()* method takes an array and merge it with the entity's internal values. Be aware PHP associative arrays keys are case sensitive where postgresql's field names are not. If you need some sort of conversion the *convert()* method will help. You can overload the *convert()* method to create a more specific conversion (if you use web services data provider by example) but you cannot overload the *hydrate()* method. 
 
 Connections
 -----------
@@ -508,6 +568,34 @@ If you need partial rollback, you can use savepoints in your transactions.
     $cnx->rollback('A'); 
   }
   $cnx->commit();
+
+Sometimes, in your model you need some queries to be performed in a transaction without knowing if you are already in a transaction. 
+
+::
+
+    public function doThings()
+    {
+        if ($this->isInTransaction())
+        {
+            $savepoint = 'plop';
+            $this->setSavepoint($savepoint);
+        }
+        else
+        {
+            $savepoint = null;
+            $this->begin();
+        }
+
+        try
+        {
+            // do things
+            is_null($savepoint) && $this->commit();
+        }
+        catch (Exception $e)
+        {
+            $this->rollback($savepoint);
+        }
+    }
 
 Tools
 -----
