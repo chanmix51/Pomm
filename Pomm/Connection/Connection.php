@@ -24,6 +24,7 @@ class Connection
     protected $database;
     protected $parameter_holder;
     protected $isolation;
+    protected $in_transaction = false;
 
     /**
      * __construct()
@@ -133,7 +134,12 @@ class Connection
    **/
   public function begin()
   {
-      $this->getPdo()->exec(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->isolation));
+      if ($this->in_transaction)
+      {
+          throw new Exception("Cannot begin a new transaction, we are already in a transaction.");
+      }
+
+      $this->in_transaction = 0 === $this->getPdo()->exec(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->isolation));
 
       return $this;
   }
@@ -146,7 +152,12 @@ class Connection
    **/
   public function commit()
   {
-      $this->getPdo()->exec('COMMIT');
+      if (! $this->in_transaction)
+      {
+          throw new Exception("COMMIT while not in a transaction");
+      }
+
+      $this->in_transaction = 0 !== $this->getPdo()->exec('COMMIT');
 
       return $this;
   }
@@ -162,9 +173,15 @@ class Connection
    **/
   public function rollback($name = null)
   {
+      if (! $this->in_transaction)
+      {
+          throw new Exception("ROLLBACK while not in a transaction");
+      }
+
       if (is_null($name))
       {
           $this->getPdo()->rollback();
+          $this->in_transaction = false;
       }
       else
       {
@@ -201,5 +218,16 @@ class Connection
       $this->getPdo()->exec(sprintf("RELEASE SAVEPOINT %s", $name));
 
       return $this;
+  }
+
+  /**
+   * isInTransaction
+   * Check if we are in transaction mode
+   *
+   * @return boolean
+   **/
+  public function isInTransaction()
+  {
+      return (bool) $this->in_transaction;
   }
 }

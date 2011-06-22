@@ -187,6 +187,23 @@ class my_test extends \lime_test
 
         return $this;
     }
+
+    public function testInTransaction($should_we)
+    {
+        $this->info('Check in transaction or not.');
+        if ($should_we)
+        {
+            $message =  'We are in transaction mode.';
+        }
+        else
+        {
+            $message =  'We are NOT in transaction mode';
+        }
+
+        $this->is($this->transac->isInTransaction(), $should_we, $message);
+
+        return $this;
+    }
 }
 
 $test = new my_test();
@@ -207,14 +224,18 @@ $test->initialize()
     ->testDeleteOne()
     ->testQuery('SELECT * FROM book', array(), 0)
     ->testFindWhere(0)
+    ->testInTransaction(false)
     ->beginTransaction()
+    ->testInTransaction(true)
     ->testHydrate(array('id' => 2, 'title' => 'the NO book', 'authors' => array('one', 'two'), 'is_available' => true), array('id' => 2, 'title' => 'the NO book', 'authors' => array('one', 'two'), 'is_available' => true))
     ->testSaveOne()
     ->setSavepoint('a')
     ->testDeleteOne()
     ->testFindWhere(0)
     ->rollback('a')
+    ->testInTransaction(true)
     ->testRetreiveByPk(array('id' => 2))
     ->commit()
+    ->testInTransaction(false)
     ->testFindWhere(1)
     ;
