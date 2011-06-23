@@ -103,9 +103,10 @@ Database and converters
 
 The *Database* class brings access to mechanisms to create connections and transactions and also register converters. A *Converter* is a class that translates a data type from Postgresql to PHP and from PHP to Postgresql. By default, the following converters are registered, this means all databases have them:
  * Boolean: convert postgresql 't' and 'f' to PHP boolean value
- * Integer: convert postgresql 'smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial' types to numbers
+ * Number: convert postgresql 'smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial' types to numbers
  * String: convert postgresql 'varchar' and 'text' into PHP string
  * Timestamp: convert postgresql 'timestamp', 'date', 'time' to PHP DateTime instance.
+ * Point: convert a postgresql 'point' into a Pomm\\Type\\Point instance.
 
 Postgresql contribs come with handy extra data type (like HStore, a key => value array and LTree a materialized path data type). If you use these types in your database you have to register the according converters from your database instance::
 
@@ -136,6 +137,22 @@ If your database has a lot of custom types, it is a better idea to create your o
   }
 
 This way, converters will be automatically registered at instantiation.
+
+Entity converter
+================
+
+A nice feature of postgresql when you create a table is a type with the same name as the table is created according to the table structure. Hence, it is possible to use that data type in other tables. Pomm proposes a special converter to do so: the *PgEntity* converter. Passing the table data type name and the associated entity class name will grant you with embedded entities.
+
+::
+
+  class MyDatabase extends Pomm\Connection\Database
+  {
+    protected function initialize()
+    {
+      parent::initialize();
+      $this->registerConverter('MyEntity', new Pomm\Converter\PgEntity($this, 'Model\Pomm\Entity\Schema\MyEntity'), array('my_entity'));
+    }
+  }
 
 Converters and types
 ====================

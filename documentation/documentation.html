@@ -453,6 +453,19 @@ $service-&gt;getDatabase()
 </pre>
 <p>This way, converters will be automatically registered at instantiation.</p>
 </div>
+<div class="section" id="entity-converter">
+<h2>Entity converter</h2>
+<p>A nice feature of postgresql when you create a table is a type with the same name as the table is created according to the table structure. Hence, it is possible to use that data type in other tables. Pomm proposes a special converter to do so: the <em>PgEntity</em> converter. Passing the table data type name and the associated entity class name will grant you with embedded entities.</p>
+<pre class="literal-block">class MyDatabase extends Pomm\Connection\Database
+{
+  protected function initialize()
+  {
+    parent::initialize();
+    $this-&gt;registerConverter('MyEntity', new Pomm\Converter\PgEntity($this, 'Model\Pomm\Entity\Schema\MyEntity'), array('my_entity'));
+  }
+}
+</pre>
+</div>
 <div class="section" id="converters-and-types">
 <h2>Converters and types</h2>
 <p>Composite types are particularly useful to store complex set of data. In fact, with Postgresql, defining a table automatically defines the according type. Hydrating type instances with postgresql values are the work of your custom converters. Let's take an example: electrical transformers windings. A transformer winding is defined by the voltage it is supposed to have and the maximum current it can stands. A transformer have two or more windings so if we define a type WindingPower we will be able to store an array of windings in our transformer table:</p>
