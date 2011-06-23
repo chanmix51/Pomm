@@ -28,6 +28,7 @@ function __autoload($name)
         'Pomm/Converter/PgString.php',
         'Pomm/Converter/PgTimestamp.php',
         'Pomm/Converter/PgPoint.php',
+        'Pomm/Converter/PgEntity.php',
         'Pomm/Type/Point.php',
 );
     $name = preg_split('/\\\/', $name);

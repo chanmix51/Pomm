@@ -180,7 +180,7 @@ class Connection
 
       if (is_null($name))
       {
-          $this->getPdo()->rollback();
+          $this->getPdo()->exec('ROLLBACK TRANSACTION');
           $this->in_transaction = false;
       }
       else

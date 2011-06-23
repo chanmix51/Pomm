@@ -426,7 +426,6 @@ abstract class BaseObjectMap
 
             $this->query($sql, array_values($object->getPrimaryKey()));
             $object = $this->findByPk($object->getPrimaryKey());
-            //$object->_setStatus(BaseObject::EXIST);
         }
         else
         {
