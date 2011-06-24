@@ -510,24 +510,33 @@ Entities are the end of the process, they are the data. Unlike Active Record whe
   $entity->isNew();           // true
   $entity->isModified();      // true
 
-  $map->saveOne($entity);
+  $map->saveOne($entity);     // INSERT
 
   $entity->isNew();           // false
   $entity->isModified();      // false
   $entity->setPika('no');
+  $entity->setPlop(true);
   $entity->isNew();           // false
   $entity->isModified();      // true
 
-  $map->saveOne($entity);
+  $map->saveOne($entity);     // UPDATE
 
   $entity->isNew();           // false
   $entity->isModified();      // false
+  $entity->setPika('chu');
+  $entity->setPlop(false);
+
+  $map->updateOne($entity, array('pika'));
+
+  $map->getPika();            // chu
+  $map->getPlop();            // true
 
   $map->deleteOne($entity);
 
-  $entity->isNew();           // true
+  $entity->isNew();           // false
   $entity->isModify();        // false
 
+In the example above, you can see there are several ways to save data to the database. The first obvious one is *saveOne()*. Depending on the entity's status is performs an insert or an update on the right table. In the case the entity already exists, all the fields are systematically updated which can sometimes be a problem. If you wish to specifically tell Pomm to update only a subset of the entity, the *updateOne()* method is made for that. This method will save the data you want and will reload the object to reflect eventual changes triggered by the update. This means all other changes are discarded and replaced by the values from the database.
 
 Hydrate and convert
 ===================

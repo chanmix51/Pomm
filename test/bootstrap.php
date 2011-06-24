@@ -28,7 +28,7 @@ class TestTableMap extends BaseObjectMap
 
     public function createTable()
     {
-        $sql = "CREATE TABLE book (id SERIAL PRIMARY KEY, created_at TIMESTAMP NOT NULL DEFAULT now(), last_out DATE, last_in DATE, title VARCHAR(256) NOT NULL, authors VARCHAR(255)[] NOT NULL, is_available BOOLEAN NOT NULL DEFAULT true, location POINT)";
+        $sql = "CREATE TABLE book (id SERIAL PRIMARY KEY, created_at TIMESTAMP NOT NULL DEFAULT now(), last_out TIMESTAMP, last_in TIMESTAMP, title VARCHAR(256) NOT NULL, authors VARCHAR(255)[] NOT NULL, is_available BOOLEAN NOT NULL DEFAULT true, location POINT)";
         $this->query($sql);
     }
 

@@ -59,10 +59,25 @@ class my_test extends \lime_test
     protected function testObjectFields($values)
     {
         $this->diag('TestTableMap::testObjectFields');
-        foreach ($this->obj->extract() as $name => $value)
+        $obj_values = $this->obj->extract();
+        foreach ($values as $name => $value)
         {
-            if (gettype($value) == 'object') continue;
-            $this->is($value, $values[$name], sprintf('Comparing "%s"', $name));
+            if (is_object($obj_values[$name])) 
+            {
+                if ($obj_values[$name] instanceof \DateTime)
+                {
+                    $this->is($obj_values[$name]->format('Y-m-d H:i:s'), $value, sprintf("Comparig datetime '%s'.", $name));
+                }
+                else continue;
+            }
+            elseif (is_array($value))
+            {
+                $this->is_deeply($obj_values[$name], $value, sprintf('Comparing array "%s".', $name));
+            }
+            else 
+            {
+                $this->is($value, (string) $obj_values[$name], sprintf('Comparing value "%s"', $name));
+            }
         }
 
         return $this;
@@ -83,13 +98,36 @@ class my_test extends \lime_test
         try
         {
             $this->map->saveOne($this->obj);
-            $this->is($this->obj->_getStatus(), BaseObject::EXIST, 'Object does exist but is NOT modified');
+            $this->is($this->obj->_getStatus(), BaseObject::EXIST, 'Object does exist and is NOT modified');
             $this->ok($this->obj->getId(), 'Object has an ID');
         }
         catch(Exception $e)
         {
             $this->fail(sprintf("Error while saving object.\n===\n%s\n===\n", $e->getMessage()));
             $this->skip(1);
+        }
+
+        return $this;
+    }
+
+    public function testUpdateOne(Array $fields)
+    {
+        $this->diag('TestTableMap::updateOne()');
+
+        try
+        {
+            $this->map->updateOne($this->obj, array_keys($fields));
+        }
+        catch(Exception $e)
+        {
+            $this->fail(sprintf("Exception while updating object.\n===\n%s\n===\n", $e->getMessage()));
+        }
+
+        $this->is($this->obj->_getStatus(), BaseObject::EXIST, 'Object does exist and is NOT modified');
+
+        foreach($fields as $key => $value)
+        {
+            $this->is($this->obj[$key], $value, sprintf("New value = '%s'.", $value));
         }
 
         return $this;
@@ -105,7 +143,7 @@ class my_test extends \lime_test
         }
         else
         {
-            $this->testObjectFields($object->extract());
+            $this->testObjectFields($values);
         }
 
         return $this;
@@ -207,20 +245,22 @@ class my_test extends \lime_test
 }
 
 $test = new my_test();
-$location = new \Pomm\Type\Point(3,2);
 
 $test->initialize()
     ->testCreate()
-    ->testHydrate(array('title' => 'title test', 'authors' => array('pika chu'), 'is_available' => true, 'position' => $location), array('title' => 'title test', 'authors' => array('pika chu'), 'is_available' => true, 'location' => $location))
+    ->testHydrate(array('title' => 'title test', 'authors' => array('pika chu'), 'is_available' => true), array('title' => 'title test', 'authors' => array('pika chu'), 'is_available' => true))
     ->testSaveOne()
     ->testFindWhere(1)
     ->testQuery('SELECT * FROM book WHERE id < ?', array(10), 1)
     ->testHydrate(array(), array('id' => 1, 'title' => 'title test', 'authors' => array('pika chu'), 'is_available' => true))
     ->testRetreiveByPk(array('id' => 1))
-    ->testHydrate(array('title' => 'modified title', 'last_out' => '1975-06-17 21:13', 'last_in' => '2010-04-01 7:59', 'authors' => array('pika chu', 'john doe')), array('id' => 1, 'title' => 'modified title', 'last_out' => '1975-06-17 21:13', 'last_in' => '2010-04-01 7:59', 'authors' => array('pika chu', 'john doe'), 'is_available' => true))
+    ->testHydrate(array('title' => 'modified title', 'last_out' => new \DateTime('1975-06-17 21:13'), 'last_in' => new \DateTime('2010-04-01 7:59'), 'authors' => array('pika chu', 'john doe')), array('id' => 1, 'title' => 'modified title', 'last_out' => '1975-06-17 21:13:00', 'last_in' => '2010-04-01 07:59:00', 'authors' => array('pika chu', 'john doe'), 'is_available' => true))
     ->testSaveOne()
-    ->testHydrate(array(), array('id' => 1, 'title' => 'modified title', 'authors' => array('pika chu', 'john doe'), 'is_available' => true, 'last_out' => '1975-06-17 21:13:00', 'last_in' => '2010-04-01 7:59:00'))
+    ->testHydrate(array(), array('id' => 1, 'title' => 'modified title', 'authors' => array('pika chu', 'john doe'), 'is_available' => true, 'last_out' => '1975-06-17 21:13:00', 'last_in' => '2010-04-01 07:59:00'))
     ->testRetreiveByPk(array('id' => 1))
+    ->testHydrate(array('title' => 'original title'), array('title' => 'original title'))
+    ->testUpdateOne(array('title' => 'original title'))
+    ->testHydrate(array(), array('title' => 'original title'))
     ->testDeleteOne()
     ->testQuery('SELECT * FROM book', array(), 0)
     ->testFindWhere(0)

@@ -405,6 +405,7 @@ abstract class BaseObjectMap
     public function deleteByPk(Array $pk)
     {
         $sql = sprintf('DELETE FROM %s WHERE %s', $this->object_name, $this->createSqlAndFrom($pk));
+
         return $this->query($sql, array_values($pk));
     }
 
@@ -439,6 +440,48 @@ abstract class BaseObjectMap
     }
 
     /**
+     * updateOne
+     * Update part of an object
+     * Because this can trigger other changes in the database, the object is 
+     * reloaded and all other changes in it will be discarded
+     *
+     * @param BaseObject 
+     * @param Array fields
+     **/
+    public function updateOne(BaseObject &$object, Array $fields)
+    {
+        $this->checkObject($object, sprintf('"%s" class does not know how to update "%s" objects.', get_class($this), get_class($object)));
+
+        if (!$object->_getStatus() & BaseObject::EXIST)
+        {
+            throw new Exception(sprintf("Object class '%s' seems not to exist in the database, try 'saveOne' method instead.", get_class($object)));
+        }
+
+        $values = array();
+        foreach($fields as $field)
+        {
+            if (array_key_exists($field, $object->getPrimaryKey()))
+            {
+                throw new Exception(sprintf("Field '%s' to be updated belongs to the primary key of table '%s'. Do that directly with the map class instead of using a BaseObject.", $field, $this->object_name));
+            }
+
+            $values[$field] = $object->get($field);
+        }
+
+        $updates = array();
+        foreach($this->convertPg($values, 'toPg') as $field => $value)
+        {
+            $updates[] = sprintf("%s = %s", $field, $value);
+        }
+
+
+
+        $sql = sprintf("UPDATE %s SET %s WHERE %s", $this->object_name, join(', ', $updates), $this->createSqlAndFrom($object->getPrimaryKey()));
+        $this->query($sql, array_values($object->getPrimaryKey()));
+        $object = $this->findByPk($object->getPrimaryKey());
+    }
+
+    /**
      * parseForInsert 
      * 
      * @param BaseObject $object 
@@ -466,6 +509,7 @@ abstract class BaseObjectMap
     protected function parseForUpdate($object)
     {
         $tmp = array();
+
         foreach ($this->convertPg($object->extract(), 'toPg') as $field_name => $field_value)
         {
             if (array_key_exists($field_name, $object->getPrimaryKey())) continue;
