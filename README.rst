@@ -8,7 +8,7 @@ What is POMM ?
 
 If you do not know *Pomm*, you should have a look on `Pomm's website`_.
 
-_ http://pomm.coolkeums.org
+_`Pomm's website` http://pomm.coolkeums.org
 
 =====================
 How to install Pomm ?
