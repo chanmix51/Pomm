@@ -101,11 +101,14 @@ The **dsn** parameter format is important because it interacts with the server's
 Database and converters
 =======================
 
-The *Database* class brings access to mechanisms to create connections and transactions and also register converters. A *Converter* is a class that translates a data type from Postgresql to PHP and from PHP to Postgresql. By default, the following converters are registered, this means all databases have them:
+The *Database* class brings access to mechanisms to create connections and transactions and also register converters. A *Converter* is a class that translates a data type from Postgresql to PHP and from PHP to Postgresql. By default, the following converters are registered, this means you can use them without configuring anything:
  * Boolean: convert postgresql 't' and 'f' to PHP boolean value
  * Number: convert postgresql 'smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial' types to numbers
  * String: convert postgresql 'varchar' and 'text' into PHP string
  * Timestamp: convert postgresql 'timestamp', 'date', 'time' to PHP DateTime instance.
+
+Other types are natively available in postgresql databases but are not loaded automatically by Pomm:
+
  * Point: convert a postgresql 'point' into a Pomm\\Type\\Point instance.
 
 Postgresql contribs come with handy extra data type (like HStore, a key => value array and LTree a materialized path data type). If you use these types in your database you have to register the according converters from your database instance::
@@ -114,7 +117,7 @@ Postgresql contribs come with handy extra data type (like HStore, a key => value
   # The following line registers the HStore converter to the default database.
   
   $service->getDatabase()
-    ->registerConverter('HStore', new Pomm\Converter\HStore(), array('hstore'));
+    ->registerConverter('HStore', new Pomm\Converter\PgHStore(), array('hstore'));
 
 Arguments for instanciating a *Converter* are the following:
  * the first argument is the converter name. It is used in the *Map Classes* to link with fields (see Map Classes below).

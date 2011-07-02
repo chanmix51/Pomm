@@ -410,21 +410,27 @@ $service-&gt;setDatabase('db_two', new App\MyDb(array(
 <div class="section" id="database-and-converters">
 <h2>Database and converters</h2>
 <dl class="docutils">
-<dt>The <em>Database</em> class brings access to mechanisms to create connections and transactions and also register converters. A <em>Converter</em> is a class that translates a data type from Postgresql to PHP and from PHP to Postgresql. By default, the following converters are registered, this means all databases have them:</dt>
+<dt>The <em>Database</em> class brings access to mechanisms to create connections and transactions and also register converters. A <em>Converter</em> is a class that translates a data type from Postgresql to PHP and from PHP to Postgresql. By default, the following converters are registered, this means you can use them without configuring anything:</dt>
 <dd><ul class="first last simple">
 <li>Boolean: convert postgresql 't' and 'f' to PHP boolean value</li>
-<li>Integer: convert postgresql 'smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial' types to numbers</li>
+<li>Number: convert postgresql 'smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial' types to numbers</li>
 <li>String: convert postgresql 'varchar' and 'text' into PHP string</li>
 <li>Timestamp: convert postgresql 'timestamp', 'date', 'time' to PHP DateTime instance.</li>
 </ul>
 </dd>
 </dl>
+<p>Other types are natively available in postgresql databases but are not loaded automatically by Pomm:</p>
+<blockquote>
+<ul class="simple">
+<li>Point: convert a postgresql 'point' into a Pomm\Type\Point instance.</li>
+</ul>
+</blockquote>
 <p>Postgresql contribs come with handy extra data type (like HStore, a key =&gt; value array and LTree a materialized path data type). If you use these types in your database you have to register the according converters from your database instance:</p>
 <pre class="literal-block"># The HStore converter converts a postgresql HStore to a PHP associative array and the other way around.
 # The following line registers the HStore converter to the default database.
 
 $service-&gt;getDatabase()
-  -&gt;registerConverter('HStore', new Pomm\Converter\HStore(), array('hstore'));
+  -&gt;registerConverter('HStore', new Pomm\Converter\PgHStore(), array('hstore'));
 </pre>
 <dl class="docutils">
 <dt>Arguments for instanciating a <em>Converter</em> are the following:</dt>
@@ -824,12 +830,12 @@ $entity-&gt;setPlop(false);
 
 $map-&gt;updateOne($entity, array('pika'));
 
-$entity-&gt;getPika();        // chu
-$entity-&gt;getPlop();        // true
+$map-&gt;getPika();            // chu
+$map-&gt;getPlop();            // true
 
 $map-&gt;deleteOne($entity);
 
-$entity-&gt;isNew();           // true
+$entity-&gt;isNew();           // false
 $entity-&gt;isModify();        // false
 </pre>
 <p>In the example above, you can see there are several ways to save data to the database. The first obvious one is <em>saveOne()</em>. Depending on the entity's status is performs an insert or an update on the right table. In the case the entity already exists, all the fields are systematically updated which can sometimes be a problem. If you wish to specifically tell Pomm to update only a subset of the entity, the <em>updateOne()</em> method is made for that. This method will save the data you want and will reload the object to reflect eventual changes triggered by the update. This means all other changes are discarded and replaced by the values from the database.</p>
