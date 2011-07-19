@@ -1,0 +1,74 @@
+<?php
+namespace Pomm\Converter;
+
+use Pomm\Converter\ConverterInterface;
+use Pomm\Type\Point;
+use Pomm\Type\Lseg;
+use Pomm\Exception\Exception;
+
+/**
+ * Pomm\Converter\PgLseg - Geometric Segment converter
+ * 
+ * @package Pomm
+ * @version $id$
+ * @copyright 2011 Grégoire HUBERT 
+ * @author Grégoire HUBERT <hubert.greg@gmail.com>
+ * @license X11 {@link http://opensource.org/licenses/mit-license.php}
+ */
+class PgLseg implements ConverterInterface
+{
+    protected $class_name;
+    protected $point_converter;
+
+    /**
+     * __construct() - Converter constuctor
+     *
+     * @param String the fully qualified Segment type class name
+     **/
+    public function __construct($class_name = 'Pomm\Type\Segment', PgPoint $point_converter = null)
+    {
+        $this->class_name = $class_name;
+        $this->point_converter = is_null($point_converter) ? new PgPoint() : $point_converter;
+    }
+
+    /**
+     * @see ConverterInterface
+     **/
+    public function fromPg($data)
+    {
+        $data = trim($data, "[]");
+        $elts = preg_split('/[,\s]*(\([^\)]+\))[,\s]*|[,\s]+/', $data, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+
+        if (count($elts) !== 2)
+        {
+            throw new Exception(sprintf("Cannot parse segment data '%s'.", $data));
+        }
+
+        return new $this->class_name($this->point_converter->fromPg($elts[0]), $this->point_converter->fromPg($elts[1]));
+    }
+
+    /**
+     * @see ConverterInterface
+     **/
+    public function toPg($data)
+    {
+        if (! $data instanceof $this->class_name)
+        {
+            if (!is_object($data)) 
+            {
+                $type = gettype($data);
+            }
+            else 
+            {
+                $type = get_class($data);
+            }
+
+            throw new Exception(sprintf("Converter PgPoint needs data to be an instance of '%s' ('%s' given).", $this->class_name, $type));
+        }
+
+        return sprintf("'[%s,%s]'::lseg", 
+            str_replace("'", '', str_replace('::point', '', $this->point_converter->toPg($data->point_a))),
+            str_replace("'", '', str_replace('::point', '', $this->point_converter->toPg($data->point_b)))
+        );
+    }
+}
