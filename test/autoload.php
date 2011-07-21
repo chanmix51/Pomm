@@ -29,7 +29,9 @@ function __autoload($name)
         'Pomm/Converter/PgTimestamp.php',
         'Pomm/Converter/PgPoint.php',
         'Pomm/Converter/PgEntity.php',
+        'Pomm/Converter/PgLseg.php',
         'Pomm/Type/Point.php',
+        'Pomm/Type/Segment.php',
 );
     $name = preg_split('/\\\/', $name);
     $class_name = array_pop($name);

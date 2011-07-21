@@ -453,7 +453,7 @@ abstract class BaseObjectMap
      * @param BaseObject 
      * @param Array fields
      **/
-    public function updateOne(BaseObject &$object, Array $fields)
+    public function updateOne(BaseObject $object, Array $fields)
     {
         $this->checkObject($object, sprintf('"%s" class does not know how to update "%s" objects.', get_class($this), get_class($object)));
 

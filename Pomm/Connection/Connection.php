@@ -114,120 +114,120 @@ class Connection
         return $object;
     }
 
-  /**
-   * getDatabase
-   * Returns the connection's database
-   *
-   * @access public
-   * @return Database
-   **/
+    /**
+     * getDatabase
+     * Returns the connection's database
+     *
+     * @access public
+     * @return Database
+     **/
     public function getDatabase()
     {
         return $this->database;
     }
 
-  /**
-   * begin
-   * Starts a new transaction
-   *
-   * @return Pomm\Connection\Connection
-   **/
-  public function begin()
-  {
-      if ($this->in_transaction)
-      {
-          throw new Exception("Cannot begin a new transaction, we are already in a transaction.");
-      }
+    /**
+     * begin
+     * Starts a new transaction
+     *
+     * @return Pomm\Connection\Connection
+     **/
+    public function begin()
+    {
+        if ($this->in_transaction)
+        {
+            throw new Exception("Cannot begin a new transaction, we are already in a transaction.");
+        }
 
-      $this->in_transaction = 0 === $this->getPdo()->exec(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->isolation));
+        $this->in_transaction = 0 === $this->getPdo()->exec(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->isolation));
 
-      return $this;
-  }
+        return $this;
+    }
 
-  /**
-   * commit
-   * Commits a transaction in the database
-   *
-   * @return Pomm\Connection\Connection
-   **/
-  public function commit()
-  {
-      if (! $this->in_transaction)
-      {
-          throw new Exception("COMMIT while not in a transaction");
-      }
+    /**
+     * commit
+     * Commits a transaction in the database
+     *
+     * @return Pomm\Connection\Connection
+     **/
+    public function commit()
+    {
+        if (! $this->in_transaction)
+        {
+            throw new Exception("COMMIT while not in a transaction");
+        }
 
-      $this->in_transaction = 0 !== $this->getPdo()->exec('COMMIT');
+        $this->in_transaction = 0 !== $this->getPdo()->exec('COMMIT');
 
-      return $this;
-  }
+        return $this;
+    }
 
-  /**
-   * rollback
-   * rollback a transaction. This can be the whole transaction
-   * or if a savepoint name is specified only the queries since
-   * this savepoint.
-   *
-   * @param String $name the name of the savepoint (optionnal)
-   * @return Pomm\Connection\Connection
-   **/
-  public function rollback($name = null)
-  {
-      if (! $this->in_transaction)
-      {
-          throw new Exception("ROLLBACK while not in a transaction");
-      }
+    /**
+     * rollback
+     * rollback a transaction. This can be the whole transaction
+     * or if a savepoint name is specified only the queries since
+     * this savepoint.
+     *
+     * @param String $name the name of the savepoint (optionnal)
+     * @return Pomm\Connection\Connection
+     **/
+    public function rollback($name = null)
+    {
+        if (! $this->in_transaction)
+        {
+            throw new Exception("ROLLBACK while not in a transaction");
+        }
 
-      if (is_null($name))
-      {
-          $this->getPdo()->exec('ROLLBACK TRANSACTION');
-          $this->in_transaction = false;
-      }
-      else
-      {
-          $this->getPdo()->exec(sprintf("ROLLBACK TO SAVEPOINT %s", $name));
-      }
+        if (is_null($name))
+        {
+            $this->getPdo()->exec('ROLLBACK TRANSACTION');
+            $this->in_transaction = false;
+        }
+        else
+        {
+            $this->getPdo()->exec(sprintf("ROLLBACK TO SAVEPOINT %s", $name));
+        }
 
-      return $this;
-  }
+        return $this;
+    }
 
 
-  /**
-   * setSavepoint
-   * Set a new savepoint with the given name
-   *
-   * @param String $name the savepoint's name
-   * @return Pomm\Connection\Connection
-   **/
-  public function setSavepoint($name)
-  {
-      $this->getPdo()->exec(sprintf("SAVEPOINT %s", $name));
+    /**
+     * setSavepoint
+     * Set a new savepoint with the given name
+     *
+     * @param String $name the savepoint's name
+     * @return Pomm\Connection\Connection
+     **/
+    public function setSavepoint($name)
+    {
+        $this->getPdo()->exec(sprintf("SAVEPOINT %s", $name));
 
-      return $this;
-  }
+        return $this;
+    }
 
-  /**
-   * releaseSavepoint
-   * forget the specified savepoint
-   *
-   * @param String $name the savepoint's name
-   * @return Pomm\Connection\Connection
-   **/
-  public function releaseSavepoint($name)
-  {
-      $this->getPdo()->exec(sprintf("RELEASE SAVEPOINT %s", $name));
+    /**
+     * releaseSavepoint
+     * forget the specified savepoint
+     *
+     * @param String $name the savepoint's name
+     * @return Pomm\Connection\Connection
+     **/
+    public function releaseSavepoint($name)
+    {
+        $this->getPdo()->exec(sprintf("RELEASE SAVEPOINT %s", $name));
 
-      return $this;
-  }
+        return $this;
+    }
 
-  /**
-   * isInTransaction
-   * Check if we are in transaction mode
-   *
-   * @return boolean
-   **/
-  public function isInTransaction()
-  {
-      return (bool) $this->in_transaction;
-  }
+    /**
+     * isInTransaction
+     * Check if we are in transaction mode
+     *
+     * @return boolean
+     **/
+    public function isInTransaction()
+    {
+        return (bool) $this->in_transaction;
+    }
 }

@@ -20,12 +20,12 @@ class PgHStore implements ConverterInterface
      **/
     public function fromPg($data)
     {
-        $split = preg_split('/[,\s]*"([^"]+)"[,\s]*|[,\s]+/', $data, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        $split = preg_split('/[,\s]*"([^"]+)"[,\s]*|[,=>\s]+/', $data, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
         $hstore = array();
 
-        for ($index = 0; $index < count($line['something']); $index = $index + 3)
+        for ($index = 0; $index < count($split); $index = $index + 2)
         {
-            $hstore[$split[$index]] = $split[$index + 2];
+            $hstore[$split[$index]] = $split[$index + 1] != 'NULL' ? $split[$index + 1] : null;
         }
 
         return $hstore;
@@ -43,9 +43,16 @@ class PgHStore implements ConverterInterface
 
         $insert_values = array();
 
-        foreach($to_insert as $key => $value)
+        foreach($data as $key => $value)
         {
-            $insert_values[] = sprintf('"%s" => "%s"', $key, $value);
+            if (is_null($value))
+            {
+                $insert_values[] = sprintf('"%s" => NULL', $key);
+            }
+            else
+            {
+                $insert_values[] = sprintf('"%s" => "%s"', $key, $value);
+            }
         }
 
         return sprintf("'%s'::hstore", join(', ', $insert_values));

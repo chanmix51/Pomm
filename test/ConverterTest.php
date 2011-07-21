@@ -114,7 +114,7 @@ class converter_test extends \lime_test
         }
 
         $this->object->setTestLseg($segment);
-        $this->map->saveOne($this->object);
+        $this->map->updateOne($this->object, array('test_lseg'));
 
         $object = $this->map->findByPk($this->object->getPrimaryKey());
 
@@ -124,6 +124,37 @@ class converter_test extends \lime_test
         $this->is($object['test_lseg']->point_a->y, $segment->point_a->y, sprintf("Coord 'y' are equal (%f).", $segment->point_a->y));
         $this->is($object['test_lseg']->point_b->x, $segment->point_b->x, sprintf("Coord 'x' are equal (%f).", $segment->point_b->x));
         $this->is($object['test_lseg']->point_b->y, $segment->point_b->y, sprintf("Coord 'y' are equal (%f).", $segment->point_b->y));
+
+        return $this;
+    }
+
+    public function testHStore(Array $values)
+    {
+        $this->info('\\Pomm\\Converter\\PgHStore');
+        if (!$this->map->hasField('test_hstore'))
+        {
+            $this->info('Creating column test_hstore.');
+            $this->map->addHStore();
+        }
+
+        $this->object->setTestHstore($values);
+        $this->map->updateOne($this->object, array('test_hstore'));
+
+        $object = $this->map->findByPk($this->object->getPrimaryKey());
+
+        $hstore = $object['test_hstore'];
+        foreach ($values as $key => $value)
+        {
+            if (is_null($value))
+            {
+                $this->ok(is_null($hstore[$key]), sprintf("Check hstore '%s' is NULL.", $key));
+                print($hstore[$key]);
+            }
+            else
+            {
+                $this->is($hstore[$key], $value, sprintf("Check hstore key '%s' => '%s'.", $key, $value));
+            }
+        }
 
         return $this;
     }
@@ -137,4 +168,6 @@ $test
     ->testPoint(new Type\Point(0,0))
     ->testPoint(new Type\Point(47.123456,-0.654321))
     ->testLseg(new Type\Segment(new Type\Point(1,1), new Type\Point(2,2)))
+    ->testHStore(array('plop' => 1, 'pika' => 'chu'))
+    ->testHStore(array('a' => null, 'b' => 2))
     ;

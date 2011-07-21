@@ -6,6 +6,7 @@ use Pomm\Service;
 use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
 use Pomm\Object\Collection;
+use Pomm\Converter;
 
 class TestTableMap extends BaseObjectMap
 {
@@ -40,5 +41,73 @@ class TestTableMap extends BaseObjectMap
 }
 
 class TestTable extends BaseObject
+{
+}
+
+class TestConverterMap extends BaseObjectMap
+{
+    protected function initialize()
+    {
+        $this->object_class =  'Pomm\Test\TestConverter';
+        $this->object_name  =  'pomm_test.converter';
+        $this->field_definitions  = array(
+            'id'               => 'Integer',
+            'created_at'       => 'Timestamp',
+            'something'        => 'String',
+            'is_true'          => 'Boolean',
+            'precision'        => 'Integer',
+            'probed_data'      => 'Integer',
+        );
+    }
+
+    public function createTable()
+    {
+        try
+        {
+            $this->connection->begin();
+            $sql = "CREATE SCHEMA pomm_test";
+            $this->query($sql);
+
+            $sql = "CREATE TABLE pomm_test.converter (id SERIAL PRIMARY KEY, created_at TIMESTAMP NOT NULL DEFAULT now(), something VARCHAR, is_true BOOLEAN, precision FLOAT, probed_data NUMERIC(4,3))";
+            $this->query($sql);
+            $this->connection->commit();
+        }
+        catch (Exception $e)
+        {
+            $this->connection->rollback();
+            throw $e;
+        }
+    }
+
+    public function dropTable()
+    {
+        $sql = "DROP SCHEMA pomm_test CASCADE";
+        $this->query($sql);
+    }
+
+    public function addPoint()
+    {
+        $this->query('ALTER TABLE pomm_test.converter ADD COLUMN test_point point');
+        $this->connection->getDatabase()->registerConverter('Point', new Converter\PgPoint(), array('point'));
+        $this->addField('test_point', 'Point');
+    }
+
+    public function addLseg()
+    {
+        $this->query('ALTER TABLE pomm_test.converter ADD COLUMN test_lseg lseg');
+        $this->connection->getDatabase()->registerConverter('Lseg', new Converter\PgLseg(), array('lseg'));
+        $this->addField('test_lseg', 'Lseg');
+    }
+
+    public function addHStore()
+    {
+        $this->query('ALTER TABLE pomm_test.converter ADD COLUMN test_hstore hstore');
+        $this->connection->getDatabase()->registerConverter('HStore', new Converter\PgHStore(), array('hstore'));
+        $this->addField('test_hstore', 'HStore');
+    }
+
+}
+
+class TestConverter extends BaseObject
 {
 }
