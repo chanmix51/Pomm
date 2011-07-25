@@ -30,8 +30,10 @@ function __autoload($name)
         'Pomm/Converter/PgPoint.php',
         'Pomm/Converter/PgEntity.php',
         'Pomm/Converter/PgLseg.php',
+        'Pomm/Converter/PgCircle.php',
         'Pomm/Type/Point.php',
         'Pomm/Type/Segment.php',
+        'Pomm/Type/Circle.php',
 );
     $name = preg_split('/\\\/', $name);
     $class_name = array_pop($name);

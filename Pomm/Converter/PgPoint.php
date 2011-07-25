@@ -57,6 +57,6 @@ class PgPoint implements ConverterInterface
             throw new Exception(sprintf("Converter PgPoint needs data to be an instance of Pomm\\Type\\Point ('%s' given).", $type));
         }
 
-        return sprintf("('%f,%f')::point", $data->x, $data->y);
+        return sprintf("point(%f, %f)", $data->x, $data->y);
     }
 }

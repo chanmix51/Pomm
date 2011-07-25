@@ -158,6 +158,29 @@ class converter_test extends \lime_test
 
         return $this;
     }
+
+    public function testCircle(Type\Circle $circle)
+    {
+        $this->info('\\Pomm\\Converter\\PgCircle');
+        if (!$this->map->hasField('test_circle'))
+        {
+            $this->info('Creating column test_circle.');
+            $this->map->addCircle();
+        }
+
+        $this->object->setTestCircle($circle);
+        $this->map->updateOne($this->object, array('test_circle'));
+
+        $object = $this->map->findByPk($this->object->getPrimaryKey());
+        $this->ok(is_object($object['test_circle']), "'test_circle' is an object.");
+        $this->ok($object['test_circle'] instanceof \Pomm\Type\Circle, "'test_circle' is a \\Pomm\\Type\\Circle instance.");
+        $this->is($object['test_circle']->center->x, $circle->center->x, sprintf("Center 'x' is equal to '%f'.", $circle->center->x));
+        $this->is($object['test_circle']->center->y, $circle->center->y, sprintf("Center 'y' is equal to '%f'.", $circle->center->y));
+        $this->is($object['test_circle']->radius, $circle->radius, sprintf("Radius is equal to '%f'.", $circle->radius));
+
+        return $this;
+
+    }
 }
 
 $test = new converter_test();
@@ -170,4 +193,5 @@ $test
     ->testLseg(new Type\Segment(new Type\Point(1,1), new Type\Point(2,2)))
     ->testHStore(array('plop' => 1, 'pika' => 'chu'))
     ->testHStore(array('a' => null, 'b' => 2))
+    ->testCircle(new Type\Circle(new Type\Point(1,2), 3))
     ;

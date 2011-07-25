@@ -15,7 +15,7 @@ class TestTableMap extends BaseObjectMap
         $this->object_class =  'Pomm\Test\TestTable';
         $this->object_name  =  'book';
         $this->field_definitions  = array(
-            'id'               =>    'Integer',
+            'id'               =>    'Number',
             'created_at'       =>    'Timestamp',
             'last_in'          =>    'Timestamp',
             'last_out'         =>    'Timestamp',
@@ -51,12 +51,12 @@ class TestConverterMap extends BaseObjectMap
         $this->object_class =  'Pomm\Test\TestConverter';
         $this->object_name  =  'pomm_test.converter';
         $this->field_definitions  = array(
-            'id'               => 'Integer',
+            'id'               => 'Number',
             'created_at'       => 'Timestamp',
             'something'        => 'String',
             'is_true'          => 'Boolean',
-            'precision'        => 'Integer',
-            'probed_data'      => 'Integer',
+            'precision'        => 'Number',
+            'probed_data'      => 'Number',
         );
     }
 
@@ -106,6 +106,12 @@ class TestConverterMap extends BaseObjectMap
         $this->addField('test_hstore', 'HStore');
     }
 
+    public function addCircle()
+    {
+        $this->query('ALTER TABLE pomm_test.converter ADD COLUMN test_circle circle');
+        $this->connection->getDatabase()->registerConverter('Circle', new Converter\PgCircle(), array('circle'));
+        $this->addField('test_circle', 'Circle');
+    }
 }
 
 class TestConverter extends BaseObject

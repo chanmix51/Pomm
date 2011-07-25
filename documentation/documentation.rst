@@ -109,7 +109,9 @@ The *Database* class brings access to mechanisms to create connections and trans
 
 Other types are natively available in postgresql databases but are not loaded automatically by Pomm:
 
- * Point: convert a postgresql 'point' into a Pomm\\Type\\Point instance.
+ * Point: postgresql 'point' representation as Pomm\\Type\\Point instance.
+ * Segment : 'segment' representation as Pomm\\Type\\Segment.
+ * Circle : 'circle' representation as Pomm\\Type\\Circle.
 
 Postgresql contribs come with handy extra data type (like HStore, a key => value array and LTree a materialized path data type). If you use these types in your database you have to register the according converters from your database instance::
 
@@ -119,7 +121,7 @@ Postgresql contribs come with handy extra data type (like HStore, a key => value
   $service->getDatabase()
     ->registerConverter('HStore', new Pomm\Converter\PgHStore(), array('hstore'));
 
-Arguments for instanciating a *Converter* are the following:
+Arguments to instanciate a *Converter* are the following:
  * the first argument is the converter name. It is used in the *Map Classes* to link with fields (see Map Classes below).
  * the second argument is the instance of the *Converter*
  * the third argument is a word or a set of words for Pomm to identify what converter to use when scanning the database to create the Map files. These words are going to be used in a regular expression match.
@@ -136,6 +138,8 @@ If your database has a lot of custom types, it is a better idea to create your o
     {
       parent::initialize();
       $this->registerConverter('HStore', new Pomm\Converter\Hstore(), array('hstore'));
+      $this->registerConverter('Point', new Converter\Pgpoint(), array('point'));
+      $this->registerConverter('Circle', new Converter\PgCircle(), array('circle'));
     }
   }
 

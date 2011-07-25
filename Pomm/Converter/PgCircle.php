@@ -3,11 +3,10 @@ namespace Pomm\Converter;
 
 use Pomm\Converter\ConverterInterface;
 use Pomm\Type\Point;
-use Pomm\Type\Lseg;
-use Pomm\Exception\Exception;
+use Pomm\Type\Circle;
 
 /**
- * Pomm\Converter\PgLseg - Geometric Segment converter
+ * Pomm\Converter\PgCircle - Geometric Circle converter
  * 
  * @package Pomm
  * @version $id$
@@ -15,7 +14,7 @@ use Pomm\Exception\Exception;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class PgLseg implements ConverterInterface
+class PgCircle implements ConverterInterface
 {
     protected $class_name;
     protected $point_converter;
@@ -23,9 +22,9 @@ class PgLseg implements ConverterInterface
     /**
      * __construct() - Converter constuctor
      *
-     * @param String the fully qualified Segment type class name
+     * @param String the fully qualified Circle type class name
      **/
-    public function __construct($class_name = 'Pomm\Type\Segment', PgPoint $point_converter = null)
+    public function __construct($class_name = 'Pomm\Type\Circle', PgPoint $point_converter = null)
     {
         $this->class_name = $class_name;
         $this->point_converter = is_null($point_converter) ? new PgPoint() : $point_converter;
@@ -36,15 +35,17 @@ class PgLseg implements ConverterInterface
      **/
     public function fromPg($data)
     {
-        $data = trim($data, "[]");
+        $data = trim($data, '<>');
+
         $elts = preg_split('/[,\s]*(\([^\)]+\))[,\s]*|[,\s]+/', $data, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
         if (count($elts) !== 2)
         {
-            throw new Exception(sprintf("Cannot parse segment data '%s'.", $data));
+            throw new Exception(sprintf("Cannot parse circle data '%s'.", $data));
         }
 
-        return new $this->class_name($this->point_converter->fromPg($elts[0]), $this->point_converter->fromPg($elts[1]));
+
+        return new Circle($this->point_converter->fromPg($elts[0]), $elts[1]);
     }
 
     /**
@@ -63,12 +64,12 @@ class PgLseg implements ConverterInterface
                 $type = get_class($data);
             }
 
-            throw new Exception(sprintf("Converter PgLseg needs data to be an instance of '%s' ('%s' given).", $this->class_name, $type));
+            throw new Exception(sprintf("Converter PgCircle needs data to be an instance of '%s' ('%s' given).", $this->class_name, $type));
         }
 
-        return sprintf("lseg(%s, %s)", 
-            $this->point_converter->toPg($data->point_a),
-            $this->point_converter->toPg($data->point_b)
+        return sprintf("circle(%s, %s)",
+            $this->point_converter->toPg($data->center),
+            $data->radius
         );
     }
 }

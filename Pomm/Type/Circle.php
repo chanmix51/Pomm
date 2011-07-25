@@ -3,7 +3,7 @@
 namespace Pomm\Type;
 
 /**
- * Pomm\Type\Point - Point type
+ * Pomm\Type\Circle - Circle type
  * 
  * @package Pomm
  * @version $id$
@@ -11,14 +11,15 @@ namespace Pomm\Type;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class Point
+class Circle
 {
-    public $x;
-    public $y;
 
-    public function __construct($x, $y)
+    public $center;
+    public $radius;
+
+    public function __construct(Point $center, $radius)
     {
-        $this->x = $x;
-        $this->y = $y;
+        $this->center = $center;
+        $this->radius = $radius;
     }
 }

@@ -422,7 +422,9 @@ $service-&gt;setDatabase('db_two', new App\MyDb(array(
 <p>Other types are natively available in postgresql databases but are not loaded automatically by Pomm:</p>
 <blockquote>
 <ul class="simple">
-<li>Point: convert a postgresql 'point' into a Pomm\Type\Point instance.</li>
+<li>Point: postgresql 'point' representation as Pomm\Type\Point instance.</li>
+<li>Segment : 'segment' representation as Pomm\Type\Segment.</li>
+<li>Circle : 'circle' representation as Pomm\Type\Circle.</li>
 </ul>
 </blockquote>
 <p>Postgresql contribs come with handy extra data type (like HStore, a key =&gt; value array and LTree a materialized path data type). If you use these types in your database you have to register the according converters from your database instance:</p>
@@ -433,7 +435,7 @@ $service-&gt;getDatabase()
   -&gt;registerConverter('HStore', new Pomm\Converter\PgHStore(), array('hstore'));
 </pre>
 <dl class="docutils">
-<dt>Arguments for instanciating a <em>Converter</em> are the following:</dt>
+<dt>Arguments to instanciate a <em>Converter</em> are the following:</dt>
 <dd><ul class="first last simple">
 <li>the first argument is the converter name. It is used in the <em>Map Classes</em> to link with fields (see Map Classes below).</li>
 <li>the second argument is the instance of the <em>Converter</em></li>
@@ -454,6 +456,8 @@ $service-&gt;getDatabase()
   {
     parent::initialize();
     $this-&gt;registerConverter('HStore', new Pomm\Converter\Hstore(), array('hstore'));
+    $this-&gt;registerConverter('Point', new Converter\Pgpoint(), array('point'));
+    $this-&gt;registerConverter('Circle', new Converter\PgCircle(), array('circle'));
   }
 }
 </pre>
