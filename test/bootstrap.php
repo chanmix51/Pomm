@@ -58,6 +58,7 @@ class TestConverterMap extends BaseObjectMap
             'precision'        => 'Number',
             'probed_data'      => 'Number',
         );
+        $this->pk_fields    = array('id');
     }
 
     public function createTable()
