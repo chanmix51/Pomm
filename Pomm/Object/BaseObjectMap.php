@@ -571,7 +571,7 @@ abstract class BaseObjectMap
      * @access public
      * @return Array
      **/
-    public function getGroupByFields($alias = '')
+    public function getGroupByFields($alias = null)
     {
         $this->getFields($alias);
     }
@@ -585,7 +585,7 @@ abstract class BaseObjectMap
      * @access public
      * @return Array
      **/
-    public function getSelectFields($alias = '')
+    public function getSelectFields($alias = null)
     {
         return $this->getFields($alias);
     }
@@ -599,10 +599,10 @@ abstract class BaseObjectMap
      * @access public
      * @return Array
      **/
-    public function getFields($alias = '')
+    public function getFields($alias = null)
     {
         $fields = array();
-        $alias  = "" === $alias ? $alias : $alias.".";
+        $alias  = is_null($alias) ? '' : $alias.".";
 
         foreach ($this->field_definitions as $name => $type)
         {
