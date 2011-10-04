@@ -10,221 +10,180 @@ namespace Pomm\Object;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class Collection implements \ArrayAccess, \Iterator, \Countable 
+class Collection implements \Iterator, \Countable 
 {
-  protected $collection = array();
-  protected $position;
+    protected $stmt;
+    protected $object_map;
+    protected $position = 0;
 
-  /**
-   * __construct 
-   * 
-   * @param Array $data 
-   * @access public
-   * @return void
-   */
-  public function __construct(Array $data)
-  {
-    $this->collection = $data;
-    $this->position = $this->count() > 0 ? 0 : null;
-  }
+    /**
+     * __construct 
+     * 
+     * @param Array $data 
+     * @access public
+     * @return void
+     */
+    public function __construct(\PDOStatement $stmt, \Pomm\Object\BaseObjectMap $object_map)
+    {
+        $this->stmt = $stmt;
+        $this->object_map = $object_map;
+        $this->position = $this->stmt === false ? null : 0;
+    }
 
-  /**
-   * count 
-   * 
-   * @access public
-   * @return integer
-   */
-  public function count()
-  {
-    return count($this->collection);
-  }
+    public function __destruct()
+    {
+        $this->stmt->closeCursor();
+    }
 
-  /**
-   * addData 
-   * 
-   * @param mixed $data 
-   * @access public
-   * @return void
-   */
-  public function addData($data)
-  {
-    $this->collection[] = $data;
-  }
+    /**
+     * count 
+     * 
+     * @access public
+     * @see \Countable
+     * @return integer
+     */
+    public function count()
+    {
+        return $this->stmt->rowCount();
+    }
 
-  /**
-   * offsetSet 
-   * 
-   * @param mixed $offset 
-   * @param mixed $value 
-   * @access public
-   * @return void
-   */
-  public function offsetSet($offset, $value) 
-  {
-    $this->collection[$offset] = $value;
-  }
 
-  /**
-   * offsetExists 
-   * 
-   * @param mixed $offset 
-   * @access public
-   * @return boolean
-   */
-  public function offsetExists($offset) 
-  {
-    return isset($this->collection[$offset]);
-  }
+    /**
+     * rewind 
+     * 
+     * @access public
+     * @see \Iterator
+     * @return void
+     */
+    public function rewind() 
+    {
+        $this->position = 0;
+    }
 
-  /**
-   * offsetUnset 
-   * 
-   * @param mixed $offset 
-   * @access public
-   * @return void
-   */
-  public function offsetUnset($offset) 
-  {
-    unset($this->collection[$offset]);
-  }
+    /**
+     * current 
+     * 
+     * @access public
+     * @see \Iterator
+     * @return void
+     */
+    public function current() 
+    {
+        $values = $this->stmt->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_ABS, $this->position);
+        $object = $this->object_map->createObject();
 
-  /**
-   * offsetGet 
-   * 
-   * @param mixed $offset 
-   * @access public
-   * @return mixed
-   */
-  public function offsetGet($offset) 
-  {
-    return isset($this->collection[$offset]) ? $this->collection[$offset] : null;
-  }
+        $object->hydrate($this->object_map->convertPg($values, 'fromPg'));
+        $object->_setStatus(BaseObject::EXIST);
 
-  /**
-   * rewind 
-   * 
-   * @access public
-   * @return void
-   */
-  public function rewind() 
-  {
-    $this->position = 0;
-  }
+        return $object;
+    }
 
-  /**
-   * current 
-   * 
-   * @access public
-   * @return void
-   */
-  public function current() 
-  {
-    return $this->collection[$this->position];
-  }
+    /**
+     * key 
+     * 
+     * @access public
+     * @see \Iterator
+     * @return void
+     */
+    public function key() 
+    {
+        return $this->position;
+    }
 
-  /**
-   * key 
-   * 
-   * @access public
-   * @return void
-   */
-  public function key() 
-  {
-    return $this->position;
-  }
+    /**
+     * next 
+     * 
+     * @access public
+     * @see \Iterator
+     * @return void
+     */
+    public function next() 
+    {
+        ++$this->position;
+    }
 
-  /**
-   * next 
-   * 
-   * @access public
-   * @return void
-   */
-  public function next() 
-  {
-    ++$this->position;
-  }
+    /**
+     * valid 
+     * 
+     * @access public
+     * @see \Iterator
+     * @return boolean
+     */
+    public function valid() 
+    {
+        return isset($this->collection[$this->position]);
+    }
 
-  /**
-   * valid 
-   * 
-   * @access public
-   * @return boolean
-   */
-  public function valid() 
-  {
-    return isset($this->collection[$this->position]);
-  }
+    /**
+     * isFirst 
+     * Is the iterator on the first element ?
+     *
+     * @access public
+     * @return boolean
+     */
+    public function isFirst()
+    {
+        return $this->position == 0;
+    }
 
-  /**
-   * isFirst 
-   * Is the iterator on the first element ?
-   *
-   * @access public
-   * @return boolean
-   */
-  public function isFirst()
-  {
-    return $this->position == 0;
-  }
+    /**
+     * isLast 
+     * Is the iterator on the last element ?
+     * 
+     * @access public
+     * @return boolean
+     */
+    public function isLast()
+    {
+        return $this->position == $this->count() - 1;
+    }
 
-  /**
-   * isLast 
-   * Is the iterator on the last element ?
-   * 
-   * @access public
-   * @return boolean
-   */
-  public function isLast()
-  {
-    return $this->position == $this->count() - 1;
-  }
+    /**
+     * isEmpty 
+     * Is the collection empty (no element) ?
+     * 
+     * @access public
+     * @return boolean
+     */
+    public function isEmpty()
+    {
+        return is_null($this->position);
+    }
 
-  /**
-   * isEmpty 
-   * Is the collection empty (no element) ?
-   * 
-   * @access public
-   * @return boolean
-   */
-  public function isEmpty()
-  {
-    return is_null($this->position);
-  }
+    /**
+     * isEven 
+     * Is the iterator on an even position ?
+     * 
+     * @access public
+     * @return boolean
+     */
+    public function isEven()
+    {
+        return ($this->position % 2) == 0;
+    }
 
-  /**
-   * isEven 
-   * Is the iterator on an even position ?
-   * 
-   * @access public
-   * @return boolean
-   */
-  public function isEven()
-  {
-    return ($this->position % 2) == 0;
-  }
+    /**
+     * isOdd 
+     * 
+     * @access public
+     * @return boolean
+     */
+    public function isOdd()
+    {
+        return ($this->position % 2) == 1;
+    }
 
-  /**
-   * isOdd 
-   * 
-   * @access public
-   * @return boolean
-   */
-  public function isOdd()
-  {
-    return ($this->position % 2) == 1;
-  }
-
-  /**
-   * getOddEven 
-   * Return 'odd' or 'even' depending on the element index position
-   * Useful to style list elements when printing lists to do 
-   * <li class="line_<?php $list->getOddEven() ?>">
-   * 
-   * @access public
-   * @return string
-   */
-  public function getOddEven()
-  {
-    return $this->position % 2 ? 'odd' : 'even';
-  }
+    /**
+     * getOddEven 
+     * Return 'odd' or 'even' depending on the element index position
+     * Useful to style list elements when printing lists to do 
+     * <li class="line_<?php $list->getOddEven() ?>">
+     * 
+     * @access public
+     * @return string
+     */
+    public function getOddEven()
+    {
+        return $this->position % 2 ? 'odd' : 'even';
+    }
 }

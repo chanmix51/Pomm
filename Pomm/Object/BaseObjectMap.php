@@ -120,7 +120,7 @@ abstract class BaseObjectMap
      */
     protected function prepareStatement($sql)
     {
-        return $this->connection->getPdo()->prepare($sql);
+        return $this->connection->getPdo()->prepare($sql, array(\PDO::CURSOR_SCROLL));
     }
 
     /**
@@ -201,7 +201,7 @@ abstract class BaseObjectMap
      */
     public function query($sql, $values = array())
     {
-        return $this->createObjectsFromStmt($this->doQuery($sql, $values));
+        return $this->createCollectionFromStatement($this->doQuery($sql, $values));
     }
 
     /**
@@ -230,19 +230,9 @@ abstract class BaseObjectMap
      * @access protected
      * @return Collection
      */
-    protected function createObjectsFromStmt(\PDOStatement $stmt)
+    protected function createCollectionFromStatement(\PDOStatement $stmt)
     {
-        $objects = array();
-        foreach($stmt->fetchAll(\PDO::FETCH_ASSOC) as $values)
-        {
-            $object = $this->createObject();
-            $object->hydrate($this->convertPg($values, 'fromPg'));
-            $object->_setStatus(BaseObject::EXIST);
-
-            $objects[] = $object;
-        }
-
-        return new Collection($objects);
+        return new Collection($stmt, $this);
     }
 
     /**
@@ -317,7 +307,7 @@ abstract class BaseObjectMap
 
         $result = $this->findWhere($this->createSqlAndFrom($values), array_values($values));
 
-        return count($result) == 1 ? $result[0] : null;
+        return count($result) == 1 ? $result->current() : null;
     }
 
     /**
@@ -326,10 +316,10 @@ abstract class BaseObjectMap
      *
      * @param Array $values Values to convert
      * @param mixed $method can be "fromPg" and "toPg"
-     * @access protected
+     * @access public
      * @return array
      */
-    protected function convertPg(Array $values, $method)
+    public function convertPg(Array $values, $method)
     {
         $out_values = array();
         foreach ($values as $name => $value)
@@ -439,7 +429,7 @@ abstract class BaseObjectMap
             $sql = sprintf('INSERT INTO %s (%s) VALUES (%s) RETURNING *;', $this->object_name, join(',', array_keys($pg_values)), join(',', array_values($pg_values)));
 
             $collection = $this->query($sql, array());
-            $object = $collection[0];
+            $object = $collection->current();
             $object->_setStatus(BaseObject::EXIST);
         }
     }
