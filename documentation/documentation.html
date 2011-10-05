@@ -755,8 +755,20 @@ public function getBlogPostsWithCommentCount(Pomm\Query\Where $where)
 </div>
 <div class="section" id="collections">
 <h2>Collections</h2>
+<p>The <em>query</em> method return a <em>Collection</em> instance that holds the PDOStatement with the results. The <em>Collection</em> class implements the <em>Coutable</em> and <em>Iterator</em> interfaces so you can foreach on a Collection to retrieve the results:</p>
+<pre class="literal-block">printf("Your search returned '%d' results.", $collection-&gt;count());
+
+foreach($collection as $blog_post)
+{
+  printf("Blog post '%s' posted on '%s' by '%s'.", $blog_post['title'], $blog_post['created_at']-&gt;format('Y-m-d'), $blog_post['author']);
+}
+</pre>
+<p>Sometimes, you want to access a particular result in a collection knowing the result's index. It is possible using the <em>has</em> and <em>get</em> methods:</p>
+<pre class="literal-block"># Get the an object from the collection at a given index or create a new one if index does not exist
+$object = $collection-&gt;has($index) ? $collection-&gt;get($index) : $map-&gt;createObject();
+</pre>
 <dl class="docutils">
-<dt>The <em>query</em> method return a <em>Collection</em> instance that holds all the <em>Entity</em> instances. This collection implements <em>ArrayAccess</em> to behave like an Array. Collections have handful methods like:</dt>
+<dt>Collections have other handful methods like:</dt>
 <dd><ul class="first last simple">
 <li><em>isFirst()</em></li>
 <li><em>isLast()</em></li>

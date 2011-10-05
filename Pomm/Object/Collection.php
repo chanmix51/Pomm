@@ -30,9 +30,50 @@ class Collection implements \Iterator, \Countable
         $this->position = $this->stmt === false ? null : 0;
     }
 
+    /**
+     * __destruct
+     * The instance destructor
+     * It closes the cursos when the collection is cleared.
+     *
+     * @access public
+     **/
     public function __destruct()
     {
         $this->stmt->closeCursor();
+    }
+
+    /**
+     * get
+     * Return a particular result
+     *
+     * @param index
+     * @access public
+     * @return \Pomm\Object\BaseObject
+     **/
+
+    public function get($index)
+    {
+        $object = $this->object_map->createObject();
+        $values = $this->stmt->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_ABS, $index);
+
+        $object->hydrate($this->object_map->convertPg($values, 'fromPg'));
+        $object->_setStatus(BaseObject::EXIST);
+
+        return $object;
+    }
+
+    /**
+     * has
+     * Return true if the given index exists false otherwise
+     *
+     * @access public
+     * @param index
+     * @return Boolean
+     **/
+
+    public function has($index)
+    {
+        return $index < $this->count();
     }
 
     /**
@@ -69,13 +110,7 @@ class Collection implements \Iterator, \Countable
      */
     public function current() 
     {
-        $values = $this->stmt->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_ABS, $this->position);
-        $object = $this->object_map->createObject();
-
-        $object->hydrate($this->object_map->convertPg($values, 'fromPg'));
-        $object->_setStatus(BaseObject::EXIST);
-
-        return $object;
+        return $this->get($this->position);
     }
 
     /**
@@ -111,7 +146,7 @@ class Collection implements \Iterator, \Countable
      */
     public function valid() 
     {
-        return isset($this->collection[$this->position]);
+        return $this->has($this->position);
     }
 
     /**

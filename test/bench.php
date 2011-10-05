@@ -72,6 +72,6 @@ case "bench":
     printf("Count = '%d'.\n", $collection->count());
     foreach ($collection as $result)
     {
-        sprintf(" %d | %d | %s | %s\n", $result['id'], $result['data_int'], $result['data_char'], $result['data_bool'] ? 'true' : 'false');
+        echo sprintf(" %d | %d | %s | %s\n", $result['id'], $result['data_int'], $result['data_char'], $result['data_bool'] ? 'true' : 'false');
     }
 }

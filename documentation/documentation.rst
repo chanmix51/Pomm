@@ -448,7 +448,25 @@ Whatever you are retrieving, Pomm will hydrate objects according to what is in *
 Collections
 ===========
 
-The *query* method return a *Collection* instance that holds all the *Entity* instances. This collection implements *ArrayAccess* to behave like an Array. Collections have handful methods like:
+The *query* method return a *Collection* instance that holds the PDOStatement with the results. The *Collection* class implements the *Coutable* and *Iterator* interfaces so you can foreach on a Collection to retrieve the results:
+
+::
+
+  printf("Your search returned '%d' results.", $collection->count());
+
+  foreach($collection as $blog_post)
+  {
+    printf("Blog post '%s' posted on '%s' by '%s'.", $blog_post['title'], $blog_post['created_at']->format('Y-m-d'), $blog_post['author']);
+  }
+
+Sometimes, you want to access a particular result in a collection knowing the result's index. It is possible using the *has* and *get* methods:
+
+::
+
+  # Get the an object from the collection at a given index or create a new one if index does not exist
+  $object = $collection->has($index) ? $collection->get($index) : $map->createObject();
+
+Collections have other handful methods like:
  * *isFirst()*
  * *isLast()*
  * *isEmpty()*
