@@ -49,19 +49,17 @@ class Connection
 
     protected function launch()
     {
-        $connect_string = sprintf('%s:dbname=%s user=%s', 
+        $connect_string = sprintf('%s:dbname=%s', 
             $this->parameter_holder['adapter'],
-            $this->parameter_holder['database'],
-            $this->parameter_holder['user'] 
+            $this->parameter_holder['database']
         );
 
-        $connect_string .= $this->parameter_holder['host'] !== '' ? sprintf(' host=%s', $this->parameter_holder['host']) : '';
-        $connect_string .= $this->parameter_holder['port'] !== '' ? sprintf(' port=%d', $this->parameter_holder['port']) : '';
-        $connect_string .= $this->parameter_holder['pass'] !== '' ? sprintf(' password=%s', $this->parameter_holder['pass']) : '';
+        $connect_string .= $this->parameter_holder['host'] !== '' ? sprintf(';host=%s', $this->parameter_holder['host']) : '';
+        $connect_string .= $this->parameter_holder['port'] !== '' ? sprintf(';port=%d', $this->parameter_holder['port']) : '';
 
         try
         {
-            $this->handler = new \PDO($connect_string);
+            $this->handler = new \PDO($connect_string, $this->parameter_holder['user'], $this->parameter_holder->hasParameter('pass') ? $this->parameter_holder['pass'] : null);
         }
         catch (\PDOException $e)
         {
