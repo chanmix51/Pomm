@@ -563,7 +563,7 @@ abstract class BaseObjectMap
      **/
     public function getGroupByFields($alias = null)
     {
-        $this->getFields($alias);
+        return $this->getFields($alias);
     }
 
     /**
@@ -600,5 +600,31 @@ abstract class BaseObjectMap
         }
 
         return $fields;
+    }
+
+    public function createFromForeign(Array $old_values)
+    {
+        $values = array();
+        $new_values = array();
+        $table = $this->getTableName();
+        $table_name = strpos($table, '.') ? substr(strstr($table, '.'), 1) : $table;
+
+        foreach($old_values as $name => $value)
+        {
+            if (preg_match(sprintf('/%s\{(\w+)\}/', $table_name), $name, $matchs))
+            {
+                $values[$matchs[1]] = $value;
+            }
+            else
+            {
+                $new_values[$name] = $value;
+            }
+        }
+
+        $new_values[$table_name] = $this->createObject();
+        $new_values[$table_name]->hydrate($this->convertPg($values, 'fromPg'));
+        $new_values[$table_name]->_setStatus(BaseObject::EXIST);
+
+        return $new_values;
     }
 }

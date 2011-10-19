@@ -15,6 +15,7 @@ class Collection implements \Iterator, \Countable
     protected $stmt;
     protected $object_map;
     protected $position = 0;
+    protected $filters = array();
 
     /**
      * __construct 
@@ -43,6 +44,44 @@ class Collection implements \Iterator, \Countable
     }
 
     /**
+     * registerFilter
+     * Register a callable as filter
+     *
+     * @access public
+     * @param Callable $callable
+     **/
+
+    public function registerFilter($callable)
+    {
+        $this->filters[] = $callable;
+    }
+
+    /**
+     * unregisterFilter
+     * unregister a filter
+     *
+     * @access public
+     * @param Callable the callable to unregister
+     **/
+    public function unregisterFilter($callable)
+    {
+        array_walk($this->filters, function($value) use ($callable) {
+            return $value == $callable ? $value : null;
+        });
+    }
+
+    /**
+     * resetFilters
+     * remove all filters
+     *
+     * @access public
+     **/
+    public function resetFilters()
+    {
+        $this->filters = array();
+    }
+
+    /**
      * get
      * Return a particular result
      *
@@ -55,8 +94,14 @@ class Collection implements \Iterator, \Countable
     {
         $object = $this->object_map->createObject();
         $values = $this->stmt->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_ABS, $index);
+        $values = $this->object_map->convertPg($values, 'fromPg');
 
-        $object->hydrate($this->object_map->convertPg($values, 'fromPg'));
+        foreach($this->filters as $filter)
+        {
+            $values = $filter($values);
+        }
+
+        $object->hydrate($values);
         $object->_setStatus(BaseObject::EXIST);
 
         return $object;
