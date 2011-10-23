@@ -602,6 +602,40 @@ abstract class BaseObjectMap
         return $fields;
     }
 
+    /**
+     * getRemoteSelectFields
+     * Return the select fields formatted as table{%s} for use with 
+     * createFromForeign filter.
+     *
+     * @param String $alias
+     * @return Array $fields
+     **/
+    public function getRemoteSelectFields($alias = null)
+    {
+        $fields = $this->getSelectFields();
+        $alias = is_null($alias) ? '' : sprintf("%s.", $alias);
+        $table = $this->getTableName();
+        $table = strpos($table, '.') ? substr(strstr($table, '.'), 1) : $table;
+
+        array_walk($fields, function($field) { 
+            return sprintf('%s AS "%s{%s}"', 
+                $alias.$field,
+                $table,
+                $field
+            ); });
+
+        return $fields;
+    }
+
+    /**
+     * createFromForeign
+     * Hydrate an object from the values with keys formated like table{field}
+     * and set it in the values with the table name as key. All the values used 
+     * to hydrate the object are removed from the array.
+     *
+     * @param Array values
+     * @return Array values
+     **/
     public function createFromForeign(Array $old_values)
     {
         $values = array();

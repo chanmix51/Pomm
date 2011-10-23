@@ -61,7 +61,7 @@ Dealing with databases
 Service: the database provider
 ==============================
 
-The *Service* class just stores your *Database* instances and provide convenient methods to create connections from them. There are several ways to declare databases to the service class. Either you use the constructor passing an array "name" => "connection parameters" or you can use the *setDatabase* method of the service class.::
+The *Service* class just stores your *Database* instances and provides convenient methods to create connections from them. There are several ways to declare databases to the service class. Either you use the constructor passing an array "name" => "connection parameters" or you can use the *setDatabase* method of the service class.::
 
     # The two examples below are equivalent
     # Using the constructor
@@ -463,8 +463,11 @@ Sometimes, you want to access a particular result in a collection knowing the re
 
 ::
 
-  # Get the an object from the collection at a given index or create a new one if index does not exist
-  $object = $collection->has($index) ? $collection->get($index) : $map->createObject();
+  # Get the an object from the collection at a given index or create a new one
+  if index does not exist 
+  $object = $collection->has($index) ?
+    $collection->get($index) : 
+    $map->createObject();
 
 Collections have other handful methods like:
  * *isFirst()*
@@ -473,6 +476,43 @@ Collections have other handful methods like:
  * *isOdd()*
  * *isEven()*
  * *getOddEven()*
+
+Pomm's *Collection* class can register filters. Filters are just functions that are executed after values were fetched from the database and befors the object is hydrated with values. These filters take the array of fetched values as parameter. They return an array with the values. After all filters are being executed, the values are used to hydrate the Object instance. This is very convenient to create pseudo relationship between objects:
+
+::
+
+  # This filter triggers the *createFromForeign* method of the *AuthorMap*
+  # class. It takes all the fields named *author{%s}* to hydrate a *Author*
+  # object and set it in the values.
+  # SELECT
+  #   article.id,
+  #   article.title,
+  #   ...
+  #   author.id AS "author{id}",
+  #   author.name AS "author{name}",
+  #   ...
+  # FROM
+  #   schema.article article
+  #     JOIN schema.author author ON article.author_id = author.id
+  # WHERE
+  #     article.id = ?
+  #
+  # ArticleMap.php
+
+  $author_map = $this->connection->getMapFor('Author');
+  $sql = sprintf("SELECT %s FROM %s article JOIN %s author ON article.author_id = author.id WHERE article.id = ?",
+    join(', ', array_merge($this->getSelectFields('article'), $author_map->getRemoteSelectFields('author'))),
+    $this->getTableName(),
+    $author_map->getTableName()
+    );
+
+  $collection = $this->query($sql, $id);
+  $collection->registerFilter(function($values) use ($author_map) { return $author_map->createFromForeign($values); });
+
+  foreach($collection as $article)
+  {
+    printf("%s wrote the article '%s'.", $article->getAuthor()->getName(), $article->getTitle());
+  }
 
 Entities
 --------
