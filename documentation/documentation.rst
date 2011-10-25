@@ -477,7 +477,7 @@ Collections have other handful methods like:
  * *isEven()*
  * *getOddEven()*
 
-Pomm's *Collection* class can register filters. Filters are just functions that are executed after values were fetched from the database and befors the object is hydrated with values. These filters take the array of fetched values as parameter. They return an array with the values. After all filters are being executed, the values are used to hydrate the Object instance. This is very convenient to create pseudo relationship between objects:
+Pomm's *Collection* class can register filters. Filters are just functions that are executed after values were fetched from the database and before the object is hydrated with values. These filters take the array of fetched values as parameter. They return an array with the values. After all filters are being executed, the values are used to hydrate the Object instance. This is very convenient to create pseudo relationship between objects:
 
 ::
 

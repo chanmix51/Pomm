@@ -1,6 +1,8 @@
 <?php
 namespace Pomm\Object;
 
+use Pomm\Exception\Exception;
+
 /**
  * Collection 
  * 
@@ -96,9 +98,13 @@ class Collection implements \Iterator, \Countable
         $values = $this->stmt->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_ABS, $index);
         $values = $this->object_map->convertPg($values, 'fromPg');
 
-        foreach($this->filters as $filter)
+        foreach($this->filters as $index => $filter)
         {
             $values = $filter($values);
+            if (!is_array($values))
+            {
+                throw new Exception(sprintf("Filters have to return an Array. Filter number %d returned a '%s'.", $index, gettype($values)));
+            }
         }
 
         $object->hydrate($values);
