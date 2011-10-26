@@ -204,7 +204,7 @@ class Database
   {
       $this->registerConverter('Boolean', new Converter\PgBoolean(), array('boolean'));
       $this->registerConverter('Number', new Converter\PgNumber(), array('smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial'));
-      $this->registerConverter('String', new Converter\PgString(), array('character', 'text'));
+      $this->registerConverter('String', new Converter\PgString(), array('character', 'text', 'uuid'));
       $this->registerConverter('Timestamp', new Converter\PgTimestamp(), array('timestamp', 'date', 'time'));
   }
 }
