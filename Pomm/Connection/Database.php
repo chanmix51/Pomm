@@ -206,5 +206,6 @@ class Database
       $this->registerConverter('Number', new Converter\PgNumber(), array('smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial'));
       $this->registerConverter('String', new Converter\PgString(), array('character', 'text', 'uuid'));
       $this->registerConverter('Timestamp', new Converter\PgTimestamp(), array('timestamp', 'date', 'time'));
+      $this->registerConverter('Interval', new Converter\PgInterval(), array('interval'));
   }
 }
