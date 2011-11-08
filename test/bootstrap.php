@@ -113,6 +113,13 @@ class TestConverterMap extends BaseObjectMap
         $this->connection->getDatabase()->registerConverter('Circle', new Converter\PgCircle(), array('circle'));
         $this->addField('test_circle', 'Circle');
     }
+
+    public function addInterval()
+    {
+        $this->query('ALTER TABLE pomm_test.converter ADD COLUMN test_interval interval');
+        $this->connection->getDatabase()->registerConverter('Interval', new Converter\PgInterval(), array('interval'));
+        $this->addField('test_interval', 'Interval');
+    }
 }
 
 class TestConverter extends BaseObject

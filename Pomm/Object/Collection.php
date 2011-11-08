@@ -67,9 +67,9 @@ class Collection implements \Iterator, \Countable
      **/
     public function unregisterFilter($callable)
     {
-        array_walk($this->filters, function($value) use ($callable) {
+        $this->filters = array_map(function($value) use ($callable) {
             return $value == $callable ? $value : null;
-        });
+        }, $this->filters);
     }
 
     /**

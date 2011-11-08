@@ -27,6 +27,7 @@ function __autoload($name)
         'Pomm/Converter/PgLTree.php',
         'Pomm/Converter/PgString.php',
         'Pomm/Converter/PgTimestamp.php',
+        'Pomm/Converter/PgInterval.php',
         'Pomm/Converter/PgPoint.php',
         'Pomm/Converter/PgEntity.php',
         'Pomm/Converter/PgLseg.php',

@@ -617,14 +617,12 @@ abstract class BaseObjectMap
         $table = $this->getTableName();
         $table = strpos($table, '.') ? substr(strstr($table, '.'), 1) : $table;
 
-        array_walk($fields, function(&$field) use ($table, $alias) { 
-            $field = sprintf('%s AS "%s{%s}"', 
+        return array_map(function($field) use ($table, $alias) { 
+            return sprintf('%s AS "%s{%s}"', 
                 $alias.$field,
                 $table,
                 $field
-            ); });
-
-        return $fields;
+            ); }, $fields);
     }
 
     /**

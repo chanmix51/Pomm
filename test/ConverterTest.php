@@ -181,6 +181,29 @@ class converter_test extends \lime_test
         return $this;
 
     }
+
+    public function testInterval(\DateInterval $interval)
+    {
+        $this->info('\\Pomm\\Converter\\PgInterval');
+        if (!$this->map->hasField('test_interval'))
+        {
+            $this->info('Creating column test_interval.');
+            $this->map->addInterval();
+        }
+
+        $this->object->setTestInterval($interval);
+        $this->map->updateOne($this->object, array('test_interval'));
+
+        $object = $this->map->findByPk($this->object->getPrimaryKey());
+        $this->ok(is_object($object['test_interval']), "'test_interval' is an object.");
+        $this->ok($object['test_interval'] instanceof \DateInterval, "'test_interval' is a \\DateInterval instance.");
+        $this->is($object['test_interval']->format('%Y %m %d %h %i %s'), $this->object['test_interval']->format('%Y %m %d %h %i %s'), "Formatted intervals match.");
+
+        $this->object->setTestInterval(\DateInterval::createFromDateString("18 months"));
+        $this->map->updateOne($this->object, array('test_interval'));
+        $this->is($this->object['test_interval']->format('%Y years %m months'), "00 years 18 months", "Record NOT updated with database value.");
+
+    }
 }
 
 $test = new converter_test();
@@ -194,4 +217,5 @@ $test
     ->testHStore(array('plop' => 1, 'pika' => 'chu'))
     ->testHStore(array('a' => null, 'b' => 2))
     ->testCircle(new Type\Circle(new Type\Point(1,2), 3))
+    ->testInterval(\DateInterval::createFromDateString('1 years 8 months 30 days 14 hours 25 minutes 7 seconds'))
     ;
