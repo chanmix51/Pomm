@@ -96,6 +96,10 @@ class Collection implements \Iterator, \Countable
     {
         $object = $this->object_map->createObject();
         $values = $this->stmt->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_ABS, $index);
+
+        if ($values === false) 
+            return false;
+
         $values = $this->object_map->convertPg($values, 'fromPg');
 
         foreach($this->filters as $index => $filter)
