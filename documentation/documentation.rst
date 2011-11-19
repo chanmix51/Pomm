@@ -514,6 +514,43 @@ Pomm's *Collection* class can register filters. Filters are just functions that 
     printf("%s wrote the article '%s'.", $article->getAuthor()->getName(), $article->getTitle());
   }
 
+Pagers
+======
+
+*BaseObjectMap* instances provide 2 methods that will grant you with a *Pager* class. *paginateQuery()* and the handy *paginateFindWhere*. It adds the correct subset limitation at the end of you query. Of course, it assumes you do not specify any LIMIT nor OFFSET sql clauses in your query. Here is an example of how to use retrieve and use a *Pager*:
+
+::
+
+  # In your controller
+  # Retrieve femal students or aged under 19 sorted by score
+  # 25 results per page, page 4
+
+  $pager = $student_map->paginateFindWhere('age < ? OR gender = ?', array(19, 'F'), 'ORDER BY score ASC', 25, 4);
+
+  # In your twig template
+  <ul>
+    {% for student in pager.getCollection() %}
+      <li>{{ student }}</li>
+    {% endfor %}
+  </ul>
+  {% if pager.getLastPage() > 1 %}
+  <div class="pager"><p>
+  <a href="{{ app.url_generator.generate('news') }}">First</a>
+  {% if pager.isPreviousPage() %}
+  <a href="{{ app.url_generator.generate('news', {'page': pager.getPage - 1}) }}">Previous</a>
+  {% else %}
+  Previous
+  {% endif %}
+  News {{ pager.getResultMin() }} to {{ pager.getResultMax() }}
+  {% if pager.isNextPage() %}
+  <a href="{{ app.url_generator.generate('news', {'page': pager.getPage + 1} ) }}">Next</a>
+  {% else %}
+  Next
+  {% endif %}
+  <a href="{{ app.url_generator.generate('news', {'page': pager.getLastPage} ) }}">Last</a>
+  </p></div>
+  {% endif %}
+
 Entities
 --------
 
