@@ -9,6 +9,7 @@ function __autoload($name)
         'Pomm/Object/Collection.php',
         'Pomm/Object/BaseObject.php',
         'Pomm/Object/BaseObjectMap.php',
+        'Pomm/Object/Pager.php',
         'Pomm/Service.php',
         'Pomm/Connection/Database.php', 
         'Pomm/Connection/Connection.php', 

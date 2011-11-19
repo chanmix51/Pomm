@@ -248,6 +248,25 @@ abstract class BaseObjectMap
     }
 
     /**
+     * generateSqlForWhere
+     * Generate the SQL for findWhere and paginateFindWhere methods
+     *
+     * @see findWhere
+     * @see paginateFindWhere
+     **/
+    protected function generateSqlForWhere($where, $suffix = null)
+    {
+        $sql = sprintf('SELECT %s FROM %s WHERE %s', join(', ', $this->getSelectFields()), $this->object_name, $where); 
+
+        if (!is_null($suffix)) 
+        {
+            $sql = sprintf("%s %s", $sql, $suffix);
+        }
+
+        return $sql;
+    }
+
+    /**
      * findWhere 
      * 
      * @param string $where 
@@ -270,14 +289,7 @@ abstract class BaseObjectMap
             }
         }
 
-        $sql = sprintf('SELECT %s FROM %s WHERE %s', join(', ', $this->getSelectFields()), $this->object_name, $where); 
-
-        if (!is_null($suffix)) 
-        {
-            $sql = sprintf("%s %s", $sql, $suffix);
-        }
-
-        return $this->query($sql, $values);
+        return $this->query($this->generateSqlForWhere($where, $suffix), $values);
     }
 
     /**
@@ -410,7 +422,6 @@ abstract class BaseObjectMap
      *
      * @param BaseObject $object 
      * @access public
-     * @return Collection
      */
     public function saveOne(BaseObject &$object)
     {
@@ -658,5 +669,69 @@ abstract class BaseObjectMap
         $new_values[$table_name]->_setStatus(BaseObject::EXIST);
 
         return $new_values;
+    }
+
+    /**
+     * queryPaginate
+     * paginate and execute a query
+     *
+     * @param $sql the SQL query to paginate
+     * @param $sql_count the SQL that count the overall results
+     * @param $values the queries parameters
+     * @param $items_per_page how many results per page
+     * @param $page the page index
+     *
+     * @return Pager
+     **/
+    public function paginateQuery($sql, $sql_count, $values, $items_per_page, $page = 1)
+    {
+        if ($page < 1)
+        {
+            throw new Exception(sprintf("Pagination offset (page) must be >= 1. ([%s] given).", $page));
+        }
+
+        $sql = sprintf("%s LIMIT %d OFFSET %d", $sql, $items_per_page, (int) ($items_per_page * ( $page - 1)));
+
+        $collection = $this->query($sql, $values);
+        $stmt = $this->doQuery($sql_count, $values);
+
+        if ($stmt->columnCount() > 1)
+        {
+            throw new Exception(sprintf("Count query '%s' return more than one field.", $sql_count));
+        }
+
+        return new Pager($collection, $stmt->fetchColumn(), $items_per_page, $page);
+    }
+
+    /**
+     * paginateFindWhere
+     * Paginate and execute a query with a Where statement
+     *
+     * @param $where the where string or Where instance
+     * @param $values the queries parameters
+     * @param $suffix any ORDER BY or others
+     * @param $items_per_page how many results per page
+     * @param $page the page index
+     **/
+    public function paginateFindWhere($where, $values, $suffix, $items_per_page, $page = 1)
+    {
+        if (is_object($where))
+        {
+            if ($where instanceof Where)
+            {
+                $values = $where->getValues();
+            }
+            else
+            {
+                throw new Exception(sprintf("findWhere expects a Pomm\\Query\\Where instance, '%s' given.", get_class($where)));
+            }
+        }
+
+        $sql_count = sprintf("SELECT count(*) FROM %s WHERE %s", 
+            $this->getTableName(),
+            (string) $where
+        );
+
+        return $this->paginateQuery($this->generateSqlForWhere($where, $suffix), $sql_count, $values, $items_per_page, $page);
     }
 }
