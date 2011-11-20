@@ -51,6 +51,8 @@ class CreateMapTool extends BaseTool
     }
 
     /**
+     * determine namespace
+    /**
      * generateMapFile
      * Generates the empty map file
      *
@@ -58,7 +60,7 @@ class CreateMapTool extends BaseTool
      **/
     protected function generateMapFile()
     {
-        $namespace = sprintf("%s\\%s", $this->options['namespace'], sfInflector::camelize($this->options['schema']));
+        $namespace = sprintf("%s\\%s", $this->options['namespace'], $this->options['schema'] == 'public' ? 'PublicSchema' : sfInflector::camelize($this->options['schema']));
         $class =     $this->options['class'];
 
         $php = <<<EOD
@@ -68,6 +70,7 @@ namespace $namespace;
 
 use $namespace\\Base\\${class}Map as Base${class}Map;
 use Pomm\\Exception\\Exception;
+use Pomm\\Query\\Where;
 
 class ${class}Map extends Base${class}Map
 {
@@ -85,7 +88,7 @@ EOD;
      **/
     protected function saveMapFile($content)
     {
-        $filename = sprintf("%s/%s/%sMap.php", $this->options['dir'], sfInflector::camelize($this->options['schema']), $this->options['class']);
+        $filename = sprintf("%s/%s/%sMap.php", $this->options['dir'], $this->options['schema'] == 'public' ? 'PublicSchema' : sfInflector::camelize($this->options['schema']), $this->options['class']);
         $fh = fopen($filename, 'w');
         fputs($fh, $content);
         fclose($fh);
