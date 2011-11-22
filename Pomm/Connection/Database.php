@@ -105,19 +105,6 @@ class Database
   }
 
   /**
-   * createTransaction()
-   *
-   * Opens a new connection to the database
-   * This connection is transaction capable
-   * @access public
-   * @return Transaction
-   **/
-  public function createTransaction()
-  {
-      return new Transaction($this);
-  }
-
-  /**
    * createConnection()
    *
    * Opens a new connection to the database

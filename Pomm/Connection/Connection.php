@@ -25,6 +25,7 @@ class Connection
     protected $parameter_holder;
     protected $isolation;
     protected $in_transaction = false;
+    protected $identity_mapper;
 
     /**
      * __construct()
@@ -45,6 +46,15 @@ class Connection
         );
 
         $this->isolation = $this->parameter_holder['isolation'];
+
+        $this->parameter_holder->setDefaultValue('identity_mapper', false);
+
+        if ($this->parameter_holder['identity_mapper'] !== false)
+        {
+            $identity_class = $this->parameter_holder['identity_mapper'] === true ? 'Pomm\Identity\IdentityMapper' : $this->parameter_holder['identity_mapper'];
+
+            $this->identity_mapper = new $identity_class();
+        }
     }
 
     protected function launch()
@@ -227,5 +237,10 @@ class Connection
     public function isInTransaction()
     {
         return (bool) $this->in_transaction;
+    }
+
+    public function getIdentityMapper()
+    {
+        return $this->identity_mapper;
     }
 }

@@ -305,6 +305,7 @@ abstract class BaseObject implements \ArrayAccess
     public function offsetGet($offset)
     {
         $method_name = "get".sfInflector::camelize($offset);
+
         return $this->$method_name();
     }
 

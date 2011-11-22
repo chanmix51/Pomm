@@ -232,7 +232,7 @@ abstract class BaseObjectMap
      */
     protected function createCollectionFromStatement(\PDOStatement $stmt)
     {
-        return new Collection($stmt, $this);
+        return new Collection($stmt, $this, $this->connection->getIdentityMapper());
     }
 
     /**
