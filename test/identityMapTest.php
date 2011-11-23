@@ -41,7 +41,7 @@ class IdentityMapTest extends \lime_test
 
         $other_object = $this->map->findByPk($object->getPrimaryKey());
         $this->ok($other_object->isModified(), 'same instance');
-        $this->is($other_object, $object, 'same intance.');
+        $this->is($other_object, $object, 'same instance.');
         $this->is($other_object->getPika(), 'chu', 'same instance.');
 
         return $this;

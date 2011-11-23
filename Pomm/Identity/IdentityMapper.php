@@ -2,6 +2,8 @@
 
 namespace Pomm\Identity;
 
+use Pomm\Object\BaseObject;
+
 class IdentityMapper implements IdentityMapperInterface
 {
     protected $mapper = array();
@@ -11,11 +13,22 @@ class IdentityMapper implements IdentityMapperInterface
      *
      * @see IdentityMapperInterface
      **/
-    public function getModelInstance(\Pomm\Object\BaseObject $object)
+    public function getModelInstance(BaseObject $object)
     {
-        $crc = $this->signature(get_class($object), $object->getPrimaryKey());
+        $crc = $this->getSignature(get_class($object), $object->getPrimaryKey());
 
-        if (!array_key_exists($crc, $this->mapper))
+        if (array_key_exists($crc, $this->mapper))
+        {
+            if (!$this->mapper[$crc]->_getStatus() & BaseObject::EXIST)
+            {
+                $this->mapper[$crc] = $object;
+            }
+            elseif (!$this->mapper[$crc]->isModified())
+            {
+                $this->mapper[$crc]->hydrate($object->extract());
+            }
+        }
+        else
         {
             $this->mapper[$crc] = $object;
         }
@@ -45,7 +58,7 @@ class IdentityMapper implements IdentityMapperInterface
     {
         $crc = $this->getSignature($class_name, $primary_key);
 
-        return array_key_exists($crc, $this->mapper)
+        return array_key_exists($crc, $this->mapper) && ($this->mapper[$crc]->_getStatus() & BaseObject::EXIST)
             ? $this->mapper[$crc]
             : false
             ;

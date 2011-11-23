@@ -317,6 +317,12 @@ abstract class BaseObjectMap
             throw new Exception(sprintf('Given values "%s" do not match PK definition "%s" using class "%s".', print_r($values, true), print_r($this->getPrimaryKey(), true), get_class($this)));
         }
 
+        if ($this->connection->getIdentityMapper() and
+            ($object = $this->connection->getIdentityMapper()->checkModelInstance($this->object_class, $values)))
+        {
+            return $object;
+        }
+
         $result = $this->findWhere($this->createSqlAndFrom($values), array_values($values));
 
         return count($result) == 1 ? $result->current() : null;
