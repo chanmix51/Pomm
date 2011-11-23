@@ -664,9 +664,13 @@ abstract class BaseObjectMap
             }
         }
 
-        $new_values[$table_name] = $this->createObject();
-        $new_values[$table_name]->hydrate($this->convertPg($values, 'fromPg'));
-        $new_values[$table_name]->_setStatus(BaseObject::EXIST);
+        $object = $this->createObject();
+        $object->hydrate($this->convertPg($values, 'fromPg'));
+        $object->_setStatus(BaseObject::EXIST);
+        $new_values[$table_name] = $this->connection->getIdentityMapper() 
+            ? $this->connection->getIdentityMapper()->getModelInstance($object) 
+            : $object
+            ;
 
         return $new_values;
     }

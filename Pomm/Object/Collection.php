@@ -96,7 +96,6 @@ class Collection implements \Iterator, \Countable
 
     public function get($index)
     {
-        $object = $this->object_map->createObject();
         $values = $this->stmt->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_ABS, $index);
 
         if ($values === false) 
@@ -113,10 +112,11 @@ class Collection implements \Iterator, \Countable
             }
         }
 
+        $object = $this->object_map->createObject();
         $object->hydrate($values);
         $object->_setStatus(BaseObject::EXIST);
 
-        return $this->identity_map ? $this->identity_map->check($object) : $object;
+        return $this->identity_map ? $this->identity_map->getModelInstance($object) : $object;
     }
 
     /**
