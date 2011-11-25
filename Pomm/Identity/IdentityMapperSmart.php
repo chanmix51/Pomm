@@ -4,10 +4,8 @@ namespace Pomm\Identity;
 
 use Pomm\Object\BaseObject;
 
-class IdentityMapper implements IdentityMapperInterface
+class IdentityMapperSmart extends IdentityMapperStrict
 {
-    protected $mapper = array();
-
     /**
      * getModelInstance
      *
@@ -37,20 +35,6 @@ class IdentityMapper implements IdentityMapperInterface
     }
 
     /**
-     * getSignature
-     *
-     * Return a unique identifier for each instance
-     *
-     * @param String $class_name the class name of the Model
-     * @param Array the primary key
-     * @return String
-     **/
-    protected function getSignature($class_name, Array $primary_key)
-    {
-        return md5($class_name . join('', $primary_key));
-    }
-
-    /**
      * checkModelInstance
      * @see IdentityMapperInterface 
      **/
@@ -62,15 +46,5 @@ class IdentityMapper implements IdentityMapperInterface
             ? $this->mapper[$crc]
             : false
             ;
-    }
-
-    public function discardInstance($class_name, Array $primary_key)
-    {
-        $crc = $this->getSignature($class_name, $primary_key);
-
-        if (array_key_exists($crc, $this->mapper))
-        {
-            unset($this->mapper[$crc]);
-        }
     }
 }

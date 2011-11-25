@@ -46,14 +46,13 @@ class Connection
         );
 
         $this->isolation = $this->parameter_holder['isolation'];
+        $this->parameter_holder->setDefaultValue('identity_mapper', false);
 
         if (is_null($mapper))
         {
-            $this->parameter_holder->setDefaultValue('identity_mapper', false);
-
             if ($this->parameter_holder['identity_mapper'] !== false)
             {
-                $identity_class = $this->parameter_holder['identity_mapper'] === true ? 'Pomm\Identity\IdentityMapper' : $this->parameter_holder['identity_mapper'];
+                $identity_class = $this->parameter_holder['identity_mapper'] === true ? 'Pomm\Identity\IdentityMapperSmart' : $this->parameter_holder['identity_mapper'];
 
                 $this->identity_mapper = new $identity_class();
             }

@@ -36,7 +36,9 @@ function __autoload($name)
         'Pomm/Type/Point.php',
         'Pomm/Type/Segment.php',
         'Pomm/Type/Circle.php',
-        'Pomm/Identity/IdentityMapper.php',
+        'Pomm/Identity/IdentityMapperNone.php',
+        'Pomm/Identity/IdentityMapperSmart.php',
+        'Pomm/Identity/IdentityMapperStrict.php',
         'Pomm/Identity/IdentityMapperInterface.php',
 );
     $name = preg_split('/\\\/', $name);
