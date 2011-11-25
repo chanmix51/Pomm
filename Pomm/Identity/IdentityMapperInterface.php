@@ -27,4 +27,14 @@ interface IdentityMapperInterface
      * @return mixed
      **/
     public function checkModelInstance($class_name, Array $primary_key);
+
+    /**
+     * discardInstance
+     *
+     * remove an existing model instance
+     *
+     * @param String $class_name the class name of the Model
+     * @param Array the primary key
+     **/
+    public function discardInstance($class_name, Array $primary_key);
 }

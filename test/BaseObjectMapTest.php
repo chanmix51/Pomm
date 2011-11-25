@@ -23,7 +23,7 @@ class my_test extends \lime_test
     public function initialize()
     {
         $this->service = new Service();
-        $this->service->setDatabase('default', new Database(array('dsn' => 'pgsql://greg/greg', 'identity_mapper' => true)));
+        $this->service->setDatabase('default', new Database(array('dsn' => 'pgsql://greg/greg')));
         $this->transac = $this->service->getDatabase()->createConnection();
         $this->transac->getMapFor('Pomm\Test\TestTable')->createTable();
 

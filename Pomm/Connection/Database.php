@@ -111,9 +111,9 @@ class Database
    * @access public
    * @return Connection
    **/
-  public function createConnection()
+  public function createConnection(\Pomm\Identity\IdentityMapperInterface $mapper = null)
   {
-      return new Connection($this);
+      return new Connection($this, $mapper);
   }
 
   /**

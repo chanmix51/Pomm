@@ -15,8 +15,9 @@ class IdentityMapTest extends \lime_test
     public function initialize()
     {
         $this->service = new Service();
-        $this->service->setDatabase('default', new Database(array('dsn' => 'pgsql://greg/greg', 'identity_mapper' => true)));
-        $this->map = $this->service->createConnection()->getMapFor('Bench\PommBench');
+        $this->service->setDatabase('with', new Database(array('dsn' => 'pgsql://greg/greg', 'identity_mapper' => true)));
+        $this->service->setDatabase('without', new Database(array('dsn' => 'pgsql://greg/greg', 'identity_mapper' => false)));
+        $this->map = $this->service->getDatabase('with')->createConnection(new \Pomm\Identity\IdentityMapper())->getMapFor('Bench\PommBench');
         $this->map->createTable();
         $this->map->feedTable(10);
 

@@ -64,4 +64,13 @@ class IdentityMapper implements IdentityMapperInterface
             ;
     }
 
+    public function discardInstance($class_name, Array $primary_key)
+    {
+        $crc = $this->getSignature($class_name, $primary_key);
+
+        if (array_key_exists($crc, $this->mapper))
+        {
+            unset($this->mapper[$crc]);
+        }
+    }
 }

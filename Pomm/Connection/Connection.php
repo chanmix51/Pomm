@@ -34,7 +34,7 @@ class Connection
      * @access public
      * @param ParameterHolder $parameter_holder the db parameters
      **/
-    public function __construct(Database $database)
+    public function __construct(Database $database, \Pomm\Identity\IdentityMapperInterface $mapper = null)
     {
         $this->database = $database;
 
@@ -47,13 +47,20 @@ class Connection
 
         $this->isolation = $this->parameter_holder['isolation'];
 
-        $this->parameter_holder->setDefaultValue('identity_mapper', false);
-
-        if ($this->parameter_holder['identity_mapper'] !== false)
+        if (is_null($mapper))
         {
-            $identity_class = $this->parameter_holder['identity_mapper'] === true ? 'Pomm\Identity\IdentityMapper' : $this->parameter_holder['identity_mapper'];
+            $this->parameter_holder->setDefaultValue('identity_mapper', false);
 
-            $this->identity_mapper = new $identity_class();
+            if ($this->parameter_holder['identity_mapper'] !== false)
+            {
+                $identity_class = $this->parameter_holder['identity_mapper'] === true ? 'Pomm\Identity\IdentityMapper' : $this->parameter_holder['identity_mapper'];
+
+                $this->identity_mapper = new $identity_class();
+            }
+        }
+        else
+        {
+            $this->identity_mapper = $mapper;
         }
     }
 
