@@ -16,6 +16,8 @@ Map Classes
   They are a link between your database and *Entity Classes*. They perform queries that return *Collection* of *Entity Classes* instances. 
 Entity Classes
   These instances represent a set of data that can be persisted in the database. These data can be stored under different kind of *Type* which can be associated to a *Converter* to ensure correct representation in PHP.
+IdentityMapperInterface
+  An identity mapper is a layer between the map files and the database. There are several implementation coming with Pomm but you can design your own.
 
 Directory tree
 ==============
@@ -71,7 +73,8 @@ The *Service* class just stores your *Database* instances and provides convenien
       ),
       'db_two' => array(
         'dsn' => 'pgsql://otheruser:hispass@otherhost/db_b',
-        'class' => 'App\MyDb'
+        'class' => 'App\MyDb',
+        'identity_mapper' => 'App\MyIdentityMapper'
       )
       ));
     
