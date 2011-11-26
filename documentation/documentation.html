@@ -365,7 +365,7 @@ ul.auto-toc {
 <h1>Dealing with databases</h1>
 <div class="section" id="service-the-database-provider">
 <h2>Service: the database provider</h2>
-<p>The <em>Service</em> class just stores your <em>Database</em> instances and provide convenient methods to create connections from them. There are several ways to declare databases to the service class. Either you use the constructor passing an array "name" =&gt; "connection parameters" or you can use the <em>setDatabase</em> method of the service class.:</p>
+<p>The <em>Service</em> class just stores your <em>Database</em> instances and provides convenient methods to create connections from them. There are several ways to declare databases to the service class. Either you use the constructor passing an array "name" =&gt; "connection parameters" or you can use the <em>setDatabase</em> method of the service class.:</p>
 <pre class="literal-block"># The two examples below are equivalent
 # Using the constructor
 $service = new Pomm\Service(array(
@@ -764,8 +764,11 @@ foreach($collection as $blog_post)
 }
 </pre>
 <p>Sometimes, you want to access a particular result in a collection knowing the result's index. It is possible using the <em>has</em> and <em>get</em> methods:</p>
-<pre class="literal-block"># Get the an object from the collection at a given index or create a new one if index does not exist
-$object = $collection-&gt;has($index) ? $collection-&gt;get($index) : $map-&gt;createObject();
+<pre class="literal-block"># Get the an object from the collection at a given index or create a new one
+if index does not exist
+$object = $collection-&gt;has($index) ?
+  $collection-&gt;get($index) :
+  $map-&gt;createObject();
 </pre>
 <dl class="docutils">
 <dt>Collections have other handful methods like:</dt>
@@ -779,6 +782,74 @@ $object = $collection-&gt;has($index) ? $collection-&gt;get($index) : $map-&gt;c
 </ul>
 </dd>
 </dl>
+<p>Pomm's <em>Collection</em> class can register filters. Filters are just functions that are executed after values were fetched from the database and before the object is hydrated with values. These filters take the array of fetched values as parameter. They return an array with the values. After all filters are being executed, the values are used to hydrate the Object instance. This is very convenient to create pseudo relationship between objects:</p>
+<pre class="literal-block"># This filter triggers the *createFromForeign* method of the *AuthorMap*
+# class. It takes all the fields named *author{%s}* to hydrate a *Author*
+# object and set it in the values.
+# SELECT
+#   article.id,
+#   article.title,
+#   ...
+#   author.id AS "author{id}",
+#   author.name AS "author{name}",
+#   ...
+# FROM
+#   schema.article article
+#     JOIN schema.author author ON article.author_id = author.id
+# WHERE
+#     article.id = ?
+#
+# ArticleMap.php
+
+$author_map = $this-&gt;connection-&gt;getMapFor('Author');
+$sql = sprintf("SELECT %s FROM %s article JOIN %s author ON article.author_id = author.id WHERE article.id = ?",
+  join(', ', array_merge($this-&gt;getSelectFields('article'), $author_map-&gt;getRemoteSelectFields('author'))),
+  $this-&gt;getTableName(),
+  $author_map-&gt;getTableName()
+  );
+
+$collection = $this-&gt;query($sql, $id);
+$collection-&gt;registerFilter(function($values) use ($author_map) { return $author_map-&gt;createFromForeign($values); });
+
+foreach($collection as $article)
+{
+  printf("%s wrote the article '%s'.", $article-&gt;getAuthor()-&gt;getName(), $article-&gt;getTitle());
+}
+</pre>
+</div>
+<div class="section" id="pagers">
+<h2>Pagers</h2>
+<p><em>BaseObjectMap</em> instances provide 2 methods that will grant you with a <em>Pager</em> class. <em>paginateQuery()</em> and the handy <em>paginateFindWhere</em>. It adds the correct subset limitation at the end of you query. Of course, it assumes you do not specify any LIMIT nor OFFSET sql clauses in your query. Here is an example of how to use retrieve and use a <em>Pager</em>:</p>
+<pre class="literal-block"># In your controller
+# Retrieve femal students or aged under 19 sorted by score
+# 25 results per page, page 4
+
+$pager = $student_map-&gt;paginateFindWhere('age &lt; ? OR gender = ?', array(19, 'F'), 'ORDER BY score ASC', 25, 4);
+
+# In your twig template
+&lt;ul&gt;
+  {% for student in pager.getCollection() %}
+    &lt;li&gt;{{ student }}&lt;/li&gt;
+  {% endfor %}
+&lt;/ul&gt;
+{% if pager.getLastPage() &gt; 1 %}
+&lt;div class="pager"&gt;&lt;p&gt;
+&lt;a href="{{ app.url_generator.generate('news') }}"&gt;First&lt;/a&gt;
+{% if pager.isPreviousPage() %}
+&lt;a href="{{ app.url_generator.generate('news', {'page': pager.getPage - 1}) }}"&gt;Previous&lt;/a&gt;
+{% else %}
+Previous
+{% endif %}
+News {{ pager.getResultMin() }} to {{ pager.getResultMax() }}
+{% if pager.isNextPage() %}
+&lt;a href="{{ app.url_generator.generate('news', {'page': pager.getPage + 1} ) }}"&gt;Next&lt;/a&gt;
+{% else %}
+Next
+{% endif %}
+&lt;a href="{{ app.url_generator.generate('news', {'page': pager.getLastPage} ) }}"&gt;Last&lt;/a&gt;
+&lt;/p&gt;&lt;/div&gt;
+{% endif %}
+</pre>
 </div>
 </div>
 <div class="section" id="entities">
@@ -863,8 +934,8 @@ $entity-&gt;isModify();        // false
 </div>
 <div class="section" id="connections">
 <h1>Connections</h1>
-<div class="section" id="map-instance-provider">
-<h2>Map Instance provider</h2>
+<div class="section" id="map-instances-provider">
+<h2>Map Instances provider</h2>
 <dl class="docutils">
 <dt>As soon as you have a database instance, you can create new connections. This is done by using the <em>createConnection</em> method. Connections are the way to</dt>
 <dd><ul class="first last simple">
@@ -874,9 +945,37 @@ $entity-&gt;isModify();        // false
 </dd>
 </dl>
 <p>The entities are stored in a particular database. This is why only connections to this base are able to give you associated Map classes:</p>
-<pre class="literal-block">$map = $service-&gt;createConnection()
+<pre class="literal-block">$map = $service-&gt;getDatabase()-&gt;createConnection()
   -&gt;getMapFor('Model\Pomm\Entity\School\Student');
 </pre>
+</div>
+<div class="section" id="identity-mappers">
+<h2>Identity mappers</h2>
+<dl class="docutils">
+<dt>Connections are also the way to tell the map classes to use or not an <em>IdentityMapper</em>. An indentity mapper is an index kept by the connection and shared amongst the map instances. This index ensures that if an object is retrieved twice from the database, the same <em>Object</em> instance will be returned. This is a very powerful (and dangerous) feature. There are two ways to declare an identity mapper to your connections:</dt>
+<dd><ul class="first simple">
+<li>in the <em>Database</em> parameters. All the connections created for this database will use the given <em>IdentityMapper</em> class.</li>
+<li>when instanciating the connection through the <em>createConnection</em> call. This enforces the parameter given to the <em>Database</em> class if any.</li>
+</ul>
+<pre class="last literal-block">$map = $service-&gt;getDatabase()
+  -&gt;createConnection(new \Pomm\Identity\IdentityMapperSmart())
+  -&gt;getMapFor('Model\Pomm\Entity\School\Student');
+
+$student1 = $map-&gt;findByPK(array('id' =&gt; 3));
+$student2 = $map-&gt;findByPK(array('id' =&gt; 3));
+
+$student1-&gt;setName('plop');
+echo $student2-&gt;getName();    // plop
+</pre>
+</dd>
+<dt>It is often a good idea to have an identity mapper by default, but in some cases you will want to switch it off and ensure all objects you fetch from the database do not come from the mapper. This is possible passing the <em>Connection</em> an instance of <em>IdentityMapperNone</em>. It will never keep any instances. There are two other types of identity mappers:</dt>
+<dd><ul class="first last simple">
+<li><em>IdentityMapperStrict</em> which always return an instance if it is in the index.</li>
+<li><em>IdentityMapperSmart</em> which checks if the instance has not been deleted. If data are fetched from the db, it checks if the instance kept in the index has not been modified. If not, it merges the fetched values with its instance.</li>
+</ul>
+</dd>
+</dl>
+<p>It is of course always possible to remove an instance from the mapper by calling the <em>removeInstance()</em>. You can create your own identity mapper, just make sure your class implement the <em>IdentityMapperInterface</em>. Be aware the mapper is called for each values fetched from the database so it has a real impact on performances.</p>
 </div>
 <div class="section" id="transactions">
 <h2>Transactions</h2>

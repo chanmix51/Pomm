@@ -648,8 +648,8 @@ It may happen you need to create objects with data as array. *Pomm* uses this me
 Connections
 -----------
 
-Map Instance provider
-=====================
+Map Instances provider
+======================
 
 As soon as you have a database instance, you can create new connections. This is done by using the *createConnection* method. Connections are the way to
  * Retrieve *Map Classes* instances
@@ -657,9 +657,34 @@ As soon as you have a database instance, you can create new connections. This is
 
 The entities are stored in a particular database. This is why only connections to this base are able to give you associated Map classes::
 
-  $map = $service->createConnection()
+  $map = $service->getDatabase()->createConnection()
     ->getMapFor('Model\Pomm\Entity\School\Student'); 
   
+
+Identity mappers
+================
+
+Connections are also the way to tell the map classes to use or not an *IdentityMapper*. An indentity mapper is an index kept by the connection and shared amongst the map instances. This index ensures that if an object is retrieved twice from the database, the same *Object* instance will be returned. This is a very powerful (and dangerous) feature. There are two ways to declare an identity mapper to your connections:
+ * in the *Database* parameters. All the connections created for this database will use the given *IdentityMapper* class.
+ * when instanciating the connection through the *createConnection* call. This enforces the parameter given to the *Database* class if any. 
+
+ ::
+
+  $map = $service->getDatabase()
+    ->createConnection(new \Pomm\Identity\IdentityMapperSmart())
+    ->getMapFor('Model\Pomm\Entity\School\Student');
+
+  $student1 = $map->findByPK(array('id' => 3));
+  $student2 = $map->findByPK(array('id' => 3));
+
+  $student1->setName('plop');
+  echo $student2->getName();    // plop
+
+It is often a good idea to have an identity mapper by default, but in some cases you will want to switch it off and ensure all objects you fetch from the database do not come from the mapper. This is possible passing the *Connection* an instance of *IdentityMapperNone*. It will never keep any instances. There are two other types of identity mappers:
+ * *IdentityMapperStrict* which always return an instance if it is in the index.
+ * *IdentityMapperSmart* which checks if the instance has not been deleted. If data are fetched from the db, it checks if the instance kept in the index has not been modified. If not, it merges the fetched values with its instance.
+
+It is of course always possible to remove an instance from the mapper by calling the *removeInstance()*. You can create your own identity mapper, just make sure your class implement the *IdentityMapperInterface*. Be aware the mapper is called for each values fetched from the database so it has a real impact on performances.
 
 Transactions
 ============
