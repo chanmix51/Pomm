@@ -65,11 +65,38 @@ abstract class BaseObjectMap
      * @access public
      * @return BaseObject
      */
-    public function createObject()
+    public function createObject(Array $values = null)
     {
         $class_name = $this->object_class;
 
-        return new $class_name($this->pk_fields, $this->field_definitions);
+        $object = new $class_name($this->pk_fields, $this->field_definitions);
+
+        if (is_null($values))
+        {
+            return $object;
+        }
+
+        $object->hydrate($values);
+
+        return $object;
+    }
+
+    /**
+     * createObjectFromPg
+     *
+     * create an object with converted values
+     * @param Array $values that will be converted
+     * @return \Pomm\Object\BaseObject $object
+     **/
+    public function createObjectFromPg(Array $values)
+    {
+        $values = $this->convertPg($values, 'fromPg');
+        $object = $this->createObject($values);
+        $object->_setStatus(BaseObject::EXIST);
+
+        $identity_map = $this->connection->getIdentityMapper();
+
+        return $identity_map ? $identity_map->getModelInstance($object) : $object;
     }
 
     /**
@@ -232,7 +259,7 @@ abstract class BaseObjectMap
      */
     protected function createCollectionFromStatement(\PDOStatement $stmt)
     {
-        return new Collection($stmt, $this, $this->connection->getIdentityMapper());
+        return new Collection($stmt, $this);
     }
 
     /**
@@ -317,8 +344,8 @@ abstract class BaseObjectMap
             throw new Exception(sprintf('Given values "%s" do not match PK definition "%s" using class "%s".', print_r($values, true), print_r($this->getPrimaryKey(), true), get_class($this)));
         }
 
-        if ($this->connection->getIdentityMapper() and
-            ($object = $this->connection->getIdentityMapper()->checkModelInstance($this->object_class, $values)))
+        if ($identity_mapper = $this->connection->getIdentityMapper() and
+            ($object = $identity_mapper->checkModelInstance($this->object_class, $values)))
         {
             return $object;
         }
@@ -334,10 +361,10 @@ abstract class BaseObjectMap
      *
      * @param Array $values Values to convert
      * @param mixed $method can be "fromPg" and "toPg"
-     * @access public
+     * @access protected
      * @return array
      */
-    public function convertPg(Array $values, $method)
+    protected function convertPg(Array $values, $method)
     {
         $out_values = array();
         foreach ($values as $name => $value)
@@ -670,13 +697,7 @@ abstract class BaseObjectMap
             }
         }
 
-        $object = $this->createObject();
-        $object->hydrate($this->convertPg($values, 'fromPg'));
-        $object->_setStatus(BaseObject::EXIST);
-        $new_values[$table_name] = $this->connection->getIdentityMapper() 
-            ? $this->connection->getIdentityMapper()->getModelInstance($object) 
-            : $object
-            ;
+        $new_values[$table_name] = $this->createObjectFromPg($values);
 
         return $new_values;
     }
@@ -744,4 +765,5 @@ abstract class BaseObjectMap
 
         return $this->paginateQuery($this->generateSqlForWhere($where, $suffix), $sql_count, $values, $items_per_page, $page);
     }
+
 }

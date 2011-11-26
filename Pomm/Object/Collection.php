@@ -18,7 +18,6 @@ class Collection implements \Iterator, \Countable
     protected $object_map;
     protected $position = 0;
     protected $filters = array();
-    protected $identity_map;
 
     /**
      * __construct 
@@ -27,12 +26,11 @@ class Collection implements \Iterator, \Countable
      * @access public
      * @return void
      */
-    public function __construct(\PDOStatement $stmt, \Pomm\Object\BaseObjectMap $object_map, $identity_map = false)
+    public function __construct(\PDOStatement $stmt, \Pomm\Object\BaseObjectMap $object_map)
     {
         $this->stmt = $stmt;
         $this->object_map = $object_map;
         $this->position = $this->stmt === false ? null : 0;
-        $this->identity_map = $identity_map;
     }
 
     /**
@@ -101,8 +99,6 @@ class Collection implements \Iterator, \Countable
         if ($values === false) 
             return false;
 
-        $values = $this->object_map->convertPg($values, 'fromPg');
-
         foreach($this->filters as $index => $filter)
         {
             $values = $filter($values);
@@ -112,11 +108,7 @@ class Collection implements \Iterator, \Countable
             }
         }
 
-        $object = $this->object_map->createObject();
-        $object->hydrate($values);
-        $object->_setStatus(BaseObject::EXIST);
-
-        return $this->identity_map ? $this->identity_map->getModelInstance($object) : $object;
+        return $this->object_map->createObjectFromPg($values);
     }
 
     /**
