@@ -73,11 +73,12 @@ class converter_test extends \lime_test
         $this->is($this->object['id'], $compare['id'], sprintf("'id' is '%d'.", $compare['id']));
         $this->isa_ok($this->object['created_at'], 'DateTime', "'created_at' is a 'DateTime' instance.");
         $this->is($this->object['created_at']->format('d/m/Y H:i'), $compare['created_at']->format('d/m/Y H:i'), sprintf("'created_at' is '%s'.", $compare['created_at']->format('d/m/Y H:i')));
-        $this->is($this->object['something'], 'plop', "'something' is 'plop'.");
+        $this->is($this->object['something'], $compare['something'], "'something' is 'plop'.");
         $this->ok(is_bool($this->object['is_true']), "'is_true' is boolean.");
         $this->is($this->object['is_true'], $compare['is_true'], sprintf("'is_true' is '%s'.", $compare['is_true'] ? 'true' : 'false'));
         $this->is($this->object['precision'], $compare['precision'], sprintf("'precision' match float '%f'.", $compare['precision']));
         $this->is($this->object['probed_data'], $compare['probed_data'], sprintf("'probed_data' match '%4.3f'.", $compare['probed_data']));
+        $this->is(substr(base64_encode($this->object['binary_data']), 0, 10), substr(base64_encode($compare['binary_data']), 0, 10), "'binary_data' match.");
 
         return $this;
     }
@@ -207,10 +208,11 @@ class converter_test extends \lime_test
 }
 
 $test = new converter_test();
+$binary = file_get_contents('https://twimg0-a.akamaihd.net/profile_images/1583413811/smile_normal.JPG');
 
 $test
     ->initialize()
-    ->testBasics(array('something' => 'plop', 'is_true' => false, 'precision' => 0.123456789, 'probed_data' => 4.3210), array('id' => 1, 'created_at' => new \DateTime(), 'something' => 'plop', 'is_true' => false, 'precision' => 0.123456789, 'probed_data' => 4.321))
+    ->testBasics(array('something' => 'plop', 'is_true' => false, 'precision' => 0.123456789, 'probed_data' => 4.3210, 'binary_data' => $binary), array('id' => 1, 'created_at' => new \DateTime(), 'something' => 'plop', 'is_true' => false, 'precision' => 0.123456789, 'probed_data' => 4.321, 'binary_data' => $binary))
     ->testPoint(new Type\Point(0,0))
     ->testPoint(new Type\Point(47.123456,-0.654321))
     ->testLseg(new Type\Segment(new Type\Point(1,1), new Type\Point(2,2)))

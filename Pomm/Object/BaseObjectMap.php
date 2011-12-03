@@ -383,33 +383,35 @@ abstract class BaseObjectMap
                 continue;
             }
 
-            if (!preg_match('/([a-z]+)(\[\])?/i', $converter_name, $matchs))
+            if (preg_match('/([a-z]+)(\[\])?/i', $converter_name, $matchs))
             {
-                throw new Exception(sprintf('Error, bad type converter expression "%s".', $converter));
-            }
-
-            if (count($matchs) > 2)
-            {
-                $converter_name = $matchs[1];
-                if ($method === 'fromPg')
+                if (count($matchs) <= 2)
                 {
-                    $field_value = array();
-                    $value = trim($value, "{}");
-                    foreach(preg_split('/[,\s]*"([^"]+)"[,\s]*|[,\s]+/', $value, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE) as $elt)
-                    {
-                        $field_value[] = $this->connection->getDatabase()->getConverterFor($converter_name)->$method($elt);
-                    }
+                    $field_value = $this->connection->getDatabase()->getConverterFor($converter_name)->$method($value);
                 }
                 else
                 {
-                    $converter = $this->connection->getDatabase()->getConverterFor($converter_name);
-                    array_walk($value, function(&$a) use ($converter) { $a = $converter->toPg($a);});
-                    $field_value = sprintf("ARRAY[%s]", join(', ', $value));
+                    $converter_name = $matchs[1];
+                    if ($method === 'fromPg')
+                    {
+                        $field_value = array();
+                        $value = trim($value, "{}");
+                        foreach(preg_split('/[,\s]*"([^"]+)"[,\s]*|[,\s]+/', $value, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE) as $elt)
+                        {
+                            $field_value[] = $this->connection->getDatabase()->getConverterFor($converter_name)->$method($elt);
+                        }
+                    }
+                    else
+                    {
+                        $converter = $this->connection->getDatabase()->getConverterFor($converter_name);
+                        array_walk($value, function(&$a) use ($converter) { $a = $converter->toPg($a);});
+                        $field_value = sprintf("ARRAY[%s]", join(', ', $value));
+                    }
                 }
             }
             else
             {
-                $field_value = $this->connection->getDatabase()->getConverterFor($converter_name)->$method($value);
+                throw new Exception(sprintf('Error, bad type converter expression "%s".', $converter));
             }
 
             $out_values[$name] = $field_value;
