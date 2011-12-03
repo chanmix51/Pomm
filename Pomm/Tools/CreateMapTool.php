@@ -69,6 +69,7 @@ class CreateMapTool extends BaseTool
 namespace $namespace;
 
 use $namespace\\Base\\${class}Map as Base${class}Map;
+use $namespace\\${class};
 use Pomm\\Exception\\Exception;
 use Pomm\\Query\\Where;
 
