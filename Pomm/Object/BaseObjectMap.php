@@ -462,10 +462,9 @@ abstract class BaseObjectMap
 
         if ($object->_getStatus() & BaseObject::EXIST)
         {
-            $sql = sprintf('UPDATE %s SET %s WHERE %s', $this->object_name, $this->parseForUpdate($object), $this->createSqlAndFrom($object->getPrimaryKey()));
+            $sql = sprintf('UPDATE %s SET %s WHERE %s RETURNING *;', $this->object_name, $this->parseForUpdate($object), $this->createSqlAndFrom($object->getPrimaryKey()));
 
-            $this->query($sql, array_values($object->getPrimaryKey()));
-            $object = $this->findByPk($object->getPrimaryKey());
+            $collection = $this->query($sql, array_values($object->getPrimaryKey()));
         }
         else
         {
@@ -473,9 +472,10 @@ abstract class BaseObjectMap
             $sql = sprintf('INSERT INTO %s (%s) VALUES (%s) RETURNING *;', $this->object_name, join(',', array_keys($pg_values)), join(',', array_values($pg_values)));
 
             $collection = $this->query($sql, array());
-            $object = $collection->current();
-            $object->_setStatus(BaseObject::EXIST);
         }
+
+        $object = $collection->current();
+        $object->_setStatus(BaseObject::EXIST);
     }
 
     /**
