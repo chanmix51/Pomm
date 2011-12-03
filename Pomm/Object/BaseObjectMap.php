@@ -515,9 +515,8 @@ abstract class BaseObjectMap
 
 
 
-        $sql = sprintf("UPDATE %s SET %s WHERE %s", $this->object_name, join(', ', $updates), $this->createSqlAndFrom($object->getPrimaryKey()));
-        $this->query($sql, array_values($object->getPrimaryKey()));
-        $object = $this->findByPk($object->getPrimaryKey());
+        $sql = sprintf("UPDATE %s SET %s WHERE %s RETURNING *;", $this->object_name, join(', ', $updates), $this->createSqlAndFrom($object->getPrimaryKey()));
+        $object = $this->query($sql, array_values($object->getPrimaryKey()));
     }
 
     /**
