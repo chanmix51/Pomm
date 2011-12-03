@@ -117,6 +117,18 @@ class Database
     }
 
     /**
+     * executeAnonymousQuery
+     * Performs a raw SQL query
+     *
+     * @param string $sql
+     * @return \PDOStatement
+     */
+    public function executeAnonymousQuery($sql)
+    {
+        return $this->createConnection()->getPdo()->query($sql, \PDO::FETCH_LAZY);
+    }
+
+    /**
      * registerConverter
      *
      * Register a new converter

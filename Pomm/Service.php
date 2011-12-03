@@ -8,10 +8,10 @@ use Pomm\Exception\Exception;
 /**
  * Service
  * This is the service for the Pomm API.
- * 
+ *
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -26,7 +26,7 @@ class Service
      * Set the databases with parameters
      *
      * @access public
-     * @param Array databases and parameters
+     * @param Array databases parameters
      * @return void
      */
 
@@ -34,7 +34,7 @@ class Service
     {
         foreach ($databases as $name => $parameters)
         {
-            $db_class = array_key_exists('class', $parameters) ? $parameters['class'] : 'Pomm\Connection\Database';
+            $db_class = isset($parameters['class']) ? $parameters['class'] : 'Pomm\Connection\Database';
             $this->setDatabase($name, new $db_class($parameters));
         }
     }
@@ -55,12 +55,12 @@ class Service
     }
 
     /**
-     * getDatabase 
+     * getDatabase
      * Returns the corresponding Database or the first one if no name is provided
-     * 
-     * @param mixed $name 
+     *
+     * @param mixed $name
      * @access public
-     * @return Pomm\Connection\Database 
+     * @return Pomm\Connection\Database
      */
     public function getDatabase($name = null)
     {
@@ -70,12 +70,8 @@ class Service
             {
                 throw new Exception(sprintf('No database registered.'));
             }
-            else
-            {
-                $db = array_values($this->databases);
 
-                return $db[0];
-            }
+            return reset($this->databases);
         }
         if (array_key_exists($name, $this->databases))
         {
@@ -86,21 +82,21 @@ class Service
     }
 
     /**
-     * executeAnonymousSelect 
+     * executeAnonymousQuery
      * Performs a raw SQL query
-     * 
-     * @param string $sql 
-     * @param string $database 
+     *
+     * @param string $sql
+     * @param string $database
      * @access public
      * @return \PDOStatement
      */
     public function executeAnonymousQuery($sql, $name = null)
     {
-        return $this->getDatabase($name)->createConnection()->getPdo()->query($sql, \PDO::FETCH_LAZY);
+        return $this->getDatabase($name)->executeAnonymousQuery($sql);
     }
 
     /**
-     * createConnection 
+     * createConnection
      * Shortcut to get a connection from a database
      *
      * @param string the database name
