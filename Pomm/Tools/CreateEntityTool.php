@@ -9,11 +9,11 @@ use Pomm\External\sfInflector;
 /**
  * Pomm\Tools\CreateEntityTool - Create an Entity class
  *
- * 
+ *
  * @uses Pomm\Tools\BaseTool
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -24,7 +24,6 @@ class CreateEntityTool extends BaseTool
      * @see BaseTool
      *
      * mandatory options :
-     * * dir        the directory base classes will be generated in
      * * class      the class name to generate
      *
      * optional options :
@@ -34,7 +33,6 @@ class CreateEntityTool extends BaseTool
 
     protected function configure()
     {
-        $this->options->mustHave('dir');
         $this->options->mustHave('class');
         $this->options->setDefaultValue('namespace', 'Model\Pomm\Entity');
         $this->options->setDefaultValue('schema', 'public');
@@ -47,7 +45,8 @@ class CreateEntityTool extends BaseTool
     public function execute()
     {
         $content = $this->generateMapFile();
-        $this->saveFile($content);
+        $path = sprintf("%s/%s.php", $this->getDestinationPath(), $this->options['class']);
+        $this->saveFile($path, $content);
     }
 
     /**
@@ -58,7 +57,7 @@ class CreateEntityTool extends BaseTool
      **/
     protected function generateMapFile()
     {
-        $namespace = sprintf("%s\\%s", $this->options['namespace'], $this->options['schema'] == 'public' ? 'PublicSchema' : sfInflector::camelize($this->options['schema']));
+        $namespace = $this->getNamespace();
         $class =     $this->options['class'];
 
         $php = <<<EOD
@@ -75,19 +74,5 @@ class $class extends BaseObject
 EOD;
 
         return $php;
-    }
-
-    /**
-     * saveFile
-     * Saves the file content
-     *
-     * @args String The content
-     **/
-    protected function saveFile($content)
-    {
-        $filename = sprintf("%s/%s/%s.php", $this->options['dir'], $this->options['schema'] == 'public' ? 'PublicSchema' : sfInflector::camelize($this->options['schema']), $this->options['class']);
-        $fh = fopen($filename, 'w');
-        fputs($fh, $content);
-        fclose($fh);
     }
 }
