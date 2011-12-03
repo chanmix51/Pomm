@@ -27,7 +27,7 @@ class PgBytea implements ConverterInterface
      **/
     public function fromPg($data)
     {
-        return @pg_unescape_bytea($data);
+        return stripcslashes(stream_get_contents($data));
     }
 }
 
