@@ -6,16 +6,16 @@ use Pomm\Exception\Exception;
 use Pomm\External\sfInflector;
 
 /**
- * BaseObject - Parent for entity classes 
- * 
+ * BaseObject - Parent for entity classes
+ *
  * @abstract
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-abstract class BaseObject implements \ArrayAccess 
+abstract class BaseObject implements \ArrayAccess
 {
     const NONE     = 0;
     const EXIST    = 1;
@@ -28,9 +28,9 @@ abstract class BaseObject implements \ArrayAccess
     protected $primary_key = array();
 
     /**
-     * __construct 
+     * __construct
      * The constructor. This shouldn't be called directly, see BaseObjectMap::createObject() instead
-     * 
+     *
      * @param Array $pk the primary key definition
      * @param Array $fields_definition the fields declared to be stored in the database
      * @access public
@@ -43,23 +43,25 @@ abstract class BaseObject implements \ArrayAccess
     }
 
     /**
-     * get 
-     * Returns the $name value 
-     * 
+     * get
+     * Returns the $name value
+     *
      * @param string $var The key you want to retrieve value from
      * @access public
      * @return mixed
      */
     public function get($var)
     {
-        return $this->fields[$var];
+        if ($this->has($var)) {
+            return $this->fields[$var];
+        }
     }
 
     /**
-     * has 
+     * has
      * Returns true if the given key exists
-     * 
-     * @param string $var 
+     *
+     * @param string $var
      * @access public
      * @return boolean
      */
@@ -69,11 +71,11 @@ abstract class BaseObject implements \ArrayAccess
     }
 
     /**
-     * __call 
+     * __call
      * Allows dynamic methods getXXX, setXXX or addXXX
-     * 
-     * @param mixed $method 
-     * @param mixed $arguments 
+     *
+     * @param mixed $method
+     * @param mixed $arguments
      * @access public
      * @return mixed
      */
@@ -86,10 +88,8 @@ abstract class BaseObject implements \ArrayAccess
         {
         case 'set':
             return $this->set($attribute, $arguments[0]);
-            break;
         case 'get':
             return $this->get($attribute);
-            break;
         case 'add':
             return $this->add($attribute, $arguments[0]);
         default:
@@ -98,10 +98,10 @@ abstract class BaseObject implements \ArrayAccess
     }
 
     /**
-     * hydrate 
+     * hydrate
      * Merge internal values with given $values in the object
-     * 
-     * @param Array $values 
+     *
+     * @param Array $values
      * @access public
      * @return void
      */
@@ -111,10 +111,10 @@ abstract class BaseObject implements \ArrayAccess
     }
 
     /**
-     * convert 
+     * convert
      * Make all keys lowercase and hydrate the object
-     * 
-     * @param Array $values 
+     *
+     * @param Array $values
      * @access public
      * @return void
      */
@@ -130,10 +130,10 @@ abstract class BaseObject implements \ArrayAccess
     }
 
     /**
-     * _getStatus 
+     * _getStatus
      * Returns the current status of the instance
      * can be self::NONE, self::EXIST and SELF::MODIFIED
-     * 
+     *
      * @access public
      * @return integer
      */
@@ -143,10 +143,10 @@ abstract class BaseObject implements \ArrayAccess
     }
 
     /**
-     * _setStatus 
+     * _setStatus
      * Forces the status of the object
-     * 
-     * @param integer $status 
+     *
+     * @param integer $status
      * @access public
      * @return void
      */
@@ -156,9 +156,9 @@ abstract class BaseObject implements \ArrayAccess
     }
 
     /**
-     * extract 
+     * extract
      * Returns the fields array
-     * 
+     *
      * @access public
      * @return array
      */
@@ -168,9 +168,9 @@ abstract class BaseObject implements \ArrayAccess
     }
 
     /**
-     * setPrimaryKey 
-     * 
-     * @param Array $keys 
+     * setPrimaryKey
+     *
+     * @param Array $keys
      * @access public
      * @return void
      */
@@ -180,9 +180,9 @@ abstract class BaseObject implements \ArrayAccess
     }
 
     /**
-     * getPrimaryKey 
+     * getPrimaryKey
      * returns the values of the instance's primary key
-     * 
+     *
      * @access public
      * @return void
      */
@@ -198,11 +198,11 @@ abstract class BaseObject implements \ArrayAccess
     }
 
     /**
-     * __set 
+     * __set
      * PHP magic to set attributes
-     * 
-     * @param string $var 
-     * @param mixed $value 
+     *
+     * @param string $var
+     * @param mixed $value
      * @access public
      * @return void
      */
@@ -210,13 +210,25 @@ abstract class BaseObject implements \ArrayAccess
     {
         $this->set($var, $value);
     }
+    /**
+     * __get
+     * PHP magic to get attributes
+     *
+     * @param string $var
+     * @access public
+     * @return void
+     */
+    public function __get($var)
+    {
+        $this->get($var);
+    }
 
     /**
-     * set 
+     * set
      * Set a value in the varholder
      *
-     * @param string $var 
-     * @param mixed $value 
+     * @param string $var
+     * @param mixed $value
      * @access public
      * @return void
      */
@@ -227,12 +239,12 @@ abstract class BaseObject implements \ArrayAccess
     }
 
     /**
-     * add 
+     * add
      * When the corresponding attribute is an array, call this method
      * to set values
-     * 
-     * @param string $var 
-     * @param mixed $value 
+     *
+     * @param string $var
+     * @param mixed $value
      * @access public
      * @return void
      */
@@ -256,9 +268,9 @@ abstract class BaseObject implements \ArrayAccess
     }
 
     /**
-     * isNew 
+     * isNew
      * is the current object self::NEW (does not it exist in the database already ?)
-     * 
+     *
      * @access public
      * @return boolean
      */
@@ -268,9 +280,9 @@ abstract class BaseObject implements \ArrayAccess
     }
 
     /**
-     * isModified 
+     * isModified
      * Has the object been modified since we know it ?
-     * 
+     *
      * @access public
      * @return boolean
      */
