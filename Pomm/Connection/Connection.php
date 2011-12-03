@@ -75,7 +75,7 @@ class Connection
 
         try
         {
-            $this->handler = new \PDO($connect_string, $this->parameter_holder['user'], $this->parameter_holder->hasParameter('pass') ? $this->parameter_holder['pass'] : null);
+            $this->handler = new \PDO($connect_string, $this->parameter_holder['user'], $this->parameter_holder['pass'] != '' ? $this->parameter_holder['pass'] : null);
         }
         catch (\PDOException $e)
         {
