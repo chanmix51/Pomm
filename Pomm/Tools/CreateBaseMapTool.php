@@ -10,11 +10,11 @@ use Pomm\Connection\Database;
 /**
  * Pomm\Tools\CreateBaseMapTool - Create a BaseMap class from the database.
  *
- * 
+ *
  * @uses Pomm\Tools\BaseTool
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -164,13 +164,13 @@ EOD;
         $pkey = $this->transaction->getPdo()->query($sql)->fetch(\PDO::FETCH_NAMED);
 
         $pkey = preg_split('/, /', trim($pkey['pkey'], '["{}]'));
-        array_walk($pkey, function(&$value) { $value = sprintf("'%s'", $value); }); 
+        array_walk($pkey, function(&$value) { $value = sprintf("'%s'", $value); });
 
         return join($pkey, ", ");
     }
 
     /**
-     * generateFieldsDefinition - Generate the Pomm field definition for a 
+     * generateFieldsDefinition - Generate the Pomm field definition for a
      * column
      *
      * @public
