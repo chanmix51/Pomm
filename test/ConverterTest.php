@@ -78,7 +78,8 @@ class converter_test extends \lime_test
         $this->is($this->object['is_true'], $compare['is_true'], sprintf("'is_true' is '%s'.", $compare['is_true'] ? 'true' : 'false'));
         $this->is($this->object['precision'], $compare['precision'], sprintf("'precision' match float '%f'.", $compare['precision']));
         $this->is($this->object['probed_data'], $compare['probed_data'], sprintf("'probed_data' match '%4.3f'.", $compare['probed_data']));
-        $this->is(substr(base64_encode($this->object['binary_data']), 0, 10), substr(base64_encode($compare['binary_data']), 0, 10), "'binary_data' match.");
+        $this->is(substr(base64_encode($this->object['binary_data']), 0, 20), substr(base64_encode($compare['binary_data']), 0, 20), "'binary_data' match.");
+        $this->is($this->object['ft_search'], $compare['ft_search'], sprintf("'tsvector' field match '%s'.", $compare['ft_search']));
 
         return $this;
     }
@@ -212,7 +213,7 @@ $binary = file_get_contents('https://twimg0-a.akamaihd.net/profile_images/158341
 
 $test
     ->initialize()
-    ->testBasics(array('something' => 'plop', 'is_true' => false, 'precision' => 0.123456789, 'probed_data' => 4.3210, 'binary_data' => $binary), array('id' => 1, 'created_at' => new \DateTime(), 'something' => 'plop', 'is_true' => false, 'precision' => 0.123456789, 'probed_data' => 4.321, 'binary_data' => $binary))
+    ->testBasics(array('something' => 'plop', 'is_true' => false, 'precision' => 0.123456789, 'probed_data' => 4.3210, 'binary_data' => $binary, 'ft_search' => "'academi':1 'battl':15 'canadian':20 'dinosaur':2 'drama':5 'epic':4 'feminist':8 'mad':11 'must':14 'rocki':21 'scientist':12 'teacher':17"), array('id' => 1, 'created_at' => new \DateTime(), 'something' => 'plop', 'is_true' => false, 'precision' => 0.123456789, 'probed_data' => 4.321, 'binary_data' => $binary, 'ft_search' => "'academi':1 'battl':15 'canadian':20 'dinosaur':2 'drama':5 'epic':4 'feminist':8 'mad':11 'must':14 'rocki':21 'scientist':12 'teacher':17"))
     ->testPoint(new Type\Point(0,0))
     ->testPoint(new Type\Point(47.123456,-0.654321))
     ->testLseg(new Type\Segment(new Type\Point(1,1), new Type\Point(2,2)))

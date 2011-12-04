@@ -58,6 +58,7 @@ class TestConverterMap extends BaseObjectMap
             'precision'        => 'Number',
             'probed_data'      => 'Number',
             'binary_data'      => 'Binary',
+            'ft_search'        => 'String',
         );
         $this->pk_fields    = array('id');
     }
@@ -70,7 +71,7 @@ class TestConverterMap extends BaseObjectMap
             $sql = "CREATE SCHEMA pomm_test";
             $this->query($sql);
 
-            $sql = "CREATE TABLE pomm_test.converter (id SERIAL PRIMARY KEY, created_at TIMESTAMP NOT NULL DEFAULT now(), something VARCHAR, is_true BOOLEAN, precision FLOAT, probed_data NUMERIC(4,3), binary_data BYTEA)";
+            $sql = "CREATE TABLE pomm_test.converter (id SERIAL PRIMARY KEY, created_at TIMESTAMP NOT NULL DEFAULT now(), something VARCHAR, is_true BOOLEAN, precision FLOAT, probed_data NUMERIC(4,3), binary_data BYTEA, ft_search tsvector)";
             $this->query($sql);
             $this->connection->commit();
         }
