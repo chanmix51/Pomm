@@ -15,11 +15,36 @@ use Pomm\Converter\ConverterInterface;
 class PgBytea implements ConverterInterface
 {
     /**
+     * escByteA
+     *
+     * Does the job of pg_escape_bytea in PHP
+     * see http://php.net/manual/fr/function.pg-escape-bytea.php
+     *
+     * @param String the binary sting to be escaped
+     * @return String binary string
+     **/
+    protected function escByteA($string)
+    {
+        $search = array(chr(92), chr(0), chr(39)); 
+        $replace = array('\\\134', '\\\000', '\\\047'); 
+        $binData = str_replace($search, $replace, $binData); 
+
+        return $binData;
+    }
+
+    /**
      * @see ConverterInterface
      **/
     public function toPg($data)
     {
-        return sprintf("E'%s'::bytea", @pg_escape_bytea($data));
+        if (function_exists('pg_escape_bytea'))
+        {
+            return sprintf("E'%s'::bytea", @pg_escape_bytea($data));
+        }
+        else
+        {
+            return $this->escByteA($data);
+        }
     }
 
     /**
