@@ -221,4 +221,14 @@ class Database
     {
         return $this->parameter_holder->hasParameter('name') ? $this->parameter_holder['name'] : $this->parameter_holder['database'];
     }
+
+    /**
+     * setName
+     *
+     * Sets the database name.
+     **/
+    public function setName($name)
+    {
+        $this->parameter_holder->setParameter('name', $name);
+    }
 }
