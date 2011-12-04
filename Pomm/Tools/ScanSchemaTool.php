@@ -8,13 +8,13 @@ use Pomm\External\sfInflector;
 use Pomm\Connection\Database;
 
 /**
- * Pomm\Tools\ScanSchemaTool - Scan postgresql's schema to generate BaseMap 
+ * Pomm\Tools\ScanSchemaTool - Scan postgresql's schema to generate BaseMap
  * files
  *
  * @uses Pomm\Tools\BaseTool
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */

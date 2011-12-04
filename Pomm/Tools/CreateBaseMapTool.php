@@ -29,7 +29,6 @@ class CreateBaseMapTool extends BaseTool
     /**
      * configure()
      * mandatory options :
-     * * dir        the directory base classes will be generated in
      * * table      the db table to be mapped
      * * connection a Connection instance
      *
@@ -46,8 +45,7 @@ class CreateBaseMapTool extends BaseTool
         $this->options->setDefaultValue('extends', 'BaseObjectMap');
         $this->options->setDefaultValue('schema', 'public');
 
-        $this->options['dir'] = $this->options['prefix_dir'] != '' ? $this->options['prefix_dir'].'/Model/Pomm/Entity' : 'Model/Pomm/Entity';
-        $this->options['namespace'] = $this->options->hasParameter('prefix_namespace') ? $this->options['prefix_namespace'].'\Model\Pomm\Entity' : 'Model\Pomm\Entity';
+        $this->options['namespace'] = $this->options->getParameter('prefix_namespace');
     }
 
     /**
@@ -106,8 +104,8 @@ class CreateBaseMapTool extends BaseTool
         $this->getAttributesInfo();
 
         $map_file = $this->generateMapFile();
-        $this->createDirIfNotExist();
-        $this->saveMapFile($map_file);
+        $path = sprintf('%s/Base/%sMap.php', $this->getDestinationPath(), $this->options['class_name']);
+        $this->saveFile($path, $map_file);
         $this->createEmptyFilesIfNotExist();
     }
 
@@ -119,8 +117,8 @@ class CreateBaseMapTool extends BaseTool
      **/
     protected function generateMapFile()
     {
-        $std_namespace   = sprintf("%s\\%s", $this->options['namespace'], $this->options['schema'] == 'public' ? 'PublicSchema' : sfInflector::camelize($this->options['schema']));
-        $namespace       = $std_namespace."\\Base";
+        $std_namespace = $this->getNamespace();
+        $namespace       = $std_namespace.'\\Base';
         $class_name  = $this->options['class_name'];
         $table_name  = sprintf("%s.%s", $this->options['schema'], $this->options['table']);
         $extends     = $this->options['extends'];
@@ -204,50 +202,22 @@ EOD;
     }
 
     /**
-     * saveMapFile - Save the file
-     *
-     * @public
-     * @param string the content to be saved
-     * @return void
-     **/
-    public function saveMapFile($content)
-    {
-        $filename = sprintf("%s/%s/Base/%sMap.php",$this->options['dir'], $this->options['schema'] == 'public' ? 'PublicSchema' : sfInflector::camelize($this->options['schema']), $this->options['class_name']);
-        $fh = fopen($filename, 'w');
-        fputs($fh, $content);
-        fclose($fh);
-    }
-
-    /**
-     * createDirIfNotExist
-     * Create Entity model directory structure if it does no exist
-     *
-     * @return void;
-     **/
-    protected function createDirIfNotExist()
-    {
-        $dir = sprintf("%s/%s/Base", $this->options['dir'], $this->options['schema'] == 'public' ? 'PublicSchema' : sfInflector::camelize($this->options['schema']));
-        if (file_exists($dir)) return;
-        mkdir($dir, 0755, true);
-    }
-
-    /**
      * createEmptyFilesIfNotExist
      * Create empty map and entity class if they do not exist
      **/
     protected function createEmptyFilesIfNotExist()
     {
-       $file = sprintf("%s/%s/%s.php", $this->options['dir'], $this->options['schema'] == 'public' ? 'PublicSchema' : sfInflector::camelize($this->options['schema']), $this->options['class_name']);
+       $file = sprintf("%s/%s.php", $this->getDestinationPath(), $this->options['class_name']);
        if (!file_exists($file))
        {
-           $tool = new CreateEntityTool(array('dir' => $this->options['dir'], 'class' => $this->options['class_name'], 'namespace' => $this->options['namespace'], 'schema' => $this->options['schema']));
+           $tool = new CreateEntityTool(array('prefix_dir' => dirname($this->getDestinationPath()), 'class' => $this->options['class_name'], 'namespace' => $this->options['namespace'], 'schema' => $this->options['schema']));
            $tool->execute();
        }
 
-       $file = sprintf("%s/%s/%sMap.php", $this->options['dir'], $this->options['schema'] == 'public' ? 'PublicSchema' : sfInflector::camelize($this->options['schema']), $this->options['class_name']);
+       $file = sprintf("%s/%sMap.php", $this->getDestinationPath(), $this->options['class_name']);
        if (!file_exists($file))
        {
-           $tool = new CreateMapTool(array('dir' => $this->options['dir'], 'class' => $this->options['class_name'], 'namespace' => $this->options['namespace'], 'schema' => $this->options['schema']));
+           $tool = new CreateMapTool(array('prefix_dir' => dirname($this->getDestinationPath()), 'class' => $this->options['class_name'], 'namespace' => $this->options['namespace'], 'schema' => $this->options['schema']));
            $tool->execute();
        }
     }
