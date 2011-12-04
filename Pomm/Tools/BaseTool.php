@@ -29,61 +29,8 @@ abstract class BaseTool
     public final function __construct(Array $options = array())
     {
         $this->options = new ParameterHolder($options);
-
         $this->configure();
     }
-
-    public function getDestinationPath()
-    {
-        $schemaDir = sfInflector::camelize($this->options['schema']);
-        if ($schemaDir === 'Public') {
-            $schemaDir = 'PublicSchema';
-        }
-        if ($prefix = $this->options['prefix_dir']) {
-            $prefix .= DIRECTORY_SEPARATOR;
-        }
-        $dir = $prefix.$schemaDir;
-
-        return $dir;
-    }
-
-    protected function getNamespace()
-    {
-        $prefix = $this->options['namespace'];
-        if ($prefix) {
-            $prefix .= '\\';
-        }
-        $suffix = $this->options['schema'] == 'public' ? 'PublicSchema' : sfInflector::camelize($this->options['schema']);
-        return sprintf('%s%s', $prefix, $suffix);
-    }
-    /**
-     * saveFile - Save the file
-     *
-     * @param string the path
-     * @param string the content to be saved
-     * @return void
-     **/
-    protected function saveFile($path, $content)
-    {
-        $this->createDirIfNotExist(dirname($path));
-        file_put_contents($path, $content);
-    }
-
-    /**
-     * createDirIfNotExist
-     * Create Entity model directory structure if it does no exist
-     *
-     * @return void;
-     **/
-    protected function createDirIfNotExist($dir)
-    {
-        if (!file_exists($dir)) {
-            return @mkdir($dir, 0755, true);
-        }
-
-        return true;
-    }
-
 
     /**
      * configure - This is called from the constructor. Override it to

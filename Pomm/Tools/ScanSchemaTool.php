@@ -18,22 +18,19 @@ use Pomm\Connection\Database;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class ScanSchemaTool extends BaseTool
+class ScanSchemaTool extends CreateFileTool
 {
     /**
      * configure()
      * mandatory options :
      * * dir        the directory base classes will be generated in
-     * * table      the db table to be mapped
-     * * connection a Connection instance
+     * * database   a Database instance
      *
      * @see Pomm\Tools\BaseTool
      **/
     protected function configure()
     {
-        $this->options->mustHave('prefix_dir');
-        $this->options->mustHave('connection');
-        $this->options->setDefaultValue('schema', 'public');
+        parent::configure();
         $this->options->setDefaultValue('extends', 'BaseObjectMap');
     }
 
@@ -44,12 +41,12 @@ class ScanSchemaTool extends BaseTool
      **/
     public function execute()
     {
-        if (!($this->options['connection'] instanceof Database))
+        if (!($this->options['database'] instanceof Database))
         {
-            throw new \InvalidArgumentException(sprintf('The connection must be a "Pomm\Connection\Database" instance, "%s" given.', get_class($this->options['connection'])));
+            throw new \InvalidArgumentException(sprintf('The database must be a "Pomm\Connection\Database" instance, "%s" given.', get_class($this->options['database'])));
         }
 
-        $this->transaction = $this->options['connection']->createConnection();
+        $this->transaction = $this->options['database']->createConnection();
 
         foreach ($this->getTables() as $table)
         {

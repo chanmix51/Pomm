@@ -18,7 +18,7 @@ use Pomm\Connection\Database;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class CreateBaseMapTool extends BaseTool
+class CreateBaseMapTool extends CreateFileTool
 {
     protected $db;
     protected $oid;
@@ -30,22 +30,20 @@ class CreateBaseMapTool extends BaseTool
      * configure()
      * mandatory options :
      * * table      the db table to be mapped
-     * * connection a Connection instance
+     * * database   a Database instance
+     * * prefix_dir where to generate the dirs
      *
      * @see Pomm\Tools\BaseTool
      *
      **/
     protected function configure()
     {
-        $this->options->mustHave('prefix_dir');
+        $this->options['namespace'] = $this->options->getParameter('prefix_namespace');
+        parent::configure();
         $this->options->mustHave('table');
-        $this->options->mustHave('connection');
 
         $this->options->setDefaultValue('class_name', sfInflector::camelize($this->options['table']));
         $this->options->setDefaultValue('extends', 'BaseObjectMap');
-        $this->options->setDefaultValue('schema', 'public');
-
-        $this->options['namespace'] = $this->options->getParameter('prefix_namespace');
     }
 
     /**
@@ -95,11 +93,11 @@ class CreateBaseMapTool extends BaseTool
      **/
     public function execute()
     {
-        if (!($this->options['connection'] instanceof Database))
+        if (!($this->options['database'] instanceof Database))
         {
-            throw new \InvalidArgumentException(sprintf('The connection must be a "Pomm\Connection\Database" instance, "%s" given.', get_class($this->options['connection'])));
+            throw new \InvalidArgumentException(sprintf('The database must be a "Pomm\Connection\Database" instance, "%s" given.', get_class($this->options['database'])));
         }
-        $this->transaction = $this->options['connection']->createConnection();
+        $this->transaction = $this->options['database']->createConnection();
         $this->getGeneralInfo();
         $this->getAttributesInfo();
 
@@ -131,8 +129,8 @@ class CreateBaseMapTool extends BaseTool
 
 namespace $namespace;
 
-use Pomm\\Object\\BaseObjectMap;
-use Pomm\\Exception\\Exception;
+use \\Pomm\\Object\\BaseObjectMap;
+use \\Pomm\\Exception\\Exception;
 
 abstract class $map_name extends $extends
 {
@@ -210,14 +208,26 @@ EOD;
        $file = sprintf("%s/%s.php", $this->getDestinationPath(), $this->options['class_name']);
        if (!file_exists($file))
        {
-           $tool = new CreateEntityTool(array('prefix_dir' => dirname($this->getDestinationPath()), 'class' => $this->options['class_name'], 'namespace' => $this->options['namespace'], 'schema' => $this->options['schema']));
+           $tool = new CreateEntityTool(array(
+               'prefix_dir' => $this->options['prefix_dir'],
+               'class'      => $this->options['class_name'],
+               'namespace'  => $this->options['namespace'],
+               'schema'     => $this->options['schema'],
+               'database'   => $this->options['database']
+           ));
            $tool->execute();
        }
 
        $file = sprintf("%s/%sMap.php", $this->getDestinationPath(), $this->options['class_name']);
        if (!file_exists($file))
        {
-           $tool = new CreateMapTool(array('prefix_dir' => dirname($this->getDestinationPath()), 'class' => $this->options['class_name'], 'namespace' => $this->options['namespace'], 'schema' => $this->options['schema']));
+           $tool = new CreateMapTool(array(
+               'prefix_dir' => $this->options['prefix_dir'],
+               'class'      => $this->options['class_name'],
+               'namespace'  => $this->options['namespace'],
+               'schema'     => $this->options['schema'],
+               'database'   => $this->options['database']
+           ));
            $tool->execute();
        }
     }

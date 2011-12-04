@@ -208,4 +208,17 @@ class Database
         $this->registerConverter('Interval', new Converter\PgInterval(), array('interval'));
         $this->registerConverter('Binary', new Converter\PgBytea(), array('bytea'));
     }
+
+    /**
+     * getName
+     *
+     * Returns the database name.
+     * This name is used to generate the namespaces for the Model files.
+     *
+     * @return String
+     **/
+    public function getName()
+    {
+        return $this->parameter_holder->hasParameter('name') ? $this->parameter_holder['name'] : $this->parameter_holder['database'];
+    }
 }

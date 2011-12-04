@@ -17,7 +17,7 @@ use Pomm\External\sfInflector;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class CreateMapTool extends BaseTool
+class CreateMapTool extends CreateFileTool
 {
     /**
      * configure()
@@ -25,16 +25,18 @@ class CreateMapTool extends BaseTool
      *
      * mandatory options :
      * * class      the class name to generate
+     * * database   the database name
      *
      * optional options :
      * * namespace
      * * extends
+     * * schema (default public)
      **/
 
     protected function configure()
     {
+        parent::configure();
         $this->options->mustHave('class');
-        $this->options->setDefaultValue('schema', 'public');
     }
 
     /**
@@ -68,8 +70,8 @@ namespace $namespace;
 
 use $namespace\\Base\\${class}Map as Base${class}Map;
 use $namespace\\${class};
-use Pomm\\Exception\\Exception;
-use Pomm\\Query\\Where;
+use \\Pomm\\Exception\\Exception;
+use \\Pomm\\Query\\Where;
 
 class ${class}Map extends Base${class}Map
 {

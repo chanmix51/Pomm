@@ -17,7 +17,7 @@ use Pomm\External\sfInflector;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class CreateEntityTool extends BaseTool
+class CreateEntityTool extends CreateFileTool
 {
     /**
      * configure()
@@ -25,17 +25,17 @@ class CreateEntityTool extends BaseTool
      *
      * mandatory options :
      * * class      the class name to generate
+     * * database   the database 
      *
      * optional options :
      * * namespace
-     * * schema
+     * * schema (default public)
      **/
 
     protected function configure()
     {
+        parent::configure();
         $this->options->mustHave('class');
-        $this->options->setDefaultValue('namespace', 'Model\Pomm\Entity');
-        $this->options->setDefaultValue('schema', 'public');
     }
 
     /**
@@ -65,8 +65,8 @@ class CreateEntityTool extends BaseTool
 
 namespace $namespace;
 
-use Pomm\\Object\\BaseObject;
-use Pomm\\Exception\\Exception;
+use \\Pomm\\Object\\BaseObject;
+use \\Pomm\\Exception\\Exception;
 
 class $class extends BaseObject
 {

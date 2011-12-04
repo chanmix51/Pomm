@@ -21,6 +21,7 @@ function __autoload($name)
         'Pomm/Tools/ScanSchemaTool.php',
         'Pomm/Tools/CreateEntityTool.php',
         'Pomm/Tools/CreateMapTool.php',
+        'Pomm/Tools/CreateFileTool.php',
         'Pomm/Converter/ConverterInterface.php',
         'Pomm/Converter/PgBoolean.php',
         'Pomm/Converter/PgHStore.php',
