@@ -9,11 +9,11 @@ use Pomm\External\sfInflector;
 /**
  * Pomm\Tools\CreateMapTool - Create a Map class
  *
- * 
+ *
  * @uses Pomm\Tools\BaseTool
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -24,19 +24,16 @@ class CreateMapTool extends BaseTool
      * @see BaseTool
      *
      * mandatory options :
-     * * dir        the directory base classes will be generated in
      * * class      the class name to generate
      *
      * optional options :
      * * namespace
-     * * extends 
+     * * extends
      **/
 
     protected function configure()
     {
-        $this->options->mustHave('dir');
         $this->options->mustHave('class');
-        $this->options->setDefaultValue('namespace', 'Model\Pomm\Entity');
         $this->options->setDefaultValue('schema', 'public');
     }
 
@@ -47,7 +44,8 @@ class CreateMapTool extends BaseTool
     public function execute()
     {
         $content = $this->generateMapFile();
-        $this->saveMapFile($content);
+        $path = sprintf("%s/%sMap.php", $this->getDestinationPath(), $this->options['class']);
+        $this->saveFile($path, $content);
     }
 
     /**
@@ -60,7 +58,7 @@ class CreateMapTool extends BaseTool
      **/
     protected function generateMapFile()
     {
-        $namespace = sprintf("%s\\%s", $this->options['namespace'], $this->options['schema'] == 'public' ? 'PublicSchema' : sfInflector::camelize($this->options['schema']));
+        $namespace = $this->getNamespace();
         $class =     $this->options['class'];
 
         $php = <<<EOD
@@ -79,19 +77,5 @@ class ${class}Map extends Base${class}Map
 EOD;
 
         return $php;
-    }
-
-    /**
-     * saveMapFile
-     * Saves the map file content
-     *
-     * @args String The content of the map file
-     **/
-    protected function saveMapFile($content)
-    {
-        $filename = sprintf("%s/%s/%sMap.php", $this->options['dir'], $this->options['schema'] == 'public' ? 'PublicSchema' : sfInflector::camelize($this->options['schema']), $this->options['class']);
-        $fh = fopen($filename, 'w');
-        fputs($fh, $content);
-        fclose($fh);
     }
 }
