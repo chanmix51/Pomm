@@ -38,7 +38,6 @@ class CreateBaseMapTool extends CreateFileTool
      **/
     protected function configure()
     {
-        $this->options['namespace'] = $this->options->getParameter('prefix_namespace');
         parent::configure();
         $this->options->mustHave('table');
 
