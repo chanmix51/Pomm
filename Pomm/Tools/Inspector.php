@@ -11,7 +11,7 @@ class Inspector
 
     public function __construct(Connection $connection)
     {
-        $this->database = $connection;
+        $this->connection = $connection;
     }
 
     /**
@@ -25,7 +25,7 @@ class Inspector
     public function getTableOid($schema, $table)
     {
         $sql = sprintf("SELECT c.oid FROM pg_catalog.pg_class c LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = '%s' AND c.relname ~ '^(%s)$';", $schema, $table);
-        $oid = $this->transaction->getPdo()->query($sql)->fetchColumn();
+        $oid = $this->connection->getPdo()->query($sql)->fetchColumn();
 
         if ($oid === FALSE)
         {
@@ -33,6 +33,28 @@ class Inspector
         }
 
         return $oid;
+    }
+
+    /**
+     * getTableInformation 
+     * Returns the object name, type and schema associated to an oid 
+     *
+     * @param Integer oid
+     * @return Array the informations [table_oid, schema_oid, schema, name]
+     **/
+    public function getTableInformation($oid)
+    {
+        $sql = sprintf("SELECT c.oid AS table_oid, n.oid AS schema_oid, n.nspname AS \"schema\", c.relname AS \"table\" FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.oid = %d;", $oid);
+        $pdo = $this->connection->getPdo()->query($sql);
+
+        $information = $pdo->fetch(\PDO::FETCH_ASSOC);
+
+        if ($information === FALSE)
+        {
+            throw new Exception(sprintf("Could not find any objects in table pg_class for oid='%d'.", $oid));
+        }
+
+        return $information;
     }
 
     /**
@@ -64,7 +86,7 @@ class Inspector
     {
         $sql = sprintf("SELECT a.attname, pg_catalog.format_type(a.atttypid, a.atttypmod), (SELECT substring(pg_catalog.pg_get_expr(d.adbin, d.adrelid) for 128) FROM pg_catalog.pg_attrdef d WHERE d.adrelid = a.attrelid AND d.adnum = a.attnum AND a.atthasdef) as defaultval, a.attnotnull as notnull, a.attnum as index FROM pg_catalog.pg_attribute a WHERE a.attrelid = '%d' AND a.attnum > 0 AND NOT a.attisdropped ORDER BY a.attnum;", $oid);
 
-        $pdo = $this->transaction->getPdo()->query($sql);
+        $pdo = $this->connection->getPdo()->query($sql);
         $attributes = array();
         while ($class = $pdo->fetch(\PDO::FETCH_LAZY))
         {
@@ -72,5 +94,49 @@ class Inspector
         }
 
         return $attributes;
+    }
+
+    /**
+     * getTableParent
+     *
+     * Return the oid of the parent table if any, FALSE is returned if there are no parent or if there are several 
+     * parents.
+     * @param Integer oid
+     * @return Integer oid
+     **/
+    public function getTableParents($oid)
+    {
+        $sql = sprintf("SELECT pa.inhparent FROM pg_catalog.pg_inherits pa WHERE pa.inhrelid = %d", $oid);
+        $pdo = $this->connection->getPdo()->query($sql);
+
+        if ($pdo->rowCount() <> 1)
+        {
+            return FALSE;
+        }
+
+        return $pdo->fetchColumn();
+    }
+
+
+    /**
+     * getTablesInSchema
+     * Return the list of the tables within the schema
+     *
+     * @public
+     * @param String schema name
+     * @return Array tables OID
+     **/
+    public function getTablesInSchema($schema)
+    {
+        $sql = sprintf("SELECT c.oid FROM pg_catalog.pg_class c LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind='r' AND n.nspname = '%s'", $schema);
+
+        $tables = array();
+        $pdo = $this->connection->getPdo()->query($sql);
+        while ($oid = $pdo->fetchColumn())
+        {
+            $tables[] = $oid;
+        }
+
+        return $tables;
     }
 }

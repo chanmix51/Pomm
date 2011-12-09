@@ -46,35 +46,14 @@ class ScanSchemaTool extends CreateFileTool
             throw new \InvalidArgumentException(sprintf('The database must be a "Pomm\Connection\Database" instance, "%s" given.', get_class($this->options['database'])));
         }
 
-        $this->transaction = $this->options['database']->createConnection();
+        $inspector = new Inspector($this->options['database']->createConnection());
 
-        foreach ($this->getTables() as $table)
+        foreach ($inspector->getTablesInSchema($this->options['schema']) as $table_oid)
         {
-            $this->options['table'] = $table;
+            $this->options['oid'] = $table_oid;
             $tool = new CreateBaseMapTool($this->options->getParameters());
 
             $tool->execute();
         }
-    }
-
-    /**
-     * getTables
-     * Return the list of the tables within the schema
-     *
-     * @protected
-     * @return Array tables
-     **/
-    protected function getTables()
-    {
-        $sql = sprintf("SELECT c.relname FROM pg_catalog.pg_class c LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind='r' AND n.nspname = '%s'", $this->options['schema']);
-
-        $tables = array();
-        $pdo = $this->transaction->getPdo()->query($sql);
-        while ($table = $pdo->fetch(\PDO::FETCH_LAZY))
-        {
-            $tables[] = $table->relname;
-        }
-
-        return $tables;
     }
 }

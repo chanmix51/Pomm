@@ -18,8 +18,6 @@ use Pomm\Tools\Inspector;
  */
 class CreateBaseMapTool extends CreateFileTool
 {
-    protected $attributes = array();
-
     /**
      * configure()
      * mandatory options :
@@ -33,7 +31,17 @@ class CreateBaseMapTool extends CreateFileTool
     protected function configure()
     {
         parent::configure();
-        $this->options->mustHave('table');
+        $this->inspector = new Inspector($this->options['database']->createConnection());
+        if (!$this->options->hasParameter('oid'))
+        {
+            $this->options->mustHave('table');
+            $this->options['oid'] = $this->inspector->getTableOid($this->options['schema'], $this->options['table']);
+        }
+        else
+        {
+            $infos = $this->inspector->getTableInformation($this->options['oid']);
+            $this->options['table'] = $infos['table'];
+        }
 
         $this->options->setDefaultValue('class_name', sfInflector::camelize($this->options['table']));
         $this->options->setDefaultValue('extends', 'BaseObjectMap');
@@ -46,11 +54,10 @@ class CreateBaseMapTool extends CreateFileTool
      **/
     public function execute()
     {
-        if (!($this->options['database'] instanceof Database))
+        if (!($this->options['database'] instanceof \Pomm\Connection\Database))
         {
-            throw new \InvalidArgumentException(sprintf('The database must be a "Pomm\Connection\Database" instance, "%s" given.', get_class($this->options['database'])));
+            throw new \InvalidArgumentException(sprintf('The database must be a "\Pomm\Connection\Database" instance, "%s" given.', get_class($this->options['database'])));
         }
-        $this->inspector = new Inspector($this->options['database']->createConnection());
 
         $map_file = $this->generateMapFile();
         $path = sprintf('%s/Base/%sMap.php', $this->getDestinationPath(), $this->options['class_name']);
@@ -71,10 +78,22 @@ class CreateBaseMapTool extends CreateFileTool
         $class_name  = $this->options['class_name'];
         $table_name  = sprintf("%s.%s", $this->options['schema'], $this->options['table']);
         $extends     = $this->options['extends'];
-        $oid = $this->inspector->getTableGeneralInfo($this->options['schema'], $this->options['name']);
-        $primary_key = join(', ', $this->inspector->getTablePrimaryKey($oid));
-        $fields_definitions = $this->generateFieldsDefinition($this->inspector->getTableFieldsInformation($oid));
+        $primary_key = join(', ', $this->inspector->getTablePrimaryKey($this->options['oid']));
         $map_name   =  sprintf("%sMap", $class_name);
+
+        if ($inherits = $this->inspector->getTableParents($this->options['oid']))
+        {
+            $parent_table_infos = $this->inspector->getTableInformation($inherits);
+            $extends = sprintf("%s\\%sMap", $std_namespace, sfInflector::camelize($parent_table_infos['table']));
+            $fields_definition = $this->generateFieldsDefinition(array_diff_key($this->inspector->getTableFieldsInformation($this->options['oid']), $this->inspector->getTableFieldsInformation($inherits)));
+            $parent_call = "parent::intialize();\n";
+        }
+        else
+        {
+            $fields_definition = $this->generateFieldsDefinition($this->inspector->getTableFieldsInformation($this->options['oid']));
+            $parent_call = "";
+        }
+
 
         $php = <<<EOD
 <?php
@@ -91,7 +110,8 @@ abstract class $map_name extends $extends
         \$this->object_class =  '$std_namespace\\$class_name';
         \$this->object_name  =  '$table_name';
 
-$fields_definitions
+        $parent_call
+$fields_definition
         \$this->pk_fields = array($primary_key);
     }
 }
@@ -104,10 +124,10 @@ EOD;
      * generateFieldsDefinition - Generate the Pomm field definition for a
      * column
      *
-     * @public
+     * @protected
      * @return string definiion
      **/
-    public function generateFieldsDefinition($attributes)
+    protected function generateFieldsDefinition($attributes)
     {
         $fields_definition = "";
 
