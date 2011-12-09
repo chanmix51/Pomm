@@ -86,7 +86,7 @@ class CreateBaseMapTool extends CreateFileTool
             $parent_table_infos = $this->inspector->getTableInformation($inherits);
             $extends = sprintf("%s\\%sMap", $std_namespace, sfInflector::camelize($parent_table_infos['table']));
             $fields_definition = $this->generateFieldsDefinition(array_diff_key($this->inspector->getTableFieldsInformation($this->options['oid']), $this->inspector->getTableFieldsInformation($inherits)));
-            $parent_call = "parent::intialize();\n";
+            $parent_call = "        parent::intialize();\n";
         }
         else
         {
@@ -107,10 +107,10 @@ abstract class $map_name extends $extends
 {
     public function initialize()
     {
+$parent_call
         \$this->object_class =  '$std_namespace\\$class_name';
         \$this->object_name  =  '$table_name';
 
-        $parent_call
 $fields_definition
         \$this->pk_fields = array($primary_key);
     }
