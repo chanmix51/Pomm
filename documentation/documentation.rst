@@ -4,7 +4,18 @@ Pomm Documentation
 
 Overview
 --------
-To begin with Pomm it is important to understand some of its parts:
+
+Pomm is a fast, lightweight, efficient model manager for Postgresql written in PHP. It can be seen as an enhanced object hydrator above PDO with the following features:
+ * Database Inspector to build automatically your PHP model files. Table inheritance from Pg will make your model class to inherit from each other.
+ * Namespaces are used to ovoid collision between objects located in different Pg schemas.
+ * Type converters, 't' and 'f' Pg booleans are converted into PHP booleans, so are binary, arrays, geometric and your own data types.
+ * Collections, queries results are fetched on demand to keep minimal memory fingerprint.
+ * Filters, it is possible to register anonymous PHP functions to parse fetched results prior to hydration.
+ * Model objects are extensible, you can add fields in your SELECT statements, values will be in your model instances.
+ * Identity mapper, fetching twice the same rows will return same instances.
+ * SQL is the query language.
+
+Let's have an overview of Pomm's components:
 
 Service 
   This class manages your *Database* connection pool. 
@@ -16,46 +27,10 @@ Map Classes
   They are a link between your database and *Entity Classes*. They perform queries that return *Collection* of *Entity Classes* instances. 
 Entity Classes
   These instances represent a set of data that can be persisted in the database. These data can be stored under different kind of *Type* which can be associated to a *Converter* to ensure correct representation in PHP.
-IdentityMapperInterface
-  An identity mapper is a layer between the map files and the database. There are several implementation coming with Pomm but you can design your own.
-
-Directory tree
-==============
-
-As Pomm classes' namespace is based on the directory structure, it is important to have a look at the way the model part is organized. A Pomm model directory tree looks like this:
-
-::
-
-  Model
-  └── Pomm
-      ├── Converter
-      ├── Database
-      ├── Entity
-      │   ├── SchemaA
-      │   ├── SchemaB
-      │   ├── ...
-      │   └── SchemaZ
-      │       ├── Base
-      │       │   ├── EntityAMap.php
-      │       │   ├── EntityBMap.php
-      │       │   ├── ...
-      │       │   └── EntityZMap.php
-      │       ├── EntityAMap.php
-      │       ├── EntityA.php
-      │       ├── EntityBMap.php
-      │       ├── EntityB.php
-      │       ├── ...
-      │       ├── EntityZMap.php
-      │       └── EntityZ.php
-      └── Type
-
-Directories:
- * *Converter*           holds the converters for your custom database types
- * *Database*            holds your own *Database* classes if you need any
- * *Entity*              this is where the map classes and their relative entities are stored
- * *Entity/Schema*       schema name will be *Public* by default
- * *Entity/Schema/Base*  where generated files are going to be saved (need write access)
- * *Type*                composite types often need to be stored as class instances in PHP
+Collections
+  A collection holds a query result. You can iterate over it with a _foreach_ to fetch Entity instances but it proposes a lot more of handy methods. 
+Converter
+  By default, each database has the basic converters registered in order to convert native types from/to Postgresql/PHP. Some of them are optional and you can write your own for your custom database types.
 
 Dealing with databases
 ----------------------
@@ -107,8 +82,9 @@ Database and converters
 The *Database* class brings access to mechanisms to create connections and transactions and also register converters. A *Converter* is a class that translates a data type from Postgresql to PHP and from PHP to Postgresql. By default, the following converters are registered, this means you can use them without configuring anything:
  * Boolean: convert postgresql 't' and 'f' to PHP boolean value
  * Number: convert postgresql 'smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial' types to numbers
- * String: convert postgresql 'varchar' and 'text' into PHP string
+ * String: convert postgresql 'varchar', 'uuid', 'xml' and 'text' into PHP string
  * Timestamp: convert postgresql 'timestamp', 'date', 'time' to PHP DateTime instance.
+ * Interval: convert postgresql's 'interval' type into PHP SplInterval instance. 
 
 Other types are natively available in postgresql databases but are not loaded automatically by Pomm:
 
@@ -249,7 +225,7 @@ Every action you will perform with your entities will use a Map class. They are 
 
 Map classes represent a structure in the database and provide methods to retrieve and save data with this structure. To be short, one table or view <=> one map class.
 
-To be able to be the bridge between your database and your entities, all Map classes **must** extends *Pomm\\Object\\BaseObjectMap* class. This class implements methods that directly interact with the database using the PDO layer. These methods will be explained in the chapter how to query the database.
+To be able to be the bridge between your database and your entities, all Map classes **must** at the end extends *Pomm\\Object\\BaseObjectMap* class. This class implements methods that directly interact with the database using the PDO layer. These methods will be explained in the chapter how to query the database.
 
 The structure of the map classes can be automatically guessed from the database hence it is possible to generate the structure part of the map files from the command line (see below). If these classes can be generated, it is advisable not to modify them by hand because modifications would be lost at the next generation. This is why Map classes are split using inheritance:
  * *BaseYourEntityMap* which are abstract classes inheriting from *BaseObjectMap*
@@ -296,7 +272,7 @@ The according generated structure will be:::
   {
       public function initialize()
       {
-          $this->object_class =  'Model\Pomm\Entity\Public\Student';
+          $this->object_class =  'MyDatabase\PublicSchema\Student';
           $this->object_name  =  'student';
   
           $this->addField('reference', 'String');
@@ -315,7 +291,7 @@ If the previous table were in the *school* database schema, the following lines 
  <?php
   namespace Model\Pomm\Entity\School\Base;
   ...
-          $this->object_class =  'Model\Pomm\Entity\School\Student';
+          $this->object_class =  'MyDatabase\School\Student';
           $this->object_name  =  'school.student';
   
 
@@ -391,7 +367,7 @@ Of course, this is not very useful, a finder *getYoungerThan* would be::
     return $this->findWhere("birthdate > ?", array($date->format('Y-m-d')), 'ORDER BY birthdate DESC LIMIT 10');
   }
 
-All queries are prepared, this might increase the performance but it certainly increases the security. The argument here will automatically be escaped by the database and ovoid SQL-injection attacks. If a suffix is passed, it is appended to the query **as is**. The suffix is intended to allow developpers to specify sorting a subset parameters to the query. As the query is prepared, a multiple query injection type attack is not directly possible but be careful if you pass values sent by the customer.
+All queries are prepared, this might increase the performance but it certainly increases the security. The argument here will automatically be escaped by the database and ovoid SQL-injection attacks. If a suffix is passed, it is appended to the query **as is**. The suffix is intended to allow developers to specify sorting a subset parameters to the query. As the query is prepared, a multiple query injection type attack is not directly possible but be careful if you pass values sent by the customer.
 
 Sometimes, you do not know in advance what will be the clause of your query because it depends on other factors. You can use the *Where* class to do so and chain logical statements.
 
@@ -480,7 +456,7 @@ Collections have other handful methods like:
  * *isEven()*
  * *getOddEven()*
 
-Pomm's *Collection* class can register filters. Filters are just functions that are executed after values were fetched from the database and before the object is hydrated with values. These filters take the array of fetched values as parameter. They return an array with the values. After all filters are being executed, the values are used to hydrate the Object instance. This is very convenient to create pseudo relationship between objects:
+Pomm's *Collection* class can register filters. Filters are just functions that are executed after values were fetched from the database and before the object is hydrated with values. These filters take the array of fetched values as parameter. They return an array with the values. After all filters are being executed, the values are used to hydrate the Object instance related the the Map instance the Collection comes from. This is very convenient to create pseudo relationship between objects:
 
 ::
 
@@ -582,8 +558,15 @@ Entities implement PHP's *ArrayAccess* interface to use the accessors if any. Th
 
 ::
 
-  $entity['pika'];    // chu
-  $entity->getPika(); // chu
+  // in the Entity class
+  public function getPika()
+  {
+    return strtoupper($this->get('pika'));
+  }
+
+  // elsewhere
+  $entity->getPika(); // CHU
+  $entity['pika'];    // CHU
 
 Of course you can extend your entities providing new accessors. If by example you have an entity with a weight in grams and you would like to have an accessor that return it in ounces::
 
@@ -604,7 +587,7 @@ In your templates, you can directly benefit from this accessor while using the e
 Life cycle
 ==========
 
-Entities are the end of the process, they are the data. Unlike Active Record where entities know how to manage themselves, with Pomm, entities are just data container that may embed processes. Nevertheless, these data container must be formatted to know about their structure and state. This is why entities all inherit from *BaseObject* class and cannot be instantiated directly.
+Entities are the end of the process, they are the data. Unlike Active Record where entities know how to manage themselves, with Pomm, entities are just data container that may embed processes. Nevertheless, these data containers must be formatted to know about their structure and state. This is why entities all inherit from *BaseObject* class and cannot be instantiated directly.
 
 ::
 
@@ -773,7 +756,7 @@ Pomm comes with *Tools* classes to assist the user in some common tasks. The mos
   $scan = new Pomm\Tools\ScanSchemaTool(array(
       'dir'=> __DIR__,
       'schema' => 'transfo',
-      'connection' => $service->getDatabase(),
+      'database' => $service->getDatabase(),
   ));
 
   $scan->execute();

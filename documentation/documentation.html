@@ -308,7 +308,21 @@ ul.auto-toc {
 
 <div class="section" id="overview">
 <h1>Overview</h1>
-<p>To begin with Pomm it is important to understand some of its parts:</p>
+<dl class="docutils">
+<dt>Pomm is a fast, lightweight, efficient model manager for Postgresql written in PHP. It can be seen as an enhanced object hydrator above PDO with the following features:</dt>
+<dd><ul class="first last simple">
+<li>Database Inspector to build automatically your PHP model files. Table inheritance from Pg will make your model class to inherit from each other.</li>
+<li>Namespaces are used to ovoid collision between objects located in different Pg schemas.</li>
+<li>Type converters, 't' and 'f' Pg booleans are converted into PHP booleans, so are binary, arrays, geometric and your own data types.</li>
+<li>Collections, queries results are fetched on demand to keep minimal memory fingerprint.</li>
+<li>Filters, it is possible to register anonymous PHP functions to parse fetched results prior to hydration.</li>
+<li>Model objects are extensible, you can add fields in your SELECT statements, values will be in your model instances.</li>
+<li>Identity mapper, fetching twice the same rows will return same instances.</li>
+<li>SQL is the query language.</li>
+</ul>
+</dd>
+</dl>
+<p>Let's have an overview of Pomm's components:</p>
 <dl class="docutils">
 <dt>Service</dt>
 <dd>This class manages your <em>Database</em> connection pool.</dd>
@@ -320,49 +334,11 @@ ul.auto-toc {
 <dd>They are a link between your database and <em>Entity Classes</em>. They perform queries that return <em>Collection</em> of <em>Entity Classes</em> instances.</dd>
 <dt>Entity Classes</dt>
 <dd>These instances represent a set of data that can be persisted in the database. These data can be stored under different kind of <em>Type</em> which can be associated to a <em>Converter</em> to ensure correct representation in PHP.</dd>
-<dt>IdentityMapperInterface</dt>
-<dd>An identity mapper is a layer between the map files and the database. There are several implementation coming with Pomm but you can design your own.</dd>
+<dt>Collections</dt>
+<dd>A collection holds a query result. You can iterate over it with a _foreach_ to fetch Entity instances but it proposes a lot more of handy methods.</dd>
+<dt>Converter</dt>
+<dd>By default, each database has the basic converters registered in order to convert native types from/to Postgresql/PHP. Some of them are optional and you can write your own for your custom database types.</dd>
 </dl>
-
-<div class="section" id="directory-tree">
-<h2>Directory tree</h2>
-<p>As Pomm classes' namespace is based on the directory structure, it is important to have a look at the way the model part is organized. A Pomm model directory tree looks like this:</p>
-<pre class="literal-block">Model
-└── Pomm
-    ├── Converter
-    ├── Database
-    ├── Entity
-    │   ├── SchemaA
-    │   ├── SchemaB
-    │   ├── ...
-    │&nbsp;&nbsp; └── SchemaZ
-    │&nbsp;&nbsp;     ├── Base
-    │       │   ├── EntityAMap.php
-    │       │   ├── EntityBMap.php
-    │       │   ├── ...
-    │&nbsp;&nbsp;     │&nbsp;&nbsp; └── EntityZMap.php
-    │&nbsp;&nbsp;     ├── EntityAMap.php
-    │&nbsp;&nbsp;     ├── EntityA.php
-    │&nbsp;&nbsp;     ├── EntityBMap.php
-    │&nbsp;&nbsp;     ├── EntityB.php
-    │&nbsp;&nbsp;     ├── ...
-    │&nbsp;&nbsp;     ├── EntityZMap.php
-    │&nbsp;&nbsp;     └── EntityZ.php
-    └── Type
-</pre>
-<dl class="docutils">
-<dt>Directories:</dt>
-<dd><ul class="first last simple">
-<li><em>Converter</em>           holds the converters for your custom database types</li>
-<li><em>Database</em>            holds your own <em>Database</em> classes if you need any</li>
-<li><em>Entity</em>              this is where the map classes and their relative entities are stored</li>
-<li><em>Entity/Schema</em>       schema name will be <em>Public</em> by default</li>
-<li><em>Entity/Schema/Base</em>  where generated files are going to be saved (need write access)</li>
-<li><em>Type</em>                composite types often need to be stored as class instances in PHP</li>
-</ul>
-</dd>
-</dl>
-</div>
 </div>
 <div class="section" id="dealing-with-databases">
 <h1>Dealing with databases</h1>
@@ -377,7 +353,8 @@ $service = new Pomm\Service(array(
   ),
   'db_two' =&gt; array(
     'dsn' =&gt; 'pgsql://otheruser:hispass@otherhost/db_b',
-    'class' =&gt; 'App\MyDb'
+    'class' =&gt; 'App\MyDb',
+    'identity_mapper' =&gt; 'App\MyIdentityMapper'
   )
   ));
 
@@ -417,8 +394,9 @@ $service-&gt;setDatabase('db_two', new App\MyDb(array(
 <dd><ul class="first last simple">
 <li>Boolean: convert postgresql 't' and 'f' to PHP boolean value</li>
 <li>Number: convert postgresql 'smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial' types to numbers</li>
-<li>String: convert postgresql 'varchar' and 'text' into PHP string</li>
+<li>String: convert postgresql 'varchar', 'uuid', 'xml' and 'text' into PHP string</li>
 <li>Timestamp: convert postgresql 'timestamp', 'date', 'time' to PHP DateTime instance.</li>
+<li>Interval: convert postgresql's 'interval' type into PHP SplInterval instance.</li>
 </ul>
 </dd>
 </dl>
@@ -559,7 +537,7 @@ class WindingPower implements ConverterInterface
 </dl>
 <p>Every action you will perform with your entities will use a Map class. They are roughly the equivalent of Propel's <em>Peer</em> classes. Although it might look like Propel, it is important to understand unlike the normal Active Record design pattern, entities do not even know how to save themselves. You have to use their relative Map class to save them.</p>
 <p>Map classes represent a structure in the database and provide methods to retrieve and save data with this structure. To be short, one table or view &lt;=&gt; one map class.</p>
-<p>To be able to be the bridge between your database and your entities, all Map classes <strong>must</strong> extends <em>Pomm\Object\BaseObjectMap</em> class. This class implements methods that directly interact with the database using the PDO layer. These methods will be explained in the chapter how to query the database.</p>
+<p>To be able to be the bridge between your database and your entities, all Map classes <strong>must</strong> at the end extends <em>Pomm\Object\BaseObjectMap</em> class. This class implements methods that directly interact with the database using the PDO layer. These methods will be explained in the chapter how to query the database.</p>
 <dl class="docutils">
 <dt>The structure of the map classes can be automatically guessed from the database hence it is possible to generate the structure part of the map files from the command line (see below). If these classes can be generated, it is advisable not to modify them by hand because modifications would be lost at the next generation. This is why Map classes are split using inheritance:</dt>
 <dd><ul class="first last simple">
@@ -625,7 +603,7 @@ class WindingPower implements ConverterInterface
  {
      public function initialize()
      {
-         $this-&gt;object_class =  'Model\Pomm\Entity\Public\Student';
+         $this-&gt;object_class =  'MyDatabase\PublicSchema\Student';
          $this-&gt;object_name  =  'student';
 
          $this-&gt;addField('reference', 'String');
@@ -642,7 +620,7 @@ class WindingPower implements ConverterInterface
 <pre class="literal-block">&lt;?php
  namespace Model\Pomm\Entity\School\Base;
  ...
-         $this-&gt;object_class =  'Model\Pomm\Entity\School\Student';
+         $this-&gt;object_class =  'MyDatabase\School\Student';
          $this-&gt;object_name  =  'school.student';
 </pre>
 </div>
@@ -711,7 +689,7 @@ $students = $this-&gt;findWhere("birthdate &gt; '1980-01-01'");
   return $this-&gt;findWhere("birthdate &gt; ?", array($date-&gt;format('Y-m-d')), 'ORDER BY birthdate DESC LIMIT 10');
 }
 </pre>
-<p>All queries are prepared, this might increase the performance but it certainly increases the security. The argument here will automatically be escaped by the database and ovoid SQL-injection attacks. If a suffix is passed, it is appended to the query <strong>as is</strong>. The suffix is intended to allow developpers to specify sorting a subset parameters to the query. As the query is prepared, a multiple query injection type attack is not directly possible but be careful if you pass values sent by the customer.</p>
+<p>All queries are prepared, this might increase the performance but it certainly increases the security. The argument here will automatically be escaped by the database and ovoid SQL-injection attacks. If a suffix is passed, it is appended to the query <strong>as is</strong>. The suffix is intended to allow developers to specify sorting a subset parameters to the query. As the query is prepared, a multiple query injection type attack is not directly possible but be careful if you pass values sent by the customer.</p>
 <p>Sometimes, you do not know in advance what will be the clause of your query because it depends on other factors. You can use the <em>Where</em> class to do so and chain logical statements.</p>
 <pre class="literal-block">public function getYoungerThan(DateTime $date, $level = 0)
 {
@@ -785,7 +763,7 @@ $object = $collection-&gt;has($index) ?
 </ul>
 </dd>
 </dl>
-<p>Pomm's <em>Collection</em> class can register filters. Filters are just functions that are executed after values were fetched from the database and before the object is hydrated with values. These filters take the array of fetched values as parameter. They return an array with the values. After all filters are being executed, the values are used to hydrate the Object instance. This is very convenient to create pseudo relationship between objects:</p>
+<p>Pomm's <em>Collection</em> class can register filters. Filters are just functions that are executed after values were fetched from the database and before the object is hydrated with values. These filters take the array of fetched values as parameter. They return an array with the values. After all filters are being executed, the values are used to hydrate the Object instance related the the Map instance the Collection comes from. This is very convenient to create pseudo relationship between objects:</p>
 <pre class="literal-block"># This filter triggers the *createFromForeign* method of the *AuthorMap*
 # class. It takes all the fields named *author{%s}* to hydrate a *Author*
 # object and set it in the values.
@@ -875,8 +853,15 @@ $entity-&gt;getPika()    // chu
 </pre>
 <p>This allow developers to overload accessors. The methods <em>set</em> and <em>get</em> are only used within the class definition and should not be used outside unless you want to bypass any overload that could exist.</p>
 <p>Entities implement PHP's <em>ArrayAccess</em> interface to use the accessors if any. This means you can have easy access to your entity's data in your templates without bypassing accessors !</p>
-<pre class="literal-block">$entity['pika'];    // chu
-$entity-&gt;getPika(); // chu
+<pre class="literal-block">// in the Entity class
+public function getPika()
+{
+  return strtoupper($this-&gt;get('pika'));
+}
+
+// elsewhere
+$entity-&gt;getPika(); // CHU
+$entity['pika'];    // CHU
 </pre>
 <p>Of course you can extend your entities providing new accessors. If by example you have an entity with a weight in grams and you would like to have an accessor that return it in ounces:</p>
 <pre class="literal-block">public function getWeightInOunce()
@@ -894,7 +879,7 @@ $entity-&gt;getPika(); // chu
 </div>
 <div class="section" id="life-cycle">
 <h2>Life cycle</h2>
-<p>Entities are the end of the process, they are the data. Unlike Active Record where entities know how to manage themselves, with Pomm, entities are just data container that may embed processes. Nevertheless, these data container must be formatted to know about their structure and state. This is why entities all inherit from <em>BaseObject</em> class and cannot be instantiated directly.</p>
+<p>Entities are the end of the process, they are the data. Unlike Active Record where entities know how to manage themselves, with Pomm, entities are just data container that may embed processes. Nevertheless, these data containers must be formatted to know about their structure and state. This is why entities all inherit from <em>BaseObject</em> class and cannot be instantiated directly.</p>
 <pre class="literal-block">$entity = $map-&gt;createObject();
 $entity-&gt;isNew();           // true
 $entity-&gt;isModified();      // false
@@ -1055,7 +1040,7 @@ $service = new Pomm\Service(array(
 $scan = new Pomm\Tools\ScanSchemaTool(array(
     'dir'=&gt; __DIR__,
     'schema' =&gt; 'transfo',
-    'connection' =&gt; $service-&gt;getDatabase(),
+    'database' =&gt; $service-&gt;getDatabase(),
 ));
 
 $scan-&gt;execute();
