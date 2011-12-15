@@ -464,14 +464,14 @@ abstract class BaseObjectMap
 
         if ($object->_getStatus() & BaseObject::EXIST)
         {
-            $sql = sprintf('UPDATE %s SET %s WHERE %s RETURNING *;', $this->object_name, $this->parseForUpdate($object), $this->createSqlAndFrom($object->getPrimaryKey()));
+            $sql = sprintf('UPDATE %s SET %s WHERE %s RETURNING %s;', $this->object_name, $this->parseForUpdate($object), $this->createSqlAndFrom($object->getPrimaryKey()), join(', ', $this->getSelectFields()));
 
             $collection = $this->query($sql, array_values($object->getPrimaryKey()));
         }
         else
         {
             $pg_values = $this->parseForInsert($object);
-            $sql = sprintf('INSERT INTO %s (%s) VALUES (%s) RETURNING *;', $this->object_name, join(',', array_keys($pg_values)), join(',', array_values($pg_values)));
+            $sql = sprintf('INSERT INTO %s (%s) VALUES (%s) RETURNING %s;', $this->object_name, join(',', array_keys($pg_values)), join(',', array_values($pg_values)), join(', ', $this->getSelectFields()));
 
             $collection = $this->query($sql, array());
         }
@@ -708,7 +708,7 @@ abstract class BaseObjectMap
      * paginate and execute a query
      *
      * @param $sql the SQL query to paginate
-     * @param $sql_count the SQL that count the overall results
+     * @param $sql_count the SQL that count the overall results (whatever the column name is)
      * @param $values the queries parameters
      * @param $items_per_page how many results per page
      * @param $page the page index
