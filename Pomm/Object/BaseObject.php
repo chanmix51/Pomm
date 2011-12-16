@@ -54,11 +54,6 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
             }
             else
             {
-                if (is_null($default))
-                {
-                    throw new Exception(sprintf("Cannot get unknown var '%s' in instance '%s'.", $var, get_class($this)));
-                }
-
                 return $default;
             }
         }

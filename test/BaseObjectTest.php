@@ -57,10 +57,9 @@ class my_test extends \lime_test
     public function testHydrate($values, $tested_values)
     {
         $this->obj->hydrate($values);
-        $extract = $this->obj->extract();
         foreach ($tested_values as $field => $value)
         {
-            $this->is($value, $extract[$field], sprintf('"%s" values match', $field));
+            $this->is($value, $this->obj[$field], sprintf('"%s" values match', $field));
         }
 
         return $this;
@@ -109,6 +108,7 @@ $my_test
     ->testSet('authors', array('plop1'))
     ->testAdd('authors', 'plop2', array('plop1', 'plop2'))
     ->testHydrate(array('title' => 'modified title'), $test_values)
+    ->testHydrate(array('title' => 'modified title'), array_merge($test_values, array('pika' => null)))
     ->testArrayAccess($test_values)
     ->testIteratorAggregate($test_values)
     ;
