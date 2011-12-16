@@ -15,7 +15,7 @@ use Pomm\External\sfInflector;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-abstract class BaseObject implements \ArrayAccess
+abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
 {
     const NONE     = 0;
     const EXIST    = 1;
@@ -328,5 +328,14 @@ abstract class BaseObject implements \ArrayAccess
     public function offsetUnset($offset)
     {
         $this->offsetSet($offset, null);
+    }
+
+    /**
+     * getIterator
+     * @see IteratorAggregate
+     **/
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->fields);
     }
 }

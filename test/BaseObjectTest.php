@@ -72,8 +72,33 @@ class my_test extends \lime_test
 
         return $this;
     }
+
+    public function testArrayAccess($values)
+    {
+        $this->ok($this->obj instanceof \ArrayAccess, "Implements ArrayAccess.");
+
+        foreach($values as $key => $value)
+        {
+            $this->is($this->obj[$key], $value, sprintf("Key '%s' is value '%s'.", $key, $value));
+        }
+
+        return $this;
+    }
+
+    public function testIteratorAggregate()
+    {
+        $this->ok($this->obj instanceof \IteratorAggregate, "Implements IteratorAggregate.");
+
+        foreach($this->obj as $key => $value)
+        {
+            $this->is($value, $this->obj[$key], sprintf("Key '%s' is value '%s'.", $key, $value));
+        }
+
+        return $this;
+    }
 }
 
+$test_values = array('title' => 'modified title', 'authors' => array('plop1', 'plop2'));
 $my_test = new my_test();
 $my_test
     ->initialize()
@@ -83,6 +108,8 @@ $my_test
     ->testStatus(BaseObject::MODIFIED)
     ->testSet('authors', array('plop1'))
     ->testAdd('authors', 'plop2', array('plop1', 'plop2'))
-    ->testHydrate(array('title' => 'modified title'), array('title' => 'modified title', 'authors' => array('plop1', 'plop2')))
+    ->testHydrate(array('title' => 'modified title'), $test_values)
+    ->testArrayAccess($test_values)
+    ->testIteratorAggregate($test_values)
     ;
 
