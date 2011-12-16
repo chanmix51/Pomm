@@ -96,7 +96,7 @@ class converter_test extends \lime_test
         $this->object->setTestPoint($point);
         $this->map->saveOne($this->object);
 
-        $object = $this->map->findByPk($this->object->getPrimaryKey());
+        $object = $this->map->findByPk($this->object->get($this->map->getPrimaryKey()));
 
         $this->ok(is_object($object['test_point']), "'point' is an object.");
         $this->ok($object['test_point'] instanceof \Pomm\Type\Point, "'point' is a \\Pomm\\Type\\Point instance.");
@@ -118,7 +118,7 @@ class converter_test extends \lime_test
         $this->object->setTestLseg($segment);
         $this->map->updateOne($this->object, array('test_lseg'));
 
-        $object = $this->map->findByPk($this->object->getPrimaryKey());
+        $object = $this->map->findByPk($this->object->get($this->map->getPrimaryKey()));
 
         $this->ok(is_object($object['test_lseg']), "'test_lseg' is an object.");
         $this->ok($object['test_lseg'] instanceof \Pomm\Type\Segment, "'test_lseg' is a \\Pomm\\Type\\Segment instance.");
@@ -142,7 +142,7 @@ class converter_test extends \lime_test
         $this->object->setTestHstore($values);
         $this->map->updateOne($this->object, array('test_hstore'));
 
-        $object = $this->map->findByPk($this->object->getPrimaryKey());
+        $object = $this->map->findByPk($this->object->get($this->map->getPrimaryKey()));
 
         $hstore = $object['test_hstore'];
         foreach ($values as $key => $value)
@@ -173,7 +173,7 @@ class converter_test extends \lime_test
         $this->object->setTestCircle($circle);
         $this->map->updateOne($this->object, array('test_circle'));
 
-        $object = $this->map->findByPk($this->object->getPrimaryKey());
+        $object = $this->map->findByPk($this->object->get($this->map->getPrimaryKey()));
         $this->ok(is_object($object['test_circle']), "'test_circle' is an object.");
         $this->ok($object['test_circle'] instanceof \Pomm\Type\Circle, "'test_circle' is a \\Pomm\\Type\\Circle instance.");
         $this->is($object['test_circle']->center->x, $circle->center->x, sprintf("Center 'x' is equal to '%f'.", $circle->center->x));
@@ -196,7 +196,7 @@ class converter_test extends \lime_test
         $this->object->setTestInterval($interval);
         $this->map->updateOne($this->object, array('test_interval'));
 
-        $object = $this->map->findByPk($this->object->getPrimaryKey());
+        $object = $this->map->findByPk($this->object->get($this->map->getPrimaryKey()));
         $this->ok(is_object($object['test_interval']), "'test_interval' is an object.");
         $this->ok($object['test_interval'] instanceof \DateInterval, "'test_interval' is a \\DateInterval instance.");
         $this->is($object['test_interval']->format('%Y %m %d %h %i %s'), $this->object['test_interval']->format('%Y %m %d %h %i %s'), "Formatted intervals match.");

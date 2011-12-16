@@ -23,25 +23,19 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
 
 
     protected $fields = array();
-    protected $fields_definition = array();
-    protected $status = 0;
-    protected $primary_key = array();
+    protected $status = self::NONE;
 
     /**
      * __construct
-     * The constructor. This shouldn't be called directly, see BaseObjectMap::createObject() instead
-     *
-     * @param Array $pk the primary key definition
-     * @param Array $fields_definition the fields declared to be stored in the database
-     * @access public
-     * @return void
-     */
-    public function __construct(Array $pk = array(), Array $fields_definition = array())
+     * Instanciate the object and hydrate it with the given values
+     **/
+    public function __construct(Array $values = null)
     {
-        $this->setPrimaryKey($pk);
-        $this->fields_definition = $fields_definition;
+        if (!is_null($values))
+        {
+            $this->hydrate($values);
+        }
     }
-
     /**
      * get
      * Returns the $name value
@@ -50,10 +44,27 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      * @access public
      * @return mixed
      */
-    public function get($var)
+    public function get($var, $default = null)
     {
-        if ($this->has($var)) {
-            return $this->fields[$var];
+        if (is_scalar($var))
+        {
+            if ($this->has($var)) 
+            {
+                return $this->fields[$var];
+            }
+            else
+            {
+                if (is_null($default))
+                {
+                    throw new Exception(sprintf("Cannot get unknown var '%s' in instance '%s'.", $var, get_class($this)));
+                }
+
+                return $default;
+            }
+        }
+        elseif (is_array($var))
+        {
+            return array_intersect_key($this->fields, array_flip($var));
         }
     }
 
@@ -168,36 +179,6 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * setPrimaryKey
-     *
-     * @param Array $keys
-     * @access public
-     * @return void
-     */
-    public function setPrimaryKey(Array $keys)
-    {
-        $this->primary_key = $keys;
-    }
-
-    /**
-     * getPrimaryKey
-     * returns the values of the instance's primary key
-     *
-     * @access public
-     * @return void
-     */
-    public function getPrimaryKey()
-    {
-        $keys = array();
-        foreach ($this->primary_key as $key)
-        {
-            $keys[$key] = array_key_exists($key, $this->fields) ? $this->fields[$key] : null;
-        }
-
-        return $keys;
-    }
-
-    /**
      * __set
      * PHP magic to set attributes
      *
@@ -250,20 +231,13 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      */
     public function add($var, $value)
     {
-        if (preg_match('/\[\]$/', $this->fields_definition[$var]))
+        if ($this->has($var) && is_array($this->fields[$var]))
         {
-            if ($this->has($var) && is_array($this->fields[$var]))
-            {
-                $this->fields[$var][] = $value;
-            }
-            else
-            {
-                $this->fields[$var] = array($value);
-            }
+            $this->fields[$var][] = $value;
         }
         else
         {
-            throw new Exception(sprintf("'%s' field is not defined as an array ('%s').", $var, $this->fields_definition[$var]));
+            $this->fields[$var] = array($value);
         }
     }
 

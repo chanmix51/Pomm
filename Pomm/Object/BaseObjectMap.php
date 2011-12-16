@@ -69,16 +69,7 @@ abstract class BaseObjectMap
     {
         $class_name = $this->object_class;
 
-        $object = new $class_name($this->pk_fields, $this->field_definitions);
-
-        if (is_null($values))
-        {
-            return $object;
-        }
-
-        $object->hydrate($values);
-
-        return $object;
+        return new $class_name($values);
     }
 
     /**
@@ -464,9 +455,9 @@ abstract class BaseObjectMap
 
         if ($object->_getStatus() & BaseObject::EXIST)
         {
-            $sql = sprintf('UPDATE %s SET %s WHERE %s RETURNING %s;', $this->object_name, $this->parseForUpdate($object), $this->createSqlAndFrom($object->getPrimaryKey()), join(', ', $this->getSelectFields()));
+            $sql = sprintf('UPDATE %s SET %s WHERE %s RETURNING %s;', $this->object_name, $this->parseForUpdate($object), $this->createSqlAndFrom($object->get($this->getPrimaryKey())), join(', ', $this->getSelectFields()));
 
-            $collection = $this->query($sql, array_values($object->getPrimaryKey()));
+            $collection = $this->query($sql, array_values($object->get($this->getPrimaryKey())));
         }
         else
         {
@@ -501,7 +492,7 @@ abstract class BaseObjectMap
         $values = array();
         foreach($fields as $field)
         {
-            if (array_key_exists($field, $object->getPrimaryKey()))
+            if (array_key_exists($field, array_flip($this->getPrimaryKey())))
             {
                 throw new Exception(sprintf("Field '%s' to be updated belongs to the primary key of table '%s'. Do that directly with the map class instead of using a BaseObject.", $field, $this->object_name));
             }
@@ -517,8 +508,8 @@ abstract class BaseObjectMap
 
 
 
-        $sql = sprintf("UPDATE %s SET %s WHERE %s RETURNING *;", $this->object_name, join(', ', $updates), $this->createSqlAndFrom($object->getPrimaryKey()));
-        $object = $this->query($sql, array_values($object->getPrimaryKey()));
+        $sql = sprintf("UPDATE %s SET %s WHERE %s RETURNING %s;", $this->object_name, join(', ', $updates), $this->createSqlAndFrom($object->get($this->getPrimaryKey())), join(', ', $this->getSelectFields()));
+        $object = $this->query($sql, array_values($object->get($this->getPrimaryKey())));
     }
 
     /**
@@ -552,7 +543,7 @@ abstract class BaseObjectMap
 
         foreach ($this->convertPg($object->extract(), 'toPg') as $field_name => $field_value)
         {
-            if (array_key_exists($field_name, $object->getPrimaryKey())) continue;
+            if (array_key_exists($field_name, array_flip($this->getPrimaryKey()))) continue;
             $tmp[] = sprintf('%s=%s', $field_name, $field_value);
         }
 
@@ -592,7 +583,7 @@ abstract class BaseObjectMap
      */
     public function deleteOne(BaseObject $object)
     {
-        $this->deleteByPk($object->getPrimaryKey());
+        $this->deleteByPk($object->get($this->getPrimaryKey()));
         $object->_setStatus(BaseObject::NONE);
     }
 
