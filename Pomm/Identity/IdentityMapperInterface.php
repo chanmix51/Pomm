@@ -13,7 +13,7 @@ interface IdentityMapperInterface
      * @param Pomm\Object\BaseObject
      * @return Pomm\Object\BaseObject
      **/
-    public function getModelInstance(\Pomm\Object\BaseObject $object);
+    public function getModelInstance(\Pomm\Object\BaseObject $object, Array $pk_fields);
 
 
     /**

@@ -25,9 +25,9 @@ class IdentityMapperStrict implements IdentityMapperInterface
      *
      * @see IdentityMapperInterface
      **/
-    public function getModelInstance(\Pomm\Object\BaseObject $object)
+    public function getModelInstance(\Pomm\Object\BaseObject $object, Array $pk_fields)
     {
-        $index = $this->getSignature(get_class($object), $object->getPrimaryKey());
+        $index = $this->getSignature(get_class($object), $object->get($pk_fields));
 
         if (!array_key_exists($index, $this->mapper))
         {

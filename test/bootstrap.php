@@ -13,7 +13,7 @@ class TestTableMap extends BaseObjectMap
     protected function initialize()
     {
         $this->object_class =  'Pomm\Test\TestTable';
-        $this->object_name  =  'book';
+        $this->object_name  =  'pomm_test.book';
         $this->field_definitions  = array(
             'id'               =>    'Number',
             'created_at'       =>    'Timestamp',
@@ -29,19 +29,30 @@ class TestTableMap extends BaseObjectMap
 
     public function createTable()
     {
-        $sql = "CREATE TABLE book (id SERIAL PRIMARY KEY, created_at TIMESTAMP NOT NULL DEFAULT now(), last_out TIMESTAMP, last_in TIMESTAMP, title VARCHAR(256) NOT NULL, authors VARCHAR(255)[] NOT NULL, is_available BOOLEAN NOT NULL DEFAULT true, location POINT)";
+        $sql = "CREATE SCHEMA pomm_test;";
+        $this->query($sql);
+        $sql = "CREATE TABLE pomm_test.book (id SERIAL PRIMARY KEY, created_at TIMESTAMP NOT NULL DEFAULT now(), last_out TIMESTAMP, last_in TIMESTAMP, title VARCHAR(256) NOT NULL, authors VARCHAR(255)[] NOT NULL, is_available BOOLEAN NOT NULL DEFAULT true, location POINT)";
         $this->query($sql);
     }
 
     public function dropTable()
     {
-        $sql = "DROP TABLE book";
+        $sql = "DROP SCHEMA pomm_test CASCADE;";
         $this->query($sql);
     }
 }
 
 class TestTable extends BaseObject
 {
+    public function getTitle()
+    {
+        return strtolower($this->get('title'));
+    }
+
+    public function setTitle($title)
+    {
+        $this->set('title', strtoupper($title));
+    }
 }
 
 class TestConverterMap extends BaseObjectMap

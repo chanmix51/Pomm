@@ -4,7 +4,7 @@ namespace Pomm\Identity;
 
 class IdentityMapperNone implements IdentityMapperInterface
 {
-    public function getModelInstance(\Pomm\Object\BaseObject $object)
+    public function getModelInstance(\Pomm\Object\BaseObject $object, Array $pk_fields)
     {
         return $object;
     }

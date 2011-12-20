@@ -11,9 +11,9 @@ class IdentityMapperSmart extends IdentityMapperStrict
      *
      * @see IdentityMapperInterface
      **/
-    public function getModelInstance(BaseObject $object)
+    public function getModelInstance(BaseObject $object, Array $pk_fields)
     {
-        $crc = $this->getSignature(get_class($object), $object->getPrimaryKey());
+        $crc = $this->getSignature(get_class($object), $object->get($pk_fields));
 
         if (array_key_exists($crc, $this->mapper))
         {

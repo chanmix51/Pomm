@@ -49,8 +49,7 @@ class IdentityMapTest extends \lime_test
 
         $this->map->saveOne($object);
         $object['pika'] = 'chu';
-
-        $other_object = $this->map->findByPk($object->getPrimaryKey());
+        $other_object = $this->map->findByPk($object->get($this->map->getPrimaryKey()));
         if ($same === true)
         {
             $this->ok($other_object->isModified(), 'same instance');
@@ -59,7 +58,7 @@ class IdentityMapTest extends \lime_test
         }
         else
         {
-            $this->is_deeply($other_object->getPrimaryKey(), $object->getPrimaryKey(), "They have the same PK.");
+            $this->is_deeply($other_object->get($this->map->getPrimaryKey()), $object->get($this->map->getPrimaryKey()), "They have the same PK.");
             $this->is(!$other_object->isModified(), "New object is not modified.");
         }
 
@@ -72,7 +71,7 @@ class IdentityMapTest extends \lime_test
         $object = $collection->current();
         $this->map->deleteOne($object);
 
-        $other_object = $this->map->findByPk($object->getPrimaryKey());
+        $other_object = $this->map->findByPk($object->get($this->map->getPrimaryKey()));
 
         if ($returned === true) 
         {

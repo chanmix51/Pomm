@@ -87,7 +87,7 @@ abstract class BaseObjectMap
 
         $identity_map = $this->connection->getIdentityMapper();
 
-        return $identity_map ? $identity_map->getModelInstance($object) : $object;
+        return $identity_map ? $identity_map->getModelInstance($object, $this->getPrimaryKey()) : $object;
     }
 
     /**

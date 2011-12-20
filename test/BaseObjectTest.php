@@ -5,6 +5,8 @@ use Pomm\Service;
 use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
 use Pomm\Connection\Database;
+use Pomm\External\Toolkit;
+use Pomm\External\sfInflector;
 
 include __DIR__.'/../Pomm/External/lime.php';
 include "autoload.php";
@@ -20,12 +22,18 @@ class my_test extends \lime_test
     public function initialize()
     {
         $this->service = new Service();
-        $this->service->setDatabase('plop', new Database(array('dsn' => 'pgsql://user@localhost/nobase')));
+        $this->service->setDatabase('plop', new Database(array('dsn' => 'pgsql://greg/greg')));
         $this->transaction = $this->service->getDatabase()->createConnection();
         $this->map = $this->transaction->getMapFor('Pomm\Test\TestTable');
- //       $this->map->createTable();
+        $this->map->createTable();
 
         return $this;
+    }
+
+    public function __destruct()
+    {
+        $this->map->dropTable();
+        parent::__destruct();
     }
 
     public function create()
@@ -95,6 +103,36 @@ class my_test extends \lime_test
 
         return $this;
     }
+
+    public function testAccessors($field, $expected_value)
+    {
+        $method_name = sprintf('get%s', sfInflector::camelize($field));
+
+        $this->is($this->obj->$method_name(), $expected_value, 'Accessor works.');
+        $this->is($this->obj[$field], $expected_value, 'Array access use accessor.');
+
+        return $this;
+    }
+
+    public function testGenericAccessor($field, $value)
+    {
+        $this->is($this->obj->get($field), $value, 'Generic getter bypass overloads.');
+
+        return $this;
+    }
+
+    public function testMutators($field, $raw_value, $expected_value)
+    {
+        $method_name = sprintf("set%s", sfInflector::camelize($field));
+        $this->obj->$method_name($raw_value);
+        $this->is($this->obj->get($field), $expected_value, 'Mutator sets the value.');
+        $this->obj[$field] = $raw_value;
+        $this->is($this->obj->get($field), $expected_value, 'Array access uses mutator.');
+        $this->obj->set($field, $raw_value);
+        $this->is($this->obj->get($field, $raw_value), $raw_value, 'Generic mutator bypass overloads.');
+
+        return $this;
+    }
 }
 
 $test_values = array('title' => 'modified title', 'authors' => array('plop1', 'plop2'));
@@ -111,5 +149,9 @@ $my_test
     ->testHydrate(array('title' => 'modified title'), array_merge($test_values, array('pika' => null)))
     ->testArrayAccess($test_values)
     ->testIteratorAggregate($test_values)
+    ->testHydrate(array('title' => 'MODIFIED TITLE'), array())
+    ->testAccessors('title', 'modified title')
+    ->testGenericAccessor('title', 'MODIFIED TITLE')
+    ->testMutators('title', 'uppercase title',  'UPPERCASE TITLE')
     ;
 
