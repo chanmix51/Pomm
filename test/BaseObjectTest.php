@@ -117,6 +117,7 @@ class my_test extends \lime_test
     public function testGenericAccessor($field, $value)
     {
         $this->is($this->obj->get($field), $value, 'Generic getter bypass overloads.');
+        $this->is($this->obj->$field, $value, 'Direct access to attribute bypass overloads.');
 
         return $this;
     }
@@ -130,6 +131,8 @@ class my_test extends \lime_test
         $this->is($this->obj->get($field), $expected_value, 'Array access uses mutator.');
         $this->obj->set($field, $raw_value);
         $this->is($this->obj->get($field, $raw_value), $raw_value, 'Generic mutator bypass overloads.');
+        $this->obj->$field = $raw_value;
+        $this->is($this->obj->get($field, $raw_value), $raw_value, 'Direct attribute access bypass overloads.');
 
         return $this;
     }
