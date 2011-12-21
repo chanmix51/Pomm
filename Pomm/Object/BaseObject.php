@@ -192,11 +192,11 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      *
      * @param string $var
      * @access public
-     * @return void
+     * @return mixed
      */
     public function __get($var)
     {
-        $this->get($var);
+        return $this->get($var);
     }
 
     /**
