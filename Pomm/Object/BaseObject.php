@@ -98,6 +98,8 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
             return $this->get($attribute);
         case 'add':
             return $this->add($attribute, $arguments[0]);
+        case 'has':
+            return $this->has($attribute);
         default:
             throw new Exception(sprintf('No such method "%s:%s()"', get_class($this), $method));
         }
@@ -184,8 +186,10 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      */
     public function __set($var, $value)
     {
-        $this->set($var, $value);
+        $method_name = "set".sfInflector::camelize($var);
+        $this->$method_name($value);
     }
+
     /**
      * __get
      * PHP magic to get attributes
@@ -196,7 +200,9 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      */
     public function __get($var)
     {
-        return $this->get($var);
+        $method_name = "get".sfInflector::camelize($var);
+
+        return $this->$method_name();
     }
 
     /**
@@ -266,7 +272,9 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      **/
     public function offsetExists($offset)
     {
-        return $this->has($offset);
+        $method_name = "has".sfInflector::camelize($offset);
+
+        return $this->$method_name();
     }
 
     /**
@@ -275,8 +283,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      **/
     public function offsetSet($offset, $value)
     {
-        $method_name = "set".sfInflector::camelize($offset);
-        $this->$method_name($value);
+        $this->__set($offset, $value);
     }
 
     /**
@@ -285,9 +292,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      **/
     public function offsetGet($offset)
     {
-        $method_name = "get".sfInflector::camelize($offset);
-
-        return $this->$method_name();
+        return $this->__get($offset);
     }
 
     /**
