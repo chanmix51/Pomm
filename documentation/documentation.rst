@@ -2,6 +2,8 @@
 Pomm Documentation
 ------------------
 
+.. contents::
+
 Overview
 --------
 
@@ -59,12 +61,13 @@ The *Service* class just stores your *Database* instances and provides convenien
       'dsn' => 'pgsql://user:pass@host:port/db_a'
     )));
     $service->setDatabase('db_two', new App\MyDb(array(
-      'dsn' => 'pgsql://otheruser:hispass@otherhost/db_b'
+      'dsn' => 'pgsql://otheruser:hispass@otherhost/db_b',
+      'identity_mapper' => 'App\MyIdentityMapper'
     )));
 
 The *setDatabase* method is used internally by the constructor. The parameters may be any of the following:
  * "dsn": a URL like string to connect the database. It is in the form pgsql://user:password@host:port/database_name (**mandatory**)
- * "class": The *Database* class to instanciate as a database. This class must extend Pomm\\Database as we will see below.
+ * "class": The *Database* class to instantiate as a database. This class must extend Pomm\\Database as we will see below.
  * "isolation": transaction isolation level. Must be one of Pomm\\Connection\\Connection::ISOLATION_READ_COMMITTED or ISOLATION_SERIALIZABLE (default ISOLATION_READ_COMMITTED).
 
 Once registered, you can retrieve the databases with their name by calling the *getDatabase* method passing the name as argument. If no name is given, the first declared *Database* will be returned.
@@ -76,6 +79,8 @@ The **dsn** parameter format is important because it interacts with the server's
  * *pgsql://user@host/database* Connect *user* to the db *database* on host *host* using TCP/IP.
  * *pgsql://user:pass@host:port/database* The same but with password and TCP port specified. This is the maximal form.
 
+The **identity_mapper** option gives you the opportunity to register an identity mapper. When connections are created, they will instantiate the given class. By default, the Smart IM is loaded. This can be overridden for specific connections (see the identity mapper section below).
+
 Database and converters
 =======================
 
@@ -85,6 +90,7 @@ The *Database* class brings access to mechanisms to create connections and trans
  * String: convert postgresql 'varchar', 'uuid', 'xml' and 'text' into PHP string
  * Timestamp: convert postgresql 'timestamp', 'date', 'time' to PHP DateTime instance.
  * Interval: convert postgresql's 'interval' type into PHP SplInterval instance. 
+ * Binary: convert postgresql's 'bytea' type into PHP string.
 
 Other types are natively available in postgresql databases but are not loaded automatically by Pomm:
 
@@ -218,11 +224,10 @@ Overview
 
 Map classes are the central point of Pomm because 
  * they are a bridge between the database and your entities (Pomm\\Object\\BaseObjectMap)
- * they own the structure of the entities (BaseYourEntityMap)
- * They act as Entity provider (YourEntityMap)
+ * they own the structure of the entities 
+ * They act as Entity provider 
 
-Every action you will perform with your entities will use a Map class. They are roughly the equivalent of Propel's *Peer* classes. Although it might look like Propel, it is important to understand unlike the normal Active Record design pattern, entities do not even know how to save themselves. You have to use their relative Map class to save them.
-
+Every action you will perform with your entities will use a Map class. They are roughly the equivalent of Propel's *Peer* classes. Although it might look like Propel, it is important to understand unlike the normal Active Record design pattern, entities do not even know their structure and how to save themselves. You have to use their relative Map class to save them.
 Map classes represent a structure in the database and provide methods to retrieve and save data with this structure. To be short, one table or view <=> one map class.
 
 To be able to be the bridge between your database and your entities, all Map classes **must** at the end extends *Pomm\\Object\\BaseObjectMap* class. This class implements methods that directly interact with the database using the PDO layer. These methods will be explained in the chapter how to query the database.
@@ -242,9 +247,9 @@ When Map classes are instantiated, the method *initialize* is called. This metho
  * *field_structure*: the fields with the corresponding converters
  * *primary_key*: simple or composite primary key
 
-If the table is stored in a special database schema, it must appear in the *object_name* attribute. If you do not use schemas, postgresql will store everything in the *public* schema. You do not have to specify it in the *object_name* attribute but it will be used in the class namespace.
+If the table is stored in a special database schema, it must appear in the *object_name* attribute. If you do not use schemas, postgresql will store everything in the *public* schema. You do not have to specify it in the *object_name* attribute but it will be used in the class namespace. *public* is also a reserved keyword of PHP, the namespace for the *public* schema is *PublicSchema*.
 
-Let's say we have the following table *student* in the database:
+Let's say we have the following table *student* in the database *College*:
 
   +-------------+-----------------------------+
   |   Column    |            Type             |
@@ -263,16 +268,16 @@ Let's say we have the following table *student* in the database:
 The according generated structure will be:::
 
  <?php
-  namespace Model\Pomm\Entity\Public\Base;
+  namespace College\PublicSchema\Base;
 
   use Pomm\Object\BaseObjectMap;
   use Pomm\Exception\Exception;
 
-  abstract class BaseStudentMap extends BaseObjectMap
+  abstract class StudentMap extends BaseObjectMap
   {
       public function initialize()
       {
-          $this->object_class =  'MyDatabase\PublicSchema\Student';
+          $this->object_class =  'College\PublicSchema\Student';
           $this->object_name  =  'student';
   
           $this->addField('reference', 'String');
@@ -289,9 +294,9 @@ If the previous table were in the *school* database schema, the following lines 
 
 
  <?php
-  namespace Model\Pomm\Entity\School\Base;
+  namespace College\School\Base;
   ...
-          $this->object_class =  'MyDatabase\School\Student';
+          $this->object_class =  'College\School\Student';
           $this->object_name  =  'school.student';
   
 
@@ -304,10 +309,12 @@ Create finders
 The first time you generate the *BaseMap* classes, it will also generate the map classes and the entity classes. Using the example with student, the empty map file should look like this::
 
   <?php
-  namespace Model\Pomm\Entity\School;
+  namespace College\School;
 
-  use Model\Pomm\Entity\School\Base\StudentMap as BaseStudentMap;
+  use College\School\Base\StudentMap as BaseStudentMap;
   use Pomm\Exception\Exception;
+  use Pomm\Query\Where;
+  use College\School\Student;
 
   class StudentMap extends BaseStudentMap
   {
@@ -344,9 +351,8 @@ It is possible to use it directly because we are in a Map class hence Pomm knows
   */
   $students = $this->findWhere("birthdate > '1980-01-01'"); 
   
-  
 
-Of course, this is not very useful, a finder *getYoungerThan* would be::
+Of course, this is not very useful, because the date is very likely to be a parameter. A finder *getYoungerThan* would be::
 
   public function getYoungerThan(DateTime $date)
   {
@@ -402,17 +408,17 @@ Because the WHERE ... IN clause needs to declare as many '?' as given parameters
 Custom queries
 ==============
 
-Although it is possible to write whole plain queries by hand in the finders, this may induce coupling between your classes and the database structure. To ovoid coupling, the Map class owns the following methods: *getSelectFields*, *getGroupByFields* and *getFields*.
+Although it is possible to write whole plain queries by hand in the finders, this may induce coupling between your classes and the database structure. To ovoid coupling, the Map class owns the following methods: *getSelectFields*, *getGroupByFields* and *getFields*. It is important that table names are also retrieved with the *getTableName* method to keep the query correct if the table name changes over time.
 
 ::
 
-  // Model\Pomm\Entity\Blog\PostMap Class
+  // MyDatabase\Blog\PostMap Class
   public function getBlogPostsWithCommentCount(Pomm\Query\Where $where)
   {
-    $sql = sprintf('SELECT %s, COUNT(c.id) as "comment_count" FROM %s p JOIN %s c ON p.id = c.post_id WHERE %s GROUP BY %s',
+    $sql = sprintf('SELECT %s, COUNT(c.id) as "comment_count" FROM %s JOIN %s ON p.id = c.post_id WHERE %s GROUP BY %s',
         join(', ', $this->getSelectFields('p')),
         $this->getTableName('p'),
-        $this->Connection->getMapFor('Model\Pomm\Entity\Blog\Comment')->getTableName(),
+        $this->Connection->getMapFor('MyDatabase\Blog\Comment')->getTableName('c'),
         $where,
         join(', ', $this->getGroupByFields('p'))
         );
@@ -423,6 +429,24 @@ Although it is possible to write whole plain queries by hand in the finders, thi
 The *query* method is available for your custom queries. It takes 2 parameters, the SQL statement and an optional array of values to be escaped. Keep in mind, the number of values must match the '?' Occurrences in the query.
 
 Whatever you are retrieving, Pomm will hydrate objects according to what is in *$this->object_class* of your map class. The entity instances returned here will have this extra field "comment_count" exactly as it would be a normal field. You can use a *Where* instance everywhere as their *toString* method returns the condition as a string and the *getValues* method return the array with the values to be escaped.
+
+Extending the model
+===================
+
+All the finders internally use the *getSelectFields()* method to ovoid using the star notation (*) of course but also to make the fields list extendible. Imagine your model as a *created_at* field that stores the timestamp of the creation for every rows in a table. You can overload the *getSelectFields()* method to add a *created_since* field that returns the time interval between now and *created_at*. It will then be used in **all** finders and this extra attribute will never be saved as it does not belong to the Map structure.
+
+It is also possible to reduce a model, stripping by example a *password* field or any other field that does not make sense outside the database. The Map classes do propose 3 kind of field selectors:
+ * getSelectFields($alias) 
+ * getGroupByFields($alias)
+ * getFields() // used by both getSelectFields and getGroupByFields
+ * getRemoteSelectFields($alias) // uses getSelectFields()
+
+*getRemoteSelectFields()* is a bit special as it returns the same fields as *getSelectFields()* but it aliases the results like the following::
+
+  print join(', ', $author_map->getRemoteSelectFields('a'));
+  // a.id AS "author{id}, a.first_name AS "author{first_name}, ...
+
+It is intended for use with the collection filters explained below.
 
 Collections
 ===========
@@ -446,7 +470,7 @@ Sometimes, you want to access a particular result in a collection knowing the re
   if index does not exist 
   $object = $collection->has($index) ?
     $collection->get($index) : 
-    $map->createObject();
+    new Object();
 
 Collections have other handful methods like:
  * *isFirst()*
@@ -479,10 +503,10 @@ Pomm's *Collection* class can register filters. Filters are just functions that 
   # ArticleMap.php
 
   $author_map = $this->connection->getMapFor('Author');
-  $sql = sprintf("SELECT %s FROM %s article JOIN %s author ON article.author_id = author.id WHERE article.id = ?",
+  $sql = sprintf("SELECT %s FROM %s JOIN %s ON article.author_id = author.id WHERE article.id = ?",
     join(', ', array_merge($this->getSelectFields('article'), $author_map->getRemoteSelectFields('author'))),
-    $this->getTableName(),
-    $author_map->getTableName()
+    $this->getTableName('article'),
+    $author_map->getTableName('author')
     );
 
   $collection = $this->query($sql, $id);
@@ -544,12 +568,22 @@ Internally, all values are stored in an array. The methods *set()* and *get()* a
   $entity->has('pika'); // true
   $entity->get('pika'); // chu
 
-*BaseObject* uses magic getters and setters to dynamically build the according methods. The example below is equivalent::
+Note that the *get* can take an array with multiple attributes::
 
-  $entity = $map->createObject()
-  $entity->has('pika'); // false
+  $entity->set('pika', 'chu');
+  $entity->set('plop', true);
+
+  $entity->get(array('pika', 'plop')); // returns array('pika' => 'chu', 'plop' => true);
+  $entity->get($map->getPrimaryKey()); // returns the primary key if set.
+
+*BaseObject* uses magic getters and setters to dynamically build the according methods.
+
+::
+
+  $entity = new MyEntity();
+  $entity->hasPika();   // false
   $entity->setPika('chu');
-  $entity->has('pika'); // true
+  $entity->hasPika();   // true
   $entity->getPika()    // chu
 
 This allow developers to overload accessors. The methods *set* and *get* are only used within the class definition and should not be used outside unless you want to bypass any overload that could exist.
@@ -565,8 +599,12 @@ Entities implement PHP's *ArrayAccess* interface to use the accessors if any. Th
   }
 
   // elsewhere
-  $entity->getPika(); // CHU
-  $entity['pika'];    // CHU
+  $entity->setPika('chu');
+  $entity->getPika();     // CHU
+  $entity['pika'];        // CHU
+  $entity->pika;          // CHU
+  
+  $entity->get('pika');   // chu
 
 Of course you can extend your entities providing new accessors. If by example you have an entity with a weight in grams and you would like to have an accessor that return it in ounces::
 
@@ -587,11 +625,11 @@ In your templates, you can directly benefit from this accessor while using the e
 Life cycle
 ==========
 
-Entities are the end of the process, they are the data. Unlike Active Record where entities know how to manage themselves, with Pomm, entities are just data container that may embed processes. Nevertheless, these data containers must be formatted to know about their structure and state. This is why entities all inherit from *BaseObject* class and cannot be instantiated directly.
+Entities are the end of the process, they are the data. Unlike Active Record where entities know how to manage themselves, with Pomm, entities are just data container that may embed processes. 
 
 ::
 
-  $entity = $map->createObject();
+  $entity = new MyEntity();
   $entity->isNew();           // true
   $entity->isModified();      // false
   $entity->setPika('chu');
@@ -614,7 +652,7 @@ Entities are the end of the process, they are the data. Unlike Active Record whe
   $entity->setPika('chu');
   $entity->setPlop(false);
 
-  $map->updateOne($entity, array('pika'));
+  $map->updateOne($entity, array('pika')); // UPDATE ... set pika='...'
 
   $map->getPika();            // chu
   $map->getPlop();            // true
@@ -644,7 +682,7 @@ As soon as you have a database instance, you can create new connections. This is
 The entities are stored in a particular database. This is why only connections to this base are able to give you associated Map classes::
 
   $map = $service->getDatabase()->createConnection()
-    ->getMapFor('Model\Pomm\Entity\School\Student'); 
+    ->getMapFor('College\School\Student'); 
   
 
 Identity mappers
@@ -658,7 +696,7 @@ Connections are also the way to tell the map classes to use or not an *IdentityM
 
   $map = $service->getDatabase()
     ->createConnection(new \Pomm\Identity\IdentityMapperSmart())
-    ->getMapFor('Model\Pomm\Entity\School\Student');
+    ->getMapFor('College\School\Student');
 
   $student1 = $map->findByPK(array('id' => 3));
   $student2 = $map->findByPK(array('id' => 3));

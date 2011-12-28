@@ -567,11 +567,14 @@ abstract class BaseObjectMap
      * getTableName 
      * 
      * @access public
+     * @param  string optionnal alias (default null)
      * @return string
      */
-    public function getTableName()
+    public function getTableName($alias = null)
     {
-        return $this->object_name;
+        $alias = is_null($alias) ? '' : sprintf(" %s", $alias);
+
+        return sprintf("%s%s", $this->object_name, $alias);
     }
 
     /**
