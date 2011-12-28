@@ -25,15 +25,8 @@ class my_test extends \lime_test
         $this->service->setDatabase('plop', new Database(array('dsn' => 'pgsql://greg/greg')));
         $this->transaction = $this->service->getDatabase()->createConnection();
         $this->map = $this->transaction->getMapFor('Pomm\Test\TestTable');
-        $this->map->createTable();
 
         return $this;
-    }
-
-    public function __destruct()
-    {
-        $this->map->dropTable();
-        parent::__destruct();
     }
 
     public function create()
@@ -110,6 +103,7 @@ class my_test extends \lime_test
 
         $this->is($this->obj->$method_name(), $expected_value, 'Accessor works.');
         $this->is($this->obj[$field], $expected_value, 'Array access use accessor.');
+        $this->is($this->obj->$field, $expected_value, 'Direct access to attribute use mutator.');
 
         return $this;
     }
@@ -117,7 +111,6 @@ class my_test extends \lime_test
     public function testGenericAccessor($field, $value)
     {
         $this->is($this->obj->get($field), $value, 'Generic getter bypass overloads.');
-        $this->is($this->obj->$field, $value, 'Direct access to attribute bypass overloads.');
 
         return $this;
     }
@@ -130,9 +123,32 @@ class my_test extends \lime_test
         $this->obj[$field] = $raw_value;
         $this->is($this->obj->get($field), $expected_value, 'Array access uses mutator.');
         $this->obj->set($field, $raw_value);
-        $this->is($this->obj->get($field, $raw_value), $raw_value, 'Generic mutator bypass overloads.');
+        $this->is($this->obj->get($field), $raw_value, 'Generic mutator bypass overloads.');
         $this->obj->$field = $raw_value;
-        $this->is($this->obj->get($field, $raw_value), $raw_value, 'Direct attribute access bypass overloads.');
+        $this->is($this->obj->get($field), $expected_value, 'Direct attribute access uses mutator.');
+
+        return $this;
+    }
+
+    public function testHas($field, $raw_value, $expected_value)
+    {
+        if ($raw_value)
+        {
+            $this->ok($this->obj->has($field), sprintf("Attribute '%s' exists.", $field));
+        }
+        else
+        {
+            $this->ok(!$this->obj->has($field), sprintf("Attribute '%s' does NOT exist.", $field));
+        }
+
+        if ($expected_value)
+        {
+            $this->ok(isset($this->obj[$field]), sprintf("Virtual attribute '%s' exists.", $field));
+        }
+        else
+        {
+            $this->ok(!isset($this->obj[$field]), sprintf("Virtual attribute '%s' does NOT exist.", $field));
+        }
 
         return $this;
     }
@@ -156,5 +172,7 @@ $my_test
     ->testAccessors('title', 'modified title')
     ->testGenericAccessor('title', 'MODIFIED TITLE')
     ->testMutators('title', 'uppercase title',  'UPPERCASE TITLE')
+    ->testHas('title', true, true)
+    ->testHas('title_and_authors', false, true)
     ;
 

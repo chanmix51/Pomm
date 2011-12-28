@@ -53,6 +53,11 @@ class TestTable extends BaseObject
     {
         $this->set('title', strtoupper($title));
     }
+
+    public function hasTitleAndAuthors()
+    {
+        return $this->has('authors') && $this->has('title');
+    }
 }
 
 class TestConverterMap extends BaseObjectMap
