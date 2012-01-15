@@ -52,7 +52,7 @@ class Database
     {
         $dsn = $this->parameter_holder['dsn'];
 
-        if (!preg_match('#([a-z]+)://([^:@]+)(?::([^@]+))?(?:@([\w\.]+)(?::(\w+))?)?/(\w+)#', $dsn, $matchs))
+        if (!preg_match('#([a-z]+)://([^:@]+)(?::([^@]+))?(?:@([\w\.]+|!/.+[^/]!)(?::(\w+))?)?/(\w+)#', $dsn, $matchs))
         {
             throw new PommException(sprintf('Cound not parse DSN "%s".', $dsn));
         }
@@ -70,7 +70,16 @@ class Database
         }
         $user = $matchs[2];
         $pass = $matchs[3];
-        $host = $matchs[4];
+
+        if (preg_match('/!(.*)!/', $matchs[4], $host_matchs))
+        {
+            $host = $host_matchs[1];
+        }
+        else
+        {
+            $host = $matchs[4];
+        }
+
         $port = $matchs[5];
 
         if ($matchs[6] == null)

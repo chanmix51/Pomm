@@ -23,17 +23,17 @@ Download the pomm repository somewhere in your project. All sources are in the P
   │   ├── Pomm.php                  # Register and retreive databases
   │   ├── Connection
   │   │   ├── Database.php          # Database provides connections and transactions
-  │   │   ├── Connection.php        # A simple database connection
-  │   │   └── Transaction.php       # Transaction is an enhanced connection
+  │   │   └── Connection.php        # A connection to the database
   │   ├── Exception
   │   ├── External
   │   ├── Object
-  │   │   ├── BaseObjectMap.php     # All your map classes ultimately extends this
-  │   │   ├── BaseObject.php        # All your entities extends this
+  │   │   ├── BaseObjectMap.php     # All your map classes ultimately extend this
+  │   │   ├── BaseObject.php        # All your entities extend this
   │   │   └── Collection.php        # Your queries return this
   │   ├── Query
   │   │   └── Where.php             # The Where class
   │   ├── Tools
+  │   │   ├── Inspector.php         # Database inspector
   │   │   ├── CreateBaseMapTool.php # Create a Map file from the database
   │   │   └── ScanSchemaTool.php    # Scan a postrgresql's schema to create all map files
   │   └── Type                      # builtin Postgresql types
