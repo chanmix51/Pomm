@@ -30,12 +30,12 @@ class Service
      * @return void
      */
 
-    public function __construct(Array $databases = array())
+    public function __construct(Array $databases = array(), $logger = null)
     {
         foreach ($databases as $name => $parameters)
         {
             $db_class = isset($parameters['class']) ? $parameters['class'] : 'Pomm\Connection\Database';
-            $this->setDatabase($name, new $db_class($parameters));
+            $this->setDatabase($name, new $db_class($parameters, $logger));
         }
     }
 

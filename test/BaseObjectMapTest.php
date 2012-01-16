@@ -170,9 +170,12 @@ class my_test extends \lime_test
     public function testQuery($sql, $values, $num_result)
     {
         $this->diag('TestTableMap::query()');
+        $logger = new Logger();
+        $this->transac->getDatabase()->setLogger($logger);
         $results = $this->map->query($sql, $values);
         $this->isa_ok($results, 'Pomm\\Object\\Collection', 'The result is a collection');
         $this->is($results->count(), $num_result, 'We have the good number of results');
+        $this->is($logger->queries[$logger->currentQuery], $sql, 'We have the good query in logger');
 
         return $this;
     }

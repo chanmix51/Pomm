@@ -19,6 +19,7 @@ class Database
     protected $parameter_holder = array();
     protected $_handler;
     protected $converters = array();
+    protected $logger;
 
     /**
      * __construct
@@ -34,9 +35,10 @@ class Database
      * @access public
      * @return void
      */
-    final public function __construct($parameters = array())
+    final public function __construct($parameters = array(), $logger = null)
     {
         $this->parameter_holder = new ParameterHolder($parameters);
+        $this->logger = $logger;
         $this->initialize();
     }
 
@@ -134,7 +136,19 @@ class Database
      */
     public function executeAnonymousQuery($sql)
     {
-        return $this->createConnection()->getPdo()->query($sql, \PDO::FETCH_LAZY);
+        if ($this->logger)
+        {
+            $this->logger->startQuery($sql);
+        }
+
+        $result = $this->createConnection()->getPdo()->query($sql, \PDO::FETCH_LAZY);
+
+        if ($this->logger)
+        {
+            $this->logger->stopQuery();
+        }
+
+        return $result;
     }
 
     /**
@@ -239,5 +253,15 @@ class Database
     public function setName($name)
     {
         $this->parameter_holder->setParameter('name', $name);
+    }
+
+    public function getLogger()
+    {
+        return $this->logger;
+    }
+
+    public function setLogger($logger)
+    {
+        return $this->logger = $logger;
     }
 }
