@@ -11,7 +11,7 @@ use Pomm\Exception\Exception;
 
 include __DIR__.'/../Pomm/External/lime.php';
 include "autoload.php";
-include "bootstrap.php";
+$service = include "bootstrap.php";
 
 class my_test extends \lime_test
 {
@@ -20,10 +20,9 @@ class my_test extends \lime_test
     protected $transac;
     protected $service;
 
-    public function initialize()
+    public function initialize(Service $service)
     {
-        $this->service = new Service();
-        $this->service->setDatabase('default', new Database(array('dsn' => 'pgsql://greg/greg')));
+        $this->service = $service;
         $this->transac = $this->service->getDatabase()->createConnection();
         $this->transac->getMapFor('Pomm\Test\TestTable')->createTable();
 
@@ -246,7 +245,7 @@ class my_test extends \lime_test
 
 $test = new my_test();
 
-$test->initialize()
+$test->initialize($service)
     ->testCreate()
     ->testHydrate(array('title' => 'title test', 'authors' => array('pika chu'), 'is_available' => true), array('title' => 'title test', 'authors' => array('pika chu'), 'is_available' => true))
     ->testSaveOne()

@@ -10,7 +10,7 @@ use Pomm\External\sfInflector;
 
 include __DIR__.'/../Pomm/External/lime.php';
 include "autoload.php";
-include "bootstrap.php";
+$service = include "bootstrap.php";
 
 class my_test extends \lime_test
 {
@@ -19,10 +19,9 @@ class my_test extends \lime_test
     protected $obj;
     protected $service;
 
-    public function initialize()
+    public function initialize(Service $service)
     {
-        $this->service = new Service();
-        $this->service->setDatabase('plop', new Database(array('dsn' => 'pgsql://greg/greg')));
+        $this->service = $service;
         $this->transaction = $this->service->getDatabase()->createConnection();
         $this->map = $this->transaction->getMapFor('Pomm\Test\TestTable');
 
@@ -157,7 +156,7 @@ class my_test extends \lime_test
 $test_values = array('title' => 'modified title', 'authors' => array('plop1', 'plop2'));
 $my_test = new my_test();
 $my_test
-    ->initialize()
+    ->initialize($service)
     ->create()
     ->testStatus(BaseObject::NONE)
     ->testSet('title', 'my title')

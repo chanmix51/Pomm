@@ -1,8 +1,9 @@
 <?php
 
-include __DIR__.'/../Pomm/External/lime.php';
-include "autoload.php";
-include "PommBench.php";
+require __DIR__.'/../Pomm/External/lime.php';
+require "autoload.php";
+require "PommBench.php";
+$service = require "bootstrap.php";
 
 use Pomm\Service;
 use Pomm\Connection\Database;
@@ -16,11 +17,10 @@ class IdentityMapTest extends \lime_test
     protected $service;
     protected $map;
 
-    public function initialize()
+    public function initialize($service)
     {
-        $this->service = new Service();
-        $this->service->setDatabase('with', new Database(array('dsn' => 'pgsql://greg/greg', 'identity_mapper' => '\Pomm\Identity\IdentityMapperNone')));
-        $this->map = $this->service->getDatabase()->createConnection()->getMapFor('Bench\PommBench');
+        $this->service = $service;
+        $this->map = $this->service->getDatabase()->createConnection(new Pomm\Identity\IdentityMapperNone())->getMapFor('Bench\PommBench');
         $this->map->createTable();
         $this->map->feedTable(10);
 

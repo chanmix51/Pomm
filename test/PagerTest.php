@@ -1,8 +1,10 @@
 <?php
 
-include __DIR__.'/../Pomm/External/lime.php';
-include "autoload.php";
-include "PommBench.php";
+require __DIR__.'/../Pomm/External/lime.php';
+require "autoload.php";
+require "PommBench.php";
+
+$service = require "bootstrap.php";
 
 use Pomm\Service;
 use Pomm\Connection\Database;
@@ -13,10 +15,9 @@ class PagerTest extends \lime_test
     protected $service;
     protected $map;
 
-    public function initialize()
+    public function initialize($service)
     {
-        $this->service = new Service();
-        $this->service->setDatabase('default', new Database(array('dsn' => 'pgsql://greg/greg')));
+        $this->service = $service;
         $this->map = $this->service->createConnection()->getMapFor('Bench\PommBench');
         $this->map->createTable();
         $this->map->feedTable(1000);
@@ -120,7 +121,7 @@ class PagerTest extends \lime_test
 $test = new PagerTest();
 
 $test
-    ->initialize()
+    ->initialize($service)
     ->testPaginateQuery()
     ->testPaginateFindWhere()
     ;
