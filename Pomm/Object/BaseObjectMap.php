@@ -467,7 +467,11 @@ abstract class BaseObjectMap
             $collection = $this->query($sql, array());
         }
 
-        $object = $collection->current();
+        if ($collection->count())
+        {
+            $object = $collection->current();
+        }
+
         $object->_setStatus(BaseObject::EXIST);
     }
 
