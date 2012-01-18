@@ -191,6 +191,12 @@ abstract class BaseObjectMap
      */
     protected function doQuery($sql, $values = array())
     {
+        $logger = $this->connection->getDatabase()->getLogger();
+        if ($logger)
+        {
+            $logger->startQuery($sql, $values);
+        }
+
         $stmt = $this->prepareStatement($sql);
         $this->bindParams($stmt, $values);
         try
@@ -203,6 +209,11 @@ abstract class BaseObjectMap
         catch(\PDOException $e)
         {
             throw new Exception('PDOException while performing SQL query «%s». The driver said "%s".', $sql, $e->getMessage());
+        }
+
+        if ($logger)
+        {
+            $logger->stopQuery();
         }
 
         return $stmt;
