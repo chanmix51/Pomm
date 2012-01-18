@@ -396,7 +396,7 @@ $service = new Pomm\Service(array(
     'dsn' =&gt; 'pgsql://user:pass@host:port/db_a'
   ),
   'db_two' =&gt; array(
-    'dsn' =&gt; 'pgsql://otheruser:hispass@otherhost/db_b',
+    'dsn' =&gt; 'pgsql://otheruser:hispass@!/path/to/socket/directory!/db_b',
     'class' =&gt; 'App\MyDb',
     'identity_mapper' =&gt; 'App\MyIdentityMapper'
   )
@@ -408,7 +408,7 @@ $service-&gt;setDatabase('db_one', new Pomm\Connection\Database(array(
   'dsn' =&gt; 'pgsql://user:pass@host:port/db_a'
 )));
 $service-&gt;setDatabase('db_two', new App\MyDb(array(
-  'dsn' =&gt; 'pgsql://otheruser:hispass@otherhost/db_b',
+  'dsn' =&gt; 'pgsql://otheruser:hispass@!/path/to/socket/directory!/db_b',
   'identity_mapper' =&gt; 'App\MyIdentityMapper'
 )));
 </pre>
@@ -425,10 +425,14 @@ $service-&gt;setDatabase('db_two', new App\MyDb(array(
 <p>The <strong>dsn</strong> parameter format is important because it interacts with the server's access policy.</p>
 <blockquote>
 <ul class="simple">
-<li><em>pgsql://user/database</em> Connect <em>user</em> to the db <em>database</em> without password through the Unix socket system. This is the minimal form.</li>
+<li><strong>socket connection</strong></li>
+<li><em>pgsql://user/database</em> Connect <em>user</em> to the db <em>database</em> without password through the Unix socket system. This is the DSN's shortest form.</li>
 <li><em>pgsql://user:pass/database</em> The same but with password.</li>
+<li><em>pgsql://user:pass@!/path/to/socket!/database</em> When the socket is not in the default directory, it is possible to specify it in the host part of the DSN. Note it is surrounded by '!' and there are NO ending /. Using the «!» as delimiter assumes there are no «!» in your socket's path. But you don't have «!» in your socket's path do you ?</li>
+<li><em>pgsql://user@!/path/to/socket!:port/database</em> Postgresql's listening socket name are the same as TCP ports. If different than default socket, specify it in the port part.</li>
+<li><strong>TCP connection</strong></li>
 <li><em>pgsql://user@host/database</em> Connect <em>user</em> to the db <em>database</em> on host <em>host</em> using TCP/IP.</li>
-<li><em>pgsql://user:pass@host:port/database</em> The same but with password and TCP port specified. This is the maximal form.</li>
+<li><em>pgsql://user:pass@host:port/database</em> The same but with password and TCP port specified.</li>
 </ul>
 </blockquote>
 <p>The <strong>identity_mapper</strong> option gives you the opportunity to register an identity mapper. When connections are created, they will instantiate the given class. By default, the Smart IM is loaded. This can be overridden for specific connections (see the identity mapper section below).</p>

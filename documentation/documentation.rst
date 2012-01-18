@@ -49,7 +49,7 @@ The *Service* class just stores your *Database* instances and provides convenien
         'dsn' => 'pgsql://user:pass@host:port/db_a'
       ),
       'db_two' => array(
-        'dsn' => 'pgsql://otheruser:hispass@otherhost/db_b',
+        'dsn' => 'pgsql://otheruser:hispass@!/path/to/socket/directory!/db_b',
         'class' => 'App\MyDb',
         'identity_mapper' => 'App\MyIdentityMapper'
       )
@@ -61,7 +61,7 @@ The *Service* class just stores your *Database* instances and provides convenien
       'dsn' => 'pgsql://user:pass@host:port/db_a'
     )));
     $service->setDatabase('db_two', new App\MyDb(array(
-      'dsn' => 'pgsql://otheruser:hispass@otherhost/db_b',
+      'dsn' => 'pgsql://otheruser:hispass@!/path/to/socket/directory!/db_b',
       'identity_mapper' => 'App\MyIdentityMapper'
     )));
 
@@ -74,10 +74,14 @@ Once registered, you can retrieve the databases with their name by calling the *
 
 The **dsn** parameter format is important because it interacts with the server's access policy.
 
- * *pgsql://user/database* Connect *user* to the db *database* without password through the Unix socket system. This is the minimal form.
+ * **socket connection**
+ * *pgsql://user/database* Connect *user* to the db *database* without password through the Unix socket system. This is the DSN's shortest form.
  * *pgsql://user:pass/database* The same but with password.
+ * *pgsql://user:pass@!/path/to/socket!/database* When the socket is not in the default directory, it is possible to specify it in the host part of the DSN. Note it is surrounded by '!' and there are NO ending /. Using the «!» as delimiter assumes there are no «!» in your socket's path. But you don't have «!» in your socket's path do you ?
+ * *pgsql://user@!/path/to/socket!:port/database* Postgresql's listening socket name are the same as TCP ports. If different than default socket, specify it in the port part.
+ * **TCP connection**
  * *pgsql://user@host/database* Connect *user* to the db *database* on host *host* using TCP/IP.
- * *pgsql://user:pass@host:port/database* The same but with password and TCP port specified. This is the maximal form.
+ * *pgsql://user:pass@host:port/database* The same but with password and TCP port specified. 
 
 The **identity_mapper** option gives you the opportunity to register an identity mapper. When connections are created, they will instantiate the given class. By default, the Smart IM is loaded. This can be overridden for specific connections (see the identity mapper section below).
 

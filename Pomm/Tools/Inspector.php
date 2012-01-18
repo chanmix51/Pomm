@@ -126,9 +126,9 @@ class Inspector
      * @param String schema name
      * @return Array tables OID
      **/
-    public function getTablesInSchema($schema)
+    public function getTablesInSchema($schema, Array $relkind = array('r', 'v'))
     {
-        $sql = sprintf("SELECT c.oid FROM pg_catalog.pg_class c LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind='r' AND n.nspname = '%s'", $schema);
+        $sql = sprintf("SELECT c.oid FROM pg_catalog.pg_class c LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind IN (%s) AND n.nspname = '%s'", sprintf("'%s'", join("', '", $relkind)), $schema);
 
         $tables = array();
         $pdo = $this->connection->getPdo()->query($sql);
@@ -138,5 +138,29 @@ class Inspector
         }
 
         return $tables;
+    }
+
+    /**
+     * getStoredProcedureSource
+     * Return the source code of stored procedures
+     *
+     * @public
+     * @param String schema name
+     * @param String procedure name
+     * @return Array source code
+     **/
+    public function getStoredProcedureSource($schema, $name)
+    {
+        $sql = sprintf("SELECT pg_catalog.pg_proc.prosrc FROM pg_catalog.pg_proc JOIN pg_catalog.pg_namespace ON pg_catalog.pg_proc.pronamespace = pg_catalog.pg_namespace.oid WHERE proname = '%s' AND pg_catalog.pg_namespace.nspname = '%s'", $name, $schema);
+
+        $pdo = $this->connection->getPdo()->query($sql);
+        $sources = array();
+
+        while ($source = $pdo->fetchColumn())
+        {
+            $sources[] = $source;
+        }
+
+        return $sources;
     }
 }

@@ -437,7 +437,7 @@ abstract class BaseObjectMap
      */
     public function deleteByPk(Array $pk)
     {
-        $sql = sprintf('DELETE FROM %s WHERE %s', $this->object_name, $this->createSqlAndFrom($pk));
+        $sql = sprintf('DELETE FROM %s WHERE %s RETURNING %s', $this->object_name, $this->createSqlAndFrom($pk), join(', ', $this->getSelectFields()));
 
         return $this->query($sql, array_values($pk));
     }
@@ -467,7 +467,11 @@ abstract class BaseObjectMap
             $collection = $this->query($sql, array());
         }
 
-        $object = $collection->current();
+        if ($collection->count())
+        {
+            $object = $collection->current();
+        }
+
         $object->_setStatus(BaseObject::EXIST);
     }
 
@@ -509,7 +513,14 @@ abstract class BaseObjectMap
 
 
         $sql = sprintf("UPDATE %s SET %s WHERE %s RETURNING %s;", $this->object_name, join(', ', $updates), $this->createSqlAndFrom($object->get($this->getPrimaryKey())), join(', ', $this->getSelectFields()));
-        $object = $this->query($sql, array_values($object->get($this->getPrimaryKey())));
+        $collection = $this->query($sql, array_values($object->get($this->getPrimaryKey())));
+
+        if ($collection->count())
+        {
+            $object = $collection->current();
+        }
+
+        $object->_setStatus(BaseObject::EXIST);
     }
 
     /**
@@ -586,7 +597,13 @@ abstract class BaseObjectMap
      */
     public function deleteOne(BaseObject $object)
     {
-        $this->deleteByPk($object->get($this->getPrimaryKey()));
+        $collection = $this->deleteByPk($object->get($this->getPrimaryKey()));
+
+        if ($collection->count != 0)
+        {
+            $object = $collection->current();
+        }
+
         $object->_setStatus(BaseObject::NONE);
     }
 

@@ -125,7 +125,12 @@ class ParameterHolder implements \ArrayAccess, \Iterator
 
   public function mustBeOneOf($name, Array $values)
   {
-      return in_array($this[$name], $values);
+      if (!in_array($this[$name], $values))
+      {
+          throw new Exception(sprintf('The parameters "%s" must be one of [%s].', $name, implode(', ', $values)));
+      }
+
+      return true;
   }
 
   /**

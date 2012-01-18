@@ -23,17 +23,17 @@ Download the pomm repository somewhere in your project. All sources are in the P
   │   ├── Pomm.php                  # Register and retreive databases
   │   ├── Connection
   │   │   ├── Database.php          # Database provides connections and transactions
-  │   │   ├── Connection.php        # A simple database connection
-  │   │   └── Transaction.php       # Transaction is an enhanced connection
+  │   │   └── Connection.php        # A connection to the database
   │   ├── Exception
   │   ├── External
   │   ├── Object
-  │   │   ├── BaseObjectMap.php     # All your map classes ultimately extends this
-  │   │   ├── BaseObject.php        # All your entities extends this
+  │   │   ├── BaseObjectMap.php     # All your map classes ultimately extend this
+  │   │   ├── BaseObject.php        # All your entities extend this
   │   │   └── Collection.php        # Your queries return this
   │   ├── Query
   │   │   └── Where.php             # The Where class
   │   ├── Tools
+  │   │   ├── Inspector.php         # Database inspector
   │   │   ├── CreateBaseMapTool.php # Create a Map file from the database
   │   │   └── ScanSchemaTool.php    # Scan a postrgresql's schema to create all map files
   │   └── Type                      # builtin Postgresql types
@@ -56,14 +56,14 @@ You can scan Postgresql's schemas with a short PHP script like the following:
 
     require __DIR__.'/vendor/pomm/test/autoload.php';
 
-    $qservice = new Pomm\Service(array('default' => array(
+    $service = new Pomm\Service(array('default' => array(
         'dsn' => 'pgsql://nss_user:nss_password@localhost/nss_db'
         )));
 
     $scan = new Pomm\Tools\ScanSchemaTool(array(
         'dir'=> __DIR__,
         'schema' => 'nss_blog',
-        'connection' => $service->getDatabase('default'),
+        'database' => $service->getDatabase('default'),
         ));
     $scan->execute();
 

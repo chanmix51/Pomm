@@ -4,7 +4,7 @@ namespace Pomm\Test;
 
 include __DIR__.'/../Pomm/External/lime.php';
 include "autoload.php";
-include "bootstrap.php";
+$service = include "bootstrap.php";
 
 use Pomm\Service;
 use Pomm\Connection\Database;
@@ -21,9 +21,9 @@ class converter_test extends \lime_test
         $connection,
         $map;
 
-    public function initialize()
+    public function initialize($service)
     {
-        $this->service = new Service(array('default' => array('dsn' => 'pgsql://greg/greg')));
+        $this->service = $service;
         $this->connection = $this->service->createConnection();
         $this->map = $this->connection->getMapFor('Pomm\Test\TestConverter');
         $this->map->createTable();
@@ -203,7 +203,7 @@ class converter_test extends \lime_test
 
         $this->object->setTestInterval(\DateInterval::createFromDateString("18 months"));
         $this->map->updateOne($this->object, array('test_interval'));
-        $this->is($this->object['test_interval']->format('%Y years %m months'), "00 years 18 months", "Record NOT updated with database value.");
+        $this->is($this->object['test_interval']->format('%Y years %m months'), "01 years 6 months", "Record WAS updated with database value.");
 
     }
 }
@@ -212,7 +212,7 @@ $test = new converter_test();
 $binary = file_get_contents('https://twimg0-a.akamaihd.net/profile_images/1583413811/smile_normal.JPG');
 
 $test
-    ->initialize()
+    ->initialize($service)
     ->testBasics(array('something' => 'plop', 'is_true' => false, 'precision' => 0.123456789, 'probed_data' => 4.3210, 'binary_data' => $binary, 'ft_search' => "'academi':1 'battl':15 'canadian':20 'dinosaur':2 'drama':5 'epic':4 'feminist':8 'mad':11 'must':14 'rocki':21 'scientist':12 'teacher':17"), array('id' => 1, 'created_at' => new \DateTime(), 'something' => 'plop', 'is_true' => false, 'precision' => 0.123456789, 'probed_data' => 4.321, 'binary_data' => $binary, 'ft_search' => "'academi':1 'battl':15 'canadian':20 'dinosaur':2 'drama':5 'epic':4 'feminist':8 'mad':11 'must':14 'rocki':21 'scientist':12 'teacher':17"))
     ->testPoint(new Type\Point(0,0))
     ->testPoint(new Type\Point(47.123456,-0.654321))
