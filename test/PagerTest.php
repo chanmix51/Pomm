@@ -20,7 +20,7 @@ class PagerTest extends \lime_test
     {
         $this->service = $service;
         $this->logger = new Pomm\Tools\Logger();
-        $connection = $this->service->createConnection();
+        $connection = $this->service->getDatabase()->createConnection();
         $connection->registerFilter(new Pomm\FilterChain\LoggerFilter($this->logger));
         $this->map = $connection->getMapFor('Bench\PommBench');
         $this->map->createTable();
@@ -126,7 +126,7 @@ class PagerTest extends \lime_test
         $this->ok(count($this->logger->getLogs()) > 0, "There are logs in the logger.");
         foreach ($this->logger->getLogs() as $log)
         {
-            $this->like($log['sql'], '(INSERT|SELECT|UPDATE|DELETE|CREATE|DROP)', 'Sql contains one of SQL order.');
+            $this->like($log['sql'], '(INSERT|SELECT|UPDATE|DELETE|CREATE|DROP)', 'Sql contains at least one SQL order.');
             $this->cmp_ok($log['time'], '>', 0, sprintf('Time is >0 "%f".', $log['time']));
         }
 

@@ -146,6 +146,6 @@ class TestConverter extends BaseObject
 }
 
 $service = new Service();
-$service->setDatabase('default', new Database(array('dsn' => 'pgsql://greg@!/var/lib/lxc/perso/rootfs/var/run/postgresql!/greg')));
+$service->setDatabase('default', new Database(array('dsn' => 'pgsql://greg/greg')));
 
 return $service;

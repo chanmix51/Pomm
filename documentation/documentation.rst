@@ -68,7 +68,9 @@ The *Service* class just stores your *Database* instances and provides convenien
 The *setDatabase* method is used internally by the constructor. The parameters may be any of the following:
  * "dsn": a URL like string to connect the database. It is in the form pgsql://user:password@host:port/database_name (**mandatory**)
  * "class": The *Database* class to instantiate as a database. This class must extend Pomm\\Database as we will see below.
- * "isolation": transaction isolation level. Must be one of Pomm\\Connection\\Connection::ISOLATION_READ_COMMITTED or ISOLATION_SERIALIZABLE (default ISOLATION_READ_COMMITTED).
+ * "isolation": transaction isolation level. Must be one of Pomm\\Connection\\Connection::ISOLATION_READ_COMMITTED, ISOLATION_READ_REPEATABLE or ISOLATION_SERIALIZABLE (default ISOLATION_READ_COMMITTED). Check your Postgresql version for the available levels. Starting from pg 9.1, what was called SERIALIZABLE is called READ_REPEATABLE and SERIALIZABLE is a race for the first transaction to COMMIT. Check the `documentation_` for details.
+
+`_documentation` http://www.postgresql.org/docs/9.1/static/transaction-iso.html
 
 Once registered, you can retrieve the databases with their name by calling the *getDatabase* method passing the name as argument. If no name is given, the first declared *Database* will be returned.
 
@@ -777,6 +779,56 @@ Sometimes, in your model you need some queries to be performed in a transaction 
             $this->rollback($savepoint);
         }
     }
+
+Query filter chain
+==================
+
+The Connection class also holds an the heart of Pomm's query system: the *QueryFilterChain*. The filter chain is an ordered stack of filters which can be executed. As the first filter is executed it can call the following filter. The code before the next filter call will be executed before and the code placed after will be run after. 
+This mechanism aims at wrapping the query system with tools like loggers or event systems. It is also possible to bypass completely the query execution as long as you return a PDOStatement instance.
+
+::
+
+  $database = new Pomm\Connection\Database(array('dsn' => 'pgsql://user/database'));
+  $logger = new Pomm\Tools\Logger();
+  
+  $connection = $database->createConnection();
+  $connection->registerFilter(new Pomm\FilterChain\LoggerFilter($logger));
+  
+  $students = $connection
+    ->getMapFor('MyDb\School\Student')
+    ->findWhere('age > ?', array(18), 'ORDER BY level DESC');
+  
+  $logger->getLogs() 
+  /* Array( 
+       0 => Array(
+         'sql' => 'SELECT ... FROM school.student WHERE age > ? ORDER BY level DESC', 
+         'params' => array(18), 
+         'time' => 0.003079
+       ))
+   */
+
+Writing a filter is very easy, it just must implement the *FilterInterface*.
+
+  ::
+
+  class MyFilter implements \Pomm\Filter\FilterInterface
+  {
+      public function execute(\Pomm\Filter\QueryFilterChain $query_filter_chain)
+      {
+          // Do something before the query is executed
+
+          // Call the next filter
+          // If you do not, the query will never be executed. 
+          // Be sure to return a PDOStatement or throw an Exception.
+          $stmt = $query_filter_chain->executeNext($query_filter_chain);
+
+          // Do something after the query is executed
+  
+          return $stmt;
+      }
+  }
+
+You can register as many filters as you want but keep in mind filters are executed for every single query so it may slow down dramatically your application. 
 
 Tools
 -----
