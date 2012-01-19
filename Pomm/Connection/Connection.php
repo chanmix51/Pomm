@@ -4,6 +4,10 @@ namespace Pomm\Connection;
 
 use Pomm\Exception\Exception;
 use Pomm\Connection\Database;
+use Pomm\FilterChain\QueryFilterChain;
+use Pomm\Object\BaseObjectMap;
+use Pomm\FilterChain\PDOQueryFilter;
+use Pomm\FilterChain\FilterInterface;
 
 /**
  * Pomm\Connection\Connection
@@ -18,6 +22,7 @@ use Pomm\Connection\Database;
 class Connection
 {
     const ISOLATION_READ_COMMITTED = "READ COMMITTED";
+    const ISOLATION_READ_REPEATABLE = "READ REPEATABLE"; // from Pg 9.1
     const ISOLATION_SERIALIZABLE = "SERIALIZABLE";
 
     protected $handler;
@@ -26,6 +31,7 @@ class Connection
     protected $isolation;
     protected $in_transaction = false;
     protected $identity_mapper;
+    protected $query_filter_chain;
 
     /**
      * __construct()
@@ -37,12 +43,14 @@ class Connection
     public function __construct(Database $database, \Pomm\Identity\IdentityMapperInterface $mapper = null)
     {
         $this->database = $database;
+        $this->query_filter_chain = new QueryFilterChain($this);
+        $this->query_filter_chain->registerFilter(new PDOQueryFilter());
 
         $this->parameter_holder = $database->getParameterHolder();
 
         $this->parameter_holder->setDefaultValue('isolation', self::ISOLATION_READ_COMMITTED);
         $this->parameter_holder->mustBeOneOf('isolation', 
-            array(self::ISOLATION_READ_COMMITTED, self::ISOLATION_SERIALIZABLE)
+            array(self::ISOLATION_READ_COMMITTED, self::ISOLATION_SERIALIZABLE, self::ISOLATION_READ_REPEATABLE)
         );
 
         $this->isolation = $this->parameter_holder['isolation'];
@@ -245,8 +253,39 @@ class Connection
         return (bool) $this->in_transaction;
     }
 
+    /**
+     * getIdentityMapper
+     *
+     * @return IdentityMapperInterface
+     **/
     public function getIdentityMapper()
     {
         return $this->identity_mapper;
+    }
+
+    /**
+     * registerFilter
+     * Register a new Filter in the QueryFilterChain
+     *
+     * @param Pomm\FilterChain\FilterInterface
+     **/
+
+    public function registerFilter(FilterInterface $filter)
+    {
+        $this->query_filter_chain->registerFilter($filter);
+    }
+
+    /**
+     * executeFilterChain
+     * execute a SQL Query in the filter chain.
+     *
+     * @param BaseObjectMap map the map instance that sends the query
+     * @param String sql the SQL query
+     * @param Array values the parameter for the prepared query
+     * @return PDOStatement 
+     **/
+    public function executeFilterChain(BaseObjectMap $map, $sql, Array $values = array())
+    {
+        return $this->query_filter_chain->execute($map, $sql, $values);
     }
 }

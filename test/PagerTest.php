@@ -14,11 +14,15 @@ class PagerTest extends \lime_test
 {
     protected $service;
     protected $map;
+    protected $logger;
 
     public function initialize($service)
     {
         $this->service = $service;
-        $this->map = $this->service->createConnection()->getMapFor('Bench\PommBench');
+        $this->logger = new Pomm\Tools\Logger();
+        $connection = $this->service->createConnection();
+        $connection->registerFilter(new Pomm\FilterChain\LoggerFilter($this->logger));
+        $this->map = $connection->getMapFor('Bench\PommBench');
         $this->map->createTable();
         $this->map->feedTable(1000);
 
@@ -116,6 +120,18 @@ class PagerTest extends \lime_test
         $this->ok($pager->isPreviousPage(), 'There is a previous page.');
         return $this;
     }
+
+    public function testLogger()
+    {
+        $this->ok(count($this->logger->getLogs()) > 0, "There are logs in the logger.");
+        foreach ($this->logger->getLogs() as $log)
+        {
+            $this->like($log['sql'], '(INSERT|SELECT|UPDATE|DELETE|CREATE|DROP)', 'Sql contains one of SQL order.');
+            $this->cmp_ok($log['time'], '>', 0, sprintf('Time is >0 "%f".', $log['time']));
+        }
+
+        return $this;
+    }
 }
 
 $test = new PagerTest();
@@ -124,4 +140,5 @@ $test
     ->initialize($service)
     ->testPaginateQuery()
     ->testPaginateFindWhere()
+    ->testLogger();
     ;

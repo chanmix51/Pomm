@@ -22,6 +22,7 @@ function __autoload($name)
         'Pomm/Tools/CreateEntityTool.php',
         'Pomm/Tools/CreateMapTool.php',
         'Pomm/Tools/CreateFileTool.php',
+        'Pomm/Tools/Logger.php',
         'Pomm/Converter/ConverterInterface.php',
         'Pomm/Converter/PgBoolean.php',
         'Pomm/Converter/PgHStore.php',
@@ -42,6 +43,10 @@ function __autoload($name)
         'Pomm/Identity/IdentityMapperSmart.php',
         'Pomm/Identity/IdentityMapperStrict.php',
         'Pomm/Identity/IdentityMapperInterface.php',
+        'Pomm/FilterChain/QueryFilterChain.php',
+        'Pomm/FilterChain/FilterInterface.php',
+        'Pomm/FilterChain/PDOQueryFilter.php',
+        'Pomm/FilterChain/LoggerFilter.php',
 );
     $name = preg_split('/\\\/', $name);
     $class_name = array_pop($name);
