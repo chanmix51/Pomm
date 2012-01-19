@@ -42,6 +42,9 @@ function __autoload($name)
         'Pomm/Identity/IdentityMapperSmart.php',
         'Pomm/Identity/IdentityMapperStrict.php',
         'Pomm/Identity/IdentityMapperInterface.php',
+        'Pomm/FilterChain/QueryFilterChain.php',
+        'Pomm/FilterChain/FilterInterface.php',
+        'Pomm/FilterChain/PDOQueryFilter.php',
 );
     $name = preg_split('/\\\/', $name);
     $class_name = array_pop($name);

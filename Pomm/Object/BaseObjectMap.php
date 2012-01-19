@@ -129,83 +129,16 @@ abstract class BaseObjectMap
     }
 
     /**
-     * prepareStatement 
-     * Prepare a SQL statement
-     * 
-     * @param string $sql 
-     * @access protected
+     * doQuery
+     * Execute the filterChain.
+     *
+     * @param String SQL query
+     * @values Array  parameters for the prepared query
      * @return PDOStatement
-     */
-    protected function prepareStatement($sql)
+     **/
+    public function doQuery($sql, $values = array())
     {
-        return $this->connection->getPdo()->prepare($sql, array(\PDO::CURSOR_SCROLL));
-    }
-
-    /**
-     * bindParams 
-     * Bind parameters to a prepared statement
-     * 
-     * @param PDOStatement $stmt 
-     * @param mixed $values 
-     * @access protected
-     * @return PDOStatement
-     */
-    protected function bindParams($stmt, $values)
-    {
-        foreach ($values as $pos => $value)
-        {
-            if (is_integer($value))
-            {
-                $type = \PDO::PARAM_INT;
-            }
-            elseif (is_bool($value))
-            {
-                $type = \PDO::PARAM_BOOL;
-            }
-            else
-            {
-                $type = null;
-            }
-
-            if (is_null($type))
-            {
-                $stmt->bindValue($pos + 1, $value);
-            }
-            else
-            {
-                $stmt->bindValue($pos + 1, $value, $type);
-            }
-        }
-
-        return $stmt;
-    }
-
-    /**
-     * doQuery 
-     * Performs a query, returns the PDO Statment instance used
-     * 
-     * @param string $sql 
-     * @param mixed $values 
-     * @access protected
-     * @return PDOStatement
-     */
-    protected function doQuery($sql, $values = array())
-    {
-        $stmt = $this->prepareStatement($sql);
-        $this->bindParams($stmt, $values);
-        try
-        {
-            if (!$stmt->execute())
-            {
-                throw new SqlException($stmt, $sql);
-            }
-        }
-        catch(\PDOException $e)
-        {
-            throw new Exception('PDOException while performing SQL query «%s». The driver said "%s".', $sql, $e->getMessage());
-        }
-
-        return $stmt;
+        return $this->connection->executeFilterChain($this, $sql, $values);
     }
 
     /**
