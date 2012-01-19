@@ -7,6 +7,7 @@ use Pomm\Connection\Database;
 use Pomm\FilterChain\QueryFilterChain;
 use Pomm\Object\BaseObjectMap;
 use Pomm\FilterChain\PDOQueryFilter;
+use Pomm\FilterChain\FilterInterface;
 
 /**
  * Pomm\Connection\Connection

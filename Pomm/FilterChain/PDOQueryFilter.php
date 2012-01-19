@@ -3,6 +3,7 @@
 namespace Pomm\FilterChain;
 
 use Pomm\Exception\Exception;
+use Pomm\Exception\SqlException;
 use Pomm\FilterChain\FilterInterface;
 use Pomm\FilterChain\QueryFilterChain;
 
