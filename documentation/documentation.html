@@ -353,20 +353,19 @@ ul.auto-toc {
 </div>
 <div class="section" id="overview">
 <h1><a class="toc-backref" href="#id2">Overview</a></h1>
-<dl class="docutils">
-<dt>Pomm is a fast, lightweight, efficient model manager for Postgresql written in PHP. It can be seen as an enhanced object hydrator above PDO with the following features:</dt>
-<dd><ul class="first last simple">
+<p>Pomm is a fast, lightweight, efficient model manager for Postgresql written in PHP. It can be seen as an enhanced object hydrator above PDO with the following features:</p>
+<blockquote>
+<ul class="simple">
 <li>Database Inspector to build automatically your PHP model files. Table inheritance from Pg will make your model class to inherit from each other.</li>
 <li>Namespaces are used to ovoid collision between objects located in different Pg schemas.</li>
-<li>Type converters, 't' and 'f' Pg booleans are converted into PHP booleans, so are binary, arrays, geometric and your own data types.</li>
-<li>Collections, queries results are fetched on demand to keep minimal memory fingerprint.</li>
-<li>Filters, it is possible to register anonymous PHP functions to parse fetched results prior to hydration.</li>
-<li>Model objects are extensible, you can add fields in your SELECT statements, values will be in your model instances.</li>
-<li>Identity mapper, fetching twice the same rows will return same instances.</li>
-<li>SQL is the query language.</li>
+<li>Types are converted on the fly. 't' and 'f' Pg booleans are converted into PHP booleans, so are binary, arrays, geometric and your own data types.</li>
+<li>Queries results are fetched on demand to keep minimal memory fingerprint.</li>
+<li>It is possible to register anonymous PHP functions to filter fetched results prior to hydration.</li>
+<li>Model objects are extensible, simply add fields in your SELECT statements.</li>
+<li>Pomm uses an identity mapper, fetching twice the same rows will return same instances.</li>
+<li>You can register code to be executed before and/or after each query (logs, filters, event systems ...)</li>
 </ul>
-</dd>
-</dl>
+</blockquote>
 <p>Let's have an overview of Pomm's components:</p>
 <dl class="docutils">
 <dt>Service</dt>
@@ -1123,48 +1122,32 @@ $students = $connection
 
 $logger-&gt;getLogs()
 /* Array(
-     0 =&gt; Array(
-       'sql' =&gt; 'SELECT ... FROM school.student WHERE age &gt; ? ORDER BY level DESC',
-       'params' =&gt; array(18),
-       'time' =&gt; 0.003079
+     "1327047962.9422" =&gt; Array(
+       'sql'       =&gt; 'SELECT ... FROM school.student WHERE age &gt; ? ORDER BY level DESC',
+       'params'    =&gt; array(18),
+       'duration'  =&gt; 0.003079,
+       'results'   =&gt; 23
      ))
  */
 </pre>
 <p>Writing a filter is very easy, it just must implement the <em>FilterInterface</em>.</p>
-<blockquote>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">&lt;string&gt;</tt>, line 814)</p>
-Literal block expected; none found.</div>
-<p>class MyFilter implements PommFilterFilterInterface
-{</p>
-<div class="system-message">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">&lt;string&gt;</tt>, line 816)</p>
-Unexpected indentation.</div>
-<blockquote>
-<p>public function execute(PommFilterQueryFilterChain $query_filter_chain)
-{</p>
-<div class="system-message">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">&lt;string&gt;</tt>, line 818)</p>
-Unexpected indentation.</div>
-<blockquote>
-<p>// Do something before the query is executed</p>
-<p>// Call the next filter
-// If you do not, the query will never be executed.
-// Be sure to return a PDOStatement or throw an Exception.
-$stmt = $query_filter_chain-&gt;executeNext($query_filter_chain);</p>
-<p>// Do something after the query is executed</p>
-<p>return $stmt;</p>
-</blockquote>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">&lt;string&gt;</tt>, line 828)</p>
-Block quote ends without a blank line; unexpected unindent.</div>
-<p>}</p>
-</blockquote>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">&lt;string&gt;</tt>, line 829)</p>
-Block quote ends without a blank line; unexpected unindent.</div>
-<p>}</p>
-</blockquote>
+<pre class="literal-block">class MyFilter implements \Pomm\Filter\FilterInterface
+{
+    public function execute(\Pomm\Filter\QueryFilterChain $query_filter_chain)
+    {
+        // Do something before the query is executed
+
+        // Call the next filter
+        // If you do not, the query will never be executed.
+        // Be sure to return a PDOStatement or throw an Exception.
+        $stmt = $query_filter_chain-&gt;executeNext($query_filter_chain);
+
+        // Do something after the query is executed
+
+        return $stmt;
+    }
+}
+</pre>
 <p>You can register as many filters as you want but keep in mind filters are executed for every single query so it may slow down dramatically your application.</p>
 </div>
 </div>

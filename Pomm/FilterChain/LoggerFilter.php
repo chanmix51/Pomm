@@ -22,7 +22,7 @@ class LoggerFilter implements FilterInterface
         $stmt = $query_filter_chain->executeNext($query_filter_chain);
         $time_end = microtime(true);
 
-        $this->logger->add($query_filter_chain->getSql(), $query_filter_chain->getValues(), $time_end - $time_start);
+        $this->logger->add(array('sql' => $query_filter_chain->getSql(), 'params' => $query_filter_chain->getValues(), 'duration' => $time_end - $time_start, 'results' => $stmt->rowCount()));
 
         return $stmt;
     }

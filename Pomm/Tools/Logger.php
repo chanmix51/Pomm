@@ -6,9 +6,9 @@ class Logger
 {
     protected $logs = array();
 
-    public function add($sql, Array $values = array(), $time = 0)
+    public function add($status)
     {
-        $this->logs[] = array('sql' => $sql, 'params' => $values, 'time' => $time);
+        $this->logs[microtime(true)] = $status;
     }
 
     public function getLogs()

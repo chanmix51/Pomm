@@ -8,14 +8,15 @@ Overview
 --------
 
 Pomm is a fast, lightweight, efficient model manager for Postgresql written in PHP. It can be seen as an enhanced object hydrator above PDO with the following features:
+
  * Database Inspector to build automatically your PHP model files. Table inheritance from Pg will make your model class to inherit from each other.
  * Namespaces are used to ovoid collision between objects located in different Pg schemas.
- * Type converters, 't' and 'f' Pg booleans are converted into PHP booleans, so are binary, arrays, geometric and your own data types.
- * Collections, queries results are fetched on demand to keep minimal memory fingerprint.
- * Filters, it is possible to register anonymous PHP functions to parse fetched results prior to hydration.
- * Model objects are extensible, you can add fields in your SELECT statements, values will be in your model instances.
- * Identity mapper, fetching twice the same rows will return same instances.
- * SQL is the query language.
+ * Types are converted on the fly. 't' and 'f' Pg booleans are converted into PHP booleans, so are binary, arrays, geometric and your own data types.
+ * Queries results are fetched on demand to keep minimal memory fingerprint.
+ * It is possible to register anonymous PHP functions to filter fetched results prior to hydration.
+ * Model objects are extensible, simply add fields in your SELECT statements.
+ * Pomm uses an identity mapper, fetching twice the same rows will return same instances.
+ * You can register code to be executed before and/or after each query (logs, filters, event systems ...)
 
 Let's have an overview of Pomm's components:
 
@@ -800,16 +801,17 @@ This mechanism aims at wrapping the query system with tools like loggers or even
   
   $logger->getLogs() 
   /* Array( 
-       0 => Array(
-         'sql' => 'SELECT ... FROM school.student WHERE age > ? ORDER BY level DESC', 
-         'params' => array(18), 
-         'time' => 0.003079
+       "1327047962.9422" => Array(
+         'sql'       => 'SELECT ... FROM school.student WHERE age > ? ORDER BY level DESC', 
+         'params'    => array(18), 
+         'duration'  => 0.003079,
+         'results'   => 23
        ))
    */
 
 Writing a filter is very easy, it just must implement the *FilterInterface*.
 
-  ::
+::
 
   class MyFilter implements \Pomm\Filter\FilterInterface
   {
