@@ -382,7 +382,7 @@ abstract class BaseObjectMap
      * @param BaseObject $object 
      * @access public
      */
-    public function saveOne(BaseObject &$object)
+    public function saveOne(BaseObject $object)
     {
         $this->checkObject($object, sprintf('"%s" class does not know how to save "%s" objects.', get_class($this), get_class($object)));
 
