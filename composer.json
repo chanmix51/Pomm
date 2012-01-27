@@ -1,0 +1,10 @@
+{
+    "name": "GHub/Pomm",
+    "type": "library",
+    "description":  "PHP Object Model Manager for Postgesql",
+    "keywords": ["orm", "postgresql", "database"],
+    "homepage": "http://pomm.coolkeums.org",
+    "license":  "MIT",
+    "authors":  [ { "name": "Grégoire HUBERT", "email": "hubert.greg@gmail.com", "homepage": "http://www.coolkeums.org" } ],
+    "require": { "php": ">=5.3.0" }
+}
