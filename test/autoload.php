@@ -36,6 +36,7 @@ function __autoload($name)
         'Pomm/Converter/PgLseg.php',
         'Pomm/Converter/PgCircle.php',
         'Pomm/Converter/PgBytea.php',
+        'Pomm/Converter/PgXml.php',
         'Pomm/Type/Point.php',
         'Pomm/Type/Segment.php',
         'Pomm/Type/Circle.php',

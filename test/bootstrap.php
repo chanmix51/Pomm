@@ -139,6 +139,12 @@ class TestConverterMap extends BaseObjectMap
         $this->connection->getDatabase()->registerConverter('Interval', new Converter\PgInterval(), array('interval'));
         $this->addField('test_interval', 'Interval');
     }
+
+    public function addXml()
+    {
+        $this->query('ALTER TABLE pomm_test.converter ADD COLUMN test_xml xml');
+        $this->addField('test_xml', 'String');
+    }
 }
 
 class TestConverter extends BaseObject
@@ -146,6 +152,6 @@ class TestConverter extends BaseObject
 }
 
 $service = new Service();
-$service->setDatabase('default', new Database(array('dsn' => 'pgsql://greg/greg')));
+$service->setDatabase('default', new Database(array('dsn' => 'pgsql://greg/greg', 'identity_mapper' => false)));
 
 return $service;

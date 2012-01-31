@@ -212,7 +212,7 @@ class Database
     {
         $this->registerConverter('Boolean', new Converter\PgBoolean(), array('boolean'));
         $this->registerConverter('Number', new Converter\PgNumber(), array('smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial'));
-        $this->registerConverter('String', new Converter\PgString(), array('character', 'text', 'uuid', 'tsvector'));
+        $this->registerConverter('String', new Converter\PgString(), array('character', 'text', 'uuid', 'tsvector', 'xml'));
         $this->registerConverter('Timestamp', new Converter\PgTimestamp(), array('timestamp', 'date', 'time'));
         $this->registerConverter('Interval', new Converter\PgInterval(), array('interval'));
         $this->registerConverter('Binary', new Converter\PgBytea(), array('bytea'));

@@ -205,6 +205,25 @@ class converter_test extends \lime_test
         $this->map->updateOne($this->object, array('test_interval'));
         $this->is($this->object['test_interval']->format('%Y years %m months'), "01 years 6 months", "Record WAS updated with database value.");
 
+        return $this;
+    }
+
+    public function testXml($xml)
+    {
+        $this->info('\\Pomm\\Converter\\PgXml');
+        if (!$this->map->hasField('test_xml'))
+        {
+            $this->info('Creating column test_xml.');
+            $this->map->addXml();
+        }
+
+        $this->object['test_xml'] = $xml;
+        $this->map->saveOne($this->object);
+        $object = $this->map->findByPk($this->object->get($this->map->getPrimaryKey()));
+        $this->is($this->object['test_xml'], $xml, 'Original XML unchanged after saved.');
+        $this->is($object['test_xml'], $xml, 'Original XML unchanged after retrieved.');
+
+        return $this;
     }
 }
 
@@ -221,4 +240,5 @@ $test
     ->testHStore(array('a' => null, 'b' => 2))
     ->testCircle(new Type\Circle(new Type\Point(1,2), 3))
     ->testInterval(\DateInterval::createFromDateString('1 years 8 months 30 days 14 hours 25 minutes 7 seconds'))
+    ->testXml('<pika data="chu">plop</pika>')
     ;
