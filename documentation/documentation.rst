@@ -425,7 +425,7 @@ Although it is possible to write whole plain queries by hand in the finders, thi
     $sql = sprintf('SELECT %s, COUNT(c.id) as "comment_count" FROM %s JOIN %s ON p.id = c.post_id WHERE %s GROUP BY %s',
         join(', ', $this->getSelectFields('p')),
         $this->getTableName('p'),
-        $this->Connection->getMapFor('MyDatabase\Blog\Comment')->getTableName('c'),
+        $this->connection->getMapFor('MyDatabase\Blog\Comment')->getTableName('c'),
         $where,
         join(', ', $this->getGroupByFields('p'))
         );
