@@ -777,7 +777,7 @@ public function getBlogPostsWithCommentCount(Pomm\Query\Where $where)
   $sql = sprintf('SELECT %s, COUNT(c.id) as "comment_count" FROM %s JOIN %s ON p.id = c.post_id WHERE %s GROUP BY %s',
       join(', ', $this-&gt;getSelectFields('p')),
       $this-&gt;getTableName('p'),
-      $this-&gt;Connection-&gt;getMapFor('MyDatabase\Blog\Comment')-&gt;getTableName('c'),
+      $this-&gt;connection-&gt;getMapFor('MyDatabase\Blog\Comment')-&gt;getTableName('c'),
       $where,
       join(', ', $this-&gt;getGroupByFields('p'))
       );
