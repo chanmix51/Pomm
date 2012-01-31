@@ -382,7 +382,7 @@ abstract class BaseObjectMap
      * @param BaseObject $object 
      * @access public
      */
-    public function saveOne(BaseObject $object)
+    public function saveOne(BaseObject &$object)
     {
         $this->checkObject($object, sprintf('"%s" class does not know how to save "%s" objects.', get_class($this), get_class($object)));
 
@@ -417,7 +417,7 @@ abstract class BaseObjectMap
      * @param BaseObject 
      * @param Array fields
      **/
-    public function updateOne(BaseObject $object, Array $fields)
+    public function updateOne(BaseObject &$object, Array $fields)
     {
         $this->checkObject($object, sprintf('"%s" class does not know how to update "%s" objects.', get_class($this), get_class($object)));
 
@@ -528,11 +528,11 @@ abstract class BaseObjectMap
      * @access public
      * @return void
      */
-    public function deleteOne(BaseObject $object)
+    public function deleteOne(BaseObject &$object)
     {
         $collection = $this->deleteByPk($object->get($this->getPrimaryKey()));
 
-        if ($collection->count != 0)
+        if ($collection->count() != 0)
         {
             $object = $collection->current();
         }
