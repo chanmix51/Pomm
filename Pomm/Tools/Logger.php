@@ -8,7 +8,7 @@ class Logger
 
     public function add($status)
     {
-        $this->logs[microtime(true)] = $status;
+        $this->logs[] = $status;
     }
 
     public function getLogs()
