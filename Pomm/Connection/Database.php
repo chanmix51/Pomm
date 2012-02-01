@@ -145,10 +145,13 @@ class Database
      * @param name      string the name of the converter
      * @param converter ConverterInterface a converter instance
      * @param pg_types  Array an array of the mapped postgresql's types
+     * @return Pomm\Connection\Database
      **/
     public function registerConverter($name, Converter\ConverterInterface $converter, Array $pg_types)
     {
         $this->converters[$name] = array('converter' => $converter, 'types' => $pg_types);
+
+        return $this;
     }
 
     /**
