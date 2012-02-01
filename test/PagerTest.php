@@ -127,7 +127,7 @@ class PagerTest extends \lime_test
         foreach ($this->logger->getLogs() as $log)
         {
             $this->like($log['sql'], '(INSERT|SELECT|UPDATE|DELETE|CREATE|DROP)', 'Sql contains at least one SQL order.');
-            $this->cmp_ok($log['time'], '>', 0, sprintf('Time is >0 "%f".', $log['time']));
+            $this->cmp_ok($log['duration'], '>', 0, sprintf('Duration is >0 "%f".', $log['duration']));
         }
 
         return $this;
