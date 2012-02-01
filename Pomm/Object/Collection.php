@@ -18,6 +18,7 @@ class Collection implements \Iterator, \Countable
     protected $object_map;
     protected $position = 0;
     protected $filters = array();
+    protected $fetched = array();
 
     /**
      * __construct 
@@ -94,6 +95,11 @@ class Collection implements \Iterator, \Countable
 
     public function get($index)
     {
+        if (isset($this->fetched[$index]))
+        {
+            return $this->fetched[$index];
+        }
+
         $values = $this->stmt->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_ABS, $index);
 
         if ($values === false) 
@@ -108,7 +114,10 @@ class Collection implements \Iterator, \Countable
             }
         }
 
-        return $this->object_map->createObjectFromPg($values);
+        $fetched = $this->object_map->createObjectFromPg($values);
+        $this->fetched[] = $fetched;
+
+        return $fetched;
     }
 
     /**
