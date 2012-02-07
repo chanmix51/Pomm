@@ -126,8 +126,11 @@ class PagerTest extends \lime_test
         $this->ok(count($this->logger->getLogs()) > 0, "There are logs in the logger.");
         foreach ($this->logger->getLogs() as $log)
         {
-            $this->like($log['sql'], '(INSERT|SELECT|UPDATE|DELETE|CREATE|DROP)', 'Sql contains at least one SQL order.');
-            $this->cmp_ok($log['duration'], '>', 0, sprintf('Duration is >0 "%f".', $log['duration']));
+            $this->like($log['sql'], '(INSERT|SELECT|UPDATE|DELETE|CREATE|DROP)', sprintf("Sql contains at least one SQL order \"%s\".", $log['sql']));
+            $this->cmp_ok($log['duration'], '>', 0, sprintf('Duration is >0 "%.1f ms".', $log['duration']));
+            $this->ok(isset($log['time_start']), 'There is a time_start.');
+            $this->cmp_ok($log['results'], '>=', 0, sprintf("There are some positive or zero results \"%d\".", $log['results']));
+            $this->ok(isset($log['map_class']), sprintf("There is a map_class \"%s\".", $log['map_class']));
         }
 
         return $this;
