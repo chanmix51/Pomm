@@ -39,7 +39,7 @@ class PgBytea implements ConverterInterface
     {
         if (function_exists('pg_escape_bytea'))
         {
-            return sprintf("E'%s'::bytea", @pg_escape_bytea($data));
+            return sprintf("E'%s'::bytea", pg_escape_bytea($data));
         }
         else
         {
