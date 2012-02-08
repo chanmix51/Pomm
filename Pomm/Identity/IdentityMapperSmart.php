@@ -13,6 +13,11 @@ class IdentityMapperSmart extends IdentityMapperStrict
      **/
     public function getModelInstance(BaseObject $object, Array $pk_fields)
     {
+        if (count($pk_fields) == 0)
+        {
+            return $object;
+        }
+
         $crc = $this->getSignature(get_class($object), $object->get($pk_fields));
 
         if (array_key_exists($crc, $this->mapper))
@@ -40,6 +45,11 @@ class IdentityMapperSmart extends IdentityMapperStrict
      **/
     public function checkModelInstance($class_name, Array $primary_key)
     {
+        if (count($pk_fields) == 0)
+        {
+            return $object;
+        }
+
         $crc = $this->getSignature($class_name, $primary_key);
 
         return array_key_exists($crc, $this->mapper) && ($this->mapper[$crc]->_getStatus() & BaseObject::EXIST)

@@ -38,6 +38,11 @@ class PommBenchMap extends BaseObjectMap
         $sql = "INSERT INTO pomm_bench (data_int, data_char, data_bool) SELECT floor(random() * 10000000), md5(random()::text), (floor(random() * 100)::integer % 2) = 0 FROM (SELECT * FROM generate_series(1, ?)) AS x;";
         $this->query($sql, array($rows));
     }
+
+    public function removePkDefinition()
+    {
+        $this->pk_fields = array();
+    }
 }
 
 class PommBench extends BaseObject
