@@ -53,7 +53,7 @@ class IdentityMapperStrict implements IdentityMapperInterface
      **/
     public function checkModelInstance($class_name, Array $primary_key)
     {
-        if (count($pk_fields) == 0)
+        if (count($primary_key) == 0)
         {
             return $object;
         }
@@ -72,7 +72,7 @@ class IdentityMapperStrict implements IdentityMapperInterface
      **/
     public function discardInstance($class_name, Array $primary_key)
     {
-        if (count($pk_fields) != 0)
+        if (count($primary_key) != 0)
         {
             unset($this->mapper[$this->getSignature($class_name, $primary_key)]);
         }
