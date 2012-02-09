@@ -12,6 +12,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- email type
+-- Varchar that verifies the is_email constraint
+CREATE DOMAIN email AS VARCHAR CONSTRAINT valid_email CHECK(is_email(VALUE));
+
 -- is_url
 -- Check if the given string is a valid URL format
 -- @param VARCHAR url 
@@ -21,6 +25,10 @@ BEGIN
       RETURN url ~* e'(https?|ftps?)://((([a-z0-9-]+\\.)+[a-z]{2,6})|(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}))(:[0-9]+)?(/\\S*)*$';
 END;
 $$ LANGUAGE plpgsql;
+
+-- url type
+-- Varchar that verifies the is_url constraint
+CREATE DOMAIN url AS VARCHAR CONSTRAINT valid_url CHECK(is_url(VALUE));
 
 -- transliterate
 -- transform all non US chars to ASCII
@@ -63,35 +71,14 @@ CREATE OR REPLACE FUNCTION cut_nicely(my_string VARCHAR, my_length INTEGER) RETU
         my_pointer INTEGER;
     BEGIN
         my_pointer := my_length;
-        WHILE my_pointer < length(my_string) AND transliterate(substr(my_string, my_pointer, 1)) ~* '[a-z]' LOOP
+        WHILE my_pointer < length(my_string) AND substr(my_string, my_pointer, 1) ~* '[À-ÿa-z0-9-]' LOOP
             my_pointer := my_pointer + 1;
         END LOOP;
 
-        RETURN substr(my_string, 1, my_pointer);
+        RETURN substr(my_string, 1, my_pointer - 1);
     END;
 $$ LANGUAGE plpgsql
 ;
-
--- array_merge
--- merge only different elements
--- @param ANYARRAY array1
--- @param ANYARRAY array2
--- @return ANYARRAY
-CREATE OR REPLACE FUNCTION array_merge(array1 anyarray, array2 anyarray) RETURNS anyarray AS $$
-    DECLARE
-        i integer ;
-        return_array array1%TYPE;
-    BEGIN
-        return_array := array1;
-        FOR i IN SELECT * FROM unnest(array2) LOOP
-            IF NOT i = ANY(return_array) THEN
-                return_array := return_array || i;
-            END IF;
-        END LOOP;
-
-        RETURN return_array;
-    END;
-$$ LANGUAGE plpgsql;
 
 -- update updated_at
 -- to be called by a TRIGGER to update the updated_at field of a table
