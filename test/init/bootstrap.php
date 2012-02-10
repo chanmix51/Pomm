@@ -9,6 +9,8 @@ use Pomm\Object\Collection;
 use Pomm\Converter;
 use Pomm\Connection\Database;
 
+require "autoload.php";
+
 class TestTableMap extends BaseObjectMap
 {
     protected function initialize()
@@ -151,7 +153,10 @@ class TestConverter extends BaseObject
 {
 }
 
+require __DIR__."/../../Pomm/External/lime.php";
+
 $service = new Service();
-$service->setDatabase('default', new Database(array('dsn' => 'pgsql://greg/greg', 'identity_mapper' => false)));
+$dsn = require "config.php";
+$service->setDatabase('default', new Database(array('dsn' => $dsn, 'identity_mapper' => false)));
 
 return $service;

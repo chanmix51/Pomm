@@ -1,2 +1,3 @@
 *.swp
 .ctags
+test/init/config.php

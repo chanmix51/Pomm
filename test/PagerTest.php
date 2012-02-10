@@ -1,10 +1,7 @@
 <?php
 
-require __DIR__.'/../Pomm/External/lime.php';
-require "autoload.php";
+$service = require __DIR__."/init/bootstrap.php";
 require "PommBench.php";
-
-$service = require "bootstrap.php";
 
 use Pomm\Service;
 use Pomm\Connection\Database;

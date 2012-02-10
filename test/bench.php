@@ -1,7 +1,7 @@
 <?php
 
-include __DIR__.'/autoload.php';
-include __DIR__.'/PommBench.php
+include __DIR__.'/init/bootstrap.php';
+include __DIR__.'/PommBench.php';
 
 
 $db = new \Pomm\Connection\Database(array('dsn' => 'pgsql://greg/greg'));

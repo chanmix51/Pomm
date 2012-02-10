@@ -2,8 +2,7 @@
 namespace Pomm;
 use Pomm\Query\Where;
 
-include __DIR__.'/../Pomm/External/lime.php';
-include "autoload.php";
+require __DIR__."/init/bootstrap.php";
 
 class WhereTest extends \lime_test
 {

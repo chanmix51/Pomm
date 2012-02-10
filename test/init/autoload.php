@@ -57,7 +57,7 @@ function __autoload($name)
         if (strstr($lib, sprintf('/%s.php', $class_name)))
         {
             printf("Loading class '%s' in '%s'\n", $class_name, $lib);
-            require(__DIR__."/../".$lib);
+            require(__DIR__."/../../".$lib);
 
             return;
         }

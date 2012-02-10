@@ -8,9 +8,7 @@ use Pomm\Connection\Database;
 use Pomm\External\Toolkit;
 use Pomm\External\sfInflector;
 
-include __DIR__.'/../Pomm/External/lime.php';
-include "autoload.php";
-$service = include "bootstrap.php";
+$service = require __DIR__."/init/bootstrap.php";
 
 class my_test extends \lime_test
 {

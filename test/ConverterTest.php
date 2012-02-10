@@ -2,9 +2,7 @@
 
 namespace Pomm\Test;
 
-include __DIR__.'/../Pomm/External/lime.php';
-include "autoload.php";
-$service = include "bootstrap.php";
+$service = require __DIR__."/init/bootstrap.php";
 
 use Pomm\Service;
 use Pomm\Connection\Database;
