@@ -137,6 +137,14 @@ If your database has a lot of custom types, it is a better idea to create your o
 
 This way, converters will be automatically registered at instantiation.
 
+In case your database uses *DOMAIN* types you can add them to an already registered converter. The *registerTypeForConverter* method stands for that.::
+
+    $service->getDatabase('default')
+      ->registerTypeForConverter('email', 'String');
+      ;
+
+In the example above, the database contains a domain *email* which is a subtype of *VARCHAR* so it is associated with the built-in converter *String*.
+
 Entity converter
 ================
 

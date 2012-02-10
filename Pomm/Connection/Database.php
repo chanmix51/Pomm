@@ -193,6 +193,20 @@ class Database
     }
 
     /**
+     * registerTypeForConverter
+     *
+     * Associate an existing converter with a Pg type.
+     * This is useful for DOMAINs.
+     *
+     * @param String type
+     * @param String converter_name
+     **/
+    public function registerTypeForConverter($type, $converter_name)
+    {
+        $this->converters[$converter_name]['types'][] = $type;
+    }
+
+    /**
      * getParameterHolder
      *
      * Returns the parameter holder

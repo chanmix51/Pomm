@@ -495,6 +495,12 @@ $service-&gt;getDatabase()
 }
 </pre>
 <p>This way, converters will be automatically registered at instantiation.</p>
+<p>In case your database uses <em>DOMAIN</em> types you can add them to an already registered converter. The <em>registerTypeForConverter</em> method stands for that.:</p>
+<pre class="literal-block">$service-&gt;getDatabase('default')
+  -&gt;registerTypeForConverter('email', 'String');
+  ;
+</pre>
+<p>In the example above, the database contains a domain <em>email</em> which is a subtype of <em>VARCHAR</em> so it is associated with the built-in converter <em>String</em>.</p>
 </div>
 <div class="section" id="entity-converter">
 <h2><a class="toc-backref" href="#id6">Entity converter</a></h2>
