@@ -33,6 +33,7 @@ class BaseObjectMapTest extends \lime_test
     public function __destruct()
     {
         $this->map->dropTable();
+        parent::__destruct();
     }
 
     public function resetObjects()
@@ -278,7 +279,7 @@ $test->initialize($service)
     ->commit()
     ->testInTransaction(false)
     ->testFindWhere(1)
+    ->__destruct()
     ;
 
-$test->__destruct();
 unset($test);
