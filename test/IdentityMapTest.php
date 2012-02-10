@@ -1,7 +1,11 @@
 <?php
 
-$service = require __DIR__."/init/bootstrap.php";
-require "PommBench.php";
+if (!isset($service))
+{
+    $service = require __DIR__."/init/bootstrap.php";
+}
+
+require_once "PommBench.php";
 
 use Pomm\Service;
 use Pomm\Connection\Database;
@@ -25,6 +29,12 @@ class IdentityMapTest extends \lime_test
         return $this;
     }
 
+    public function __destruct()
+    {
+        $this->map->dropTable();
+        parent::__destruct();
+    }
+
     public function setMapper(IdentityMapperInterface $mapper, $nopk = false)
     {
         $this->map = $this->service->getDatabase()->createConnection($mapper)->getMapFor('Bench\PommBench');
@@ -41,12 +51,6 @@ class IdentityMapTest extends \lime_test
 
 
         return $this;
-    }
-
-    public function __destruct()
-    {
-        $this->map->dropTable();
-        parent::__destruct();
     }
 
     public function testCreateObject($same = true)
@@ -128,3 +132,6 @@ $test
     ->testCreateObject(false)
     ->testDelete(false)
     ;
+
+$test->__destruct();
+unset($test);

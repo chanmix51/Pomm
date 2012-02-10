@@ -9,11 +9,12 @@ use Pomm\Object\Collection;
 use Pomm\Query\Where;
 use Pomm\Exception\Exception;
 
-include __DIR__.'/../Pomm/External/lime.php';
-include "autoload.php";
-$service = include "bootstrap.php";
+if (!isset($service))
+{
+    $service = require __DIR__."/init/bootstrap.php";
+}
 
-class my_test extends \lime_test
+class BaseObjectMapTest extends \lime_test
 {
     protected $map;
     protected $obj;
@@ -243,7 +244,7 @@ class my_test extends \lime_test
     }
 }
 
-$test = new my_test();
+$test = new BaseObjectMapTest();
 
 $test->initialize($service)
     ->testCreate()
@@ -278,3 +279,6 @@ $test->initialize($service)
     ->testInTransaction(false)
     ->testFindWhere(1)
     ;
+
+$test->__destruct();
+unset($test);

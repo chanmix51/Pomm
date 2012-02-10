@@ -2,7 +2,10 @@
 namespace Pomm;
 use Pomm\Query\Where;
 
-require __DIR__."/init/bootstrap.php";
+if (!isset($service))
+{
+    require __DIR__."/init/bootstrap.php";
+}
 
 class WhereTest extends \lime_test
 {
@@ -128,7 +131,10 @@ class WhereTest extends \lime_test
 
 }
 
-$my_test = new WhereTest();
-$my_test->testParse()
+$test = new WhereTest();
+$test->testParse()
     ->testGetValues()
     ;
+
+$test->__destruct();
+unset($test);

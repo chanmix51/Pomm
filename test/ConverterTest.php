@@ -2,7 +2,10 @@
 
 namespace Pomm\Test;
 
-$service = require __DIR__."/init/bootstrap.php";
+if (!isset($service))
+{
+    $service = require __DIR__."/init/bootstrap.php";
+}
 
 use Pomm\Service;
 use Pomm\Connection\Database;
@@ -240,3 +243,6 @@ $test
     ->testInterval(\DateInterval::createFromDateString('1 years 8 months 30 days 14 hours 25 minutes 7 seconds'))
     ->testXml('<pika data="chu">plop</pika>')
     ;
+
+$test->__destruct();
+unset($test);

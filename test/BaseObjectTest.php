@@ -8,9 +8,12 @@ use Pomm\Connection\Database;
 use Pomm\External\Toolkit;
 use Pomm\External\sfInflector;
 
-$service = require __DIR__."/init/bootstrap.php";
+if (!isset($service)) 
+{
+    $service = require __DIR__."/init/bootstrap.php";
+}
 
-class my_test extends \lime_test
+class BaseObjectTest extends \lime_test
 {
     protected $map;
     protected $transaction;
@@ -152,8 +155,8 @@ class my_test extends \lime_test
 }
 
 $test_values = array('title' => 'modified title', 'authors' => array('plop1', 'plop2'));
-$my_test = new my_test();
-$my_test
+$test = new BaseObjectTest();
+$test
     ->initialize($service)
     ->create()
     ->testStatus(BaseObject::NONE)
@@ -173,3 +176,6 @@ $my_test
     ->testHas('title_and_authors', false, true)
     ;
 
+
+$test->__destruct();
+unset($test);

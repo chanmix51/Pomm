@@ -1,7 +1,11 @@
 <?php
 
-$service = require __DIR__."/init/bootstrap.php";
-require "PommBench.php";
+if (!isset($service))
+{
+    $service = require __DIR__."/init/bootstrap.php";
+}
+
+require_once "PommBench.php";
 
 use Pomm\Service;
 use Pomm\Connection\Database;
@@ -35,8 +39,8 @@ class PagerTest extends \lime_test
     public function testPaginateQuery()
     {
         $this->diag('BaseObjectMap::paginateQuery()');
-        $sql = "SELECT id FROM pomm_bench";
-        $sql_count = "SELECT count(id) FROM pomm_bench";
+        $sql = sprintf("SELECT id FROM %s", $this->map->getTableName());
+        $sql_count = sprintf("SELECT count(id) FROM %s", $this->map->getTableName());
 
         $pager = $this->map->paginateQuery($sql, $sql_count, array(), 100, 3);
         $this->isa_ok($pager, 'Pomm\Object\Pager', 'pager is a Pager instance.');
@@ -140,5 +144,8 @@ $test
     ->initialize($service)
     ->testPaginateQuery()
     ->testPaginateFindWhere()
-    ->testLogger();
+    ->testLogger()
     ;
+
+$test->__destruct();
+unset($test);
