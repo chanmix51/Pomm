@@ -252,7 +252,7 @@ $binary = file_get_contents('https://twimg0-a.akamaihd.net/profile_images/158341
 
 $test
     ->initialize($service)
-    ->testBasics(array('created_at' => new \DateTime(), 'something' => 'plop', 'is_true' => false, 'precision' => 0.123456789, 'probed_data' => 4.3210, 'binary_data' => $binary, 'ft_search' => "'academi':1 'battl':15 'canadian':20 'dinosaur':2 'drama':5 'epic':4 'feminist':8 'mad':11 'must':14 'rocki':21 'scientist':12 'teacher':17"), array('id' => 1, 'created_at' => new \DateTime(), 'something' => 'plop', 'is_true' => false, 'precision' => 0.123456789, 'probed_data' => 4.321, 'binary_data' => $binary, 'ft_search' => "'academi':1 'battl':15 'canadian':20 'dinosaur':2 'drama':5 'epic':4 'feminist':8 'mad':11 'must':14 'rocki':21 'scientist':12 'teacher':17"))
+    ->testBasics(array('created_at' => new \DateTime(), 'something' => 'plop', 'is_true' => false, 'precision' => 0.123456789, 'probed_data' => 04.3210, 'binary_data' => $binary, 'ft_search' => "'academi':1 'battl':15 'canadian':20 'dinosaur':2 'drama':5 'epic':4 'feminist':8 'mad':11 'must':14 'rocki':21 'scientist':12 'teacher':17"), array('id' => 1, 'created_at' => new \DateTime(), 'something' => 'plop', 'is_true' => false, 'precision' => 0.123456789, 'probed_data' => 4.321, 'binary_data' => $binary, 'ft_search' => "'academi':1 'battl':15 'canadian':20 'dinosaur':2 'drama':5 'epic':4 'feminist':8 'mad':11 'must':14 'rocki':21 'scientist':12 'teacher':17"))
     ->testPoint(new Type\Point(0,0))
     ->testPoint(new Type\Point(47.123456,-0.654321))
     ->testLseg(new Type\Segment(new Type\Point(1,1), new Type\Point(2,2)))

@@ -23,13 +23,13 @@ class PgBytea implements ConverterInterface
      * @param String the binary sting to be escaped
      * @return String binary string
      **/
-    protected function escByteA($string)
+    protected function escByteA($data)
     {
         $search = array(chr(92), chr(0), chr(39)); 
         $replace = array('\\\134', '\\\000', '\\\047'); 
-        $binData = str_replace($search, $replace, $binData); 
+        $data = str_replace($search, $replace, $data); 
 
-        return $binData;
+        return $data;
     }
 
     /**
