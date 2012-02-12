@@ -36,7 +36,8 @@ class PommBenchMap extends BaseObjectMap
 
     public function dropTable()
     {
-        $sql = sprintf("DROP SCHEMA %s CASCADE;", reset(preg_split('/\./', $this->object_name)));
+        $objects = preg_split('/\./', $this->object_name);
+        $sql = sprintf("DROP SCHEMA %s CASCADE;", reset($objects));
         $this->connection->getDatabase()->executeAnonymousQuery($sql);
     }
 
