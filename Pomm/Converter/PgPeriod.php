@@ -3,10 +3,10 @@
 namespace Pomm\Converter;
 
 use Pomm\Converter\ConverterInterface;
-use Pomm\Type\Point;
+use Pomm\Type\Period;
 
 /**
- * Pomm\Converter\PgPoint - Geometric Point converter
+ * Pomm\Converter\PgPeriod - Period converter
  * 
  * @package Pomm
  * @version $id$
@@ -14,16 +14,16 @@ use Pomm\Type\Point;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class PgPoint implements ConverterInterface
+class PgPeriod implements ConverterInterface
 {
     protected $class_name;
 
     /**
      * __construct() - Converter constuctor
      *
-     * @param String the fully qualified Point type class name
+     * @param String the fully qualified Period type class name
      **/
-    public function __construct($class_name = 'Pomm\Type\Point')
+    public function __construct($class_name = 'Pomm\Type\Period')
     {
         $this->class_name = $class_name;
     }
@@ -33,10 +33,9 @@ class PgPoint implements ConverterInterface
      **/
     public function fromPg($data)
     {
-        $data = trim($data, "()");
-        $values = preg_split("/,/", $data);
+        preg_match('/\[([^,]+), ([^,]+)\)/', $data, $matchs);
 
-        return new $this->class_name($values[0], $values[1]);
+        return new $this->class_name(new \DateTime($matchs[1]), new \DateTime($matchs[2]));
     }
 
     /**
@@ -55,9 +54,12 @@ class PgPoint implements ConverterInterface
                 $type = get_class($data);
             }
 
-            throw new Exception(sprintf("Converter PgPoint needs data to be an instance of Pomm\\Type\\Point ('%s' given).", $type));
+            throw new Exception(sprintf("Converter PgPeriod needs data to be an instance of Pomm\\Type\\Period ('%s' given).", $type));
         }
 
-        return sprintf("point(%f, %f)", $data->x, $data->y);
+        return sprintf("period('%s', '%s')",
+            $data->start->format("Y-m-d H:i:s.u"),
+            $data->end->format("Y-m-d H:i:s.u")
+        );
     }
 }

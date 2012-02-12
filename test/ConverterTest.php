@@ -226,6 +226,25 @@ class converter_test extends \lime_test
 
         return $this;
     }
+
+    public function testPeriod($date_start, $date_end)
+    {
+        $this->info('\\Pomm\\Converter\\PgPeriod');
+        if (!$this->map->hasField('test_period'))
+        {
+            $this->info('Creating column test_period.');
+            $this->map->addPeriod();
+        }
+
+        $period = new \Pomm\Type\Period(new \DateTime($date_start), new \DateTime($date_end));
+        $this->object['test_period'] = $period;
+        $this->map->updateOne($this->object, array('test_period'));
+        $object = $this->map->findByPk($this->object->get($this->map->getPrimaryKey()));
+
+        $this->ok($object['test_period'] instanceof \Pomm\Type\Period, '"test_period" is a "period" type.');
+        $this->is($this->object['test_period']->start->format('Y-m-d H:i:s'), $object['test_period']->start->format('Y-m-d H:i:s'), "Start dates are the same.");
+        $this->is($this->object['test_period']->end->format('Y-m-d H:i:s'), $object['test_period']->end->format('Y-m-d H:i:s'), "end dates are the same.");
+    }
 }
 
 $test = new converter_test();
@@ -242,6 +261,7 @@ $test
     ->testCircle(new Type\Circle(new Type\Point(1,2), 3))
     ->testInterval(\DateInterval::createFromDateString('1 years 8 months 30 days 14 hours 25 minutes 7 seconds'))
     ->testXml('<pika data="chu">plop</pika>')
+    ->testPeriod('2012-01-01 12:30:00', '2012-02-01 12:30:00')
     ;
 
 $test->__destruct();

@@ -87,7 +87,8 @@ class TestConverterMap extends BaseObjectMap
         try
         {
             $this->connection->begin();
-            $sql = sprintf("CREATE SCHEMA %s", reset(preg_split('/\./', $this->object_name)));
+            $objects = preg_split('/\./', $this->object_name);
+            $sql = sprintf("CREATE SCHEMA %s", reset($objects));
             $this->connection->getDatabase()->executeAnonymousQuery($sql);
 
             $sql = sprintf("CREATE TABLE %s (id SERIAL PRIMARY KEY, created_at TIMESTAMP NOT NULL DEFAULT now(), something VARCHAR, is_true BOOLEAN, precision FLOAT, probed_data NUMERIC(4,3), binary_data BYTEA, ft_search tsvector)", $this->object_name);
@@ -103,7 +104,8 @@ class TestConverterMap extends BaseObjectMap
 
     public function dropTable()
     {
-        $sql = sprintf("DROP SCHEMA %s CASCADE", reset(preg_split('/\./', $this->object_name)));
+        $objects = preg_split('/\./', $this->object_name);
+        $sql = sprintf("DROP SCHEMA %s CASCADE", reset($objects));
         $this->connection->getDatabase()->executeAnonymousQuery($sql);
     }
 
@@ -146,6 +148,13 @@ class TestConverterMap extends BaseObjectMap
     {
         $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_xml xml", $this->object_name));
         $this->addField('test_xml', 'String');
+    }
+
+    public function addPeriod()
+    {
+        $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_period period", $this->object_name));
+        $this->connection->getDatabase()->registerConverter('Period', new Converter\PgPeriod(), array('period'));
+        $this->addField('test_period', 'Period');
     }
 }
 
