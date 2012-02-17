@@ -79,6 +79,7 @@ class TestConverterMap extends BaseObjectMap
             'probed_data'      => 'Number',
             'binary_data'      => 'Binary',
             'ft_search'        => 'String',
+            'times'            => 'Timestamp[]',
         );
         $this->pk_fields    = array('id');
     }
@@ -92,7 +93,7 @@ class TestConverterMap extends BaseObjectMap
             $sql = sprintf("CREATE SCHEMA %s", reset($objects));
             $this->connection->getDatabase()->executeAnonymousQuery($sql);
 
-            $sql = sprintf("CREATE TABLE %s (id SERIAL PRIMARY KEY, created_at TIMESTAMP NOT NULL DEFAULT now(), something VARCHAR, is_true BOOLEAN, precision FLOAT, probed_data NUMERIC(4,3), binary_data BYTEA, ft_search tsvector)", $this->object_name);
+            $sql = sprintf("CREATE TABLE %s (id SERIAL PRIMARY KEY, created_at TIMESTAMP NOT NULL DEFAULT now(), something VARCHAR, is_true BOOLEAN, precision FLOAT, probed_data NUMERIC(4,3), binary_data BYTEA, ft_search tsvector, times TIMESTAMP[])", $this->object_name);
             $this->connection->getDatabase()->executeAnonymousQuery($sql);
             $this->connection->commit();
         }
