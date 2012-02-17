@@ -307,7 +307,7 @@ abstract class BaseObjectMap
                 continue;
             }
 
-            if (preg_match('/([a-z]+)(\[\])?/i', $converter_name, $matchs))
+            if (preg_match('/([a-z0-9]+)(\[\])?/i', $converter_name, $matchs))
             {
                 if (count($matchs) <= 2)
                 {
