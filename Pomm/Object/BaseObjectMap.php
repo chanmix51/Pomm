@@ -23,6 +23,7 @@ abstract class BaseObjectMap
     protected $object_class;
     protected $object_name;
     protected $field_definitions = array();
+    protected $virtual_fields = array();
     protected $pk_fields = array();
 
     /**
@@ -56,6 +57,20 @@ abstract class BaseObjectMap
         }
 
         $this->field_definitions[$name] = $type;
+    }
+
+    /**
+     * addVirtualField 
+     * Add a new virtial field definition
+     *
+     * @param string $name 
+     * @param string $type 
+     * @access protected
+     * @return void
+     */
+    protected function addVirtualField($name, $type)
+    {
+        $this->virtual_fields[$name] = $type;
     }
 
     /**
@@ -296,6 +311,11 @@ abstract class BaseObjectMap
             if (is_null($value)) continue;
 
             $converter_name = array_key_exists($name, $this->field_definitions) ? $this->field_definitions[$name] : null;
+
+            if (is_null($converter_name))
+            {
+                $converter_name = array_key_exists($name, $this->virtual_fields) ? $this->virtual_fields[$name] : null;
+            }
 
             if (is_null($converter_name))
             {
