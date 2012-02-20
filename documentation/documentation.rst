@@ -145,22 +145,6 @@ In case your database uses *DOMAIN* types you can add them to an already registe
 
 In the example above, the database contains a domain *email* which is a subtype of *VARCHAR* so it is associated with the built-in converter *String*.
 
-Entity converter
-================
-
-A nice feature of postgresql when you create a table is a type with the same name as the table is created according to the table structure. Hence, it is possible to use that data type in other tables. Pomm proposes a special converter to do so: the *PgEntity* converter. Passing the table data type name and the associated entity class name will grant you with embedded entities.
-
-::
-
-  class MyDatabase extends Pomm\Connection\Database
-  {
-    protected function initialize()
-    {
-      parent::initialize();
-      $this->registerConverter('MyEntity', new Pomm\Converter\PgEntity($this, 'Model\Pomm\Entity\Schema\MyEntity'), array('my_entity'));
-    }
-  }
-
 Converters and types
 ====================
 
@@ -229,7 +213,23 @@ Here, we can see the very good side of this method: we can implement a *getPower
       }
   }
 
-Of course you can hardcode the class to be returned by the converter but it prevents others to extends your type.
+Of course you can hardcode the class to be returned by the converter but it prevents others from extending your type.
+
+Entity converter
+================
+
+In Postgresql, creating a table means creating a new type with the table's fields definition. Hence, it is possible to use that data type in other tables. Pomm proposes a special converter to do so: the ``PgEntity`` converter. Passing the table data type name and the associated entity class name will grant you with embedded entities.
+
+::
+
+  class MyDatabase extends Pomm\Connection\Database
+  {
+    protected function initialize()
+    {
+      parent::initialize();
+      $this->registerConverter('MyEntity', new Pomm\Converter\PgEntity($this, 'Model\Pomm\Entity\Schema\MyEntity'), array('my_entity'));
+    }
+  }
 
 Map classes
 -----------
@@ -454,14 +454,57 @@ It is also possible to reduce a model, stripping by example a *password* field o
  * getSelectFields($alias) 
  * getGroupByFields($alias)
  * getFields() // used by both getSelectFields and getGroupByFields
- * getRemoteSelectFields($alias) // uses getSelectFields()
 
-*getRemoteSelectFields()* is a bit special as it returns the same fields as *getSelectFields()* but it aliases the results like the following::
+Virtual Fields
+==============
 
-  print join(', ', $author_map->getRemoteSelectFields('a'));
-  // a.id AS "author{id}, a.first_name AS "author{first_name}, ...
+As soon as tables have their own data type, they can be considered as plain objects and fetched as is::
 
-It is intended for use with the collection filters explained below.
+    SELECT author FROM author;
+    |      author       |
+    +-------------------+
+    | "(1,'john doe')"  |
+    +-------------------+
+    | "(2,'Edgar')"     |
+    +-------------------+
+
+Pomm takes advantage of this feature in using *Virtual Fields*. You can add fields to your select queries and tie them with a converter. If this converter is an entity converter the Pomm model instance will be fetched directly from the query. The example below create a relationship between the author and the post tables getting all the posts from one author in an array of Post instances::
+
+    // YourDb\SchemaName\AuthorMap
+
+    public function getOneWithPosts($author_name)
+    {
+        $remote_map = $this->connection->getMapFor('YourDb\SchemaName\Post');
+
+        $sql = <<<_
+        SELECT 
+          %s,
+          array_agg(post) AS posts
+        FROM 
+          %s 
+            LEFT JOIN %s ON 
+                author.id = post.author_id 
+        WHERE
+            author.name ILIKE ?
+        GROUP BY 
+          %s
+        _;
+
+        $sql = sprintf($sql, 
+            join(', ', $this->getSelectFields('author')), 
+            $this->getTableName('author'), 
+            $remote_map->getTableName('post'),
+            $this->getGroupByFields('author')
+            );
+
+        $this->addVirtualField('posts', 'Post[]');
+
+        return $this->query($sql, array(sprintf('%%%s%%', $author_name)));
+    }
+
+In this example we assume the ``Post`` converter has already been registered in the database.
+
+
 
 Collections
 ===========
@@ -495,42 +538,7 @@ Collections have other handful methods like:
  * *isEven()*
  * *getOddEven()*
 
-Pomm's *Collection* class can register filters. Filters are just functions that are executed after values were fetched from the database and before the object is hydrated with values. These filters take the array of fetched values as parameter. They return an array with the values. After all filters are being executed, the values are used to hydrate the Object instance related the the Map instance the Collection comes from. This is very convenient to create pseudo relationship between objects:
-
-::
-
-  # This filter triggers the *createFromForeign* method of the *AuthorMap*
-  # class. It takes all the fields named *author{%s}* to hydrate a *Author*
-  # object and set it in the values.
-  # SELECT
-  #   article.id,
-  #   article.title,
-  #   ...
-  #   author.id AS "author{id}",
-  #   author.name AS "author{name}",
-  #   ...
-  # FROM
-  #   schema.article article
-  #     JOIN schema.author author ON article.author_id = author.id
-  # WHERE
-  #     article.id = ?
-  #
-  # ArticleMap.php
-
-  $author_map = $this->connection->getMapFor('Author');
-  $sql = sprintf("SELECT %s FROM %s JOIN %s ON article.author_id = author.id WHERE article.id = ?",
-    join(', ', array_merge($this->getSelectFields('article'), $author_map->getRemoteSelectFields('author'))),
-    $this->getTableName('article'),
-    $author_map->getTableName('author')
-    );
-
-  $collection = $this->query($sql, $id);
-  $collection->registerFilter(function($values) use ($author_map) { return $author_map->createFromForeign($values); });
-
-  foreach($collection as $article)
-  {
-    printf("%s wrote the article '%s'.", $article->getAuthor()->getName(), $article->getTitle());
-  }
+Pomm's *Collection* class can register filters. Filters are just functions that are executed after values were fetched from the database and before the object is hydrated with values. These filters take the array of fetched values as parameter. They return an array with the values. After all filters are being executed, the values are used to hydrate the Object instance related the the Map instance the Collection comes from. 
 
 Pagers
 ======
