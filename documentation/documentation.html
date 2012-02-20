@@ -313,8 +313,8 @@ ul.auto-toc {
 <li><a class="reference internal" href="#dealing-with-databases" id="id3">Dealing with databases</a><ul>
 <li><a class="reference internal" href="#service-the-database-provider" id="id4">Service: the database provider</a></li>
 <li><a class="reference internal" href="#database-and-converters" id="id5">Database and converters</a></li>
-<li><a class="reference internal" href="#entity-converter" id="id6">Entity converter</a></li>
-<li><a class="reference internal" href="#converters-and-types" id="id7">Converters and types</a></li>
+<li><a class="reference internal" href="#converters-and-types" id="id6">Converters and types</a></li>
+<li><a class="reference internal" href="#entity-converter" id="id7">Entity converter</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#map-classes" id="id8">Map classes</a><ul>
@@ -327,26 +327,27 @@ ul.auto-toc {
 <li><a class="reference internal" href="#conditions-the-where-clause" id="id13">Conditions: the Where clause</a></li>
 <li><a class="reference internal" href="#custom-queries" id="id14">Custom queries</a></li>
 <li><a class="reference internal" href="#extending-the-model" id="id15">Extending the model</a></li>
-<li><a class="reference internal" href="#collections" id="id16">Collections</a></li>
-<li><a class="reference internal" href="#pagers" id="id17">Pagers</a></li>
+<li><a class="reference internal" href="#virtual-fields" id="id16">Virtual Fields</a></li>
+<li><a class="reference internal" href="#collections" id="id17">Collections</a></li>
+<li><a class="reference internal" href="#pagers" id="id18">Pagers</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#entities" id="id18">Entities</a><ul>
-<li><a class="reference internal" href="#accessors" id="id19">Accessors</a></li>
-<li><a class="reference internal" href="#life-cycle" id="id20">Life cycle</a></li>
-<li><a class="reference internal" href="#hydrate-and-convert" id="id21">Hydrate and convert</a></li>
+<li><a class="reference internal" href="#entities" id="id19">Entities</a><ul>
+<li><a class="reference internal" href="#accessors" id="id20">Accessors</a></li>
+<li><a class="reference internal" href="#life-cycle" id="id21">Life cycle</a></li>
+<li><a class="reference internal" href="#hydrate-and-convert" id="id22">Hydrate and convert</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#connections" id="id22">Connections</a><ul>
-<li><a class="reference internal" href="#map-instances-provider" id="id23">Map Instances provider</a></li>
-<li><a class="reference internal" href="#identity-mappers" id="id24">Identity mappers</a></li>
-<li><a class="reference internal" href="#transactions" id="id25">Transactions</a></li>
-<li><a class="reference internal" href="#query-filter-chain" id="id26">Query filter chain</a></li>
+<li><a class="reference internal" href="#connections" id="id23">Connections</a><ul>
+<li><a class="reference internal" href="#map-instances-provider" id="id24">Map Instances provider</a></li>
+<li><a class="reference internal" href="#identity-mappers" id="id25">Identity mappers</a></li>
+<li><a class="reference internal" href="#transactions" id="id26">Transactions</a></li>
+<li><a class="reference internal" href="#query-filter-chain" id="id27">Query filter chain</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#tools" id="id27">Tools</a><ul>
-<li><a class="reference internal" href="#php-tools" id="id28">PHP tools</a></li>
-<li><a class="reference internal" href="#database-tools" id="id29">Database tools</a></li>
+<li><a class="reference internal" href="#tools" id="id28">Tools</a><ul>
+<li><a class="reference internal" href="#php-tools" id="id29">PHP tools</a></li>
+<li><a class="reference internal" href="#database-tools" id="id30">Database tools</a></li>
 </ul>
 </li>
 </ul>
@@ -502,21 +503,8 @@ $service-&gt;getDatabase()
 </pre>
 <p>In the example above, the database contains a domain <em>email</em> which is a subtype of <em>VARCHAR</em> so it is associated with the built-in converter <em>String</em>.</p>
 </div>
-<div class="section" id="entity-converter">
-<h2><a class="toc-backref" href="#id6">Entity converter</a></h2>
-<p>A nice feature of postgresql when you create a table is a type with the same name as the table is created according to the table structure. Hence, it is possible to use that data type in other tables. Pomm proposes a special converter to do so: the <em>PgEntity</em> converter. Passing the table data type name and the associated entity class name will grant you with embedded entities.</p>
-<pre class="literal-block">class MyDatabase extends Pomm\Connection\Database
-{
-  protected function initialize()
-  {
-    parent::initialize();
-    $this-&gt;registerConverter('MyEntity', new Pomm\Converter\PgEntity($this, 'Model\Pomm\Entity\Schema\MyEntity'), array('my_entity'));
-  }
-}
-</pre>
-</div>
 <div class="section" id="converters-and-types">
-<h2><a class="toc-backref" href="#id7">Converters and types</a></h2>
+<h2><a class="toc-backref" href="#id6">Converters and types</a></h2>
 <p>Composite types are particularly useful to store complex set of data. In fact, with Postgresql, defining a table automatically defines the according type. Hydrating type instances with postgresql values are the work of your custom converters. Let's take an example: electrical transformers windings. A transformer winding is defined by the voltage it is supposed to have and the maximum current it can stands. A transformer have two or more windings so if we define a type WindingPower we will be able to store an array of windings in our transformer table:</p>
 <pre class="literal-block">-- SQL
 CREATE TYPE winding_power AS (
@@ -577,7 +565,20 @@ class WindingPower implements ConverterInterface
     }
 }
 </pre>
-<p>Of course you can hardcode the class to be returned by the converter but it prevents others to extends your type.</p>
+<p>Of course you can hardcode the class to be returned by the converter but it prevents others from extending your type.</p>
+</div>
+<div class="section" id="entity-converter">
+<h2><a class="toc-backref" href="#id7">Entity converter</a></h2>
+<p>In Postgresql, creating a table means creating a new type with the table's fields definition. Hence, it is possible to use that data type in other tables. Pomm proposes a special converter to do so: the <tt class="docutils literal">PgEntity</tt> converter. Passing the table data type name and the associated entity class name will grant you with embedded entities.</p>
+<pre class="literal-block">class MyDatabase extends Pomm\Connection\Database
+{
+  protected function initialize()
+  {
+    parent::initialize();
+    $this-&gt;registerConverter('MyEntity', new Pomm\Converter\PgEntity($this, 'Model\Pomm\Entity\Schema\MyEntity'), array('my_entity'));
+  }
+}
+</pre>
 </div>
 </div>
 <div class="section" id="map-classes">
@@ -803,18 +804,58 @@ public function getBlogPostsWithCommentCount(Pomm\Query\Where $where)
 <li>getSelectFields($alias)</li>
 <li>getGroupByFields($alias)</li>
 <li>getFields() // used by both getSelectFields and getGroupByFields</li>
-<li>getRemoteSelectFields($alias) // uses getSelectFields()</li>
 </ul>
 </dd>
 </dl>
-<p><em>getRemoteSelectFields()</em> is a bit special as it returns the same fields as <em>getSelectFields()</em> but it aliases the results like the following:</p>
-<pre class="literal-block">print join(', ', $author_map-&gt;getRemoteSelectFields('a'));
-// a.id AS "author{id}, a.first_name AS "author{first_name}, ...
+</div>
+<div class="section" id="virtual-fields">
+<h2><a class="toc-backref" href="#id16">Virtual Fields</a></h2>
+<p>As soon as tables have their own data type, they can be considered as plain objects and fetched as is:</p>
+<pre class="literal-block">SELECT author FROM author;
+|      author       |
++-------------------+
+| "(1,'john doe')"  |
++-------------------+
+| "(2,'Edgar')"     |
++-------------------+
 </pre>
-<p>It is intended for use with the collection filters explained below.</p>
+<p>Pomm takes advantage of this feature in using <em>Virtual Fields</em>. You can add fields to your select queries and tie them with a converter. If this converter is an entity converter the Pomm model instance will be fetched directly from the query. The example below create a relationship between the author and the post tables getting all the posts from one author in an array of Post instances:</p>
+<pre class="literal-block">// YourDb\SchemaName\AuthorMap
+
+public function getOneWithPosts($author_name)
+{
+    $remote_map = $this-&gt;connection-&gt;getMapFor('YourDb\SchemaName\Post');
+
+    $sql = &lt;&lt;&lt;_
+    SELECT
+      %s,
+      array_agg(post) AS posts
+    FROM
+      %s
+        LEFT JOIN %s ON
+            author.id = post.author_id
+    WHERE
+        author.name ILIKE ?
+    GROUP BY
+      %s
+    _;
+
+    $sql = sprintf($sql,
+        join(', ', $this-&gt;getSelectFields('author')),
+        $this-&gt;getTableName('author'),
+        $remote_map-&gt;getTableName('post'),
+        $this-&gt;getGroupByFields('author')
+        );
+
+    $this-&gt;addVirtualField('posts', 'Post[]');
+
+    return $this-&gt;query($sql, array(sprintf('%%%s%%', $author_name)));
+}
+</pre>
+<p>In this example we assume the <tt class="docutils literal">Post</tt> converter has already been registered in the database.</p>
 </div>
 <div class="section" id="collections">
-<h2><a class="toc-backref" href="#id16">Collections</a></h2>
+<h2><a class="toc-backref" href="#id17">Collections</a></h2>
 <p>The <em>query</em> method return a <em>Collection</em> instance that holds the PDOStatement with the results. The <em>Collection</em> class implements the <em>Coutable</em> and <em>Iterator</em> interfaces so you can foreach on a Collection to retrieve the results:</p>
 <pre class="literal-block">printf("Your search returned '%d' results.", $collection-&gt;count());
 
@@ -842,43 +883,10 @@ $object = $collection-&gt;has($index) ?
 </ul>
 </dd>
 </dl>
-<p>Pomm's <em>Collection</em> class can register filters. Filters are just functions that are executed after values were fetched from the database and before the object is hydrated with values. These filters take the array of fetched values as parameter. They return an array with the values. After all filters are being executed, the values are used to hydrate the Object instance related the the Map instance the Collection comes from. This is very convenient to create pseudo relationship between objects:</p>
-<pre class="literal-block"># This filter triggers the *createFromForeign* method of the *AuthorMap*
-# class. It takes all the fields named *author{%s}* to hydrate a *Author*
-# object and set it in the values.
-# SELECT
-#   article.id,
-#   article.title,
-#   ...
-#   author.id AS "author{id}",
-#   author.name AS "author{name}",
-#   ...
-# FROM
-#   schema.article article
-#     JOIN schema.author author ON article.author_id = author.id
-# WHERE
-#     article.id = ?
-#
-# ArticleMap.php
-
-$author_map = $this-&gt;connection-&gt;getMapFor('Author');
-$sql = sprintf("SELECT %s FROM %s JOIN %s ON article.author_id = author.id WHERE article.id = ?",
-  join(', ', array_merge($this-&gt;getSelectFields('article'), $author_map-&gt;getRemoteSelectFields('author'))),
-  $this-&gt;getTableName('article'),
-  $author_map-&gt;getTableName('author')
-  );
-
-$collection = $this-&gt;query($sql, $id);
-$collection-&gt;registerFilter(function($values) use ($author_map) { return $author_map-&gt;createFromForeign($values); });
-
-foreach($collection as $article)
-{
-  printf("%s wrote the article '%s'.", $article-&gt;getAuthor()-&gt;getName(), $article-&gt;getTitle());
-}
-</pre>
+<p>Pomm's <em>Collection</em> class can register filters. Filters are just functions that are executed after values were fetched from the database and before the object is hydrated with values. These filters take the array of fetched values as parameter. They return an array with the values. After all filters are being executed, the values are used to hydrate the Object instance related the the Map instance the Collection comes from.</p>
 </div>
 <div class="section" id="pagers">
-<h2><a class="toc-backref" href="#id17">Pagers</a></h2>
+<h2><a class="toc-backref" href="#id18">Pagers</a></h2>
 <p><em>BaseObjectMap</em> instances provide 2 methods that will grant you with a <em>Pager</em> class. <em>paginateQuery()</em> and the handy <em>paginateFindWhere</em>. It adds the correct subset limitation at the end of you query. Of course, it assumes you do not specify any LIMIT nor OFFSET sql clauses in your query. Here is an example of how to use retrieve and use a <em>Pager</em>:</p>
 <pre class="literal-block"># In your controller
 # Retrieve femal students or aged under 19 sorted by score
@@ -913,9 +921,9 @@ Next
 </div>
 </div>
 <div class="section" id="entities">
-<h1><a class="toc-backref" href="#id18">Entities</a></h1>
+<h1><a class="toc-backref" href="#id19">Entities</a></h1>
 <div class="section" id="accessors">
-<h2><a class="toc-backref" href="#id19">Accessors</a></h2>
+<h2><a class="toc-backref" href="#id20">Accessors</a></h2>
 <p>Internally, all values are stored in an array. The methods <em>set()</em> and <em>get()</em> are the interface to this array:</p>
 <pre class="literal-block">$entity = $map-&gt;createObject()
 $entity-&gt;has('pika'); // false
@@ -968,7 +976,7 @@ $entity-&gt;get('pika');   // chu
 </pre>
 </div>
 <div class="section" id="life-cycle">
-<h2><a class="toc-backref" href="#id20">Life cycle</a></h2>
+<h2><a class="toc-backref" href="#id21">Life cycle</a></h2>
 <p>Entities are the end of the process, they are the data. Unlike Active Record where entities know how to manage themselves, with Pomm, entities are just data container that may embed processes.</p>
 <pre class="literal-block">$entity = new MyEntity();
 $entity-&gt;isNew();           // true
@@ -1006,14 +1014,14 @@ $entity-&gt;isModify();        // false
 <p>In the example above, you can see there are several ways to save data to the database. The first obvious one is <em>saveOne()</em>. Depending on the entity's status is performs an insert or an update on the right table. In the case the entity already exists, all the fields are systematically updated which can sometimes be a problem. If you wish to specifically tell Pomm to update only a subset of the entity, the <em>updateOne()</em> method is made for that. This method will save the data you want and will reload the object to reflect eventual changes triggered by the update. This means all other changes are discarded and replaced by the values from the database.</p>
 </div>
 <div class="section" id="hydrate-and-convert">
-<h2><a class="toc-backref" href="#id21">Hydrate and convert</a></h2>
+<h2><a class="toc-backref" href="#id22">Hydrate and convert</a></h2>
 <p>It may happen you need to create objects with data as array. <em>Pomm</em> uses this mechanism internally to hydrate the entities with database values. The <em>hydrate()</em> method takes an array and merge it with the entity's internal values. Be aware PHP associative arrays keys are case sensitive where postgresql's field names are not. If you need some sort of conversion the <em>convert()</em> method will help. You can overload the <em>convert()</em> method to create a more specific conversion (if you use web services data provider by example) but you cannot overload the <em>hydrate()</em> method.</p>
 </div>
 </div>
 <div class="section" id="connections">
-<h1><a class="toc-backref" href="#id22">Connections</a></h1>
+<h1><a class="toc-backref" href="#id23">Connections</a></h1>
 <div class="section" id="map-instances-provider">
-<h2><a class="toc-backref" href="#id23">Map Instances provider</a></h2>
+<h2><a class="toc-backref" href="#id24">Map Instances provider</a></h2>
 <dl class="docutils">
 <dt>As soon as you have a database instance, you can create new connections. This is done by using the <em>createConnection</em> method. Connections are the way to</dt>
 <dd><ul class="first last simple">
@@ -1028,7 +1036,7 @@ $entity-&gt;isModify();        // false
 </pre>
 </div>
 <div class="section" id="identity-mappers">
-<h2><a class="toc-backref" href="#id24">Identity mappers</a></h2>
+<h2><a class="toc-backref" href="#id25">Identity mappers</a></h2>
 <dl class="docutils">
 <dt>Connections are also the way to tell the map classes to use or not an <em>IdentityMapper</em>. An indentity mapper is an index kept by the connection and shared amongst the map instances. This index ensures that if an object is retrieved twice from the database, the same <em>Object</em> instance will be returned. This is a very powerful (and dangerous) feature. There are two ways to declare an identity mapper to your connections:</dt>
 <dd><ul class="first simple">
@@ -1056,7 +1064,7 @@ echo $student2-&gt;getName();    // plop
 <p>It is of course always possible to remove an instance from the mapper by calling the <em>removeInstance()</em>. You can create your own identity mapper, just make sure your class implement the <em>IdentityMapperInterface</em>. Be aware the mapper is called for each values fetched from the database so it has a real impact on performances.</p>
 </div>
 <div class="section" id="transactions">
-<h2><a class="toc-backref" href="#id25">Transactions</a></h2>
+<h2><a class="toc-backref" href="#id26">Transactions</a></h2>
 <p>By default, connections are in auto-commit mode which means every change in the database is commited on the fly. Connections offer the way to enter in a transaction mode:</p>
 <pre class="literal-block">$cnx = $service-&gt;getDatabase()
   -&gt;createConnection();
@@ -1113,7 +1121,7 @@ $cnx-&gt;commit();
 </pre>
 </div>
 <div class="section" id="query-filter-chain">
-<h2><a class="toc-backref" href="#id26">Query filter chain</a></h2>
+<h2><a class="toc-backref" href="#id27">Query filter chain</a></h2>
 <p>The Connection class also holds an the heart of Pomm's query system: the <em>QueryFilterChain</em>. The filter chain is an ordered stack of filters which can be executed. As the first filter is executed it can call the following filter. The code before the next filter call will be executed before and the code placed after will be run after.
 This mechanism aims at wrapping the query system with tools like loggers or event systems. It is also possible to bypass completely the query execution as long as you return a PDOStatement instance.</p>
 <pre class="literal-block">$database = new Pomm\Connection\Database(array('dsn' =&gt; 'pgsql://user/database'));
@@ -1158,9 +1166,9 @@ $logger-&gt;getLogs()
 </div>
 </div>
 <div class="section" id="tools">
-<h1><a class="toc-backref" href="#id27">Tools</a></h1>
+<h1><a class="toc-backref" href="#id28">Tools</a></h1>
 <div class="section" id="php-tools">
-<h2><a class="toc-backref" href="#id28">PHP tools</a></h2>
+<h2><a class="toc-backref" href="#id29">PHP tools</a></h2>
 <p>Pomm comes with <em>Tools</em> classes to assist the user in some common tasks. The most used tool is the <em>BaseMap</em> classes generation from database inspection. Here is a way you can use this tool to generate all the model files based on the database structure:</p>
 <pre class="literal-block">&lt;?php
 
@@ -1182,7 +1190,7 @@ $scan-&gt;execute();
 <p>This will parse the postgresql's schema named <em>transfo</em> to scan it for tables and views. Then it will generate automatically the <em>BaseMap</em> files with the class structure and if map files or entity files do not exist, will create them.</p>
 </div>
 <div class="section" id="database-tools">
-<h2><a class="toc-backref" href="#id29">Database tools</a></h2>
+<h2><a class="toc-backref" href="#id30">Database tools</a></h2>
 <p>Pomm comes with a handy set of SQL tools. These functions are coded with PlPgsql so need that language to be created in the database.</p>
 <dl class="docutils">
 <dt>is_email(varchar)</dt>
