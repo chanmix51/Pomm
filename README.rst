@@ -21,7 +21,7 @@ What does Pomm propose ?
 
 * Database introspection and model generation
 * Lazy hydration and on the fly type conversion
-* SQL queries, finders and pagers
+* SQL queries, virtual fields, finders and pagers
 * Collection, filters and query filters
 * A Where clause builder
 * Security and debuging tools
@@ -34,9 +34,9 @@ Lazy hydration and on the fly type conversion
 *********************************************
 `Queries <http://pomm.coolkeums.org/documentation/manual#custom-queries>`_ return `collections <http://pomm.coolkeums.org/documentation/manual#collections>`_ which are scrollable iterators on results. Fetched objects are hydrated on demand for minimal memory consumption and data are `converted <http://pomm.coolkeums.org/documentation/manual#database-and-converters>`_ from/to Postgresql. Boolean in Pg are boolean in PHP, `arrays <http://www.postgresql.org/docs/8.4/static/arrays.html>`_ in Pg are arrays in PHP, `geometric types <http://www.postgresql.org/docs/8.4/static/datatype-geometric.html>`_ are converted into geometric PHP objects. Of course this is extendible and custom database types can be converted into custom PHP classes. Almost all standard and geometric types are supported plus `period <http://temporal.projects.postgresql.org/reference.html>`_, `HStore <http://www.postgresql.org/docs/8.4/static/hstore.html>`_ and `ltree <http://www.postgresql.org/docs/8.4/static/ltree.html>`_ extensions.
 
-SQL queries, finders and pagers
-*******************************
-Of course 80% of the queries of a web applications are like ``SELECT * FROM my_table WHERE ...``  So there is a method for that. You can configure what you do want in the select fields in case you would like to add your classes extra properties. For the more complicated queries, SQL is the way to go. You can use all the awesome `operators <http://www.postgresql.org/docs/8.4/static/functions.html>`_, `full text search <http://www.postgresql.org/docs/8.4/static/textsearch.html>`_, `window functions <http://www.postgresql.org/docs/8.4/static/tutorial-window.html>`_, `CTEs and recursive queries <http://www.postgresql.org/docs/8.4/static/queries-with.html>`_, (add your preferred feature here).
+SQL queries, virtual fields, finders and pagers
+***********************************************
+Of course 80% of the queries of a web applications are like ``SELECT * FROM my_table WHERE ...``  So there is a method for that. You can configure what you do want in the select fields in case you would like to add your classes extra properties. You can even use them with the converter system with extra fields adding them as virtual fields. For the more complicated queries, SQL is the way to go. You can use all the awesome `operators <http://www.postgresql.org/docs/8.4/static/functions.html>`_, `full text search <http://www.postgresql.org/docs/8.4/static/textsearch.html>`_, `window functions <http://www.postgresql.org/docs/8.4/static/tutorial-window.html>`_, `CTEs and recursive queries <http://www.postgresql.org/docs/8.4/static/queries-with.html>`_, (add your preferred feature here).
 
 Collection filters and query filters
 ************************************
