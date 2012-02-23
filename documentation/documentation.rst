@@ -1,11 +1,12 @@
-------------------
+==================
 Pomm Documentation
-------------------
+==================
 
 .. contents::
 
+********
 Overview
---------
+********
 
 Pomm is a fast, lightweight, efficient model manager for Postgresql written in PHP. It can be seen as an enhanced object hydrator above PDO with the following features:
 
@@ -18,28 +19,15 @@ Pomm is a fast, lightweight, efficient model manager for Postgresql written in P
  * Pomm uses an identity mapper, fetching twice the same rows will return same instances.
  * You can register code to be executed before and/or after each query (logs, filters, event systems ...)
 
-Let's have an overview of Pomm's components:
-
-Service 
-  This class manages your *Database* connection pool. 
-Database
-  It can create one or several *Connection* which will allow dialog with the database server and manage transactions. 
-Connections
-  They will provide you with *Map Classes*. These classes are the central point of your work with *Pomm*. Connections also give you Postgresql's advanced transaction features.
-Map Classes
-  They are a link between your database and *Entity Classes*. They perform queries that return *Collection* of *Entity Classes* instances. 
-Entity Classes
-  These instances represent a set of data that can be persisted in the database. These data can be stored under different kind of *Type* which can be associated to a *Converter* to ensure correct representation in PHP.
-Collections
-  A collection holds a query result. You can iterate over it with a _foreach_ to fetch Entity instances but it proposes a lot more of handy methods. 
-Converter
-  By default, each database has the basic converters registered in order to convert native types from/to Postgresql/PHP. Some of them are optional and you can write your own for your custom database types.
-
-Dealing with databases
-----------------------
+************************
+Databases and converters
+************************
 
 Service: the database provider
 ==============================
+
+Database classe and isolation level
+-----------------------------------
 
 The *Service* class just stores your *Database* instances and provides convenient methods to create connections from them. There are several ways to declare databases to the service class. Either you use the constructor passing an array "name" => "connection parameters" or you can use the *setDatabase* method of the service class.::
 
@@ -67,87 +55,108 @@ The *Service* class just stores your *Database* instances and provides convenien
     )));
 
 The *setDatabase* method is used internally by the constructor. The parameters may be any of the following:
- * "dsn": a URL like string to connect the database. It is in the form pgsql://user:password@host:port/database_name (**mandatory**)
- * "class": The *Database* class to instantiate as a database. This class must extend Pomm\\Database as we will see below.
- * "isolation": transaction isolation level. Must be one of Pomm\\Connection\\Connection::ISOLATION_READ_COMMITTED, ISOLATION_READ_REPEATABLE or ISOLATION_SERIALIZABLE (default ISOLATION_READ_COMMITTED). Check your Postgresql version for the available levels. Starting from pg 9.1, what was called SERIALIZABLE is called READ_REPEATABLE and SERIALIZABLE is a race for the first transaction to COMMIT. Check the `documentation_` for details.
-
-`_documentation` http://www.postgresql.org/docs/9.1/static/transaction-iso.html
+ * ``dsn`` (mandatory): a URL like string to connect the database. It is in the form ``pgsql://user:password@host:port/database_name``
+ * ``class``: The *Database* class to instantiate as a database. This class must extend ``Pomm\Database`` as we will see below.
+ * ``isolation``: transaction isolation level. Must be one of ``Pomm\Connection\Connection::ISOLATION_READ_COMMITTED``, ``ISOLATION_READ_REPEATABLE`` or ``ISOLATION_SERIALIZABLE`` (default is ``ISOLATION_READ_COMMITTED``). Check your Postgresql version for the available levels. Starting from pg 9.1, what was called ``SERIALIZABLE`` is called ``READ_REPEATABLE`` and ``SERIALIZABLE`` is a race for the first transaction to COMMIT. Check the `postgresql documentation <http://www.postgresql.org/docs/9.1/static/transaction-iso.html>`_ for details.
 
 Once registered, you can retrieve the databases with their name by calling the *getDatabase* method passing the name as argument. If no name is given, the first declared *Database* will be returned.
+
+DSN
+---
 
 The **dsn** parameter format is important because it interacts with the server's access policy.
 
  * **socket connection**
- * *pgsql://user/database* Connect *user* to the db *database* without password through the Unix socket system. This is the DSN's shortest form.
- * *pgsql://user:pass/database* The same but with password.
- * *pgsql://user:pass@!/path/to/socket!/database* When the socket is not in the default directory, it is possible to specify it in the host part of the DSN. Note it is surrounded by '!' and there are NO ending /. Using the «!» as delimiter assumes there are no «!» in your socket's path. But you don't have «!» in your socket's path do you ?
- * *pgsql://user@!/path/to/socket!:port/database* Postgresql's listening socket name are the same as TCP ports. If different than default socket, specify it in the port part.
+ * ``pgsql://user/database`` Connect *user* to the db *database* without password through the Unix socket system. This is the DSN's shortest form.
+ * ``pgsql://user:pass/database`` The same but with password.
+ * ``pgsql://user:pass@!/path/to/socket!/database`` When the socket is not in the default directory, it is possible to specify it in the host part of the DSN. Note it is surrounded by '!' and there are NO ending /. Using the «!» as delimiter assumes there are no «!» in your socket's path. But you don't have «!» in your socket's path do you ?
+ * ``pgsql://user@!/path/to/socket!:port/database`` Postgresql's listening socket name are the same as TCP ports. If different than default socket, specify it in the port part.
  * **TCP connection**
- * *pgsql://user@host/database* Connect *user* to the db *database* on host *host* using TCP/IP.
- * *pgsql://user:pass@host:port/database* The same but with password and TCP port specified. 
+ * ``pgsql://user@host/database`` Connect *user* to the db *database* on host *host* using TCP/IP.
+ * ``pgsql://user:pass@host:port/database`` The same but with password and TCP port specified. 
 
-The **identity_mapper** option gives you the opportunity to register an identity mapper. When connections are created, they will instantiate the given class. By default, the Smart IM is loaded. This can be overridden for specific connections (see the identity mapper section below).
+The ``identity_mapper`` option gives you the opportunity to register an identity mapper. When connections are created, they will instantiate the given class. By default, the Smart IM is loaded. This can be overridden for specific connections (see the identity mapper section below).
 
-Database and converters
-=======================
+Converters
+==========
 
-The *Database* class brings access to mechanisms to create connections and transactions and also register converters. A *Converter* is a class that translates a data type from Postgresql to PHP and from PHP to Postgresql. By default, the following converters are registered, this means you can use them without configuring anything:
- * Boolean: convert postgresql 't' and 'f' to PHP boolean value
- * Number: convert postgresql 'smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial' types to numbers
- * String: convert postgresql 'varchar', 'uuid', 'xml' and 'text' into PHP string
- * Timestamp: convert postgresql 'timestamp', 'date', 'time' to PHP DateTime instance.
- * Interval: convert postgresql's 'interval' type into PHP SplInterval instance. 
- * Binary: convert postgresql's 'bytea' type into PHP string.
+Built-in converters
+-------------------
 
-Other types are natively available in postgresql databases but are not loaded automatically by Pomm:
+The ``Database`` class brings access to mechanisms to create connections and also to register converters. A ``Converter`` is a class that translates a data type from Postgresql to PHP and from PHP to Postgresql. 
 
- * Point: postgresql 'point' representation as Pomm\\Type\\Point instance.
- * Segment : 'segment' representation as Pomm\\Type\\Segment.
- * Circle : 'circle' representation as Pomm\\Type\\Circle.
+By default, the following converters are registered, this means you can use them without configuring anything:
+ * ``Boolean``: convert postgresql 't' and 'f' to/from PHP boolean value
+ * ``Number``: convert postgresql 'smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial' types to numbers
+ * ``String``: convert postgresql 'varchar', 'uuid', 'xml' and 'text' into PHP string
+ * ``Timestamp``: convert postgresql 'timestamp', 'date', 'time' to PHP ``DateTime`` instance.
+ * ``Interval``: convert postgresql's 'interval' type into PHP ``SplInterval`` instance. 
+ * ``Binary``: convert postgresql's 'bytea' type into PHP string.
 
-Postgresql contribs come with handy extra data type (like HStore, a key => value array and LTree a materialized path data type). If you use these types in your database you have to register the according converters from your database instance::
+Registering converters
+----------------------
 
-  # The HStore converter converts a postgresql HStore to a PHP associative array and the other way around.
-  # The following line registers the HStore converter to the default database.
+Other types are natively available in postgresql databases but are not loaded automatically by Pomm.
+
+ * ``Point``: postgresql 'point' representation as ``Pomm\Type\Point`` instance.
+ * ``Segment``: 'segment' representation as ``Pomm\Type\Segment``.
+ * ``Circle``: 'circle' representation as ``Pomm\Type\Circle``.
+
+Postgresql contribs come with handy extra data type (like HStore, a key => value array and LTree a materialized path data type). If you use these types in your database you have to **register the according converters** from your database instance::
+
+  # The HStore converter converts a postgresql HStore to a PHP associative 
+  # array and the other way around.
+  # The following line registers the HStore converter to the default 
+  # database.
   
-  $service->getDatabase()
-    ->registerConverter('HStore', new Pomm\Converter\PgHStore(), array('hstore'));
+  $service
+    ->getDatabase()
+    ->registerConverter(
+      'HStore', 
+       new Pomm\Converter\PgHStore(), 
+       array('hstore')
+      );
 
-Arguments to instanciate a *Converter* are the following:
- * the first argument is the converter name. It is used in the *Map Classes* to link with fields (see Map Classes below).
- * the second argument is the instance of the *Converter*
+Arguments to instanciate a ``Converter`` are the following:
+ * the first argument is the converter name. It is used in the map classes to link with fields (see `Map Classes`_ below).
+ * the second argument is the instance of the ``Converter``
  * the third argument is a word or a set of words for Pomm to identify what converter to use when scanning the database to create the Map files. These words are going to be used in a regular expression match.
 
-You can write your own converters for your custom postgresql types. All they have to do is to implement the *Pomm\\Converter\\ConverterInterface*. This interface makes your converter to have two methods:
- * *fromPg*: convert data from Postgesql by returning the according PHP structure. This data will be implemented as returned here in your entities.
- * *toPg*: return a string with the Postgresql representation of a PHP structure. This string will be used in the SQL queries generated by the Map files to save or update entities.
-
-If your database has a lot of custom types, it is a better idea to create your own *Database* class.::
+If your database has a lot of custom types, it is a better idea to create your own ``Database`` class.::
 
   class MyDatabase extends Pomm\Connection\Database
   {
     protected function initialize()
     {
       parent::initialize();
-      $this->registerConverter('HStore', new Pomm\Converter\Hstore(), array('hstore'));
-      $this->registerConverter('Point', new Converter\Pgpoint(), array('point'));
-      $this->registerConverter('Circle', new Converter\PgCircle(), array('circle'));
+      $this->registerConverter('HStore', 
+        new Pomm\Converter\Hstore(), array('hstore'));
+
+      $this->registerConverter('Point', 
+        new Pomm\Converter\Pgpoint(), array('point'));
+
+      $this->registerConverter('Circle', 
+        new Pomm\Converter\PgCircle(), array('circle'));
     }
   }
 
 This way, converters will be automatically registered at instantiation.
 
-In case your database uses *DOMAIN* types you can add them to an already registered converter. The *registerTypeForConverter* method stands for that.::
+Converters and types
+====================
+Domains
+-------
+
+In case your database uses ``DOMAIN`` types you can add them to an already registered converter. The *registerTypeForConverter* method stands for that.::
 
     $service->getDatabase('default')
       ->registerTypeForConverter('email', 'String');
       ;
 
-In the example above, the database contains a domain *email* which is a subtype of *VARCHAR* so it is associated with the built-in converter *String*.
+In the example above, the database contains a domain ``email`` which is a subtype of ``VARCHAR`` so it is associated with the built-in converter ``String``.
 
-Converters and types
-====================
-
+Custom types
+------------
 Composite types are particularly useful to store complex set of data. In fact, with Postgresql, defining a table automatically defines the according type. Hydrating type instances with postgresql values are the work of your custom converters. Let's take an example: electrical transformers windings. A transformer winding is defined by the voltage it is supposed to have and the maximum current it can stands. A transformer have two or more windings so if we define a type WindingPower we will be able to store an array of windings in our transformer table:
 
 ::
@@ -158,7 +167,7 @@ Composite types are particularly useful to store complex set of data. In fact, w
       current numeric(5,3)
   );
 
-Tables containing a field with this type will return a tuple. A good way to manipulate that kind of data would be to create a *WindingPower* type class::
+Tables containing a field with this type will return a tuple. A good way to manipulate that kind of data would be to create a ``WindingPower`` type class::
 
   <?php
   
@@ -181,7 +190,16 @@ Tables containing a field with this type will return a tuple. A good way to mani
       }
   }
 
-Here, we can see the very good side of this method: we can implement a *getPowerMax()* method and make our type richer. The last thing is we need a converter to translate between PHP and Postgresql::
+Here, we can see the very good side of this method: we can implement a *getPowerMax()* method and make our type richer. 
+
+Writing your own converters
+---------------------------
+
+You can write your own converters for your custom postgresql types. All they have to do is to implement the ``Pomm\Converter\ConverterInterface``. This interface makes your converter to have two methods:
+ * ``fromPg($data)``: convert data from Postgesql by returning the according PHP structure. The returned value will be hydrated in your entities.
+ * ``toPg($data))``: returns a string with the Postgresql representation of a PHP structure. This string will be used in the SQL queries generated by the Map files to save or update entities.
+
+Here is the converter for the ``WindingPower`` type mentioned above::
 
   <?php
   
@@ -216,9 +234,9 @@ Here, we can see the very good side of this method: we can implement a *getPower
 Of course you can hardcode the class to be returned by the converter but it prevents others from extending your type.
 
 Entity converter
-================
+----------------
 
-In Postgresql, creating a table means creating a new type with the table's fields definition. Hence, it is possible to use that data type in other tables. Pomm proposes a special converter to do so: the ``PgEntity`` converter. Passing the table data type name and the associated entity class name will grant you with embedded entities.
+In Postgresql, creating a table means creating a new type with the table's fields definition. Hence, it is possible to use that data type in other tables or use them as objects in your SQL queries. Pomm proposes a special converter to do so: the ``PgEntity`` converter. Passing the table data type name and the associated entity class name will grant you with embedded entities.
 
 ::
 
@@ -227,12 +245,21 @@ In Postgresql, creating a table means creating a new type with the table's field
     protected function initialize()
     {
       parent::initialize();
-      $this->registerConverter('MyEntity', new Pomm\Converter\PgEntity($this, 'Model\Pomm\Entity\Schema\MyEntity'), array('my_entity'));
+
+      $this->registerConverter('MyEntity', 
+        new Pomm\Converter\PgEntity(
+          $this, 
+         'Database\Schema\MyEntity'
+        ), 
+        array('my_entity')
+      );
     }
   }
 
+***********
 Map classes
------------
+***********
+
 
 Overview
 ========
