@@ -1,3 +1,4 @@
+
 ==================
 Pomm Documentation
 ==================
@@ -265,33 +266,37 @@ Overview
 ========
 
 Map classes are the central point of Pomm because 
- * they are a bridge between the database and your entities (Pomm\\Object\\BaseObjectMap)
+ * they are a bridge between the database and your entities
  * they own the structure of the entities 
- * They act as Entity provider 
+ * They act as entity providers
 
 Every action you will perform with your entities will use a Map class. They are roughly the equivalent of Propel's *Peer* classes. Although it might look like Propel, it is important to understand unlike the normal Active Record design pattern, entities do not even know their structure and how to save themselves. You have to use their relative Map class to save them.
-Map classes represent a structure in the database and provide methods to retrieve and save data with this structure. To be short, one table or view <=> one map class.
 
-To be able to be the bridge between your database and your entities, all Map classes **must** at the end extends *Pomm\\Object\\BaseObjectMap* class. This class implements methods that directly interact with the database using the PDO layer. These methods will be explained in the chapter how to query the database.
+Map classes represent a structure in the database and provide methods to retrieve and save data with this structure. To be short, one table or view => one map class.
+
+To create the link between your database and your entities, all Map classes **must** at the end extends ``Pomm\Object\BaseObjectMap``. This class implements methods that directly interact with the database using the PDO layer. These methods will be explained in the chapter `Querying the database`_.
 
 The structure of the map classes can be automatically guessed from the database hence it is possible to generate the structure part of the map files from the command line (see below). If these classes can be generated, it is advisable not to modify them by hand because modifications would be lost at the next generation. This is why Map classes are split using inheritance:
- * *BaseYourEntityMap* which are abstract classes inheriting from *BaseObjectMap*
- * *YourEntityMap* inheriting BaseYourEntityMap*
+ * ``BaseYourEntityMap`` which are abstract classes inheriting from ``BaseObjectMap``
+ * ``YourEntityMap`` inheriting ``BaseYourEntityMap`` which itself inherits from ``Pomm\Object\BaseObjectMap``.
 
-*BaseYourEntityMap* is the generated Map file containing the structure for *YourEntity* and *YourEntityMap* is the file where will be your custom entity provider methods.
+``BaseYourEntityMap`` can be skipped but since Pomm proposes automatic code generation, this file can be regenerated over and over without you to loose precious custom code. This is why this file owns the data structure read from the database.
 
 Structure
 =========
 
-When Map classes are instantiated, the method *initialize* is called. This method is responsible of setting various structural elements:
- * *object_name*: the related table name
- * *object_class*: the related entity's fully qualified class name
- * *field_structure*: the fields with the corresponding converters
- * *primary_key*: simple or composite primary key
+Introspected tables
+-------------------
 
-If the table is stored in a special database schema, it must appear in the *object_name* attribute. If you do not use schemas, postgresql will store everything in the *public* schema. You do not have to specify it in the *object_name* attribute but it will be used in the class namespace. *public* is also a reserved keyword of PHP, the namespace for the *public* schema is *PublicSchema*.
+When Map classes are instantiated, the method ``initialize`` is triggered. This method is responsible of setting various structural elements:
+ * ``object_name``: the related table name
+ * ``object_class``: the related entity's fully qualified class name
+ * ``field_structure``: the fields with the corresponding converter name
+ * ``primary_key``: an array with simple or composite primary key
 
-Let's say we have the following table *student* in the database *College*:
+If the table is stored in a special database schema, it must appear in the ``object_name`` attribute. If you do not use schemas, postgresql will store everything in the public schema. You do not have to specify it in the ``object_name`` attribute but it will be used in the class namespace. As ``public`` is also a reserved keyword of PHP, the namespace for the public schema is ``PublicSchema``.
+
+Let's say we have the following table ``student`` in the ``public`` schema of the database ``College``::
 
   +-------------+-----------------------------+
   |   Column    |            Type             |
@@ -307,9 +312,10 @@ Let's say we have the following table *student* in the database *College*:
   |  level      | smallint                    |
   +-------------+-----------------------------+
 
-The according generated structure will be:::
+The according generated structure will be::
 
  <?php
+
   namespace College\PublicSchema\Base;
 
   use Pomm\Object\BaseObjectMap;
@@ -332,23 +338,82 @@ The according generated structure will be:::
       }
   }
 
-If the previous table were in the *school* database schema, the following lines would change:::
+If the previous table were in the ``school`` database schema, the following lines would change::
 
 
  <?php
+
   namespace College\School\Base;
   ...
           $this->object_class =  'College\School\Student';
           $this->object_name  =  'school.student';
   
+Arrays
+------
+
+Postgresql supports arrays. An array can contain several entities all from the same type. Pomm of course supports this feature using the ``[]`` notation after the converter declaration::
+
+    $this->addField('authors', 'String[]');   // Array of strings
+    $this->addField('locations', 'Point[]');  // Array of points
+    $this->addField('workers', 'Worker[]');   // Array of Worker entities
+
+The converter system handles that and the entities will be hydrated with an array of the according type depending on the given converter. Of course, all converters must be registered prior to the declaration.
+
+Temporary tables
+----------------
+
+Sometimes, you might want to create temporary tables. A map class can create its own table, modify it and destroy it. Let's imagine we have to create a temporary tables for students and their average scores in each discipline. The following map class could do the job::
+
+    <?php
+
+    namespace College\School;
+
+    use Pomm\Object\BaseObjectMap;
+    use Pomm\Object\BaseObject;
+    use Pomm\Query\Where;
+
+    class AverageStudentScoreMap extends BaseObjectMap
+    {
+        public function initialize()
+        {
+          $this->object_class =  'College\School\AverageStudentScore';
+          $this->object_name  =  'school.average_student_score';
+
+          $this->addField('reference', 'String');
+          $this->addField('maths', 'Number');
+          $this->addField('physics', 'Number');
+          ...
+        }
+
+        public function createTable()
+        {
+          $sql = "CREATE TEMPORARY TABLE %s (reference VARCHAR PRIMARY KEY, ...
+
+          $this->query(sprintf($sql, $this->getTableName()), array());
+        }
+
+        public function dropTable()
+        {
+          $sql = "DROP TABLE %s CASCADE";
+
+          $this->query(sprintf($sql, $this->getTableName()), array());
+        }
+    }
+
+You can create methods to change the table structure, add or drop columns etc. This is what it is done by example in the converter test script.
 
 Querying the database
----------------------
+=====================
 
-Create finders
-==============
+Create, update, drop
+--------------------
 
-The first time you generate the *BaseMap* classes, it will also generate the map classes and the entity classes. Using the example with student, the empty map file should look like this::
+
+
+Built-in finders
+----------------
+
+The first time you generate the base map classes, it will also generate the map classes and the entity classes. Using the example with student, the empty map file should look like this::
 
   <?php
   namespace College\School;
@@ -362,20 +427,22 @@ The first time you generate the *BaseMap* classes, it will also generate the map
   {
   }
 
-This is the place you are going to create your own finder methods in. As it extends *BaseObjectMap* via *BaseStudentMap* it already has some useful finders:
+This is the place you are going to create your own finder methods. As it extends ``BaseObjectMap`` via ``BaseStudentMap`` it already has some useful finders:
 
- * *findAll()* return all entities
- * *findByPK()* return a single entity
+ * ``findAll()`` return all entities
+ * ``findByPK(...)`` return a single entity
+ * ``findWhere(...)`` perform a 
+   ``SELECT ... FROM my.table WHERE ...``
 
-These finders work whatever your entities are. In this class we can declare finders more specific.
+Finders return either a ``Collection`` instance virtually containing all model instances returned by the query (see `Collections`_) or just a related model entity instance (like ``findByPK``).
 
-Conditions: the Where clause
-============================
+findWhere
+---------
 
-The simplest way to create a finder with Pomm is to use the *BaseObjectMap*'s method *findWhere()*:
+The simplest way to create a finder with Pomm is to use the ``findWhere()`` method.
 
 findWhere($where, $values, $suffix)
-  return a set of entities based on the given where clause. This clause can be a string or a *Where* instance.
+  return a set of entities based on the given where clause. This clause can be a string or a ``Where`` instance.
 
 It is possible to use it directly because we are in a Map class hence Pomm knows what table and fields to use in the query.
 
@@ -389,12 +456,16 @@ It is possible to use it directly because we are in a Map class hence Pomm knows
      FROM 
        shool.student 
      WHERE 
-         birthdate > '1980-01-01'
+         birthdate > '1980-01-01 
+       AND 
+         first_name ILIKE '%an%'
   */
-  $students = $this->findWhere("birthdate > '1980-01-01'"); 
+
+  // don't do that !
+  $students = $this->findWhere("birthdate > '1980-01-01' AND first_name ILIKE '%an%'"); 
   
 
-Of course, this is not very useful, because the date is very likely to be a parameter. A finder *getYoungerThan* would be::
+Of course, this is not very useful, because the date is very likely to be a parameter. A finder ``getYoungerThan`` would be::
 
   public function getYoungerThan(DateTime $date)
   {
@@ -406,84 +477,124 @@ Of course, this is not very useful, because the date is very likely to be a para
      FROM 
        shool.student 
      WHERE 
-         birthdate > '1980-01-01'
+         birthdate > $date
+       AND 
+         first_name ILIKE '%an%'
      ORDER BY 
        birthdate DESC
      LIMIT 10
   */
 
-    return $this->findWhere("birthdate > ?", array($date->format('Y-m-d')), 'ORDER BY birthdate DESC LIMIT 10');
+    return $this->findWhere("birthdate > ? AND first_name ILIKE ?", 
+        array($date->format('Y-m-d'), '%an%'), 
+        'ORDER BY birthdate DESC LIMIT 10'
+        );
   }
 
-All queries are prepared, this might increase the performance but it certainly increases the security. The argument here will automatically be escaped by the database and ovoid SQL-injection attacks. If a suffix is passed, it is appended to the query **as is**. The suffix is intended to allow developers to specify sorting a subset parameters to the query. As the query is prepared, a multiple query injection type attack is not directly possible but be careful if you pass values sent by the customer.
+All queries are prepared, this might increase the performance but it certainly increases the security. Passing the argument using the question mark makes it automatically to be escaped by the database and ovoid SQL-injection attacks. If a suffix is passed, it is appended to the query **as is**. The suffix is intended to allow developers to specify sorting a subset parameters to the query. As the query is prepared, a multiple query injection type attack is not directly possible but be careful if you pass values sent by the customer.
 
-Sometimes, you do not know in advance what will be the clause of your query because it depends on other factors. You can use the *Where* class to do so and chain logical statements.
+AND OR: The Where class
+-----------------------
 
-::
+Sometimes, you do not know in advance what will be the clauses of your query because it depends on variable factors. You can use the ``Where`` class to chain logical statements::
 
-  public function getYoungerThan(DateTime $date, $level = 0)
+  public function getYoungerThan(DateTime $date, $needle)
   {
     $where = new Pomm\Query\Where("birthdate > ?", array($date->format('Y-m-d')));
-    $where->andWhere('level >= ?', array($level));
+    $where->andWhere('first_name ILIKE ?', array(sprintf('%%%s%%', $needle)));
 
     return $this->findWhere($where, null, 'ORDER BY birthdate DESC LIMIT 10');
   }
 
-The *Where* class has two very handy methods: *andWhere* and *orWhere* which can take string or another *Where* instance as argument. All methods return a *Where* instance so it is possible to chain the calls. The example above can be rewritten this way::
+The ``Where`` class has two very handy methods: ``andWhere`` and ``orWhere`` which can take string or another ``Where`` instance as argument. All methods return a ``Where`` instance so it is possible to chain the calls. The example above can be rewritten this way::
 
-  public function getYoungerThan(DateTime $date, $level = 0)
+  public function getYoungerThan(DateTime $date, $needle)
   {
     $where = Pomm\Query\Where::create("birthdate > ?", array($date->format('Y-m-d')))
-      ->andWhere('level >= ?', array($level));
+        ->andWhere('first_name ILIKE ?', array(sprintf('%%%s%%', $needle)))
 
     return $this->findWhere($where, null, 'ORDER BY birthdate DESC LIMIT 10');
   }
 
-Because the WHERE ... IN clause needs to declare as many '?' as given parameters, it has its own constructor:
-
-::
+Because the ``WHERE something IN (...)`` clause needs to declare as many '?' as given parameters, it has its own constructor::
 
     // SELECT all_fields FROM some_table WHERE station_id IN ( list of ids );
     
     $this->findWhere(Pomm\Query\Where::createIn("station_id", $array_of_ids))
 
+The ``Where`` instances can be combined togeither with respect of the logical precedence::
+
+    $where1 = new Pomm\Query\Where('pika = ?', array('chu'));
+    $where2 = new Pomm\Query\Where('age < ?', array(18));
+
+    $where1->orWhere($where2);
+    $where1->andWhere(Pomm\Query\Where::createIn('other_id', array(1,2,3,5,7,11))); 
+
+    echo $where1; // (pika = ? OR age < ?) AND other_id IN (?,?,?,?,?,?)
+
 Custom queries
 ==============
 
-Although it is possible to write whole plain queries by hand in the finders, this may induce coupling between your classes and the database structure. To ovoid coupling, the Map class owns the following methods: *getSelectFields*, *getGroupByFields* and *getFields*. It is important that table names are also retrieved with the *getTableName* method to keep the query correct if the table name changes over time.
+fields methods
+--------------
+
+Although it is possible to write whole plain queries by hand in the finders, this may induce coupling between your classes and the database structure. To reduce coupling effects, the map class proposes the following methods: 
+
+* ``getSelectFields($alias)`` return an array with the field names eventually in the form of ``alias.field_name``.
+* ``getGroupByFields($alias)`` same as above.
+* ``getFields`` used for both methods above.
+* ``getTableName($alias)`` return the table name (property object_name see the `Structure`_ chapter) 
+
+Overloading one of these methods will modify the behavior of all built-in finders and those which use them. 
 
 ::
 
   // MyDatabase\Blog\PostMap Class
   public function getBlogPostsWithCommentCount(Pomm\Query\Where $where)
   {
-    $sql = sprintf('SELECT %s, COUNT(c.id) as "comment_count" FROM %s JOIN %s ON p.id = c.post_id WHERE %s GROUP BY %s',
-        join(', ', $this->getSelectFields('p')),
-        $this->getTableName('p'),
-        $this->connection->getMapFor('MyDatabase\Blog\Comment')->getTableName('c'),
-        $where,
-        join(', ', $this->getGroupByFields('p'))
-        );
+    $sql = <<<_
+    SELECT
+      %s,
+      COUNT(c.id) as "comment_count"
+    FROM
+      %s
+        LEFT JOIN %s ON
+            p.id = c.p_id
+    WHERE
+        %s
+    GROUP BY
+        %s
+    _;
+
+    $select_fields = join(', ', $this->getSelectFields('p'));
+    $local_table = $this->getTableName('p');
+    $remote_table = $this->connection->getMapFor('MyDatabase\Blog\Comment')->getTableName('c');
+    $group_fields = join(', ', $this->getGroupByFields('p'));
+
+    $sql = sprintf($sql, $select_fields, $local_table, $remote_table, $where, $group_fields);
 
     return $this->query($sql, $where->getValues());
   }
 
-The *query* method is available for your custom queries. It takes 2 parameters, the SQL statement and an optional array of values to be escaped. Keep in mind, the number of values must match the '?' Occurrences in the query.
+The ``query()`` method is available for your custom queries. It takes 2 parameters, the SQL statement and an optional array of values to be escaped. Keep in mind, the number of values must match the '?' Occurrences in the query.
 
-Whatever you are retrieving, Pomm will hydrate objects according to what is in *$this->object_class* of your map class. The entity instances returned here will have this extra field "comment_count" exactly as it would be a normal field. You can use a *Where* instance everywhere as their *toString* method returns the condition as a string and the *getValues* method return the array with the values to be escaped.
+Whatever you are retrieving, Pomm will hydrate objects according to what is in structure definition of your map class. **Entities do not know about their structure** they just contain data and methods. The entity instances returned here will have this extra field "comment_count" exactly as it would be a normal field. Of course if you update this entity in the database, this field will be ignored. 
 
-Extending the model
-===================
+Sometimes, you want to change the fields list of an entity, by example showing the age of any student. This can be done simply by overloading the ``getSelectFields()`` method in your map class::
 
-All the finders internally use the *getSelectFields()* method to ovoid using the star notation (*) of course but also to make the fields list extendible. Imagine your model as a *created_at* field that stores the timestamp of the creation for every rows in a table. You can overload the *getSelectFields()* method to add a *created_since* field that returns the time interval between now and *created_at*. It will then be used in **all** finders and this extra attribute will never be saved as it does not belong to the Map structure.
+    public function getSelectFields($alias = null)
+    {
+        $fields = parent::getSelectFields($alias);
+        $fields[] = sprintf('age(%sbirthday) AS age',
+            is_null($alias) ? '' : $alias.'.');
 
-It is also possible to reduce a model, stripping by example a *password* field or any other field that does not make sense outside the database. The Map classes do propose 3 kind of field selectors:
- * getSelectFields($alias) 
- * getGroupByFields($alias)
- * getFields() // used by both getSelectFields and getGroupByFields
+        return $fields;
+    }
+
+But you can also choose not to retrieve some columns by filtering the fields (like columns containing passwords by example). Be aware that ``getSelectFields()`` changes is used in the ``SELECT`` part but does not change the ``GROUP BY``. If your queries need both to be updated in the same time, overload the ``getFields()`` method.
 
 Virtual Fields
-==============
+--------------
 
 As soon as tables have their own data type, they can be considered as plain objects and fetched as is::
 
@@ -495,7 +606,7 @@ As soon as tables have their own data type, they can be considered as plain obje
     | "(2,'Edgar')"     |
     +-------------------+
 
-Pomm takes advantage of this feature in using *Virtual Fields*. You can add fields to your select queries and tie them with a converter. If this converter is an entity converter the Pomm model instance will be fetched directly from the query. The example below create a relationship between the author and the post tables getting all the posts from one author in an array of Post instances::
+Pomm takes advantage of this feature using *Virtual Fields*. You can add fields to your select queries and tie them with a registered converter. If this converter is an entity converter the Pomm model instance will be fetched directly from the query. The example below creates a relationship between the author and the post tables getting all the posts from one author in an array of Post instances::
 
     // YourDb\SchemaName\AuthorMap
 
@@ -512,7 +623,7 @@ Pomm takes advantage of this feature in using *Virtual Fields*. You can add fiel
             LEFT JOIN %s ON 
                 author.id = post.author_id 
         WHERE
-            author.name ILIKE ?
+            author.name = ?
         GROUP BY 
           %s
         _;
@@ -526,17 +637,18 @@ Pomm takes advantage of this feature in using *Virtual Fields*. You can add fiel
 
         $this->addVirtualField('posts', 'Post[]');
 
-        return $this->query($sql, array(sprintf('%%%s%%', $author_name)));
+        return $this->query($sql, array($author_name));
     }
 
-In this example we assume the ``Post`` converter has already been registered in the database.
-
-
+In this example we assume the ``Post`` converter has already been registered in the database. The fetched ``Author`` instances will have an extra attribute ``posts`` containing an array of ``Post`` instances (see `Arrays`_). This is a very powerful feature because you can fetch directly any entity's related objects from the database and hydrate them on the fly.
 
 Collections
 ===========
 
-The *query* method return a *Collection* instance that holds the PDOStatement with the results. The *Collection* class implements the *Coutable* and *Iterator* interfaces so you can foreach on a Collection to retrieve the results:
+fetching results
+----------------
+
+The ``query()`` method return a ``Collection`` instance that holds the PDOStatement with the results. The ``Collection`` class implements the ``Coutable`` and ``Iterator`` interfaces so you can foreach on a Collection to retrieve the results:
 
 ::
 
@@ -544,10 +656,14 @@ The *query* method return a *Collection* instance that holds the PDOStatement wi
 
   foreach($collection as $blog_post)
   {
-    printf("Blog post '%s' posted on '%s' by '%s'.", $blog_post['title'], $blog_post['created_at']->format('Y-m-d'), $blog_post['author']);
+    printf("Blog post '%s' posted on '%s' by '%s'.", 
+        $blog_post['title'], 
+        $blog_post['created_at']->format('Y-m-d'), 
+        $blog_post['author']
+        );
   }
 
-Sometimes, you want to access a particular result in a collection knowing the result's index. It is possible using the *has* and *get* methods:
+Sometimes, you want to access a particular result in a collection knowing the result's index. It is possible using the ``has()`` and ``get()`` methods:
 
 ::
 
@@ -558,19 +674,22 @@ Sometimes, you want to access a particular result in a collection knowing the re
     new Object();
 
 Collections have other handful methods like:
- * *isFirst()*
- * *isLast()*
- * *isEmpty()*
- * *isOdd()*
- * *isEven()*
- * *getOddEven()*
+ * ``isFirst()``
+ * ``isLast()``
+ * ``isEmpty()``
+ * ``isOdd()``
+ * ``isEven()``
+ * ``getOddEven()``
 
-Pomm's *Collection* class can register filters. Filters are just functions that are executed after values were fetched from the database and before the object is hydrated with values. These filters take the array of fetched values as parameter. They return an array with the values. After all filters are being executed, the values are used to hydrate the Object instance related the the Map instance the Collection comes from. 
+Collection filters
+------------------
+
+Pomm's collection class can register filters. Filters are just functions that are executed after values were fetched from the database and before the object is hydrated with them. These filters take the array of fetched values as parameter. They return an array with values which are then given to the next filter and so on. After all filters are being executed, the values are used to hydrate the object instance related the the map instance the collection comes from. 
 
 Pagers
 ======
 
-*BaseObjectMap* instances provide 2 methods that will grant you with a *Pager* class. *paginateQuery()* and the handy *paginateFindWhere*. It adds the correct subset limitation at the end of you query. Of course, it assumes you do not specify any LIMIT nor OFFSET sql clauses in your query. Here is an example of how to use retrieve and use a *Pager*:
+``BaseObjectMap`` instances provide 2 methods that will grant you with a ``Pager`` class. ``paginateQuery()`` and the handy ``paginateFindWhere``. It adds the correct subset limitation at the end of you query. Of course, it assumes you do not specify any LIMIT nor OFFSET sql clauses in your query. Here is an example of how to use retrieve and use a ``Pager``:
 
 ::
 
