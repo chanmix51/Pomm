@@ -40,11 +40,12 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      * get
      * Returns the $name value
      *
-     * @param string $var The key you want to retrieve value from
+     * @final
      * @access public
+     * @param string $var The key you want to retrieve value from
      * @return mixed
      */
-    public function get($var, $default = null)
+    public final function get($var, $default = null)
     {
         if (is_scalar($var))
         {
@@ -67,11 +68,12 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      * has
      * Returns true if the given key exists
      *
-     * @param string $var
+     * @final
      * @access public
+     * @param string $var
      * @return boolean
      */
-    public function has($var)
+    public final function has($var)
     {
         return array_key_exists($var, $this->fields);
     }
@@ -209,12 +211,13 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      * set
      * Set a value in the varholder
      *
+     * @final
+     * @access public
      * @param string $var
      * @param mixed $value
-     * @access public
      * @return void
      */
-    public function set($var, $value)
+    public final function set($var, $value)
     {
         $this->fields[$var] = $value;
         $this->status = $this->status | self::MODIFIED;
