@@ -48,6 +48,12 @@ class PgEntity implements ConverterInterface
 
         foreach ($map->getFieldDefinitions() as $field_name => $pg_type)
         {
+            if (!$data->has($field_name))
+            {
+                $fields[] = 'NULL';
+                continue;
+            }
+
             if (preg_match('/([a-z0-9_-]+)(\[\])?/i', $pg_type, $matchs))
             {
                 if (count($matchs) <= 2)
@@ -91,8 +97,9 @@ class PgEntity implements ConverterInterface
                 }
                 else
                 {
-                    $converter = $this->connection->getDatabase()->getConverterForType($pg_type);
-                    $values[$field] = array_map(function($val) use ($converter) {
+                    $pg_type = $matchs[1];
+                    $converter = $this->database->getConverterForType($pg_type);
+                    $values[$field] = array_map(function($val) use ($converter, $pg_type) {
                                 return $converter->fromPg($val, $pg_type);
                             },
                             preg_split('/[,\s]*"((?:[^\\\\"]|\\\\.)+)"[,\s]*|[,\s]+/', trim(array_shift($elts), "{}"), 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE));

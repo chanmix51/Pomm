@@ -284,6 +284,8 @@ class converter_test extends \lime_test
 
     public function testEntity()
     {
+        $this->map->dropTable();
+        $this->map->createTable();
         $map = $this->connection->getMapFor('Pomm\Test\TestConverterContainer');
         $map->createTable();
         $test_container = $map->createObject(array('test_converter' => $this->object));
@@ -296,7 +298,7 @@ class converter_test extends \lime_test
 }
 
 $test = new converter_test();
-$binary = file_get_contents(__DIR__.'/init/smallP.png');
+$binary = 'b'; //file_get_contents(__DIR__.'/init/smallP.png');
 
 $test
     ->initialize($service)

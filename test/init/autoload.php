@@ -24,6 +24,7 @@ function __autoload($name)
         'Pomm/Tools/CreateFileTool.php',
         'Pomm/Tools/Logger.php',
         'Pomm/Converter/ConverterInterface.php',
+        'Pomm/Converter/PgArray.php',
         'Pomm/Converter/PgBoolean.php',
         'Pomm/Converter/PgHStore.php',
         'Pomm/Converter/PgNumber.php',

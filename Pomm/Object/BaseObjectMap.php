@@ -96,7 +96,7 @@ abstract class BaseObjectMap
      **/
     public function createObjectFromPg(Array $values)
     {
-        $values = $this->convertPg($values, 'fromPg');
+        $values = $this->convertFromPg($values);
         $object = $this->createObject($values);
         $object->_setStatus(BaseObject::EXIST);
 
@@ -295,7 +295,7 @@ abstract class BaseObjectMap
     }
 
     /**
-     * convertPg 
+     * convertToPg 
      * Convert values to and from Postgresql
      *
      * @param Array $values Values to convert
@@ -303,9 +303,47 @@ abstract class BaseObjectMap
      * @access protected
      * @return array
      */
-    protected function convertPg(Array $values, $method)
+    public function convertToPg(Array $values)
     {
         $out_values = array();
+        foreach ($this->field_definitions as $field_name => $pg_type)
+        {
+            if (!isset($values[$field_name]))
+            {
+                continue;
+            }
+
+            if (preg_match('/([a-z0-9_-]+)(\[\])?/i', $pg_type, $matchs))
+            {
+                if (count($matchs) > 2)
+                {
+                    $converter = $this->connection
+                    ->getDatabase()
+                    ->getConverterFor('Array')
+                    ;
+                }
+                else
+                {
+                    $converter = $this->connection
+                    ->getDatabase()
+                    ->getConverterForType($pg_type)
+                    ;
+                }
+
+                $out_values[$field_name] = $converter
+                    ->toPg($values[$field_name], $matchs[1]);
+            }
+            else
+            {
+                throw new Exception(sprintf('Error, bad type expression "%s".', $pg_type));
+            }
+        }
+
+        return $out_values;
+    }
+
+    public function convertFromPg(Array $values)
+    {
         foreach ($values as $name => $value)
         {
             if (is_null($value)) continue;
@@ -315,50 +353,37 @@ abstract class BaseObjectMap
             if (is_null($pg_type))
             {
                 $pg_type = array_key_exists($name, $this->virtual_fields) ? $this->virtual_fields[$name] : null;
-            }
-
-            if (is_null($pg_type))
-            {
-                if ($method == 'fromPg')
+                if (is_null($pg_type))
                 {
                     $out_values[$name] = $value;
+                    continue;
                 }
-
-                continue;
             }
 
             if (preg_match('/([a-z0-9_-]+)(\[\])?/i', $pg_type, $matchs))
             {
-                if (count($matchs) <= 2)
+                if (count($matchs) > 2)
                 {
-                    $field_value = $this->connection->getDatabase()->getConverterForType($pg_type)->$method($value, $pg_type);
+                    $converter = $this->connection
+                    ->getDatabase()
+                    ->getConverterFor('Array')
+                    ;
                 }
                 else
                 {
-                    $pg_type = $matchs[1];
-                    $converter = $this->connection->getDatabase()->getConverterForType($pg_type);
-                    if ($method === 'fromPg')
-                    {
-                        $field_value = array_map(function($val) use ($converter, $pg_type) {
-                                return $converter->fromPg($val, $pg_type);
-                            },
-                            preg_split('/[,\s]*"((?:[^\\\\"]|\\\\.)+)"[,\s]*|[,\s]+/', trim($value, "{}"), 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE));
-                    }
-                    else
-                    {
-                        $value = array_map(function($val) use ($converter, $pg_type) {
-                            return $converter->toPg($val, $pg_type);
-                        }, $value);
-                        $field_value = sprintf("ARRAY[%s]::%s[]", join(', ', $value), $pg_type);
-                    }
+                    $converter = $this->connection
+                    ->getDatabase()
+                    ->getConverterForType($pg_type)
+                    ;
                 }
+
+                $out_values[$name] = $converter
+                    ->fromPg($values[$name], $matchs[1]);
             }
             else
             {
                 throw new Exception(sprintf('Error, bad type expression "%s".', $pg_type));
             }
-
-            $out_values[$name] = $field_value;
         }
 
         return $out_values;
@@ -458,7 +483,7 @@ abstract class BaseObjectMap
         }
 
         $updates = array();
-        foreach($this->convertPg($values, 'toPg') as $field => $value)
+        foreach($this->convertToPg($values) as $field => $value)
         {
             $updates[] = sprintf("%s = %s", $field, $value);
         }
@@ -486,7 +511,7 @@ abstract class BaseObjectMap
     protected function parseForInsert($object)
     {
         $tmp = array();
-        foreach ($this->convertPg($object->extract(), 'toPg') as $field_name => $field_value)
+        foreach ($this->convertToPg($object->extract()) as $field_name => $field_value)
         {
             $tmp[$field_name] = $field_value;
         }
@@ -505,7 +530,7 @@ abstract class BaseObjectMap
     {
         $tmp = array();
 
-        foreach ($this->convertPg($object->extract(), 'toPg') as $field_name => $field_value)
+        foreach ($this->convertToPg($object->extract()) as $field_name => $field_value)
         {
             if (array_key_exists($field_name, array_flip($this->getPrimaryKey()))) continue;
             $tmp[] = sprintf('%s=%s', $field_name, $field_value);

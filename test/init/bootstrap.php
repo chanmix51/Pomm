@@ -41,7 +41,7 @@ class TestTableMap extends BaseObjectMap
     public function dropTable()
     {
         $objects = preg_split('/\./', $this->object_name);
-        $sql = sprintf("DROP SCHEMA %s CASCADE;", reset($objects));
+        $sql = sprintf("DROP TABLE %s CASCADE;", array_shift($objects));
         $this->connection->getDatabase()->executeAnonymousQuery($sql);
     }
 }
@@ -194,7 +194,7 @@ class TestConverterContainerMap extends BaseObjectMap
         $this->object_class =  'Pomm\Test\TestConverterContainer';
         $this->object_name  =  'pomm_test.test_converter_container';
         $this->field_definitions  = array(
-            'id'               => 'Number',
+            'id'               => 'integer',
             'test_converter'   => 'pomm_test.converter',
         );
         $this->pk_fields    = array('id');

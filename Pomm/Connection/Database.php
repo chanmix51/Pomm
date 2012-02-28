@@ -236,6 +236,7 @@ class Database
 
     protected function registerBaseConverters()
     {
+        $this->registerConverter('Array', new Converter\PgArray($this), array());
         $this->registerConverter('Boolean', new Converter\PgBoolean(), array('boolean'));
         $this->registerConverter('Number', new Converter\PgNumber(), array('smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'float', 'serial', 'bigserial'));
         $this->registerConverter('String', new Converter\PgString(), array('varchar', 'char', 'text', 'uuid', 'tsvector', 'xml'));
