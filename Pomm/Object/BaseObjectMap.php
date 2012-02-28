@@ -331,7 +331,7 @@ abstract class BaseObjectMap
             {
                 if (count($matchs) <= 2)
                 {
-                    $field_value = $this->connection->getDatabase()->getConverterForType($pg_type)->$method($value);
+                    $field_value = $this->connection->getDatabase()->getConverterForType($pg_type)->$method($value, $pg_type);
                 }
                 else
                 {
@@ -339,15 +339,15 @@ abstract class BaseObjectMap
                     $converter = $this->connection->getDatabase()->getConverterForType($pg_type);
                     if ($method === 'fromPg')
                     {
-                        $field_value = array_map(function($val) use ($converter) {
-                                return $converter->fromPg($val);
+                        $field_value = array_map(function($val) use ($converter, $pg_type) {
+                                return $converter->fromPg($val, $pg_type);
                             },
                             preg_split('/[,\s]*"((?:[^\\\\"]|\\\\.)+)"[,\s]*|[,\s]+/', trim($value, "{}"), 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE));
                     }
                     else
                     {
-                        $value = array_map(function($val) use ($converter) {
-                            return $converter->toPg($val);
+                        $value = array_map(function($val) use ($converter, $pg_type) {
+                            return $converter->toPg($val, $pg_type);
                         }, $value);
                         $field_value = sprintf("ARRAY[%s]::%s[]", join(', ', $value), $pg_type);
                     }
