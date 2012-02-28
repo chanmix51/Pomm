@@ -30,6 +30,6 @@ class PgString implements ConverterInterface
      **/
     public function fromPg($data)
     {
-        return trim($data, '"');
+        return str_replace('\\"', '"', trim($data, '"'));
     }
 }

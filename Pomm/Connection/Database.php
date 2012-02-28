@@ -19,6 +19,7 @@ class Database
     protected $parameter_holder = array();
     protected $_handler;
     protected $converters = array();
+    protected $handled_types = array();
 
     /**
      * __construct
@@ -149,7 +150,12 @@ class Database
      **/
     public function registerConverter($name, Converter\ConverterInterface $converter, Array $pg_types)
     {
-        $this->converters[$name] = array('converter' => $converter, 'types' => $pg_types);
+        $this->converters[$name] = $converter;
+
+        foreach ($pg_types as $type)
+        {
+            $this->handled_types[$type] = $name;
+        }
 
         return $this;
     }
@@ -164,32 +170,35 @@ class Database
      **/
     public function getConverterFor($name)
     {
-        return $this->converters[$name]['converter'];
+        return $this->converters[$name];
     }
 
     /**
-     * getConverterNameForType
+     * getConverterForType
      *
-     * Returns the converter name for a given a postgresql's type
+     * Returns the converter instance for a given a postgresql's type
      * @access public
      * @param  string $pg_type
      * @return string converter name
      * @throw  Pomm\Exception\Exception if not found
      **/
-    public function getConverterNameForType($pg_type)
+    public function getConverterForType($pg_type)
     {
-        foreach($this->converters as $name => $composite)
+        if (isset($this->handled_types[$pg_type]))
         {
-            foreach($composite['types'] as $pattern)
+            $converter_name = $this->handled_types[$pg_type];
+
+            if (isset($this->converters[$converter_name]))
             {
-                if (preg_match("/$pattern/", $pg_type))
-                {
-                    return $name;
-                }
+                return $this->converters[$converter_name];
+            }
+            else
+            {
+                throw new Exception(sprintf("Pg type '%s' is associated with converter '%s' but converter is not registered.", $pg_type, $converter_name));
             }
         }
 
-        throw new PommException(sprintf("Could not find a converter for type '%s' declared for database type '%s' with dsn '%s'.", $pg_type, get_class($this), $this->parameter_holder['dsn']));
+        throw new PommException(sprintf("Could not find a converter for type '%s'.", $pg_type));
     }
 
     /**
@@ -203,7 +212,7 @@ class Database
      **/
     public function registerTypeForConverter($type, $converter_name)
     {
-        $this->converters[$converter_name]['types'][] = $type;
+        $this->handled_types[$type] = $converter_name;
     }
 
     /**
@@ -228,8 +237,8 @@ class Database
     protected function registerBaseConverters()
     {
         $this->registerConverter('Boolean', new Converter\PgBoolean(), array('boolean'));
-        $this->registerConverter('Number', new Converter\PgNumber(), array('smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial'));
-        $this->registerConverter('String', new Converter\PgString(), array('character', 'text', 'uuid', 'tsvector', 'xml'));
+        $this->registerConverter('Number', new Converter\PgNumber(), array('smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'float', 'serial', 'bigserial'));
+        $this->registerConverter('String', new Converter\PgString(), array('varchar', 'char', 'text', 'uuid', 'tsvector', 'xml'));
         $this->registerConverter('Timestamp', new Converter\PgTimestamp(), array('timestamp', 'date', 'time'));
         $this->registerConverter('Interval', new Converter\PgInterval(), array('interval'));
         $this->registerConverter('Binary', new Converter\PgBytea(), array('bytea'));

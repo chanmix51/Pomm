@@ -310,14 +310,14 @@ abstract class BaseObjectMap
         {
             if (is_null($value)) continue;
 
-            $converter_name = array_key_exists($name, $this->field_definitions) ? $this->field_definitions[$name] : null;
+            $pg_type = array_key_exists($name, $this->field_definitions) ? $this->field_definitions[$name] : null;
 
-            if (is_null($converter_name))
+            if (is_null($pg_type))
             {
-                $converter_name = array_key_exists($name, $this->virtual_fields) ? $this->virtual_fields[$name] : null;
+                $pg_type = array_key_exists($name, $this->virtual_fields) ? $this->virtual_fields[$name] : null;
             }
 
-            if (is_null($converter_name))
+            if (is_null($pg_type))
             {
                 if ($method == 'fromPg')
                 {
@@ -327,35 +327,35 @@ abstract class BaseObjectMap
                 continue;
             }
 
-            if (preg_match('/([a-z0-9]+)(\[\])?/i', $converter_name, $matchs))
+            if (preg_match('/([a-z0-9_-]+)(\[\])?/i', $pg_type, $matchs))
             {
                 if (count($matchs) <= 2)
                 {
-                    $field_value = $this->connection->getDatabase()->getConverterFor($converter_name)->$method($value);
+                    $field_value = $this->connection->getDatabase()->getConverterForType($pg_type)->$method($value);
                 }
                 else
                 {
-                    $converter_name = $matchs[1];
+                    $pg_type = $matchs[1];
+                    $converter = $this->connection->getDatabase()->getConverterForType($pg_type);
                     if ($method === 'fromPg')
                     {
-                        $field_value = array();
-                        $value = trim($value, "{}");
-                        foreach(preg_split('/[,\s]*"([^"]+)"[,\s]*|[,\s]+/', $value, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE) as $elt)
-                        {
-                            $field_value[] = $this->connection->getDatabase()->getConverterFor($converter_name)->$method($elt);
-                        }
+                        $field_value = array_map(function($val) use ($converter) {
+                                return $converter->fromPg($val);
+                            },
+                            preg_split('/[,\s]*"((?:[^\\\\"]|\\\\.)+)"[,\s]*|[,\s]+/', trim($value, "{}"), 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE));
                     }
                     else
                     {
-                        $converter = $this->connection->getDatabase()->getConverterFor($converter_name);
-                        array_walk($value, function(&$a) use ($converter) { $a = $converter->toPg($a);});
-                        $field_value = sprintf("ARRAY[%s]", join(', ', $value));
+                        $value = array_map(function($val) use ($converter) {
+                            return $converter->toPg($val);
+                        }, $value);
+                        $field_value = sprintf("ARRAY[%s]::%s[]", join(', ', $value), $pg_type);
                     }
                 }
             }
             else
             {
-                throw new Exception(sprintf('Error, bad type converter expression "%s".', $converter));
+                throw new Exception(sprintf('Error, bad type expression "%s".', $pg_type));
             }
 
             $out_values[$name] = $field_value;

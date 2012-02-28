@@ -18,14 +18,14 @@ class TestTableMap extends BaseObjectMap
         $this->object_class =  'Pomm\Test\TestTable';
         $this->object_name  =  'pomm_test.book';
         $this->field_definitions  = array(
-            'id'               =>    'Number',
-            'created_at'       =>    'Timestamp',
-            'last_in'          =>    'Timestamp',
-            'last_out'         =>    'Timestamp',
-            'title'            =>    'String',
-            'authors'          =>    'String[]',
-            'is_available'     =>    'Boolean',
-            'location'         =>    'Point',
+            'id'               =>    'integer',
+            'created_at'       =>    'timestamp',
+            'last_in'          =>    'timestamp',
+            'last_out'         =>    'timestamp',
+            'title'            =>    'varchar',
+            'authors'          =>    'varchar[]',
+            'is_available'     =>    'boolean',
+            'location'         =>    'point',
         );
         $this->pk_fields    = array('id');
     }
@@ -71,18 +71,18 @@ class TestConverterMap extends BaseObjectMap
         $this->object_class =  'Pomm\Test\TestConverter';
         $this->object_name  =  'pomm_test.converter';
         $this->field_definitions  = array(
-            'id'               => 'Number',
-            'created_at'       => 'Timestamp',
-            'something'        => 'String',
-            'things'           => 'String[]',
-            'is_true'          => 'Boolean',
-            'are_true'         => 'Boolean[]',
-            'precision'        => 'Number',
-            'precisions'       => 'Number[]',
-            'probed_data'      => 'Number',
-            'binary_data'      => 'Binary',
-            'ft_search'        => 'String',
-            'times'            => 'Timestamp[]',
+            'id'               => 'integer',
+            'created_at'       => 'timestamp',
+            'something'        => 'varchar',
+            'things'           => 'varchar[]',
+            'is_true'          => 'boolean',
+            'are_true'         => 'boolean[]',
+            'precision'        => 'float',
+            'precisions'       => 'float[]',
+            'probed_data'      => 'numeric',
+            'binary_data'      => 'bytea',
+            'ft_search'        => 'tsvector',
+            'times'            => 'timestamp[]',
         );
         $this->pk_fields    = array('id');
     }
@@ -135,8 +135,8 @@ _
         $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_point point", $this->object_name));
         $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_points point[]", $this->object_name));
         $this->connection->getDatabase()->registerConverter('Point', new Converter\PgPoint(), array('point'));
-        $this->addField('test_point', 'Point');
-        $this->addField('test_points', 'Point[]');
+        $this->addField('test_point', 'point');
+        $this->addField('test_points', 'point[]');
     }
 
     public function addLseg()
@@ -144,15 +144,15 @@ _
         $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_lseg lseg", $this->object_name));
         $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_lsegs lseg[]", $this->object_name));
         $this->connection->getDatabase()->registerConverter('Lseg', new Converter\PgLseg(), array('lseg'));
-        $this->addField('test_lseg', 'Lseg');
-        $this->addField('test_lsegs', 'Lseg[]');
+        $this->addField('test_lseg', 'lseg');
+        $this->addField('test_lsegs', 'lseg[]');
     }
 
     public function addHStore()
     {
         $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_hstore hstore", $this->object_name));
         $this->connection->getDatabase()->registerConverter('HStore', new Converter\PgHStore(), array('hstore'));
-        $this->addField('test_hstore', 'HStore');
+        $this->addField('test_hstore', 'hstore');
     }
 
     public function addCircle()
@@ -160,8 +160,8 @@ _
         $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_circle circle", $this->object_name));
         $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_circles circle[]", $this->object_name));
         $this->connection->getDatabase()->registerConverter('Circle', new Converter\PgCircle(), array('circle'));
-        $this->addField('test_circle', 'Circle');
-        $this->addField('test_circles', 'Circle[]');
+        $this->addField('test_circle', 'circle');
+        $this->addField('test_circles', 'circle[]');
     }
 
     public function addInterval()
@@ -169,16 +169,16 @@ _
         $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_interval interval", $this->object_name));
         $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_intervals interval[]", $this->object_name));
         $this->connection->getDatabase()->registerConverter('Interval', new Converter\PgInterval(), array('interval'));
-        $this->addField('test_interval', 'Interval');
-        $this->addField('test_intervals', 'Interval[]');
+        $this->addField('test_interval', 'interval');
+        $this->addField('test_intervals', 'interval[]');
     }
 
     public function addXml()
     {
         $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_xml xml", $this->object_name));
         $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_xmls xml[]", $this->object_name));
-        $this->addField('test_xml', 'String');
-        $this->addField('test_xmls', 'String[]');
+        $this->addField('test_xml', 'xml');
+        $this->addField('test_xmls', 'xml[]');
     }
 
 }
