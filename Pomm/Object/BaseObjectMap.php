@@ -313,7 +313,7 @@ abstract class BaseObjectMap
                 continue;
             }
 
-            if (preg_match('/([a-z0-9_-]+)(\[\])?/i', $pg_type, $matchs))
+            if (preg_match('/([a-z0-9_\.-]+)(\[\])?/i', $pg_type, $matchs))
             {
                 if (count($matchs) > 2)
                 {
@@ -360,7 +360,7 @@ abstract class BaseObjectMap
                 }
             }
 
-            if (preg_match('/([a-z0-9_-]+)(\[\])?/i', $pg_type, $matchs))
+            if (preg_match('/([a-z0-9_\.-]+)(\[\])?/i', $pg_type, $matchs))
             {
                 if (count($matchs) > 2)
                 {

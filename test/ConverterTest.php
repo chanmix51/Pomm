@@ -298,7 +298,7 @@ class converter_test extends \lime_test
 }
 
 $test = new converter_test();
-$binary = 'b'; //file_get_contents(__DIR__.'/init/smallP.png');
+$binary = file_get_contents(__DIR__.'/init/smallP.png');
 
 $test
     ->initialize($service)

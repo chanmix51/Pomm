@@ -38,7 +38,7 @@ class pgArray implements ConverterInterface
         return array_map(function($val) use ($converter, $type) {
                 return $converter->fromPg($val, $type);
                         },
-                        preg_split('/[,\s]*"((?:[^\\\\"]|\\\\.)+)"[,\s]*|[,\s]+/', trim($data, "{}"), 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE));
+                        preg_split('/[,\s]*"((?:[^\\\\"]|\\\\.|"")+)"[,\s]*|[,\s]+/', str_replace('""', '"', trim($data, "{}")), 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE));
     }
 
     /**
