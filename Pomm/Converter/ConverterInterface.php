@@ -14,7 +14,7 @@ namespace Pomm\Converter;
 
 interface ConverterInterface
 {
-    public function fromPg($data);
+    public function fromPg($data, $type = null);
 
-    public function toPg($data);
+    public function toPg($data, $type = null);
 }

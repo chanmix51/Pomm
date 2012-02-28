@@ -35,11 +35,11 @@ class PgBytea implements ConverterInterface
     /**
      * @see ConverterInterface
      **/
-    public function toPg($data)
+    public function toPg($data, $type = null)
     {
         if (function_exists('pg_escape_bytea'))
         {
-            return sprintf("'%s'::bytea", pg_escape_bytea($data));
+            return sprintf("bytea '%s'", pg_escape_bytea($data));
         }
         else
         {
@@ -50,7 +50,7 @@ class PgBytea implements ConverterInterface
     /**
      * @see ConverterInterface
      **/
-    public function fromPg($data)
+    public function fromPg($data, $type = null)
     {
         return stripcslashes(stream_get_contents($data));
     }

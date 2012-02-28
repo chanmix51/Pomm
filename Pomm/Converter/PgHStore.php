@@ -18,7 +18,7 @@ class PgHStore implements ConverterInterface
     /**
      * @see ConverterInterface
      **/
-    public function fromPg($data)
+    public function fromPg($data, $type = null)
     {
         $split = preg_split('/[,\s]*"([^"]+)"[,\s]*|[,=>\s]+/', $data, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
         $hstore = array();
@@ -34,7 +34,7 @@ class PgHStore implements ConverterInterface
     /**
      * @see ConverterInterface
      **/
-    public function toPg($data)
+    public function toPg($data, $type = null)
     {
         if (!is_array($data))
         {

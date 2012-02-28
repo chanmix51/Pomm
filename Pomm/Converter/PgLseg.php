@@ -34,7 +34,7 @@ class PgLseg implements ConverterInterface
     /**
      * @see ConverterInterface
      **/
-    public function fromPg($data)
+    public function fromPg($data, $type = null)
     {
         $data = trim($data, "[]");
         $elts = preg_split('/[,\s]*(\([^\)]+\))[,\s]*|[,\s]+/', $data, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
@@ -50,7 +50,7 @@ class PgLseg implements ConverterInterface
     /**
      * @see ConverterInterface
      **/
-    public function toPg($data)
+    public function toPg($data, $type = null)
     {
         if (! $data instanceof $this->class_name)
         {

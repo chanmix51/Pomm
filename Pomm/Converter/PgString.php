@@ -17,10 +17,11 @@ class PgString implements ConverterInterface
     /**
      * @see ConverterInterface
      **/
-    public function toPg($data)
+    public function toPg($data, $type = null)
     {
         $data = str_replace("'", "''", $data);
-        $data = sprintf("'%s'", $data);
+        $type = is_null($type) ? '' : sprintf("%s ", $type);
+        $data = sprintf("%s'%s'", $data, $type);
 
         return $data;
     }

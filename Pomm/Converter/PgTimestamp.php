@@ -17,7 +17,7 @@ class PgTimestamp implements ConverterInterface
     /**
      * @see ConverterInterface
      **/
-    public function fromPg($data)
+    public function fromPg($data, $type = null)
     {
         return new \DateTime($data);
     }
@@ -25,13 +25,13 @@ class PgTimestamp implements ConverterInterface
     /**
      * @see ConverterInterface
      **/
-    public function toPg($data)
+    public function toPg($data, $type = null)
     {
         if (!$data instanceof \DateTime)
         {
             $data = new \DateTime($data);
         }
 
-        return sprintf("'%s'::timestamp", $data->format('Y-m-d H:i:s.u'));
+        return sprintf("%s '%s'", $type, $data->format('Y-m-d H:i:s.u'));
     }
 }

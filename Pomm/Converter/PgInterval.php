@@ -19,7 +19,7 @@ class PgInterval implements ConverterInterface
     /**
      * @see ConverterInterface
      **/
-    public function fromPg($data)
+    public function fromPg($data, $type = null)
     {
         if (!preg_match("/(?:([0-9]+) year ?)?(?:([0-9]+) mons ?)?(?:([0-9]+) days ?)?(?:([1-9]{1,2}):([0-9]{1,2}):([0-9\.]+))?/", $data, $matchs))
         {
@@ -40,7 +40,7 @@ class PgInterval implements ConverterInterface
     /**
      * @see ConverterInterface
      **/
-    public function toPg($data)
+    public function toPg($data, $type = null)
     {
         if (!$data instanceof \DateInterval)
         {

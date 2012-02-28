@@ -195,7 +195,7 @@ class TestConverterContainerMap extends BaseObjectMap
         $this->object_name  =  'pomm_test.test_converter_container';
         $this->field_definitions  = array(
             'id'               => 'Number',
-            'test_converter'   => 'TestConverter',
+            'test_converter'   => 'pomm_test.converter',
         );
         $this->pk_fields    = array('id');
 
@@ -205,7 +205,7 @@ class TestConverterContainerMap extends BaseObjectMap
                 new \Pomm\Converter\PgEntity(
                     $this->connection->getDatabase(),
                     'Pomm\Test\TestConverter'),
-                array('pomm_test.test_converter')
+                array('pomm_test.converter')
             );
     }
 

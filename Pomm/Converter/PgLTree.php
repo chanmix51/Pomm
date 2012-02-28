@@ -17,7 +17,7 @@ class PgLTree implements ConverterInterface
     /**
      * @see ConverterInterface
      **/
-    public function fromPg($data)
+    public function fromPg($data, $type = null)
     {
         return preg_split('/\./', $data);
     }
@@ -25,7 +25,7 @@ class PgLTree implements ConverterInterface
     /**
      * @see ConverterInterface
      **/
-    public function toPg($data)
+    public function toPg($data, $type = null)
     {
         return sprintf("'%s'::ltree", join('.', $data));
     }

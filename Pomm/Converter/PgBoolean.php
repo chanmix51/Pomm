@@ -19,7 +19,7 @@ class PgBoolean implements ConverterInterface
     /**
      * @see ConverterInterface
      **/
-    public function fromPg($data)
+    public function fromPg($data, $type = null)
     {
         return ($data == 't');
     }
@@ -27,7 +27,7 @@ class PgBoolean implements ConverterInterface
     /**
      * @see ConverterInterface
      **/
-    public function toPg($data)
+    public function toPg($data, $type = null)
     {
         return $data ? "true" : "false";
     }

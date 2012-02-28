@@ -17,7 +17,7 @@ class PgNumber implements ConverterInterface
     /**
      * @see ConverterInterface
      **/
-    public function fromPg($data)
+    public function fromPg($data, $type = null)
     {
         return $data;
     }
@@ -25,7 +25,7 @@ class PgNumber implements ConverterInterface
     /**
      * @see ConverterInterface
      **/
-    public function toPg($data)
+    public function toPg($data, $type = null)
     {
         return $data;
     }
