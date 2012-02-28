@@ -29,6 +29,6 @@ class PgBoolean implements ConverterInterface
      **/
     public function toPg($data)
     {
-        return $data ? "'true'" : "'false'";
+        return $data ? "true" : "false";
     }
 }

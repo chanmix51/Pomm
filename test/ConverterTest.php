@@ -67,8 +67,7 @@ class converter_test extends \lime_test
     public function testBasics($values, $compare)
     {
         $this->info('basic types.');
-        $this->object = $this->map->createObject();
-        $this->object->hydrate($values);
+        $this->object = $this->map->createObject($values);
         $this->map->saveOne($this->object);
         $this->ok(is_integer($this->object['id']), "'id' is an integer.");
         $this->is($this->object['id'], $compare['id'], sprintf("'id' is '%d'.", $compare['id']));
@@ -88,6 +87,21 @@ class converter_test extends \lime_test
             $this->isa_ok($time, 'DateTime', 'Each element is a DateTime.');
             $this->is($time->format('Y-m-d H:i:s'), $compare['times'][$index]->format('Y-m-d H:i:s'), 'Formatted date time is matching.');
         }
+
+        $this->object->setThings(array($this->object['something'], $this->object['something']));
+        $this->map->saveOne($this->object);
+        $object = $this->map->findByPk($this->object->get($this->map->getPrimaryKey()));
+        $this->is_deeply($object['things'], array($this->object['something'], $this->object['something']), 'Things is an array of 2 times something.');
+
+        $this->object->setAreTrue(array(true, false, true, true));
+        $this->map->saveOne($this->object);
+        $object = $this->map->findByPk($this->object->get($this->map->getPrimaryKey()));
+        $this->is_deeply($object['are_true'], array(true, false, true, true), "Are true contains all expected booleans.");
+
+        $this->object->setPrecisions(array($this->object['precision'], $this->object['precision'] * 2));
+        $this->map->saveOne($this->object);
+        $object = $this->map->findByPk($this->object->get($this->map->getPrimaryKey()));
+        $this->is_deeply($object['precisions'], array($this->object['precision'], (string) ($this->object['precision'] * 2)), "Precisions is an array of precision && * 2");
 
         return $this;
     }
@@ -110,6 +124,14 @@ class converter_test extends \lime_test
         $this->ok($object['test_point'] instanceof \Pomm\Type\Point, "'point' is a \\Pomm\\Type\\Point instance.");
         $this->is($object['test_point']->x, $point->x, sprintf("Coord 'x' are equal (%f).", $point->x));
         $this->is($object['test_point']->y, $point->y, sprintf("Coord 'y' are equal (%f).", $point->y));
+
+        $this->object->setTestPoints(array($point, $point));
+        $this->map->saveOne($this->object);
+        $object = $this->map->findByPk($this->object->get($this->map->getPrimaryKey()));
+        $this->is($object['test_points'][0]->x, $point->x, sprintf('Point 1 from array X ok.'));
+        $this->is($object['test_points'][0]->y, $point->y, sprintf('Point 1 from array y ok.'));
+        $this->is($object['test_points'][1]->x, $point->x, sprintf('Point 2 from array X ok.'));
+        $this->is($object['test_points'][1]->y, $point->y, sprintf('Point 2 from array y ok.'));
 
         return $this;
     }
@@ -135,6 +157,14 @@ class converter_test extends \lime_test
         $this->is($object['test_lseg']->point_b->x, $segment->point_b->x, sprintf("Coord 'x' are equal (%f).", $segment->point_b->x));
         $this->is($object['test_lseg']->point_b->y, $segment->point_b->y, sprintf("Coord 'y' are equal (%f).", $segment->point_b->y));
 
+        $this->object->setTestLsegs(array($segment, $segment));
+        $this->map->updateOne($this->object, array('test_lsegs'));
+        $object = $this->map->findByPk($this->object->get($this->map->getPrimaryKey()));
+
+        $this->is($object['test_lsegs'][1]->point_a->x, $segment->point_a->x, sprintf("Instance 1 Coord 'x' are equal (%f).", $segment->point_a->x));
+        $this->is($object['test_lsegs'][1]->point_a->y, $segment->point_a->y, sprintf("Instance 1 Coord 'y' are equal (%f).", $segment->point_a->y));
+        $this->is($object['test_lsegs'][1]->point_b->x, $segment->point_b->x, sprintf("Instance 1 Coord 'x' are equal (%f).", $segment->point_b->x));
+        $this->is($object['test_lsegs'][1]->point_b->y, $segment->point_b->y, sprintf("Instance 1 Coord 'y' are equal (%f).", $segment->point_b->y));
         return $this;
     }
 
@@ -187,7 +217,13 @@ class converter_test extends \lime_test
         $this->is($object['test_circle']->center->x, $circle->center->x, sprintf("Center 'x' is equal to '%f'.", $circle->center->x));
         $this->is($object['test_circle']->center->y, $circle->center->y, sprintf("Center 'y' is equal to '%f'.", $circle->center->y));
         $this->is($object['test_circle']->radius, $circle->radius, sprintf("Radius is equal to '%f'.", $circle->radius));
+        $this->object->setTestCircles(array($circle, $circle));
+        $this->map->updateOne($this->object, array('test_circles'));
+        $object = $this->map->findByPk($this->object->get($this->map->getPrimaryKey()));
 
+        $this->is($object['test_circles'][1]->center->x, $circle->center->x, sprintf(" Instance 1 Center 'x' is equal to '%f'.", $circle->center->x));
+        $this->is($object['test_circles'][1]->center->y, $circle->center->y, sprintf(" Instance 1 Center 'y' is equal to '%f'.", $circle->center->y));
+        $this->is($object['test_circles'][1]->radius, $circle->radius, sprintf(" Instance 1 Radius is equal to '%f'.", $circle->radius));
         return $this;
 
     }
@@ -213,6 +249,13 @@ class converter_test extends \lime_test
         $this->map->updateOne($this->object, array('test_interval'));
         $this->is($this->object['test_interval']->format('%Y years %m months'), "01 years 6 months", "Record WAS updated with database value.");
 
+        $this->object->setTestIntervals(array($interval, $interval));
+        $this->map->updateOne($this->object, array('test_intervals'));
+        $object = $this->map->findByPk($this->object->get($this->map->getPrimaryKey()));
+
+        $this->ok($object['test_intervals'][1] instanceof \DateInterval, "'Instance 1 test_interval' is a \\DateInterval instance.");
+        $this->is($object['test_intervals'][1]->format('%Y %m %d %h %i %s'), $this->object['test_intervals'][1]->format('%Y %m %d %h %i %s'), "Instance 1 Formatted intervals match.");
+
         return $this;
     }
 
@@ -231,31 +274,29 @@ class converter_test extends \lime_test
         $this->is($this->object['test_xml'], $xml, 'Original XML unchanged after saved.');
         $this->is($object['test_xml'], $xml, 'Original XML unchanged after retrieved.');
 
+        $this->object['test_xmls'] = array($xml, $xml);
+        $this->map->updateOne($this->object, array('test_xmls'));
+        $object = $this->map->findByPk($this->object->get($this->map->getPrimaryKey()));
+        $this->is($object['test_xmls'][1], $xml, 'Instance 1 Original XML unchanged after retrieved.');
+
         return $this;
     }
 
-    public function testPeriod($date_start, $date_end)
+    public function testEntity()
     {
-        $this->info('\\Pomm\\Converter\\PgPeriod');
-        if (!$this->map->hasField('test_period'))
-        {
-            $this->info('Creating column test_period.');
-            $this->map->addPeriod();
-        }
+        $map = $this->connection->getMapFor('Pomm\Test\TestConverterContainer');
+        $map->createTable();
+        $test_container = $map->createObject(array('test_converter' => $this->object));
 
-        $period = new \Pomm\Type\Period(new \DateTime($date_start), new \DateTime($date_end));
-        $this->object['test_period'] = $period;
-        $this->map->updateOne($this->object, array('test_period'));
-        $object = $this->map->findByPk($this->object->get($this->map->getPrimaryKey()));
+        $map->saveOne($test_container);
 
-        $this->ok($object['test_period'] instanceof \Pomm\Type\Period, '"test_period" is a "period" type.');
-        $this->is($this->object['test_period']->start->format('Y-m-d H:i:s'), $object['test_period']->start->format('Y-m-d H:i:s'), "Start dates are the same.");
-        $this->is($this->object['test_period']->end->format('Y-m-d H:i:s'), $object['test_period']->end->format('Y-m-d H:i:s'), "end dates are the same.");
+        $this->isa_ok($test_container['test_converter'], 'Pomm\Test\TestConverter', 'The test_converter is a "TestConverter" instance.');
     }
+
 }
 
 $test = new converter_test();
-$binary = file_get_contents('https://twimg0-a.akamaihd.net/profile_images/1583413811/smile_normal.JPG');
+$binary = file_get_contents(__DIR__.'/init/smallP.png');
 
 $test
     ->initialize($service)
@@ -268,7 +309,7 @@ $test
     ->testCircle(new Type\Circle(new Type\Point(1,2), 3))
     ->testInterval(\DateInterval::createFromDateString('1 years 8 months 30 days 14 hours 25 minutes 7 seconds'))
     ->testXml('<pika data="chu">plop</pika>')
-//    ->testPeriod('2012-01-01 12:30:00', '2012-02-01 12:30:00')
+    ->testEntity()
     ;
 
 $test->__destruct();
