@@ -13,10 +13,10 @@ class PommBenchMap extends BaseObjectMap
         $this->object_class = 'Bench\PommBench';
         $this->object_name = 'bench_pomm.bench';
         $this->field_definitions = array(
-            'id'          => 'integer',
-            'data_int'    => 'integer',
+            'id'          => 'int4',
+            'data_int'    => 'int4',
             'data_char'   => 'varchar',
-            'data_bool'   => 'boolean',
+            'data_bool'   => 'bool',
         );
         $this->pk_fields = array('id');
     }
@@ -30,7 +30,7 @@ class PommBenchMap extends BaseObjectMap
     {
         $sql = sprintf("CREATE SCHEMA %s", reset(preg_split('/\./', $this->object_name)));
         $this->connection->getDatabase()->executeAnonymousQuery($sql);
-        $sql = sprintf("CREATE TABLE %s (id SERIAL PRIMARY KEY, data_int INTEGER NOT NULL, data_char VARCHAR NOT NULL, data_bool BOOLEAN NOT NULL);", $this->object_name);
+        $sql = sprintf("CREATE TABLE %s (id SERIAL PRIMARY KEY, data_int int4 NOT NULL, data_char VARCHAR NOT NULL, data_bool bool NOT NULL);", $this->object_name);
         $this->connection->getDatabase()->executeAnonymousQuery($sql);
     }
 
@@ -43,7 +43,7 @@ class PommBenchMap extends BaseObjectMap
 
     public function feedTable($rows)
     {
-        $sql = sprintf("INSERT INTO %s (data_int, data_char, data_bool) SELECT floor(random() * 10000000), md5(random()::text), (floor(random() * 100)::integer %% 2) = 0 FROM (SELECT * FROM generate_series(1, ?)) AS x;", $this->object_name);
+        $sql = sprintf("INSERT INTO %s (data_int, data_char, data_bool) SELECT floor(random() * 10000000), md5(random()::text), (floor(random() * 100)::int4 %% 2) = 0 FROM (SELECT * FROM generate_series(1, ?)) AS x;", $this->object_name);
         $this->query($sql, array($rows));
     }
 

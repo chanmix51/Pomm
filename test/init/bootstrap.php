@@ -18,13 +18,13 @@ class TestTableMap extends BaseObjectMap
         $this->object_class =  'Pomm\Test\TestTable';
         $this->object_name  =  'pomm_test.book';
         $this->field_definitions  = array(
-            'id'               =>    'integer',
+            'id'               =>    'int4',
             'created_at'       =>    'timestamp',
             'last_in'          =>    'timestamp',
             'last_out'         =>    'timestamp',
             'title'            =>    'varchar',
             'authors'          =>    'varchar[]',
-            'is_available'     =>    'boolean',
+            'is_available'     =>    'bool',
             'location'         =>    'point',
         );
         $this->pk_fields    = array('id');
@@ -34,7 +34,7 @@ class TestTableMap extends BaseObjectMap
     {
         $sql = sprintf("CREATE SCHEMA %s", reset(preg_split('/\./', $this->object_name)));
         $this->connection->getDatabase()->executeAnonymousQuery($sql);
-        $sql = sprintf("CREATE TABLE %s (id SERIAL PRIMARY KEY, created_at TIMESTAMP NOT NULL DEFAULT now(), last_out TIMESTAMP, last_in TIMESTAMP, title VARCHAR(256) NOT NULL, authors VARCHAR(255)[] NOT NULL, is_available BOOLEAN NOT NULL DEFAULT true, location POINT)", $this->object_name);
+        $sql = sprintf("CREATE TABLE %s (id SERIAL PRIMARY KEY, created_at TIMESTAMP NOT NULL DEFAULT now(), last_out TIMESTAMP, last_in TIMESTAMP, title VARCHAR(256) NOT NULL, authors VARCHAR(255)[] NOT NULL, is_available bool NOT NULL DEFAULT true, location POINT)", $this->object_name);
         $this->connection->getDatabase()->executeAnonymousQuery($sql);
     }
 
@@ -71,14 +71,14 @@ class TestConverterMap extends BaseObjectMap
         $this->object_class =  'Pomm\Test\TestConverter';
         $this->object_name  =  'pomm_test.converter';
         $this->field_definitions  = array(
-            'id'               => 'integer',
+            'id'               => 'int4',
             'created_at'       => 'timestamp',
             'something'        => 'varchar',
             'things'           => 'varchar[]',
-            'is_true'          => 'boolean',
-            'are_true'         => 'boolean[]',
-            'precision'        => 'float',
-            'precisions'       => 'float[]',
+            'is_true'          => 'bool',
+            'are_true'         => 'bool[]',
+            'precision'        => 'float8',
+            'precisions'       => 'float8[]',
             'probed_data'      => 'numeric',
             'binary_data'      => 'bytea',
             'ft_search'        => 'tsvector',
@@ -102,13 +102,13 @@ CREATE TABLE %s (
     created_at TIMESTAMP NOT NULL DEFAULT now(), 
     something VARCHAR, 
     things VARCHAR[], 
-    is_true BOOLEAN, 
-    are_true BOOLEAN[], 
-    precision FLOAT, 
-    precisions FLOAT[], 
+    is_true BOOL, 
+    are_true BOOL[], 
+    precision float8, 
+    precisions float8[], 
     probed_data NUMERIC(4,3), 
     binary_data BYTEA, 
-    ft_search tsvector, 
+    ft_search TSVECTOR, 
     times TIMESTAMP[]
 )
 _
@@ -194,7 +194,7 @@ class TestConverterContainerMap extends BaseObjectMap
         $this->object_class =  'Pomm\Test\TestConverterContainer';
         $this->object_name  =  'pomm_test.test_converter_container';
         $this->field_definitions  = array(
-            'id'               => 'integer',
+            'id'               => 'int4',
             'test_converter'   => 'pomm_test.converter',
         );
         $this->pk_fields    = array('id');
