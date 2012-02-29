@@ -146,7 +146,7 @@ EOD;
                 $format_type = $attribute['format_type'];
             }
 
-            $field_type = $this->options['database']->getConverterNameForType($format_type).$array_modifier;
+            $field_type = $format_type.$array_modifier;
 
             $fields_definition .= sprintf("        \$this->addField('%s', '%s');\n", $field_name, $field_type);
         }

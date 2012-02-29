@@ -84,13 +84,47 @@ class Inspector
      **/
     public function getTableFieldsInformation($oid)
     {
-        $sql = sprintf("SELECT a.attname, pg_catalog.format_type(a.atttypid, a.atttypmod), (SELECT substring(pg_catalog.pg_get_expr(d.adbin, d.adrelid) for 128) FROM pg_catalog.pg_attrdef d WHERE d.adrelid = a.attrelid AND d.adnum = a.attnum AND a.atthasdef) as defaultval, a.attnotnull as notnull, a.attnum as index FROM pg_catalog.pg_attribute a WHERE a.attrelid = '%d' AND a.attnum > 0 AND NOT a.attisdropped ORDER BY a.attnum;", $oid);
+        $sql = <<<_
+SELECT 
+  a.attname,
+  t.typname AS type,
+  n.nspname AS type_namespace,
+  (
+    SELECT 
+        substring(pg_catalog.pg_get_expr(d.adbin, d.adrelid) for 128) 
+    FROM 
+      pg_catalog.pg_attrdef d 
+    WHERE 
+        d.adrelid = a.attrelid 
+      AND 
+        d.adnum = a.attnum 
+      AND 
+        a.atthasdef
+  ) as defaultval,
+  a.attnotnull as notnull,
+  a.attnum as index 
+FROM 
+  pg_catalog.pg_attribute a 
+    JOIN pg_catalog.pg_type t ON
+        a.atttypid = t.oid
+    JOIN pg_namespace n ON
+        t.typnamespace = n.oid
+WHERE 
+    a.attrelid = %d
+  AND 
+    a.attnum > 0 AND 
+  NOT 
+    a.attisdropped 
+ORDER BY 
+  a.attnum
+_;
+        $sql = sprintf($sql, $oid);
 
         $pdo = $this->connection->getPdo()->query($sql);
         $attributes = array();
         while ($class = $pdo->fetch(\PDO::FETCH_LAZY))
         {
-            $attributes[] = array('attname' => $class->attname, 'format_type' => $class->format_type);
+            $attributes[] = array('attname' => $class->attname, 'format_type' => $class->type_namespace == 'pg_catalog' ? $class->type : sprintf("%s.%s", $class->type_namespace, $class->type));
         }
 
         return $attributes;
