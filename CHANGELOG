@@ -1,0 +1,124 @@
+=== 1.0.0
+ * type consistency between pg & pomm.
+ * Model generation with new converter system.
+ * Quote escaping in array and entity converters.
+ * ArrayConverter.
+ * Use ROW to ovoid litteral syntax.
+ * New converter system.
+ * Generic accessors made final.
+ * Update documentation: virtual fields.
+ * Add virtual fields support.
+ * Fix a test issue with dates.
+ * Add registerTypeForConverter method.
+ * Added a wrapper for all tests.
+ * Clean pomm_lib.sql.
+ * Fix "Bytea" converter problem.
+ * Identity Mapper with no PK.
+ * Handle when no PK is present.
+ * Logger records Map class.
+=== RC4
+ *  registerConverter can now be chained.
+ *  Logger display duration in ms.
+ *  No index in SQL logs.
+ *  Logger test was broken.
+ *  Cannot rely on SQL cursors with PDO.
+ *  Added xml to StringConverter.
+ *  Added composer.json.
+ *  Added the query logger filter.
+ *  Added query filter chain.
+ *  RETURNING * may not return anything (X.Briand).
+ *  update object after saveOne only if returned (X.Briand).
+ *  fixed ParameterHolder::mustBeOneOf method.
+ *  Unix socket path, views.
+=== RC3
+ *  Added alias in getTableName() and updated documentation.
+ *  Fixed direct attribute access to use overloads. Added the 'has' overload.
+ *  Added direct attribute access tests.
+ *  fixed BaseObject::__get return issue (X.Briand).
+ *  identity mapper cannot rely on object schema anymore.
+ *  Fetching a non existing attribute returns null.
+ *  Removed getPrimaryKey from BaseObject. BaseObject is now standalone.
+ *  BaseObject now implements IteratorAggregate.
+ *  INSERT and UPDATE now return getSelectFields().
+ *  Handling table inheritance.
+ *  Refactored Tools to use the new database Inspector.
+ *  Bug fixed about prefix namespace.
+=== RC2
+ *  Added setName on Database.
+ *  Changed generation tools so Database name appears.
+ *  tsvector type added to the string converter.
+ *  Added alternative bytea escaping.
+ *  Tested with pg_escape_bytea.
+ *  permit magic access to fields data event if empty (F.Klein).
+ *  refactored destination path and namespace handling to avoid forcing default
+    dir structure (F.Klein).
+ *  Fixed no password in DSN.
+ *  moved executeAnonymousQuery to Database object (F.Klein).
+ *  updateOne method uses RETURNING * too.
+ *  Refactored updateOne using 'RETURNING *' (yes Pg is awesome).
+=== RC1
+ *  Default IMSmart. Added IMStrict and none.
+ *  Added IM as optional argument to createConnection().
+ *  Check if the instance is not deleted.
+ *  Changed IM implementation. Add foreign method.
+ *  added identity map.
+ *  Fixed a major bug in Model generation.
+=== BETA4
+ *  Added Pager.
+ *  Added PgInterval converter.
+ *  added UUID type support as string.
+ *  Force values returned by filters to be array.
+ *  Added foreign fields formatter method.
+ *  Added filters in Collection. Fixed group by fiels bug.
+ *  Added more methods in Collection. Updated documentation.
+ *  bench.
+=== BETA3
+ *  restricted : and @ from the username.
+ *  more general username allowed.
+ *  Allowed / in user name.
+ *  Allowed . in server addr/name.
+ *  Added primary key for tests.
+=== BETA2
+ *  Circle converter.
+ *  Fixed HStore converter.
+ *  Segment converter.
+ *  Point converter is not loaded by default.
+=== BETA1
+ *  Added updateOne().
+ *  Entity converter.
+ *  hydrate final + documentation.
+ *  transaction check.
+ *  Added the «point» builtin type.
+ *  typo in documentation.
+ *  findWhere uses a suffix for ORDER BY and LIMIT modifiers.
+ *  Added an ORDER BY argument to findWhere().
+ *  tools now handles a prefix schema and namespace.
+ *  Changed tools to handle prefix dir/namespace.
+ *  updated readme.
+ *  Changes to documentation.
+ *  BaseMap are now abstract.
+ *  Service has a constructor.
+ *  Merged Transaction in Connection.
+ *  Generated classes now use consistent namespace.
+ *  Changed Pomm:setDatabase & tests.
+ *  Array support.
+ *  Removed types, added converters.
+ *  Fixed fields method call.
+ *  getGroupByFields and getSelectFields return an array.
+ *  added a getSelectFields method to replace * in SELECT.
+ *  Added SQL library.
+ *  Added schema scanning feature.
+ *  Auto creation of base classes.
+ *  now generating map files.
+ *  Fixed the autoloader.
+ *  Changed name to conform to sf2 autoloading.
+ *  Renamed lib to Pomm.
+ *  Split Transaction and Connection.
+ *  Finished transactions.
+ *  Added TransactionConnection.
+ *  Object test.
+ *  Ok test for where.
+ *  Changed namespaces and prefixes.
+ *  Connection part.
+ *  switched to pomm.
+ *  Added old files.

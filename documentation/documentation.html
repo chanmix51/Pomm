@@ -491,12 +491,13 @@ $service-&gt;setDatabase('db_two', new App\MyDb(array(
 <dl class="docutils">
 <dt>By default, the following converters are registered, this means you can use them without configuring anything:</dt>
 <dd><ul class="first last simple">
-<li><tt class="docutils literal">Boolean</tt>: convert postgresql 't' and 'f' to/from PHP boolean value</li>
+<li><tt class="docutils literal">Boolean</tt>: convert postgresql booleans 't' and 'f' to/from PHP boolean values</li>
 <li><tt class="docutils literal">Number</tt>: convert postgresql 'smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial' types to numbers</li>
 <li><tt class="docutils literal">String</tt>: convert postgresql 'varchar', 'uuid', 'xml' and 'text' into PHP string</li>
 <li><tt class="docutils literal">Timestamp</tt>: convert postgresql 'timestamp', 'date', 'time' to PHP <tt class="docutils literal">DateTime</tt> instance.</li>
 <li><tt class="docutils literal">Interval</tt>: convert postgresql's 'interval' type into PHP <tt class="docutils literal">SplInterval</tt> instance.</li>
 <li><tt class="docutils literal">Binary</tt>: convert postgresql's 'bytea' type into PHP string.</li>
+<li><tt class="docutils literal">Array</tt>: convert postgresql arrays from/to PHP arrays.</li>
 </ul>
 </dd>
 </dl>
@@ -530,7 +531,7 @@ $service
 <dd><ul class="first last simple">
 <li>the first argument is the converter name. It is used in the map classes to link with fields (see <a class="reference internal" href="#map-classes">Map Classes</a> below).</li>
 <li>the second argument is the instance of the <tt class="docutils literal">Converter</tt></li>
-<li>the third argument is a word or a set of words for Pomm to identify what converter to use when scanning the database to create the Map files. These words are going to be used in a regular expression match.</li>
+<li>the third argument is a type or a set of types for Pomm to link them with the given converter.</li>
 </ul>
 </dd>
 </dl>
@@ -558,12 +559,12 @@ $service
 <h2><a class="toc-backref" href="#id12">Converters and types</a></h2>
 <div class="section" id="domains">
 <h3><a class="toc-backref" href="#id13">Domains</a></h3>
-<p>In case your database uses <tt class="docutils literal">DOMAIN</tt> types you can add them to an already registered converter. The <em>registerTypeForConverter</em> method stands for that.:</p>
+<p>In case your database uses <tt class="docutils literal">DOMAIN</tt> types you can add them to an already registered converter. The <tt class="docutils literal">registerTypeForConverter()</tt> method stands for that.:</p>
 <pre class="literal-block">$service-&gt;getDatabase('default')
   -&gt;registerTypeForConverter('email', 'String');
   ;
 </pre>
-<p>In the example above, the database contains a domain <tt class="docutils literal">email</tt> which is a subtype of <tt class="docutils literal">VARCHAR</tt> so it is associated with the built-in converter <tt class="docutils literal">String</tt>.</p>
+<p>In the example above, the database contains a domain <tt class="docutils literal">email</tt> which is a subtype of <tt class="docutils literal">varchar</tt> so it is associated with the built-in converter <tt class="docutils literal">String</tt>.</p>
 </div>
 <div class="section" id="custom-types">
 <h3><a class="toc-backref" href="#id14">Custom types</a></h3>
@@ -596,7 +597,7 @@ class WindingPower
     }
 }
 </pre>
-<p>Here, we can see the very good side of this method: we can implement a <em>getPowerMax()</em> method and make our type richer.</p>
+<p>Here, we can see the very good side of this method: we can implement a <tt class="docutils literal">getPowerMax()</tt> method and make our type richer.</p>
 </div>
 <div class="section" id="writing-your-own-converters">
 <h3><a class="toc-backref" href="#id15">Writing your own converters</a></h3>
@@ -625,7 +626,7 @@ class WindingPower implements ConverterInterface
         $this-&gt;class_name = $class_name;
     }
 
-    public function fromPg($data)
+    public function fromPg($data, $type = null)
     {
         $data = trim($data, "()");
         $values = preg_split('/,/', $data);
@@ -633,9 +634,9 @@ class WindingPower implements ConverterInterface
         return new $this-&gt;class_name($values[0], $values[1]);
     }
 
-    public function toPg($data)
+    public function toPg($data, $type = null)
     {
-        return sprintf("(%4.1f,%4.3f)", $data-&gt;voltage, $data-&gt;current);
+        return sprintf("winding_power '(%4.1f,%4.3f)'", $data-&gt;voltage, $data-&gt;current);
     }
 }
 </pre>
@@ -874,11 +875,11 @@ $entity-&gt;isModified();      // true
          $this-&gt;object_class =  'College\PublicSchema\Student';
          $this-&gt;object_name  =  'student';
 
-         $this-&gt;addField('reference', 'String');
-         $this-&gt;addField('first_name', 'String');
-         $this-&gt;addField('last_name', 'String');
-         $this-&gt;addField('birthdate', 'Timestamp');
-         $this-&gt;addField('level', 'Number');
+         $this-&gt;addField('reference', 'char');
+         $this-&gt;addField('first_name', 'varchar');
+         $this-&gt;addField('last_name', 'varchar');
+         $this-&gt;addField('birthdate', 'timestamp');
+         $this-&gt;addField('level', 'smallint');
 
          $this-&gt;pk_fields = array('reference');
      }
@@ -896,9 +897,8 @@ $entity-&gt;isModified();      // true
 <div class="section" id="arrays">
 <h3><a class="toc-backref" href="#id34">Arrays</a></h3>
 <p>Postgresql supports arrays. An array can contain several entities all from the same type. Pomm of course supports this feature using the <tt class="docutils literal">[]</tt> notation after the converter declaration:</p>
-<pre class="literal-block">$this-&gt;addField('authors', 'String[]');   // Array of strings
-$this-&gt;addField('locations', 'Point[]');  // Array of points
-$this-&gt;addField('workers', 'Worker[]');   // Array of Worker entities
+<pre class="literal-block">$this-&gt;addField('authors', 'varchar[]');   // Array of strings
+$this-&gt;addField('locations', 'point[]');   // Array of points
 </pre>
 <p>The converter system handles that and the entities will be hydrated with an array of the according type depending on the given converter. Of course, all converters must be registered prior to the declaration.</p>
 </div>
@@ -920,9 +920,9 @@ class AverageStudentScoreMap extends BaseObjectMap
       $this-&gt;object_class =  'College\School\AverageStudentScore';
       $this-&gt;object_name  =  'school.average_student_score';
 
-      $this-&gt;addField('reference', 'String');
-      $this-&gt;addField('maths', 'Number');
-      $this-&gt;addField('physics', 'Number');
+      $this-&gt;addField('reference', 'varchar');
+      $this-&gt;addField('maths', 'numeric');
+      $this-&gt;addField('physics', 'numeric');
       ...
     }
 
@@ -1182,12 +1182,12 @@ public function getOneWithPosts($author_name)
         $this-&gt;getGroupByFields('author')
         );
 
-    $this-&gt;addVirtualField('posts', 'Post[]');
+    $this-&gt;addVirtualField('posts', 'schema_name.post[]');
 
     return $this-&gt;query($sql, array($author_name));
 }
 </pre>
-<p>In this example we assume the <tt class="docutils literal">Post</tt> converter has already been registered in the database. The fetched <tt class="docutils literal">Author</tt> instances will have an extra attribute <tt class="docutils literal">posts</tt> containing an array of <tt class="docutils literal">Post</tt> instances (see <a class="reference internal" href="#arrays">Arrays</a>). This is a very powerful feature because you can fetch directly any entity's related objects from the database and hydrate them on the fly.</p>
+<p>In this example we assume the <tt class="docutils literal">schema_name.post</tt> type has already been associated with the <tt class="docutils literal">PgEntity</tt> converter with its map class (see <a class="reference internal" href="#entity-converter">Entity converter</a>). The fetched <tt class="docutils literal">Author</tt> instances will have an extra attribute <tt class="docutils literal">posts</tt> containing an array of <tt class="docutils literal">Post</tt> instances (see <a class="reference internal" href="#arrays">Arrays</a>). This is a very powerful feature because you can fetch directly any entity's related objects from the database and hydrate them on the fly.</p>
 </div>
 </div>
 <div class="section" id="collections">
