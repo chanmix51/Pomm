@@ -86,12 +86,13 @@ Built-in converters
 The ``Database`` class brings access to mechanisms to create connections and also to register converters. A ``Converter`` is a class that translates a data type from Postgresql to PHP and from PHP to Postgresql. 
 
 By default, the following converters are registered, this means you can use them without configuring anything:
- * ``Boolean``: convert postgresql 't' and 'f' to/from PHP boolean value
+ * ``Boolean``: convert postgresql booleans 't' and 'f' to/from PHP boolean values
  * ``Number``: convert postgresql 'smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial' types to numbers
  * ``String``: convert postgresql 'varchar', 'uuid', 'xml' and 'text' into PHP string
  * ``Timestamp``: convert postgresql 'timestamp', 'date', 'time' to PHP ``DateTime`` instance.
  * ``Interval``: convert postgresql's 'interval' type into PHP ``SplInterval`` instance. 
  * ``Binary``: convert postgresql's 'bytea' type into PHP string.
+ * ``Array``: convert postgresql arrays from/to PHP arrays.
 
 Registering converters
 ----------------------
@@ -120,7 +121,7 @@ Postgresql contribs come with handy extra data type (like HStore, a key => value
 Arguments to instanciate a ``Converter`` are the following:
  * the first argument is the converter name. It is used in the map classes to link with fields (see `Map Classes`_ below).
  * the second argument is the instance of the ``Converter``
- * the third argument is a word or a set of words for Pomm to identify what converter to use when scanning the database to create the Map files. These words are going to be used in a regular expression match.
+ * the third argument is a type or a set of types for Pomm to link them with the given converter.
 
 If your database has a lot of custom types, it is a better idea to create your own ``Database`` class.::
 
@@ -147,19 +148,17 @@ Converters and types
 Domains
 -------
 
-In case your database uses ``DOMAIN`` types you can add them to an already registered converter. The *registerTypeForConverter* method stands for that.::
+In case your database uses ``DOMAIN`` types you can add them to an already registered converter. The ``registerTypeForConverter()`` method stands for that.::
 
     $service->getDatabase('default')
       ->registerTypeForConverter('email', 'String');
       ;
 
-In the example above, the database contains a domain ``email`` which is a subtype of ``VARCHAR`` so it is associated with the built-in converter ``String``.
+In the example above, the database contains a domain ``email`` which is a subtype of ``varchar`` so it is associated with the built-in converter ``String``.
 
 Custom types
 ------------
-Composite types are particularly useful to store complex set of data. In fact, with Postgresql, defining a table automatically defines the according type. Hydrating type instances with postgresql values are the work of your custom converters. Let's take an example: electrical transformers windings. A transformer winding is defined by the voltage it is supposed to have and the maximum current it can stands. A transformer have two or more windings so if we define a type WindingPower we will be able to store an array of windings in our transformer table:
-
-::
+Composite types are particularly useful to store complex set of data. In fact, with Postgresql, defining a table automatically defines the according type. Hydrating type instances with postgresql values are the work of your custom converters. Let's take an example: electrical transformers windings. A transformer winding is defined by the voltage it is supposed to have and the maximum current it can stands. A transformer have two or more windings so if we define a type WindingPower we will be able to store an array of windings in our transformer table::
 
   -- SQL
   CREATE TYPE winding_power AS (
@@ -190,7 +189,7 @@ Tables containing a field with this type will return a tuple. A good way to mani
       }
   }
 
-Here, we can see the very good side of this method: we can implement a *getPowerMax()* method and make our type richer. 
+Here, we can see the very good side of this method: we can implement a ``getPowerMax()`` method and make our type richer. 
 
 Writing your own converters
 ---------------------------
@@ -217,7 +216,7 @@ Here is the converter for the ``WindingPower`` type mentioned above::
           $this->class_name = $class_name;
       }
 
-      public function fromPg($data)
+      public function fromPg($data, $type = null)
       {
           $data = trim($data, "()");
           $values = preg_split('/,/', $data);
@@ -225,9 +224,9 @@ Here is the converter for the ``WindingPower`` type mentioned above::
           return new $this->class_name($values[0], $values[1]);
       }
    
-      public function toPg($data)
+      public function toPg($data, $type = null)
       {
-          return sprintf("(%4.1f,%4.3f)", $data->voltage, $data->current);
+          return sprintf("winding_power '(%4.1f,%4.3f)'", $data->voltage, $data->current);
       }
   }
 
@@ -491,11 +490,11 @@ The according generated structure will be::
           $this->object_class =  'College\PublicSchema\Student';
           $this->object_name  =  'student';
   
-          $this->addField('reference', 'String');
-          $this->addField('first_name', 'String');
-          $this->addField('last_name', 'String');
-          $this->addField('birthdate', 'Timestamp');
-          $this->addField('level', 'Number');
+          $this->addField('reference', 'char');
+          $this->addField('first_name', 'varchar');
+          $this->addField('last_name', 'varchar');
+          $this->addField('birthdate', 'timestamp');
+          $this->addField('level', 'smallint');
   
           $this->pk_fields = array('reference');
       }
@@ -516,9 +515,8 @@ Arrays
 
 Postgresql supports arrays. An array can contain several entities all from the same type. Pomm of course supports this feature using the ``[]`` notation after the converter declaration::
 
-    $this->addField('authors', 'String[]');   // Array of strings
-    $this->addField('locations', 'Point[]');  // Array of points
-    $this->addField('workers', 'Worker[]');   // Array of Worker entities
+    $this->addField('authors', 'varchar[]');   // Array of strings
+    $this->addField('locations', 'point[]');   // Array of points
 
 The converter system handles that and the entities will be hydrated with an array of the according type depending on the given converter. Of course, all converters must be registered prior to the declaration.
 
@@ -542,9 +540,9 @@ Sometimes, you might want to create temporary tables. A map class can create its
           $this->object_class =  'College\School\AverageStudentScore';
           $this->object_name  =  'school.average_student_score';
 
-          $this->addField('reference', 'String');
-          $this->addField('maths', 'Number');
-          $this->addField('physics', 'Number');
+          $this->addField('reference', 'varchar');
+          $this->addField('maths', 'numeric');
+          $this->addField('physics', 'numeric');
           ...
         }
 
@@ -833,12 +831,12 @@ Pomm takes advantage of this feature using *virtual fields*. You can add fields 
             $this->getGroupByFields('author')
             );
 
-        $this->addVirtualField('posts', 'Post[]');
+        $this->addVirtualField('posts', 'schema_name.post[]');
 
         return $this->query($sql, array($author_name));
     }
 
-In this example we assume the ``Post`` converter has already been registered in the database. The fetched ``Author`` instances will have an extra attribute ``posts`` containing an array of ``Post`` instances (see `Arrays`_). This is a very powerful feature because you can fetch directly any entity's related objects from the database and hydrate them on the fly.
+In this example we assume the ``schema_name.post`` type has already been associated with the ``PgEntity`` converter with its map class (see `Entity converter`_). The fetched ``Author`` instances will have an extra attribute ``posts`` containing an array of ``Post`` instances (see `Arrays`_). This is a very powerful feature because you can fetch directly any entity's related objects from the database and hydrate them on the fly.
 
 Collections
 ===========
