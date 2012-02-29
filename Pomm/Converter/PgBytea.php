@@ -52,7 +52,7 @@ class PgBytea implements ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {
-        return stripcslashes(stream_get_contents($data));
+        return stripcslashes(@stream_get_contents($data));
     }
 }
 

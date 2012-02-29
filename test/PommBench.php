@@ -13,10 +13,10 @@ class PommBenchMap extends BaseObjectMap
         $this->object_class = 'Bench\PommBench';
         $this->object_name = 'bench_pomm.bench';
         $this->field_definitions = array(
-            'id'          => 'Number',
-            'data_int'    => 'Number',
-            'data_char'   => 'String',
-            'data_bool'   => 'Boolean',
+            'id'          => 'integer',
+            'data_int'    => 'integer',
+            'data_char'   => 'varchar',
+            'data_bool'   => 'boolean',
         );
         $this->pk_fields = array('id');
     }

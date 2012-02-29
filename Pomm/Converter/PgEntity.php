@@ -18,12 +18,21 @@ class PgEntity implements ConverterInterface
     protected $database;
     protected $class_name;
 
+    /**
+     * constructor
+     *
+     * @param Pomm\Connection\Database the database instance
+     * @param String the model class to get the Map from
+     **/
     public function __construct(Database $database, $class_name)
     {
         $this->database = $database;
         $this->class_name = $class_name;
     }
 
+    /**
+     * @see ConverterInterface
+     **/
     public function toPg($data, $type = null)
     {
         if (!is_object($data))
@@ -49,6 +58,9 @@ class PgEntity implements ConverterInterface
         return sprintf("ROW(%s)%s", join(',', $map->convertToPg($data->extract())), $type);
     }
 
+    /**
+     * @see ConverterInterface
+     **/
     public function fromPg($data, $type = null)
     {
         $map = $this->database->createConnection()
