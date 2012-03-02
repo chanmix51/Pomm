@@ -72,6 +72,11 @@ class PgEntity implements ConverterInterface
             $fields[$field_name] = array_shift($elts);
         }
 
+        if (count($elts) > 0)
+        {
+            $fields['_extra'] = $elts;
+        }
+
         $object = $map->createObject($map->convertFromPg($fields));
 
         return $object;

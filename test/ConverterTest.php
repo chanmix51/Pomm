@@ -318,16 +318,13 @@ class converter_test extends \lime_test
             $this->object->get('probed_data'), 'Probed data are the same');
         $test_container['test_converters'] = array($this->object, $this->object);
 
-        // Those tests cannot pass as preg_split segfaults on this
-        /*
         $map->updateOne($test_container, array('test_converters'));
         $this->ok(is_array($test_container['test_converters']), '"test_container" is an array.');
-        $this->ok(count($test_container['test_converters']), 2, 'With 2 elements.');
+        $this->is(count($test_container['test_converters']), 2, 'With 2 elements.');
         $this->isa_ok($test_container['test_converters'][0], 'Pomm\Test\TestConverter', '"TestConverter" instance.');
         $this->isa_ok($test_container['test_converters'][1], 'Pomm\Test\TestConverter', '"TestConverter" instance.');
         $this->is($test_container['test_converters'][0]->get('probed_data'), 
             $this->object->get('probed_data'), 'Probed data are the same');
-         */
 
         return $this;
     }
