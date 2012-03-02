@@ -34,12 +34,21 @@ class pgArray implements ConverterInterface
             throw new Exception(sprintf('Array converter must be given a type.'));
         }
 
-        $converter = $this->database
-            ->getConverterForType($type);
-        return array_map(function($val) use ($converter, $type) {
-                return $converter->fromPg($val, $type);
-                        },
-                        preg_split('/[,\s]*"((?:[^\\\\"]|\\\\.|"")+)"[,\s]*|[,\s]+/', str_replace('""', '"', trim($data, "{}")), 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE));
+        if ($data !== "{NULL}")
+        {
+            $converter = $this->database
+                ->getConverterForType($type);
+
+            return array_map(function($val) use ($converter, $type) {
+                    return $converter->fromPg($val, $type);
+                },
+                    preg_split('/[,\s]*"((?:[^\\\\"]|\\\\.|"")+)"[,\s]*|[,\s]+/', 
+                        str_replace('""', '"', trim($data, "{}")), 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE));
+            }
+        else
+        {
+            return array();
+        }
     }
 
     /**
