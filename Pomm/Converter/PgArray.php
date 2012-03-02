@@ -3,6 +3,7 @@
 namespace Pomm\Converter;
 
 use Pomm\Converter\ConverterInterface;
+use Pomm\Exception\Exception;
 
 /**
  * Pomm\Converter\pgArray - Array converter
