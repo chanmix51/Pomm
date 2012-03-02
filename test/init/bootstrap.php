@@ -196,6 +196,7 @@ class TestConverterContainerMap extends BaseObjectMap
         $this->field_definitions  = array(
             'id'               => 'int4',
             'test_converter'   => 'pomm_test.converter',
+            'test_converters'  => 'pomm_test.converter[]',
         );
         $this->pk_fields    = array('id');
 
@@ -211,7 +212,7 @@ class TestConverterContainerMap extends BaseObjectMap
 
     public function createTable()
     {
-        $sql = "CREATE TABLE %s (id serial primary key, test_converter %s NOT NULL)";
+        $sql = 'CREATE TABLE %s (id serial primary key, test_converter %s, test_converters %2$s[])';
         $test_converter_map = $this->connection->getMapFor('Pomm\Test\TestConverter');
 
         $this->connection

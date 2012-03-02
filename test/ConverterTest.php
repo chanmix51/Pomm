@@ -282,8 +282,29 @@ class converter_test extends \lime_test
         return $this;
     }
 
+    public function testArray()
+    {
+        $this->info('\\Pomm\\Converter\\PgArray');
+        $this->object['times'] = array();
+        $this->map->saveOne($this->object);
+        $this->ok(is_array($this->object['times']), 'Times is an array.');
+        $this->is(count($this->object['times']), 0, 'Times as an empty array.');
+
+        $this->object['times'] = null;
+        $this->map->updateOne($this->object, array('times'));
+
+        $this->ok(is_null($this->object['times']), 'Times is null');
+
+        $this->object['times'] = array(null, null);
+        $this->map->updateOne($this->object, array('times'));
+        $this->is_deeply($this->object['times'], array(null, null), 'times is an array of 2 null elements');
+
+        return $this;
+    }
+
     public function testEntity()
     {
+        $this->info('\\Pomm\\Converter\\PgEntity');
         $this->map->dropTable();
         $this->map->createTable();
         $map = $this->connection->getMapFor('Pomm\Test\TestConverterContainer');
@@ -295,6 +316,20 @@ class converter_test extends \lime_test
         $this->isa_ok($test_container['test_converter'], 'Pomm\Test\TestConverter', 'The test_converter is a "TestConverter" instance.');
         $this->is($test_container['test_converter']->get('probed_data'), 
             $this->object->get('probed_data'), 'Probed data are the same');
+        $test_container['test_converters'] = array($this->object, $this->object);
+
+        // Those tests cannot pass as preg_split segfaults on this
+        /*
+        $map->updateOne($test_container, array('test_converters'));
+        $this->ok(is_array($test_container['test_converters']), '"test_container" is an array.');
+        $this->ok(count($test_container['test_converters']), 2, 'With 2 elements.');
+        $this->isa_ok($test_container['test_converters'][0], 'Pomm\Test\TestConverter', '"TestConverter" instance.');
+        $this->isa_ok($test_container['test_converters'][1], 'Pomm\Test\TestConverter', '"TestConverter" instance.');
+        $this->is($test_container['test_converters'][0]->get('probed_data'), 
+            $this->object->get('probed_data'), 'Probed data are the same');
+         */
+
+        return $this;
     }
 
 }
@@ -313,6 +348,7 @@ $test
     ->testCircle(new Type\Circle(new Type\Point(1,2), 3))
     ->testInterval(\DateInterval::createFromDateString('1 years 8 months 30 days 14 hours 25 minutes 7 seconds'))
     ->testXml('<pika data="chu">plop</pika>')
+    ->testArray()
     ->testEntity()
     ;
 

@@ -308,7 +308,7 @@ abstract class BaseObjectMap
         $out_values = array();
         foreach ($this->field_definitions as $field_name => $pg_type)
         {
-            if (!isset($values[$field_name]))
+            if (!array_key_exists($field_name, $values))
             {
                 continue;
             }
@@ -344,6 +344,7 @@ abstract class BaseObjectMap
 
     public function convertFromPg(Array $values)
     {
+        $out_values = array();
         foreach ($values as $name => $value)
         {
             if (is_null($value)) continue;
@@ -487,7 +488,6 @@ abstract class BaseObjectMap
         {
             $updates[] = sprintf("%s = %s", $field, $value);
         }
-
 
 
         $sql = sprintf("UPDATE %s SET %s WHERE %s RETURNING %s;", $this->object_name, join(', ', $updates), $this->createSqlAndFrom($object->get($this->getPrimaryKey())), join(', ', $this->getSelectFields()));

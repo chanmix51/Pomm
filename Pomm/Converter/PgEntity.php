@@ -53,9 +53,7 @@ class PgEntity implements ConverterInterface
         $map = $this->database->createConnection()
             ->getMapFor($this->class_name);
 
-        $type = is_null($type) ? '' : sprintf('::%s', $type);
-
-        return sprintf("ROW(%s)%s", join(',', $map->convertToPg($data->extract())), $type);
+        return sprintf("ROW(%s)%s", join(',', $map->convertToPg($data->extract())), is_null($type) ? '' : sprintf('::%s', $type));
     }
 
     /**
