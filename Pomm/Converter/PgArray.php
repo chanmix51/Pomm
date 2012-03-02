@@ -40,7 +40,7 @@ class pgArray implements ConverterInterface
                 ->getConverterForType($type);
 
             return array_map(function($val) use ($converter, $type) {
-                    return $converter->fromPg(str_replace('\\"', '"', $val), $type);
+                    return $val !== "NULL" ? $converter->fromPg(str_replace('\\"', '"', $val), $type) : null;
                 },
                     preg_split('/[,\s]*"((?:[^\\\\"]|\\\\.|"")+)"[,\s]*|[,\s]+/', 
                         str_replace('""', '"', trim($data, "{}")), 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE));
@@ -62,6 +62,11 @@ class pgArray implements ConverterInterface
         }
         if (!is_array($data))
         {
+            if (is_null($data))
+            {
+                return 'NULL';
+            }
+
             throw new Exception(sprintf("Array converter toPg() data must be an array ('%s' given).", gettype($data)));
         }
 
@@ -69,7 +74,7 @@ class pgArray implements ConverterInterface
             ->getConverterForType($type);
 
         return sprintf('ARRAY[%s]::%s[]', join(',', array_map(function ($val) use ($converter, $type) { 
-                    return $converter->toPg($val, $type); 
+                    return !is_null($val) ? $converter->toPg($val, $type) : 'NULL'; 
                 }, $data)), $type);
     }
 }
