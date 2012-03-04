@@ -610,12 +610,10 @@ abstract class BaseObjectMap
         $fields = array();
         $alias  = is_null($alias) ? '' : $alias.".";
 
-        foreach ($this->field_definitions as $name => $type)
-        {
-            $fields[] = sprintf("%s%s", $alias, $name);
-        }
-
-        return $fields;
+        return array_map(function($name) use ($alias) {
+                return sprintf("%s%s", $alias, $name);
+            }, 
+            array_keys($this->field_definitions));
     }
 
     /**
