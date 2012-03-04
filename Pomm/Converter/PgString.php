@@ -15,7 +15,7 @@ use Pomm\Converter\ConverterInterface;
 class PgString implements ConverterInterface
 {
     /**
-     * @see ConverterInterface
+     * @see Pomm\Converter\ConverterInterface
      **/
     public function toPg($data, $type = null)
     {
@@ -27,7 +27,7 @@ class PgString implements ConverterInterface
     }
 
     /**
-     * @see ConverterInterface
+     * @see Pomm\Converter\ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {

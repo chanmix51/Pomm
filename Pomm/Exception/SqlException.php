@@ -21,8 +21,7 @@ class SqlException extends Exception
    * __construct 
    * 
    * @param PDOStatement $stmt 
-   * @param mixed $sql 
-   * @access public
+   * @param Mixed        $sql 
    */
   public function __construct(\PDOStatement $stmt, $sql)
   {
@@ -32,11 +31,11 @@ class SqlException extends Exception
 
   /**
    * getSQLErrorState 
-   * Returns the SQLSTATE of the last SQL error
+   *
+   * Returns the SQLSTATE of the last SQL error.
    *
    * @link http://www.postgresql.org/docs/8.4/interactive/errcodes-appendix.html
-   * @access public
-   * @return string
+   * @return String
    */
   public function getSQLErrorState()
   {
@@ -45,10 +44,10 @@ class SqlException extends Exception
 
   /**
    * getSQLExtendedErrorStatus 
-   * Returns the internal driver error code
    *
-   * @access public
-   * @return string
+   * Returns the internal driver error code.
+   *
+   * @return String
    */
   public function getSQLExtendedErrorStatus()
   {
@@ -58,8 +57,7 @@ class SqlException extends Exception
   /**
    * getSQLErrorMessage 
    * 
-   * @access public
-   * @return string
+   * @return String
    */
   public function getSQLErrorMessage()
   {

@@ -19,13 +19,18 @@ class pgArray implements ConverterInterface
 {
     protected $database;
 
+    /**
+     * __construct
+     *
+     * @param \Pomm\Connection\Database $database
+     **/
     public function __construct(\Pomm\Connection\Database $database)
     {
         $this->database = $database;
     }
 
     /**
-     * @see ConverterInterface
+     * @see Pomm\Converter\ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {
@@ -52,7 +57,7 @@ class pgArray implements ConverterInterface
     }
 
     /**
-     * @see ConverterInterface
+     * @see Pomm\Converter\ConverterInterface
      **/
     public function toPg($data, $type = null)
     {

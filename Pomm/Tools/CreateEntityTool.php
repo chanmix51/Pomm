@@ -7,8 +7,9 @@ use Pomm\Exception\Exception;
 use Pomm\External\sfInflector;
 
 /**
- * Pomm\Tools\CreateEntityTool - Create an Entity class
+ * Pomm\Tools\CreateEntityTool 
  *
+ * Create an Entity class from the database schema.
  *
  * @uses Pomm\Tools\BaseTool
  * @package Pomm
@@ -21,7 +22,6 @@ class CreateEntityTool extends CreateFileTool
 {
     /**
      * configure()
-     * @see BaseTool
      *
      * mandatory options :
      * * class      the class name to generate
@@ -30,6 +30,7 @@ class CreateEntityTool extends CreateFileTool
      * optional options :
      * * namespace
      * * schema (default public)
+     * @see Pomm\Tools\BaseTool
      **/
 
     protected function configure()
@@ -51,9 +52,10 @@ class CreateEntityTool extends CreateFileTool
 
     /**
      * generateMapFile
-     * Generates the empty map file
      *
-     * @return void
+     * Generates the empty map file.
+     *
+     * @access protected
      **/
     protected function generateMapFile()
     {

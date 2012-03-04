@@ -7,11 +7,24 @@ use Pomm\Exception\SqlException;
 use Pomm\FilterChain\FilterInterface;
 use Pomm\FilterChain\QueryFilterChain;
 
+/**
+ * Pomm\FilterChain\PDOQueryFilter - The query filter.
+ * 
+ * @package Pomm
+ * @uses Pomm\FilterChain\FilterInterface
+ * @version $id$
+ * @copyright 2011 Grégoire HUBERT 
+ * @author Grégoire HUBERT <hubert.greg@gmail.com>
+ * @license X11 {@link http://opensource.org/licenses/mit-license.php}
+ */
 class PDOQueryFilter implements FilterInterface
 {
 
     protected $filter_chain;
 
+    /**
+     * @see Pomm\FilterChain\FilterInterface
+     **/
     public function execute(QueryFilterChain $query_filter_chain)
     {
         $this->filter_chain = $query_filter_chain;
@@ -21,10 +34,11 @@ class PDOQueryFilter implements FilterInterface
 
     /**
      * prepareStatement 
-     * Prepare a SQL statement
+     *
+     * Prepare a SQL statement.
      * 
      * @access protected
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     protected function prepareStatement()
     {
@@ -34,11 +48,12 @@ class PDOQueryFilter implements FilterInterface
 
     /**
      * bindParams 
-     * Bind parameters to a prepared statement
+     *
+     * Bind parameters to a prepared statement.
      * 
      * @param PDOStatement $stmt 
      * @access protected
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     protected function bindParams($stmt)
     {
@@ -72,10 +87,11 @@ class PDOQueryFilter implements FilterInterface
 
     /**
      * doQuery 
-     * Performs a query, returns the PDO Statment instance used
+     *
+     * Performs a query, returns the PDO Statment instance used.
      * 
      * @access protected
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     protected function doQuery()
     {

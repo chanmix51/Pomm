@@ -16,7 +16,7 @@ use Pomm\Exception\Exception as PommException;
 class PgHStore implements ConverterInterface
 {
     /**
-     * @see ConverterInterface
+     * @see Pomm\Converter\ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {
@@ -32,7 +32,7 @@ class PgHStore implements ConverterInterface
     }
 
     /**
-     * @see ConverterInterface
+     * @see Pomm\Converter\ConverterInterface
      **/
     public function toPg($data, $type = null)
     {

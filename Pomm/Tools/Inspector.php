@@ -5,10 +5,24 @@ namespace Pomm\Tools;
 use Pomm\Connection\Connection;
 use Pomm\Exception\Exception;
 
+/**
+ * Inspector - The database inspection tool.
+ *
+ * @package Pomm
+ * @version $id$
+ * @copyright 2011 Grégoire HUBERT
+ * @author Grégoire HUBERT <hubert.greg@gmail.com>
+ * @license X11 {@link http://opensource.org/licenses/mit-license.php}
+ */
 class Inspector
 {
     protected $connection;
 
+    /**
+     * __construct
+     *
+     * @param Pomm\Connection\Connection $connection
+     **/
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
@@ -16,11 +30,12 @@ class Inspector
 
     /**
      * getTableOid
-     * Returns a table oid
      *
-     * @param String schema
-     * @param String table
-     * @return Integer oid 
+     * Returns a table oid.
+     *
+     * @param String $schema
+     * @param String $table
+     * @return Integer
      **/
     public function getTableOid($schema, $table)
     {
@@ -37,10 +52,11 @@ class Inspector
 
     /**
      * getTableInformation 
-     * Returns the object name, type and schema associated to an oid 
      *
-     * @param Integer oid
-     * @return Array the informations [table_oid, schema_oid, schema, name]
+     * Returns the object name, type and schema associated to an oid.
+     *
+     * @param Integer $oid
+     * @return Array Informations [table_oid, schema_oid, schema, name]
      **/
     public function getTableInformation($oid)
     {
@@ -60,8 +76,9 @@ class Inspector
     /**
      * getTablePrimaryKey
      *
-     * returns an array with the fields composing a primary key.
-     * @param Intger oid
+     * Returns an array with the fields composing a primary key.
+     *
+     * @param Intger $oid
      * @return Array
      **/
     public function getTablePrimaryKey($oid)
@@ -78,9 +95,10 @@ class Inspector
     /**
      * getTableFieldsInformation()
      *
-     * get the columns informations
-     * @param Integer oid
-     * @return Array key is the column name, value is the type.
+     * Get the columns information.
+     *
+     * @param Integer $oid
+     * @return Array Key is the column name, value is the type.
      **/
     public function getTableFieldsInformation($oid)
     {
@@ -133,10 +151,11 @@ _;
     /**
      * getTableParent
      *
-     * Return the oid of the parent table if any, FALSE is returned if there are no parent or if there are several 
-     * parents.
-     * @param Integer oid
-     * @return Integer oid
+     * Return the oid of the parent table if any, FALSE is returned if there 
+     * are no parent or if there are several parents.
+     *
+     * @param Integer $oid
+     * @return Integer $oid
      **/
     public function getTableParents($oid)
     {
@@ -154,11 +173,11 @@ _;
 
     /**
      * getTablesInSchema
-     * Return the list of the tables within the schema
      *
-     * @public
-     * @param String schema name
-     * @return Array tables OID
+     * Return the list of the tables within the schem.
+     *
+     * @param String $schema
+     * @return Array Tables OID
      **/
     public function getTablesInSchema($schema, Array $relkind = array('r', 'v'))
     {
@@ -176,12 +195,12 @@ _;
 
     /**
      * getStoredProcedureSource
-     * Return the source code of stored procedures
      *
-     * @public
-     * @param String schema name
-     * @param String procedure name
-     * @return Array source code
+     * Return the source code of stored procedure.
+     *
+     * @param String $schema
+     * @param String $name  Stored procedure's name.
+     * @return Array Source codes.
      **/
     public function getStoredProcedureSource($schema, $name)
     {

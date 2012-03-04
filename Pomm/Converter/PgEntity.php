@@ -21,8 +21,8 @@ class PgEntity implements ConverterInterface
     /**
      * constructor
      *
-     * @param Pomm\Connection\Database the database instance
-     * @param String the model class to get the Map from
+     * @param Pomm\Connection\Database  $database
+     * @param String                    $class_name  Model class to get the Map from.
      **/
     public function __construct(Database $database, $class_name)
     {
@@ -31,7 +31,7 @@ class PgEntity implements ConverterInterface
     }
 
     /**
-     * @see ConverterInterface
+     * @see Pomm\Converter\ConverterInterface
      **/
     public function toPg($data, $type = null)
     {
@@ -57,7 +57,7 @@ class PgEntity implements ConverterInterface
     }
 
     /**
-     * @see ConverterInterface
+     * @see Pomm\Converter\ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {

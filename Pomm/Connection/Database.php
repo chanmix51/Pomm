@@ -31,7 +31,7 @@ class Database
      * isolation : transaction isolation level (default READ COMMITED)
      *
      * @final
-     * @param array $parameters
+     * @param  Array $parameters
      * @access public
      * @return void
      */
@@ -102,7 +102,8 @@ class Database
      * initialize
      *
      * This method initializes the parameters for our connection. It can be
-     * overloaded
+     * overloaded.
+     *
      * @access protected
      * @return void
      * */
@@ -119,6 +120,7 @@ class Database
      *
      * Opens a new connection to the database
      * @access public
+     * @param  IdentityMapperInterface $mapper An optional instance of a data mapper.
      * @return Connection
      **/
     public function createConnection(\Pomm\Identity\IdentityMapperInterface $mapper = null)
@@ -130,7 +132,7 @@ class Database
      * executeAnonymousQuery
      * Performs a raw SQL query
      *
-     * @param string $sql
+     * @param String $sql The sql statement to execute.
      * @return \PDOStatement
      */
     public function executeAnonymousQuery($sql)
@@ -143,9 +145,9 @@ class Database
      *
      * Register a new converter
      * @access public
-     * @param name      string the name of the converter
-     * @param converter ConverterInterface a converter instance
-     * @param pg_types  Array an array of the mapped postgresql's types
+     * @param  String             $name      The name of the converter.
+     * @param  ConverterInterface $converter A converter instance.
+     * @param  Array              $pg_types  An array of the mapped postgresql's types.
      * @return Pomm\Connection\Database
      **/
     public function registerConverter($name, Converter\ConverterInterface $converter, Array $pg_types)
@@ -163,10 +165,11 @@ class Database
     /**
      * getConverterFor
      *
-     * Returns a converter
+     * Returns a converter from its designation.
+     *
      * @access public
-     * @param  string name
-     * @return ConverterInterface converter
+     * @param  string $name       Converter desgination.
+     * @return ConverterInterface Converter instance.
      **/
     public function getConverterFor($name)
     {
@@ -177,10 +180,11 @@ class Database
      * getConverterForType
      *
      * Returns the converter instance for a given a postgresql's type
+     *
      * @access public
-     * @param  string $pg_type
-     * @return string converter name
-     * @throw  Pomm\Exception\Exception if not found
+     * @param  String $pg_type Type name.
+     * @return String Converter instance.
+     * @throw  Pomm\Exception\Exception if not found.
      **/
     public function getConverterForType($pg_type)
     {
@@ -207,8 +211,9 @@ class Database
      * Associate an existing converter with a Pg type.
      * This is useful for DOMAINs.
      *
-     * @param String type
-     * @param String converter_name
+     * @acces public
+     * @param String $type           Type name
+     * @param String $converter_name Converter designation.
      **/
     public function registerTypeForConverter($type, $converter_name)
     {
@@ -219,6 +224,7 @@ class Database
      * getParameterHolder
      *
      * Returns the parameter holder
+     *
      * @acces public
      * @return ParameterHolder
      **/
@@ -231,6 +237,7 @@ class Database
      * registerBaseConverters
      *
      * Register the converters for postgresql's built-in types
+     *
      * @access protected
      **/
 
@@ -251,6 +258,7 @@ class Database
      * Returns the database name.
      * This name is used to generate the namespaces for the Model files.
      *
+     * @access public
      * @return String
      **/
     public function getName()
@@ -262,6 +270,9 @@ class Database
      * setName
      *
      * Sets the database name.
+     *
+     * @access public
+     * @param String $name Database name
      **/
     public function setName($name)
     {

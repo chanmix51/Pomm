@@ -27,7 +27,10 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
 
     /**
      * __construct
-     * Instanciate the object and hydrate it with the given values
+     *
+     * Instanciate the entity and hydrate it with the given values.
+     *
+     * @param Array $values Optional starting values.
      **/
     public function __construct(Array $values = null)
     {
@@ -38,11 +41,12 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     }
     /**
      * get
+     *
      * Returns the $name value
      *
      * @final
-     * @access public
-     * @param string $var The key you want to retrieve value from
+     * @param String $var      Key you want to retrieve value from.
+     * @param String $default  Default value if var does not exist.
      * @return mixed
      */
     public final function get($var, $default = null)
@@ -66,11 +70,11 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
 
     /**
      * has
-     * Returns true if the given key exists
+     *
+     * Returns true if the given key exists.
      *
      * @final
-     * @access public
-     * @param string $var
+     * @param string $var 
      * @return boolean
      */
     public final function has($var)
@@ -80,11 +84,11 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
 
     /**
      * __call
-     * Allows dynamic methods getXXX, setXXX or addXXX
+     *
+     * Allows dynamic methods getXXX, setXXX, hasXXX or addXXX.
      *
      * @param mixed $method
      * @param mixed $arguments
-     * @access public
      * @return mixed
      */
     public function __call($method, $arguments)
@@ -109,11 +113,10 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
 
     /**
      * hydrate
-     * Merge internal values with given $values in the object
+     *
+     * Merge internal values with given $values in the object.
      *
      * @param Array $values
-     * @access public
-     * @return void
      */
     public final function hydrate(Array $values)
     {
@@ -122,11 +125,10 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
 
     /**
      * convert
-     * Make all keys lowercase and hydrate the object
+     *
+     * Make all keys lowercase and hydrate the object.
      *
      * @param Array $values
-     * @access public
-     * @return void
      */
     public function convert(Array $values)
     {
@@ -141,10 +143,10 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
 
     /**
      * _getStatus
-     * Returns the current status of the instance
-     * can be self::NONE, self::EXIST and SELF::MODIFIED
      *
-     * @access public
+     * Return the current status of the instance
+     * can be self::NONE, self::EXIST and SELF::MODIFIED.
+     *
      * @return integer
      */
     public function _getStatus()
@@ -154,11 +156,10 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
 
     /**
      * _setStatus
-     * Forces the status of the object
      *
-     * @param integer $status
-     * @access public
-     * @return void
+     * Force the status of the object.
+     *
+     * @param Integer $status
      */
     public function _setStatus($status)
     {
@@ -167,10 +168,10 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
 
     /**
      * extract
-     * Returns the fields array
      *
-     * @access public
-     * @return array
+     * Returns the fields array.
+     *
+     * @return Array
      */
     public function extract()
     {
@@ -179,12 +180,11 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
 
     /**
      * __set
-     * PHP magic to set attributes
      *
-     * @param string $var
-     * @param mixed $value
-     * @access public
-     * @return void
+     * PHP magic to set attributes.
+     *
+     * @param String $var       Attribute name.
+     * @param Mixed  $value     Attribute value.
      */
     public function __set($var, $value)
     {
@@ -194,11 +194,11 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
 
     /**
      * __get
-     * PHP magic to get attributes
      *
-     * @param string $var
-     * @access public
-     * @return mixed
+     * PHP magic to get attributes.
+     *
+     * @param  String $var       Attribute name.
+     * @return Mixed             Attribute value.
      */
     public function __get($var)
     {
@@ -209,13 +209,12 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
 
     /**
      * set
-     * Set a value in the varholder
+     *
+     * Set a value in the varholder.
      *
      * @final
-     * @access public
-     * @param string $var
-     * @param mixed $value
-     * @return void
+     * @param String $var       Attribute name.
+     * @param Mixed  $value     Attribute value.
      */
     public final function set($var, $value)
     {
@@ -225,13 +224,12 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
 
     /**
      * add
+     *
      * When the corresponding attribute is an array, call this method
-     * to set values
+     * to set values.
      *
      * @param string $var
-     * @param mixed $value
-     * @access public
-     * @return void
+     * @param mixed  $value
      */
     public function add($var, $value)
     {
@@ -247,10 +245,10 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
 
     /**
      * isNew
-     * is the current object self::NEW (does not it exist in the database already ?)
      *
-     * @access public
-     * @return boolean
+     * is the current object self::NEW (does not it exist in the database already ?).
+     *
+     * @return Boolean
      */
     public function isNew()
     {
@@ -259,10 +257,10 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
 
     /**
      * isModified
+     *
      * Has the object been modified since we know it ?
      *
-     * @access public
-     * @return boolean
+     * @return Boolean
      */
     public function isModified()
     {

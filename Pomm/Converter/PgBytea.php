@@ -17,11 +17,11 @@ class PgBytea implements ConverterInterface
     /**
      * escByteA
      *
-     * Does the job of pg_escape_bytea in PHP
-     * see http://php.net/manual/fr/function.pg-escape-bytea.php
+     * Does the job of pg_escape_bytea in PHP.
+     * @link http://php.net/manual/fr/function.pg-escape-bytea.php
      *
-     * @param String the binary sting to be escaped
-     * @return String binary string
+     * @param String $data Binary string to be escaped.
+     * @return String
      **/
     protected function escByteA($data)
     {
@@ -33,7 +33,7 @@ class PgBytea implements ConverterInterface
     }
 
     /**
-     * @see ConverterInterface
+     * @see Pomm\Converter\ConverterInterface
      **/
     public function toPg($data, $type = null)
     {
@@ -48,7 +48,7 @@ class PgBytea implements ConverterInterface
     }
 
     /**
-     * @see ConverterInterface
+     * @see Pomm\Converter\ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {

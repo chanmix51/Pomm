@@ -20,9 +20,10 @@ class PgCircle implements ConverterInterface
     protected $point_converter;
 
     /**
-     * __construct() - Converter constuctor
+     * __construct()
      *
-     * @param String the fully qualified Circle type class name
+     * @param String            $class_name      Optional fully qualified Circle type class name.
+     * @param Pomm\Type\PgPoint $point_converter Point converter to be used.
      **/
     public function __construct($class_name = 'Pomm\Type\Circle', PgPoint $point_converter = null)
     {
@@ -31,7 +32,7 @@ class PgCircle implements ConverterInterface
     }
 
     /**
-     * @see ConverterInterface
+     * @see Pomm\Converter\ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {
@@ -49,7 +50,7 @@ class PgCircle implements ConverterInterface
     }
 
     /**
-     * @see ConverterInterface
+     * @see Pomm\Converter\ConverterInterface
      **/
     public function toPg($data, $type = null)
     {

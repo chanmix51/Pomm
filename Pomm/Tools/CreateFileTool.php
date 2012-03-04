@@ -25,7 +25,6 @@ abstract class CreateFileTool extends BaseTool
      * * prefix_dir where to generate the dirs
      *
      * @see Pomm\Tools\BaseTool
-     *
      **/
     protected function configure()
     {
@@ -38,7 +37,8 @@ abstract class CreateFileTool extends BaseTool
     /**
      * getDestinationPath
      *
-     * create the final directory
+     * Create the final directory.
+     *
      * @return String
      **/
     public function getDestinationPath()
@@ -59,7 +59,8 @@ abstract class CreateFileTool extends BaseTool
     /**
      * getNamespace()
      *
-     * create the namespace
+     * Get the namespace.
+     *
      * @return String
      **/
     protected function getNamespace()
@@ -71,11 +72,12 @@ abstract class CreateFileTool extends BaseTool
         return join('\\', $namespace);
     }
     /**
-     * saveFile - Save the file
+     * saveFile 
      *
-     * @param string the path
-     * @param string the content to be saved
-     * @return void
+     * Save the file.
+     *
+     * @param String $path
+     * @param String $content
      **/
     protected function saveFile($path, $content)
     {
@@ -85,9 +87,10 @@ abstract class CreateFileTool extends BaseTool
 
     /**
      * createDirIfNotExist
-     * Create Entity model directory structure if it does no exist
      *
-     * @return void;
+     * Create Entity model directory structure if it does no exist.
+     *
+     * @param String $dir
      **/
     protected function createDirIfNotExist($dir)
     {

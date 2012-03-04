@@ -21,7 +21,8 @@ use Pomm\Connection\Database;
 class ScanSchemaTool extends CreateFileTool
 {
     /**
-     * configure()
+     * configure
+     *
      * mandatory options :
      * * dir        the directory base classes will be generated in
      * * database   a Database instance

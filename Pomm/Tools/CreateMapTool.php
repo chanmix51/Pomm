@@ -21,7 +21,6 @@ class CreateMapTool extends CreateFileTool
 {
     /**
      * configure()
-     * @see BaseTool
      *
      * mandatory options :
      * * class      the class name to generate
@@ -31,6 +30,8 @@ class CreateMapTool extends CreateFileTool
      * * namespace
      * * extends
      * * schema (default public)
+     *
+     * @see BaseTool
      **/
 
     protected function configure()
@@ -41,6 +42,7 @@ class CreateMapTool extends CreateFileTool
 
     /**
      * execute()
+     *
      * @see BaseTool
      **/
     public function execute()
@@ -51,12 +53,11 @@ class CreateMapTool extends CreateFileTool
     }
 
     /**
-     * determine namespace
-    /**
      * generateMapFile
-     * Generates the empty map file
      *
-     * @return void
+     * Generates the empty map file.
+     * 
+     * @access protected
      **/
     protected function generateMapFile()
     {

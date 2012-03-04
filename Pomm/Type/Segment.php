@@ -17,6 +17,12 @@ class Segment
     public $point_a;
     public $point_b;
 
+    /**
+     * __construct
+     *
+     * @param Pomm\Type\Point $point_a
+     * @param Pomm\Type\Point $point_b
+     **/
     public function __construct(Point $point_a, Point $point_b)
     {
         $this->point_a = $point_a;

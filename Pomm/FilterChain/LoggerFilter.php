@@ -7,15 +7,33 @@ use Pomm\FilterChain\FilterInterface;
 use Pomm\FilterChain\QueryFilterChain;
 use Pomm\Tools\Logger;
 
+/**
+ * Pomm\FilterChain\LoggerFilter - The logger filter.
+ * 
+ * @package Pomm
+ * @uses Pomm\FilterChain\FilterInterface
+ * @version $id$
+ * @copyright 2011 Grégoire HUBERT 
+ * @author Grégoire HUBERT <hubert.greg@gmail.com>
+ * @license X11 {@link http://opensource.org/licenses/mit-license.php}
+ */
 class LoggerFilter implements FilterInterface
 {
     protected $logger;
 
+    /**
+     * __construct
+     *
+     * @param Pomm\Tools\Logger $logger
+     **/
     public function __construct(Logger $logger)
     {
         $this->logger = $logger;
     }
 
+    /**
+     * @see Pomm\FilterChain\FilterInterface
+     **/
     public function execute(QueryFilterChain $query_filter_chain)
     {
         $time_start = microtime(true);

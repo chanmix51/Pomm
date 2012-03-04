@@ -28,26 +28,27 @@ abstract class BaseObjectMap
 
     /**
      * initialize 
+     *
      * This method is called by the constructor, use it to declare
      * - connection the connection name to use to query on this model objects
      * - fields_definitions (mandatory)
      * - object_class The class name of the corresponding model (mandatory)
-     * - primary key (optional)
+     * - primary key (optional).
      * 
      * @abstract
      * @access protected
-     * @return void
      */
     abstract protected function initialize();
 
     /**
      * addField 
-     * Add a new field definition
      *
-     * @param string $name 
-     * @param string $type 
+     * Add a new field definition.
+     *
      * @access protected
-     * @return void
+     * @param string $name
+     * @param string $type Type must be associated with a converter
+     * @see Database::registerConverter()
      */
     protected function addField($name, $type)
     {
@@ -61,12 +62,13 @@ abstract class BaseObjectMap
 
     /**
      * addVirtualField 
-     * Add a new virtial field definition
      *
-     * @param string $name 
-     * @param string $type 
+     * Add a new virtial field definition.
+     *
      * @access protected
-     * @return void
+     * @param string $name 
+     * @param string $type Type must be associated with a converter
+     * @see Database::registerConverter()
      */
     protected function addVirtualField($name, $type)
     {
@@ -75,9 +77,10 @@ abstract class BaseObjectMap
 
     /**
      * createObject 
-     * Return a new instance of the corresponding model class
+     *
+     * Return a new instance of the corresponding model class.
      * 
-     * @access public
+     * @param Array $values     Optional starting values.
      * @return BaseObject
      */
     public function createObject(Array $values = null)
@@ -90,8 +93,9 @@ abstract class BaseObjectMap
     /**
      * createObjectFromPg
      *
-     * create an object with converted values
-     * @param Array $values that will be converted
+     * create an object with converted values.
+     *
+     * @param Array $values  Values to be converted..
      * @return \Pomm\Object\BaseObject $object
      **/
     public function createObjectFromPg(Array $values)
@@ -107,10 +111,10 @@ abstract class BaseObjectMap
 
     /**
      * getFieldDefinitions 
-     * Return the field definitions of the current model
+     *
+     * Return the field definitions of the current model.
      * 
-     * @access public
-     * @return Array(string)
+     * @return Array    Types associated with each field.
      */
     public function getFieldDefinitions()
     {
@@ -119,10 +123,11 @@ abstract class BaseObjectMap
 
     /**
      * __construct 
-     * The constructor. Most of the time, you should use Pomm\Connection\Connection::getMapFor($class_name) to chain calls
-     * 
-     * @access public
-     * @return void
+     *
+     * This constructor is intended to be used by
+     * Pomm\Connection\Connection::getMapFor($class_name) to chain calls.
+     *
+     * @param Pomm\Connection\Connection $connection 
      */
     public function __construct(Connection $connection)
     {
@@ -145,10 +150,11 @@ abstract class BaseObjectMap
 
     /**
      * doQuery
+     *
      * Execute the filterChain.
      *
-     * @param String SQL query
-     * @values Array  parameters for the prepared query
+     * @param String  $sql    SQL statement.
+     * @param Array  $values Optional parameters for the prepared query.
      * @return PDOStatement
      **/
     public function doQuery($sql, $values = array())
@@ -158,12 +164,12 @@ abstract class BaseObjectMap
 
     /**
      * query 
-     * Perform a query, hydrate the results and return a collection
+     *
+     * Perform a query, hydrate the results and return a collection.
      * 
-     * @param string $sql 
-     * @param mixed $values 
-     * @access public
-     * @return Collection
+     * @param String  $sql    SQL statement.
+     * @param Array  $values Optional parameters for the prepared query.
+     * @return Pomm\Object\Collection
      */
     public function query($sql, $values = array())
     {
@@ -172,11 +178,12 @@ abstract class BaseObjectMap
 
     /**
      * createSqlAndFrom 
-     * Create a SQL condition from the associative array with AND logical operator
+     *
+     * Create a SQL condition from the associative array with AND logical operator.
      * 
-     * @param array $values 
      * @access protected
-     * @return string
+     * @param array $values 
+     * @return Pomm\Query\Where
      */
     protected function createSqlAndFrom($values)
     {
@@ -190,11 +197,13 @@ abstract class BaseObjectMap
     }
 
     /**
-     * createObjectsFromStmt 
+     * createCollectionFromStatement
+     *
+     * Creates a Pomm\Object\Collection instance from a PDOStatement.
      * 
-     * @param PDOStatement $stmt 
      * @access protected
-     * @return Collection
+     * @param PDOStatement $stmt 
+     * @return Pomm\Object\Collection
      */
     protected function createCollectionFromStatement(\PDOStatement $stmt)
     {
@@ -203,10 +212,10 @@ abstract class BaseObjectMap
 
     /**
      * findAll 
-     * The simplest query on a table
+     *
+     * The simplest query on a table.
      * 
-     * @access public
-     * @return Collection
+     * @return Pomm\Object\Collection
      */
     public function findAll()
     {
@@ -215,10 +224,15 @@ abstract class BaseObjectMap
 
     /**
      * generateSqlForWhere
-     * Generate the SQL for findWhere and paginateFindWhere methods
      *
-     * @see findWhere
-     * @see paginateFindWhere
+     * Generate the SQL for findWhere and paginateFindWhere methods.
+     *
+     * @see BaseObject::findWhere()
+     * @see BaseObject::paginateFindWhere()
+     * @access protected
+     * @param Mixed  $where   Can be a String or Pomm\Query\Where instance.
+     * @param String $suffix  ORDER BY, LIMIT etc.
+     * @return String   The SQL query.
      **/
     protected function generateSqlForWhere($where, $suffix = null)
     {
@@ -235,11 +249,12 @@ abstract class BaseObjectMap
     /**
      * findWhere 
      * 
-     * @param string $where 
-     * @param array $values 
-     * @param sring $suffix
-     * @access public
-     * @return Collection
+     * Performs a SQL query given conditions and parameters.
+     *
+     * @param String $where 
+     * @param Array  $values 
+     * @param String $suffix
+     * @return Pomm\Object\Collection
      */
     public function findWhere($where, $values = array(), $suffix = null)
     {
@@ -261,8 +276,9 @@ abstract class BaseObjectMap
     /**
      * getPrimaryKey 
      * 
-     * @access public
-     * @return array
+     * Return the array with field names composing the PK.
+     *
+     * @return Array
      */
     public function getPrimaryKey()
     {
@@ -272,9 +288,10 @@ abstract class BaseObjectMap
     /**
      * findByPk 
      * 
-     * @param Array $values 
-     * @access public
-     * @return BaseObject
+     * Retrieve the corresponing entity from the database if it exists.
+     *
+     * @param Array $values Key value of the PK.
+     * @return Pomm\Object\BaseObject
      */
     public function findByPk(Array $values)
     {
@@ -296,12 +313,11 @@ abstract class BaseObjectMap
 
     /**
      * convertToPg 
-     * Convert values to and from Postgresql
      *
-     * @param Array $values Values to convert
-     * @param mixed $method can be "fromPg" and "toPg"
-     * @access protected
-     * @return array
+     * Convert values to Postgresql.
+     *
+     * @param Array $values Values to convert.
+     * @return Array Converted values to PG format.
      */
     public function convertToPg(Array $values)
     {
@@ -342,6 +358,14 @@ abstract class BaseObjectMap
         return $out_values;
     }
 
+    /**
+     * convertFromPg 
+     *
+     * Convert values from Postgresql.
+     *
+     * @param Array $values Values from convert.
+     * @return Array Converted values from PG format.
+     */
     public function convertFromPg(Array $values)
     {
         $out_values = array();
@@ -392,12 +416,14 @@ abstract class BaseObjectMap
 
     /**
      * checkObject 
-     * Check if the instance is from the expected class or throw an exception
      *
-     * @param BaseObject $object 
-     * @param string $message 
+     * Check if the instance is from this map corresponding class or throw an 
+     * exception.
+     *
      * @access protected
-     * @return void
+     * @param Pomm\Object\BaseObject $object 
+     * @param String                 $message  Will be set in the Exception.
+     * @access protected
      */
     protected function checkObject(BaseObject $object, $message)
     {
@@ -409,10 +435,11 @@ abstract class BaseObjectMap
 
     /**
      * deleteByPk 
+     *
+     * Delete a record from the database given the PK.
      * 
      * @param Array $pk 
-     * @access public
-     * @return Collection
+     * @return Pomm\Object\Collection
      */
     public function deleteByPk(Array $pk)
     {
@@ -423,10 +450,11 @@ abstract class BaseObjectMap
 
     /**
      * saveOne 
-     * Save an instance. Use this to insert or update an object
      *
-     * @param BaseObject $object 
-     * @access public
+     * Use this to insert or update an object.
+     *
+     * @param Pomm\Object\BaseObject $object 
+     * @return Pomm\Object\BaseObject Saved instance.
      */
     public function saveOne(BaseObject &$object)
     {
@@ -456,12 +484,14 @@ abstract class BaseObjectMap
 
     /**
      * updateOne
-     * Update part of an object
-     * Because this can trigger other changes in the database, the object is 
-     * reloaded and all other changes in it will be discarded
      *
-     * @param BaseObject 
-     * @param Array fields
+     * Update part of an object.
+     * Because this can trigger other changes in the database, the object is 
+     * reloaded and all other changes are discarded.
+     *
+     * @param Pomm\Object\BaseObject $object
+     * @param Array                  $fields Only these fields will be updated.
+     * @return Pomm\Object\BaseObject 
      **/
     public function updateOne(BaseObject &$object, Array $fields)
     {
@@ -503,10 +533,12 @@ abstract class BaseObjectMap
 
     /**
      * parseForUpdate 
+     *
+     * Format the converted values for UPDATE query.
      * 
-     * @param BaseObject $object 
      * @access protected
-     * @return string
+     * @param  Pomm\Object\BaseObject $object 
+     * @return String
      */
     protected function parseForUpdate($object)
     {
@@ -523,11 +555,11 @@ abstract class BaseObjectMap
 
     /**
      * hasField 
-     * Does this class have the given field
+     *
+     * Does this class have the given field.
      * 
-     * @param string $field 
-     * @access public
-     * @return boolean
+     * @param  String $field Fields name.
+     * @return Boolean
      */
     public function hasField($field)
     {
@@ -537,9 +569,10 @@ abstract class BaseObjectMap
     /**
      * getTableName 
      * 
-     * @access public
-     * @param  string optionnal alias (default null)
-     * @return string
+     * Get the associated table signature (schema.name).
+     * 
+     * @param  String $alias Optionnal alias (default null).
+     * @return String
      */
     public function getTableName($alias = null)
     {
@@ -550,10 +583,11 @@ abstract class BaseObjectMap
 
     /**
      * deleteOne 
+     *
+     * Delete the record tied with the given entity.
      * 
-     * @param BaseObject $object 
-     * @access public
-     * @return void
+     * @param Pomm\Object\BaseObject $object 
+     * @return Pomm\Object\BaseObject 
      */
     public function deleteOne(BaseObject &$object)
     {
@@ -571,11 +605,11 @@ abstract class BaseObjectMap
      * getGroupByFields
      *
      * When grouping by all fields, this returns the fields with 
-     * the given alias (default empty string).
+     * the given alias (default null).
      *
-     * @param String $alias the table alias in the query
-     * @access public
-     * @return Array
+     * @see Pomm\Object\BaseObjectMap::getField()
+     * @param String $alias Optional table alias prefix.
+     * @return Array fields to be grouped.
      **/
     public function getGroupByFields($alias = null)
     {
@@ -585,10 +619,11 @@ abstract class BaseObjectMap
     /**
      * getSelectFields
      *
-     * When selecting all fields, this is better than *
+     * Get the list of fields to SELECT.
+     * When selecting all fields, this is better than *.
      *
-     * @param String $alias the table alias in the query
-     * @access public
+     * @see Pomm\Object\BaseObjectMap::getField()
+     * @param String $alias the table alias in the query.
      * @return Array
      **/
     public function getSelectFields($alias = null)
@@ -599,10 +634,9 @@ abstract class BaseObjectMap
     /**
      * getFields
      *
-     * When selecting all fields, this is better than *
+     * Get the list of field names.
      *
      * @param String $alias the table alias in the query
-     * @access public
      * @return Array
      **/
     public function getFields($alias = null)
@@ -618,10 +652,12 @@ abstract class BaseObjectMap
 
     /**
      * getRemoteSelectFields
+     *
      * Return the select fields formatted as table{%s} for use with 
      * createFromForeign filter.
      *
-     * @param String $alias
+     * @deprecated
+     * @param String $alias Optional alias prefix.
      * @return Array $fields
      **/
     public function getRemoteSelectFields($alias = null)
@@ -641,12 +677,14 @@ abstract class BaseObjectMap
 
     /**
      * createFromForeign
+     *
      * Hydrate an object from the values with keys formated like table{field}
      * and set it in the values with the table name as key. All the values used 
      * to hydrate the object are removed from the array.
      *
-     * @param Array values
-     * @return Array values
+     * @deprecated
+     * @param Array $@old_values
+     * @return Array 
      **/
     public function createFromForeign(Array $old_values)
     {
@@ -674,15 +712,15 @@ abstract class BaseObjectMap
 
     /**
      * queryPaginate
-     * paginate and execute a query
      *
-     * @param $sql the SQL query to paginate
-     * @param $sql_count the SQL that count the overall results (whatever the column name is)
-     * @param $values the queries parameters
-     * @param $items_per_page how many results per page
-     * @param $page the page index
+     * paginate and execute a query.
      *
-     * @return Pager
+     * @param String  $sql       SQL query to paginate.
+     * @param String  $sql_count SQL that count the overall results.
+     * @param Array   $values    query parameters.
+     * @param Integer $items_per_page
+     * @param Integer $page      page index.
+     * @return Pomm\Object\Pager
      **/
     public function paginateQuery($sql, $sql_count, $values, $items_per_page, $page = 1)
     {
@@ -706,13 +744,15 @@ abstract class BaseObjectMap
 
     /**
      * paginateFindWhere
-     * Paginate and execute a query with a Where statement
      *
-     * @param $where the where string or Where instance
-     * @param $values the queries parameters
-     * @param $suffix any ORDER BY or others
-     * @param $items_per_page how many results per page
-     * @param $page the page index
+     * Paginate and execute a query with a Where statement.
+     *
+     * @param Mixed    $where    Condition or Where instance.
+     * @param Array    $values   Query parameters.
+     * @param String   $suffix   Order by.
+     * @param Integer  $items_per_page
+     * @param Integer  $page     Page index.
+     * @return Pomm\Object\Pager
      **/
     public function paginateFindWhere($where, $values, $suffix, $items_per_page, $page = 1)
     {

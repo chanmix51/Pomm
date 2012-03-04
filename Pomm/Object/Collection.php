@@ -23,9 +23,8 @@ class Collection implements \Iterator, \Countable
     /**
      * __construct 
      * 
-     * @param Array $data 
-     * @access public
-     * @return void
+     * @param \PDOStatement              $stmt
+     * @param \Pomm\Object\BaseObjectMap $object_map
      */
     public function __construct(\PDOStatement $stmt, \Pomm\Object\BaseObjectMap $object_map)
     {
@@ -36,10 +35,8 @@ class Collection implements \Iterator, \Countable
 
     /**
      * __destruct
-     * The instance destructor
-     * It closes the cursos when the collection is cleared.
      *
-     * @access public
+     * Closes the cursor when the collection is cleared.
      **/
     public function __destruct()
     {
@@ -48,10 +45,10 @@ class Collection implements \Iterator, \Countable
 
     /**
      * registerFilter
-     * Register a callable as filter
      *
-     * @access public
-     * @param Callable $callable
+     * Register a callable as filter.
+     *
+     * @param Callable $callable May be anonymous function.
      **/
 
     public function registerFilter($callable)
@@ -61,10 +58,10 @@ class Collection implements \Iterator, \Countable
 
     /**
      * unregisterFilter
-     * unregister a filter
      *
-     * @access public
-     * @param Callable the callable to unregister
+     * Unregister a filter.
+     *
+     * @param Callable the callable to unregister.
      **/
     public function unregisterFilter($callable)
     {
@@ -75,9 +72,9 @@ class Collection implements \Iterator, \Countable
 
     /**
      * resetFilters
-     * remove all filters
      *
-     * @access public
+     * Remove all filters.
+     *
      **/
     public function resetFilters()
     {
@@ -86,10 +83,10 @@ class Collection implements \Iterator, \Countable
 
     /**
      * get
-     * Return a particular result
      *
-     * @param index
-     * @access public
+     * Return a particular result.
+     *
+     * @param Integer $index
      * @return \Pomm\Object\BaseObject
      **/
 
@@ -122,10 +119,10 @@ class Collection implements \Iterator, \Countable
 
     /**
      * has
-     * Return true if the given index exists false otherwise
      *
-     * @access public
-     * @param index
+     * Return true if the given index exists false otherwise.
+     *
+     * @param Intger $index
      * @return Boolean
      **/
 
@@ -137,9 +134,8 @@ class Collection implements \Iterator, \Countable
     /**
      * count 
      * 
-     * @access public
      * @see \Countable
-     * @return integer
+     * @return Integer
      */
     public function count()
     {
@@ -150,9 +146,7 @@ class Collection implements \Iterator, \Countable
     /**
      * rewind 
      * 
-     * @access public
      * @see \Iterator
-     * @return void
      */
     public function rewind() 
     {
@@ -162,9 +156,7 @@ class Collection implements \Iterator, \Countable
     /**
      * current 
      * 
-     * @access public
      * @see \Iterator
-     * @return void
      */
     public function current() 
     {
@@ -174,9 +166,7 @@ class Collection implements \Iterator, \Countable
     /**
      * key 
      * 
-     * @access public
      * @see \Iterator
-     * @return void
      */
     public function key() 
     {
@@ -186,9 +176,7 @@ class Collection implements \Iterator, \Countable
     /**
      * next 
      * 
-     * @access public
      * @see \Iterator
-     * @return void
      */
     public function next() 
     {
@@ -198,9 +186,8 @@ class Collection implements \Iterator, \Countable
     /**
      * valid 
      * 
-     * @access public
      * @see \Iterator
-     * @return boolean
+     * @return Boolean
      */
     public function valid() 
     {
@@ -211,8 +198,7 @@ class Collection implements \Iterator, \Countable
      * isFirst 
      * Is the iterator on the first element ?
      *
-     * @access public
-     * @return boolean
+     * @return Boolean
      */
     public function isFirst()
     {
@@ -221,10 +207,10 @@ class Collection implements \Iterator, \Countable
 
     /**
      * isLast 
+     *
      * Is the iterator on the last element ?
      * 
-     * @access public
-     * @return boolean
+     * @return Boolean
      */
     public function isLast()
     {
@@ -233,10 +219,10 @@ class Collection implements \Iterator, \Countable
 
     /**
      * isEmpty 
+     *
      * Is the collection empty (no element) ?
      * 
-     * @access public
-     * @return boolean
+     * @return Boolean
      */
     public function isEmpty()
     {
@@ -245,10 +231,10 @@ class Collection implements \Iterator, \Countable
 
     /**
      * isEven 
+     *
      * Is the iterator on an even position ?
      * 
-     * @access public
-     * @return boolean
+     * @return Boolean
      */
     public function isEven()
     {
@@ -257,9 +243,10 @@ class Collection implements \Iterator, \Countable
 
     /**
      * isOdd 
+     *
+     * Is the iterator on an odd position ?
      * 
-     * @access public
-     * @return boolean
+     * @return Boolean
      */
     public function isOdd()
     {
@@ -268,12 +255,12 @@ class Collection implements \Iterator, \Countable
 
     /**
      * getOddEven 
-     * Return 'odd' or 'even' depending on the element index position
+     *
+     * Return 'odd' or 'even' depending on the element index position.
      * Useful to style list elements when printing lists to do 
-     * <li class="line_<?php $list->getOddEven() ?>">
+     * <li class="line_<?php $list->getOddEven() ?>">.
      * 
-     * @access public
-     * @return string
+     * @return String
      */
     public function getOddEven()
     {

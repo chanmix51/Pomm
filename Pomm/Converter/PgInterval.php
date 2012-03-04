@@ -17,7 +17,7 @@ use Pomm\Exception\Exception;
 class PgInterval implements ConverterInterface
 {
     /**
-     * @see ConverterInterface
+     * @see Pomm\Converter\ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {
@@ -38,7 +38,7 @@ class PgInterval implements ConverterInterface
     }
 
     /**
-     * @see ConverterInterface
+     * @see Pomm\Converter\ConverterInterface
      **/
     public function toPg($data, $type = null)
     {

@@ -23,8 +23,7 @@ abstract class BaseTool
      * __construct
      *
      * @final
-     * @public
-     * @param Array options
+     * @param Array $options (optionnal)
      **/
     public final function __construct(Array $options = array())
     {
@@ -33,17 +32,23 @@ abstract class BaseTool
     }
 
     /**
-     * configure - This is called from the constructor. Override it to
+     * configure 
+     *
+     * This is called from the constructor. Override it to
      * configure the parameter holder.
      *
      * @abstract
+     * @access protected
      **/
     protected abstract function configure();
 
     /**
-     * execute - Is called when the tool is to be executed.
+     * execute 
+     *
+     * Is called when the tool is to be executed.
      *
      * @abstract
+     * @access protected
      **/
     protected abstract function execute();
 }

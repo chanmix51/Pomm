@@ -19,14 +19,14 @@ use Pomm\Tools\Inspector;
 class CreateBaseMapTool extends CreateFileTool
 {
     /**
-     * configure()
+     * configure
+     *
      * mandatory options :
      * * table      the db table to be mapped
      * * database   a Database instance
      * * prefix_dir where to generate the dirs
      *
      * @see Pomm\Tools\BaseTool
-     *
      **/
     protected function configure()
     {
@@ -48,7 +48,7 @@ class CreateBaseMapTool extends CreateFileTool
     }
 
     /**
-     * execute()
+     * execute
      *
      * @see Pomm\Tools\BaseTool
      **/

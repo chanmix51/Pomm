@@ -36,9 +36,11 @@ class Connection
     /**
      * __construct()
      * 
-     * open a connection to the specified database
+     * Connection instance to the specified database.
+     *
      * @access public
-     * @param ParameterHolder $parameter_holder the db parameters
+     * @param Database                  $database   The Database instance.
+     * @param IdentityMapperInterface   $mapper     The optional identity mapper instance.
      **/
     public function __construct(Database $database, \Pomm\Identity\IdentityMapperInterface $mapper = null)
     {
@@ -71,6 +73,12 @@ class Connection
         }
     }
 
+    /**
+     * launch
+     *
+     * Open a connection on the database.
+     * @access protected
+     **/
     protected function launch()
     {
         $connect_string = sprintf('%s:dbname=%s', 
@@ -94,7 +102,6 @@ class Connection
     /*
      * __destruct
      *
-     * The destructor
      * @access public
      * @return void
      */
@@ -105,7 +112,8 @@ class Connection
 
     /**
      * getPdo 
-     * Returns the PDO instance of the associated connection
+     *
+     * Returns the PDO instance of the associated connection.
      * 
      * @access public
      * @return PDO
@@ -122,11 +130,12 @@ class Connection
 
     /**
      * getMapFor 
-     * Returns a Map instance of the given model name
+     *
+     * Returns a Map instance of the given model name.
      * 
-     * @param string $class 
+     * @param  String $class The fully qualified class name of the associated entity.
      * @access public
-     * @return PommBaseObjectMap
+     * @return BaseObjectMap
      */
     public function getMapFor($class)
     {
@@ -138,7 +147,8 @@ class Connection
 
     /**
      * getDatabase
-     * Returns the connection's database
+     *
+     * Returns the connection's database.
      *
      * @access public
      * @return Database
@@ -150,7 +160,8 @@ class Connection
 
     /**
      * begin
-     * Starts a new transaction
+     *
+     * Start a new transaction.
      *
      * @return Pomm\Connection\Connection
      **/
@@ -168,7 +179,8 @@ class Connection
 
     /**
      * commit
-     * Commits a transaction in the database
+     *
+     * Commit a transaction in the database.
      *
      * @return Pomm\Connection\Connection
      **/
@@ -186,11 +198,12 @@ class Connection
 
     /**
      * rollback
+     * 
      * rollback a transaction. This can be the whole transaction
      * or if a savepoint name is specified only the queries since
      * this savepoint.
      *
-     * @param String $name the name of the savepoint (optionnal)
+     * @param  String $name Optionnal name of the savepoint.
      * @return Pomm\Connection\Connection
      **/
     public function rollback($name = null)
@@ -216,9 +229,10 @@ class Connection
 
     /**
      * setSavepoint
-     * Set a new savepoint with the given name
      *
-     * @param String $name the savepoint's name
+     * Set a new savepoint with the given name.
+     *
+     * @param String $name Savepoint's name.
      * @return Pomm\Connection\Connection
      **/
     public function setSavepoint($name)
@@ -230,7 +244,8 @@ class Connection
 
     /**
      * releaseSavepoint
-     * forget the specified savepoint
+     *
+     * Forget the specified savepoint.
      *
      * @param String $name the savepoint's name
      * @return Pomm\Connection\Connection
@@ -244,7 +259,8 @@ class Connection
 
     /**
      * isInTransaction
-     * Check if we are in transaction mode
+     *
+     * Check if we are in transaction mode.
      *
      * @return boolean
      **/
@@ -256,6 +272,8 @@ class Connection
     /**
      * getIdentityMapper
      *
+     * Get connection's related identity mapper.
+     *
      * @return IdentityMapperInterface
      **/
     public function getIdentityMapper()
@@ -265,11 +283,11 @@ class Connection
 
     /**
      * registerFilter
-     * Register a new Filter in the QueryFilterChain
+     *
+     * Register a new Filter in the QueryFilterChain.
      *
      * @param Pomm\FilterChain\FilterInterface
      **/
-
     public function registerFilter(FilterInterface $filter)
     {
         $this->query_filter_chain->registerFilter($filter);
@@ -277,12 +295,13 @@ class Connection
 
     /**
      * executeFilterChain
-     * execute a SQL Query in the filter chain.
      *
-     * @param BaseObjectMap map the map instance that sends the query
-     * @param String sql the SQL query
-     * @param Array values the parameter for the prepared query
-     * @return PDOStatement 
+     * Execute a SQL Query in the filter chain.
+     *
+     * @param BaseObjectMap $map     Map instance that sends the query.
+     * @param String        $sql     The SQL query.
+     * @param Array         $values  Optional parameter for the prepared query.
+     * @return PDOStatement
      **/
     public function executeFilterChain(BaseObjectMap $map, $sql, Array $values = array())
     {

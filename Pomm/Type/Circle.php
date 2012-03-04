@@ -17,6 +17,12 @@ class Circle
     public $center;
     public $radius;
 
+    /**
+     * __construct
+     *
+     * @param Pomm\Type\Point $center
+     * @param Integer         $radius
+     **/
     public function __construct(Point $center, $radius)
     {
         $this->center = $center;
