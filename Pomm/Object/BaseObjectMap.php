@@ -440,7 +440,7 @@ abstract class BaseObjectMap
         }
         else
         {
-            $pg_values = $this->parseForInsert($object);
+            $pg_values = $this->convertToPg($object->extract());
             $sql = sprintf('INSERT INTO %s (%s) VALUES (%s) RETURNING %s;', $this->object_name, join(',', array_keys($pg_values)), join(',', array_values($pg_values)), join(', ', $this->getSelectFields()));
 
             $collection = $this->query($sql, array());
@@ -499,24 +499,6 @@ abstract class BaseObjectMap
         }
 
         $object->_setStatus(BaseObject::EXIST);
-    }
-
-    /**
-     * parseForInsert 
-     * 
-     * @param BaseObject $object 
-     * @access protected
-     * @return array
-     */
-    protected function parseForInsert($object)
-    {
-        $tmp = array();
-        foreach ($this->convertToPg($object->extract()) as $field_name => $field_value)
-        {
-            $tmp[$field_name] = $field_value;
-        }
-
-        return $tmp;
     }
 
     /**
