@@ -1,4 +1,5 @@
 <?php
+
 namespace Pomm\Test;
 
 use Pomm\Service;

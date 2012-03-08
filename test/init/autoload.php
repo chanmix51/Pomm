@@ -23,6 +23,7 @@ function __autoload($name)
         'Pomm/Tools/CreateMapTool.php',
         'Pomm/Tools/CreateFileTool.php',
         'Pomm/Tools/Logger.php',
+        'Pomm/Tools/Inspector.php',
         'Pomm/Converter/ConverterInterface.php',
         'Pomm/Converter/PgArray.php',
         'Pomm/Converter/PgBoolean.php',
