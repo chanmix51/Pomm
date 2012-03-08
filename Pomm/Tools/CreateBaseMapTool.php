@@ -135,7 +135,7 @@ EOD;
         {
             $field_name = $attribute['attname'];
 
-            if (preg_match('/^(.+)\[\]$/', $attribute['format_type'], $matchs))
+            if (preg_match('/^_(.+)$/', $attribute['format_type'], $matchs))
             {
                 $array_modifier = '[]';
                 $format_type = $matchs[1];
@@ -146,6 +146,7 @@ EOD;
                 $format_type = $attribute['format_type'];
             }
 
+                printf("Got '%s', array_modifier = '%s' and type = '%s'.\n", $attribute['format_type'], $array_modifier, $format_type);
             $field_type = $format_type.$array_modifier;
 
             $fields_definition .= sprintf("        \$this->addField('%s', '%s');\n", $field_name, $field_type);
