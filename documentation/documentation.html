@@ -2,13 +2,13 @@
 <!-- saved from url=(0039) -->
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-<meta name="generator" content="Docutils 0.6: http://docutils.sourceforge.net/">
+<meta name="generator" content="Docutils 0.7: http://docutils.sourceforge.net/">
 <title>Pomm Documentation</title>
 <style type="text/css">
 
 /*
 :Author: David Goodger (goodger@python.org)
-:Id: $Id: html4css1.css 5951 2009-05-18 18:03:10Z milde $
+:Id: $Id: html4css1.css 6253 2010-03-02 00:24:53Z milde $
 :Copyright: This stylesheet has been placed in the public domain.
 
 Default cascading style sheet for the HTML output of Docutils.
@@ -156,15 +156,21 @@ h2.subtitle {
 hr.docutils {
   width: 75% }
 
-img.align-left, .figure.align-left{
+img.align-left, .figure.align-left, object.align-left {
   clear: left ;
   float: left ;
   margin-right: 1em }
 
-img.align-right, .figure.align-right {
+img.align-right, .figure.align-right, object.align-right {
   clear: right ;
   float: right ;
   margin-left: 1em }
+
+img.align-center, .figure.align-center, object.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
 
 .align-left {
   text-align: left }
@@ -438,9 +444,10 @@ $service = new Pomm\Service(array(
     'dsn' =&gt; 'pgsql://user:pass@host:port/db_a'
   ),
   'db_two' =&gt; array(
-    'dsn' =&gt; 'pgsql://otheruser:hispass@!/path/to/socket/directory!/db_b',
+    'dsn'   =&gt; 'pgsql://otheruser:hispass@!/path/to/socket/directory!/db_b',
     'class' =&gt; 'App\MyDb',
-    'identity_mapper' =&gt; 'App\MyIdentityMapper'
+    'identity_mapper' =&gt; 'App\MyIdentityMapper',
+    'name'  =&gt; 'my_db'
   )
   ));
 
@@ -451,7 +458,8 @@ $service-&gt;setDatabase('db_one', new Pomm\Connection\Database(array(
 )));
 $service-&gt;setDatabase('db_two', new App\MyDb(array(
   'dsn' =&gt; 'pgsql://otheruser:hispass@!/path/to/socket/directory!/db_b',
-  'identity_mapper' =&gt; 'App\MyIdentityMapper'
+  'identity_mapper' =&gt; 'App\MyIdentityMapper',
+  'name'  =&gt; 'my_db'
 )));
 </pre>
 <dl class="docutils">
@@ -460,6 +468,7 @@ $service-&gt;setDatabase('db_two', new App\MyDb(array(
 <li><tt class="docutils literal">dsn</tt> (mandatory): a URL like string to connect the database. It is in the form <tt class="docutils literal"><span class="pre">pgsql://user:password@host:port/database_name</span></tt></li>
 <li><tt class="docutils literal">class</tt>: The <em>Database</em> class to instantiate as a database. This class must extend <tt class="docutils literal">Pomm\Database</tt> as we will see below.</li>
 <li><tt class="docutils literal">isolation</tt>: transaction isolation level. (default is <tt class="docutils literal">ISOLATION_READ_COMMITTED</tt>, see <a class="reference internal" href="#standard-transactions">Standard transactions</a>)</li>
+<li><tt class="docutils literal">name</tt>: the database alias name. If none is provided, the database real name is substitued. This option is notably used for namespacing map classes during database introspection (see <a class="reference internal" href="#php-tools">PHP tools</a> and <a class="reference internal" href="#introspected-tables">Introspected tables</a>).</li>
 </ul>
 </dd>
 </dl>
@@ -846,21 +855,23 @@ $entity-&gt;isModified();      // true
 </dl>
 <p>If the table is stored in a special database schema, it must appear in the <tt class="docutils literal">object_name</tt> attribute. If you do not use schemas, postgresql will store everything in the public schema. You do not have to specify it in the <tt class="docutils literal">object_name</tt> attribute but it will be used in the class namespace. As <tt class="docutils literal">public</tt> is also a reserved keyword of PHP, the namespace for the public schema is <tt class="docutils literal">PublicSchema</tt>.</p>
 <p>Let's say we have the following table <tt class="docutils literal">student</tt> in the <tt class="docutils literal">public</tt> schema of the database <tt class="docutils literal">College</tt>:</p>
-<pre class="literal-block">+-------------+-----------------------------+
-|   Column    |            Type             |
-+=============+=============================+
-|  reference  | character(10)               |
-+-------------+-----------------------------+
-|  first_name | character varying           |
-+-------------+-----------------------------+
-|  last_name  | character varying           |
-+-------------+-----------------------------+
-|  birthdate  | timestamp without time zone |
-+-------------+-----------------------------+
-|  level      | smallint                    |
-+-------------+-----------------------------+
+<pre class="literal-block">+-------------+-------------------------------+
+|   Column    |            Type               |
++=============+===============================+
+|  reference  | character(10)                 |
++-------------+-------------------------------+
+|  first_name | character varying             |
++-------------+-------------------------------+
+|  last_name  | character varying             |
++-------------+-------------------------------+
+|  birthdate  | timestamp without time zone   |
++-------------+-------------------------------+
+|  level      | smallint                      |
++-------------+-------------------------------+
+|  exam_dates | timestamp without time zone[] |
++-------------+-------------------------------+
 </pre>
-<p>The according generated structure will be:</p>
+<p>The last field <tt class="docutils literal">exam_dates</tt> is an array of timestamps (see <a class="reference internal" href="#arrays">Arrays</a> below). The according generated structure will be:</p>
 <pre class="literal-block">&lt;?php
 
  namespace College\PublicSchema\Base;
@@ -880,12 +891,13 @@ $entity-&gt;isModified();      // true
          $this-&gt;addField('last_name', 'varchar');
          $this-&gt;addField('birthdate', 'timestamp');
          $this-&gt;addField('level', 'smallint');
+         $this-&gt;addField('exam_dates', 'timestamp[]');
 
          $this-&gt;pk_fields = array('reference');
      }
  }
 </pre>
-<p>If the previous table were in the <tt class="docutils literal">school</tt> database schema, the following lines would change:</p>
+<p>All generated map classes use PHP namespace. This namespace is composed by the database name and the database schema the table is located in. If database name is not supplied to the <tt class="docutils literal">Database</tt> constructor (see <a class="reference internal" href="#database-class-and-isolation-level">Database class and isolation level</a>), the real database name is used. If by example, the previous table were in the <tt class="docutils literal">school</tt> database schema, the following lines would change:</p>
 <pre class="literal-block">&lt;?php
 
  namespace College\School\Base;

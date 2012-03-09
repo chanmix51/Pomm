@@ -38,9 +38,10 @@ The ``Service`` class just stores your ``Database`` instances and provides conve
         'dsn' => 'pgsql://user:pass@host:port/db_a'
       ),
       'db_two' => array(
-        'dsn' => 'pgsql://otheruser:hispass@!/path/to/socket/directory!/db_b',
+        'dsn'   => 'pgsql://otheruser:hispass@!/path/to/socket/directory!/db_b',
         'class' => 'App\MyDb',
-        'identity_mapper' => 'App\MyIdentityMapper'
+        'identity_mapper' => 'App\MyIdentityMapper',
+        'name'  => 'my_db'
       )
       ));
     
@@ -51,13 +52,15 @@ The ``Service`` class just stores your ``Database`` instances and provides conve
     )));
     $service->setDatabase('db_two', new App\MyDb(array(
       'dsn' => 'pgsql://otheruser:hispass@!/path/to/socket/directory!/db_b',
-      'identity_mapper' => 'App\MyIdentityMapper'
+      'identity_mapper' => 'App\MyIdentityMapper',
+      'name'  => 'my_db'
     )));
 
 The *setDatabase* method is used internally by the constructor. The parameters may be any of the following:
  * ``dsn`` (mandatory): a URL like string to connect the database. It is in the form ``pgsql://user:password@host:port/database_name``
  * ``class``: The *Database* class to instantiate as a database. This class must extend ``Pomm\Database`` as we will see below.
  * ``isolation``: transaction isolation level. (default is ``ISOLATION_READ_COMMITTED``, see `Standard transactions`_)
+ * ``name``: the database alias name. If none is provided, the database real name is substitued. This option is notably used for namespacing map classes during database introspection (see `PHP tools`_ and `Introspected tables`_).
 
 Once registered, you can retrieve the databases with their name by calling the *getDatabase* method passing the name as argument. If no name is given, the first declared *Database* will be returned.
 
@@ -460,21 +463,23 @@ If the table is stored in a special database schema, it must appear in the ``obj
 
 Let's say we have the following table ``student`` in the ``public`` schema of the database ``College``::
 
-  +-------------+-----------------------------+
-  |   Column    |            Type             |
-  +=============+=============================+
-  |  reference  | character(10)               |
-  +-------------+-----------------------------+
-  |  first_name | character varying           |
-  +-------------+-----------------------------+
-  |  last_name  | character varying           |
-  +-------------+-----------------------------+
-  |  birthdate  | timestamp without time zone |
-  +-------------+-----------------------------+
-  |  level      | smallint                    |
-  +-------------+-----------------------------+
+  +-------------+-------------------------------+
+  |   Column    |            Type               |
+  +=============+===============================+
+  |  reference  | character(10)                 |
+  +-------------+-------------------------------+
+  |  first_name | character varying             |
+  +-------------+-------------------------------+
+  |  last_name  | character varying             |
+  +-------------+-------------------------------+
+  |  birthdate  | timestamp without time zone   |
+  +-------------+-------------------------------+
+  |  level      | smallint                      |
+  +-------------+-------------------------------+
+  |  exam_dates | timestamp without time zone[] |
+  +-------------+-------------------------------+
 
-The according generated structure will be::
+The last field ``exam_dates`` is an array of timestamps (see `Arrays`_ below). The according generated structure will be::
 
  <?php
 
@@ -495,13 +500,13 @@ The according generated structure will be::
           $this->addField('last_name', 'varchar');
           $this->addField('birthdate', 'timestamp');
           $this->addField('level', 'smallint');
+          $this->addField('exam_dates', 'timestamp[]');
   
           $this->pk_fields = array('reference');
       }
   }
 
-If the previous table were in the ``school`` database schema, the following lines would change::
-
+All generated map classes use PHP namespace. This namespace is composed by the database name and the database schema the table is located in. If database name is not supplied to the ``Database`` constructor (see `Database class and isolation level`_), the real database name is used. If by example, the previous table were in the ``school`` database schema, the following lines would change::
 
  <?php
 
