@@ -1,3 +1,16 @@
+=== 1.0.1
+ * Updated documentation.
+ * Test for base map generation.
+ * BUG in base map class generation.
+ * PHPDoc annotations update.
+ * Period type is not longer needed.
+ * Faster getFields.
+ * _extra attribute.
+ * NULLs make updates or insert to fail.
+ * Problems with NULL values in arrays.
+ * problem with empty sets using pgarray.
+ * Handle emtpy arrays.
+ * Use missing for exception in PgArray.
 === 1.0.0
  * type consistency between pg & pomm.
  * Model generation with new converter system.
