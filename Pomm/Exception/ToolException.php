@@ -1,5 +1,5 @@
 <?php
-namespace Pomm\Exception\ToolException;
+namespace Pomm\Exception;
 
 /**
  * Pomm\Exception\ToolException - Exception for CLI tools
