@@ -214,10 +214,13 @@ class Database
      * @acces public
      * @param String $type           Type name
      * @param String $converter_name Converter designation.
+     * @return Pomm\Connection\Database
      **/
     public function registerTypeForConverter($type, $converter_name)
     {
         $this->handled_types[$type] = $converter_name;
+
+        return $this;
     }
 
     /**
