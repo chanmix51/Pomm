@@ -286,11 +286,14 @@ class Connection
      *
      * Register a new Filter in the QueryFilterChain.
      *
-     * @param Pomm\FilterChain\FilterInterface
+     * @param \Pomm\FilterChain\FilterInterface
+     * @return \Pomm\Connection\Connection
      **/
     public function registerFilter(FilterInterface $filter)
     {
         $this->query_filter_chain->registerFilter($filter);
+
+        return $this;
     }
 
     /**
