@@ -21,10 +21,13 @@ class CreateBaseMapTool extends CreateFileTool
     /**
      * configure
      *
-     * mandatory options :
+     * mandatory options:
      * * table      the db table to be mapped
      * * database   a Database instance
      * * prefix_dir where to generate the dirs
+     *
+     * other options:
+     * * parent_namespace   override default namespace for parent
      *
      * @see Pomm\Tools\BaseTool
      **/
@@ -84,9 +87,21 @@ class CreateBaseMapTool extends CreateFileTool
         if ($inherits = $this->inspector->getTableParents($this->options['oid']))
         {
             $parent_table_infos = $this->inspector->getTableInformation($inherits);
-            $extends = sprintf("%s\\%sMap", $std_namespace, sfInflector::camelize($parent_table_infos['table']));
+
+            if ($this->options->hasParameter('parent_namespace'))
+            {
+                $extends = sprintf("%s\\%sMap", $this->options['parent_namespace'], sfInflector::camelize($parent_table_infos['table']));
+            }
+            else
+            {
+                $extends = sprintf("%s\\%s\\%sMap", 
+                    sfInflector::camelize($this->options['database']->getName()),
+                    sfInflector::camelize($parent_table_infos['schema']),
+                    sfInflector::camelize($parent_table_infos['table']));
+            }
+
             $fields_definition = $this->generateFieldsDefinition(array_diff_key($this->inspector->getTableFieldsInformation($this->options['oid']), $this->inspector->getTableFieldsInformation($inherits)));
-            $parent_call = "        parent::intialize();\n";
+            $parent_call = "        parent::initialize();\n";
         }
         else
         {

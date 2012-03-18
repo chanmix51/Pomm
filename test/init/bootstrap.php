@@ -32,7 +32,7 @@ class TestTableMap extends BaseObjectMap
 
     public function createTable()
     {
-        $sql = sprintf("CREATE SCHEMA %s", reset(preg_split('/\./', $this->object_name)));
+        $sql = sprintf("CREATE SCHEMA %s", @reset(preg_split('/\./', $this->object_name)));
         $this->connection->getDatabase()->executeAnonymousQuery($sql);
         $sql = sprintf("CREATE TABLE %s (id SERIAL PRIMARY KEY, created_at TIMESTAMP NOT NULL DEFAULT now(), last_out TIMESTAMP, last_in TIMESTAMP, title VARCHAR(256) NOT NULL, authors VARCHAR(255)[] NOT NULL, is_available bool NOT NULL DEFAULT true, location POINT)", $this->object_name);
         $this->connection->getDatabase()->executeAnonymousQuery($sql);
