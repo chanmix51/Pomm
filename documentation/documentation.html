@@ -961,15 +961,15 @@ class AverageStudentScoreMap extends BaseObjectMap
 <div class="section" id="create-update-drop">
 <h3><a class="toc-backref" href="#id37">Create, update, drop</a></h3>
 <p>The main goal of the map classes is to provide a layer between your database and your entities. They provide you with basic tools to save, update and delete your entities trough <tt class="docutils literal">saveOne()</tt>, <tt class="docutils literal">updateOne()</tt> and <tt class="docutils literal">deleteOne()</tt> methods.</p>
-<dl class="docutils">
-<dt>::</dt>
-<dd><p class="first">$entity = $map-&gt;createOne(array('pika' =&gt; 'chu', 'plop' =&gt; false));</p>
-<p>$map-&gt;saveOne($entity);     // INSERT</p>
-<p>$entity-&gt;setPika('no');
-$entity-&gt;setPlop(true);</p>
-<p class="last">$map-&gt;saveOne($entity);     // UPDATE</p>
-</dd>
-</dl>
+<pre class="literal-block">$entity = $map-&gt;createOne(array('pika' =&gt; 'chu', 'plop' =&gt; false));
+
+$map-&gt;saveOne($entity);     // INSERT
+
+$entity-&gt;setPika('no');
+$entity-&gt;setPlop(true);
+
+$map-&gt;saveOne($entity);     // UPDATE
+</pre>
 <p>As illustrated above, the <tt class="docutils literal">saveOne()</tt> method saves your object whatever it is an update or an insert. It is important to know that the internal state (see <a class="reference internal" href="#life-cycle">Life cycle</a>) of the entity is used to determine if the object exists or not and choose between the <tt class="docutils literal">INSERT</tt> or the <tt class="docutils literal">UPDATE</tt> statement.
 Whatever is used, the whole structure is saved every time this method is called. In case you do just update some fields you can use the <tt class="docutils literal">updateOne()</tt> method.
 Note that if the table related to this entity sets default values (like <tt class="docutils literal">created_at</tt> field by example) they will be <strong>automatically hydrated in the entity</strong>.</p>

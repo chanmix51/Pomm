@@ -577,6 +577,7 @@ Create, update, drop
 The main goal of the map classes is to provide a layer between your database and your entities. They provide you with basic tools to save, update and delete your entities trough ``saveOne()``, ``updateOne()`` and ``deleteOne()`` methods.
 
 ::
+
   $entity = $map->createOne(array('pika' => 'chu', 'plop' => false));
 
   $map->saveOne($entity);     // INSERT
