@@ -309,6 +309,8 @@ class converter_test extends \lime_test
         $this->map->createTable();
         $map = $this->connection->getMapFor('Pomm\Test\TestConverterContainer');
         $map->createTable();
+        // set an empty string in the entity
+        $this->object->something = '';
         $test_container = $map->createObject(array('test_converter' => $this->object));
 
         $map->saveOne($test_container);

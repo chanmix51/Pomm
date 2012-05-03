@@ -64,7 +64,7 @@ class PgEntity implements ConverterInterface
         $map = $this->database->createConnection()
             ->getMapFor($this->class_name);
 
-        $elts = preg_split('/[,\s]*"((?:[^\\\\"]|\\\\.|"")+)"[,\s]*|[,\s]+/', trim($data, "()"), 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        $elts = str_getcsv(trim($data, '()'));
 
         $fields = array();
         foreach ($map->getFieldDefinitions() as $field_name => $pg_type)
