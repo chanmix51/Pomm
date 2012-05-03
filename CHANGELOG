@@ -1,3 +1,11 @@
+=== 1.0.2
+ * Map generation problem with arays of user defined types. (#18)
+ * PgEntity parser fromPg now supports empty fields (#19)
+ * Connection chain call
+ * BaseMapTool inheritance issue
+ * registerTypeForConverter returns Database instance
+ * Missing type for bpchar
+ * Wrong namespace in ToolException.
 === 1.0.1
  * Updated documentation.
  * Test for base map generation.
