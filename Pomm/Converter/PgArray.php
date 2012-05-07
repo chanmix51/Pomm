@@ -39,17 +39,15 @@ class pgArray implements ConverterInterface
             throw new Exception(sprintf('Array converter must be given a type.'));
         }
 
-        if ($data !== "{NULL}")
+        if ($data !== "{NULL}" and $data !== "{}")
         {
             $converter = $this->database
                 ->getConverterForType($type);
 
             return array_map(function($val) use ($converter, $type) {
                     return $val !== "NULL" ? $converter->fromPg(str_replace('\\"', '"', $val), $type) : null;
-                },
-                    preg_split('/[,\s]*"((?:[^\\\\"]|\\\\.|"")+)"[,\s]*|[,\s]+/', 
-                        str_replace('""', '"', trim($data, "{}")), 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE));
-            }
+                }, str_getcsv(str_replace('""', '"', trim($data, "{}"))));
+        }
         else
         {
             return array();
