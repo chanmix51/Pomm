@@ -78,6 +78,7 @@ class PgEntity implements ConverterInterface
         }
 
         $object = $map->createObject($map->convertFromPg($fields));
+        $object->_setStatus(\Pomm\Object\BaseObject::EXIST);
 
         return $object;
     }

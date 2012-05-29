@@ -318,6 +318,7 @@ class converter_test extends \lime_test
         $this->isa_ok($test_container['test_converter'], 'Pomm\Test\TestConverter', 'The test_converter is a "TestConverter" instance.');
         $this->is($test_container['test_converter']->get('probed_data'), 
             $this->object->get('probed_data'), 'Probed data are the same');
+        $this->is($test_container['test_converter']->_getStatus(), 1, '"test_converter" with status EXIST.');
         $test_container['test_converters'] = array($this->object, $this->object);
 
         $map->updateOne($test_container, array('test_converters'));
