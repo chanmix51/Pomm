@@ -1,3 +1,7 @@
+=== 1.0.3
+ * PgEntity returned entities marked as existing.
+ * Generation using inheritance was broken.
+ * PgArray uses str_getcsv
 === 1.0.2
  * Map generation problem with arays of user defined types. (#18)
  * PgEntity parser fromPg now supports empty fields (#19)
