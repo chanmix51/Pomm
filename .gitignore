@@ -1,3 +1,4 @@
 *.swp
 .ctags
 test/init/config.php
+phpunit.xml
