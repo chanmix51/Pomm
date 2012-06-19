@@ -3,6 +3,7 @@
 <phpunit bootstrap="./tests/bootstrap/autoload.php">
     <php>
         <var name="dsn" value="pgsql://user:pass@host:port/db_name" />
+        <!--<var name="dev" value="true" />-->
     </php>
     <testsuites>
         <testsuite name="Pomm Test Suite">
