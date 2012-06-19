@@ -226,7 +226,7 @@ class Collection implements \Iterator, \Countable
      */
     public function isEmpty()
     {
-        return is_null($this->position);
+        return $this->stmt->rowCount() === 0;
     }
 
     /**
