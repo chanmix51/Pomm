@@ -1,4 +1,5 @@
 <?php
+
 namespace Pomm\Object;
 
 use Pomm\Exception\Exception;
@@ -202,7 +203,7 @@ class Collection implements \Iterator, \Countable
      */
     public function isFirst()
     {
-        return $this->position == 0;
+        return $this->position === 0;
     }
 
     /**
@@ -214,7 +215,7 @@ class Collection implements \Iterator, \Countable
      */
     public function isLast()
     {
-        return $this->position == $this->count() - 1;
+        return $this->position === $this->count() - 1;
     }
 
     /**
@@ -226,7 +227,7 @@ class Collection implements \Iterator, \Countable
      */
     public function isEmpty()
     {
-        return is_null($this->position);
+        return $this->stmt->rowCount() === 0;
     }
 
     /**
@@ -238,7 +239,7 @@ class Collection implements \Iterator, \Countable
      */
     public function isEven()
     {
-        return ($this->position % 2) == 0;
+        return ($this->position % 2) === 0;
     }
 
     /**
@@ -250,7 +251,7 @@ class Collection implements \Iterator, \Countable
      */
     public function isOdd()
     {
-        return ($this->position % 2) == 1;
+        return ($this->position % 2) === 1;
     }
 
     /**

@@ -17,14 +17,17 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
     {
         $database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
 
-        if (isset($GLOBALS['dev']) && $GLOBALS['dev'] == 'true') {
+        if (isset($GLOBALS['dev']) && $GLOBALS['dev'] == 'true') 
+        {
             static::$logger = new \Pomm\Tools\Logger();
 
             static::$map = $database
                 ->createConnection()
                 ->registerFilter(new \Pomm\FilterChain\LoggerFilter(static::$logger))
                 ->getMapFor('Pomm\Test\Object\BaseEntity');
-        } else {
+        } 
+        else 
+        {
             static::$map = $database
                 ->createConnection()
                 ->getMapFor('Pomm\Test\Object\BaseEntity');
