@@ -210,9 +210,9 @@ class BaseEntityMap extends BaseObjectMap
         try {
             $this->connection->begin();
             $sql = "CREATE SCHEMA pomm_test";
-            $this->connection->getDatabase()->executeAnonymousQuery($sql);
+            $this->connection->executeAnonymousQuery($sql);
             $sql = sprintf("CREATE TABLE %s (id serial PRIMARY KEY, some_data varchar NOT NULL, bool_data boolean NOT NULL DEFAULT false)", $this->getTableName());
-            $this->connection->getDatabase()->executeAnonymousQuery($sql);
+            $this->connection->executeAnonymousQuery($sql);
             $this->connection->commit();
         } catch (Exception $e) {
             $this->connection->rollback();
@@ -223,21 +223,21 @@ class BaseEntityMap extends BaseObjectMap
     public function dropTable()
     {
         $sql = "DROP SCHEMA pomm_test CASCADE";
-        $this->connection->getDatabase()->executeAnonymousQuery($sql);
+        $this->connection->executeAnonymousQuery($sql);
     }
 
     public function changeToMultiplePrimaryKey()
     {
         $sql = sprintf('TRUNCATE TABLE %s', $this->getTableName());
-        $this->connection->getDatabase()->executeAnonymousQuery($sql);
+        $this->connection->executeAnonymousQuery($sql);
 
         $this->changeToNoPrimaryKey();
 
         $sql = sprintf('ALTER TABLE %s ADD COLUMN name varchar NOT NULL', $this->getTableName());;
-        $this->connection->getDatabase()->executeAnonymousQuery($sql);
+        $this->connection->executeAnonymousQuery($sql);
 
         $sql = sprintf('ALTER TABLE %s ADD PRIMARY KEY (id, name)', $this->getTableName());
-        $this->connection->getDatabase()->executeAnonymousQuery($sql);
+        $this->connection->executeAnonymousQuery($sql);
 
         $this->addField('name', 'varchar');
         $this->pk_fields = array('id', 'name');
@@ -246,7 +246,7 @@ class BaseEntityMap extends BaseObjectMap
     public function changeToNoPrimaryKey()
     {
         $sql = sprintf('ALTER TABLE %s DROP CONSTRAINT pomm_test_pkey', $this->getTableName());;
-        $this->connection->getDatabase()->executeAnonymousQuery($sql);
+        $this->connection->executeAnonymousQuery($sql);
     }
 
 }
