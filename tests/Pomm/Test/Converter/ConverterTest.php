@@ -105,7 +105,66 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('&"\'-- =+_-;\?,{}[]()', $entity['some_varchar'], "Non alpha is escaped.");
         $this->assertEquals('', $entity['some_text'], "Empty strings are ok.");
         $this->assertEquals(array(null, '123', null, '', null, 'abc'), $entity['arr_varchar'], "Char arrays can contain nulls and emtpy strings.");
+
+        return $entity;
     }
+
+    /**
+     * @depends testString
+     **/
+    public function testDate(ConverterEntity $entity)
+    {
+        static::$cv_map->alterDate();
+        $values = array('some_ts' => '2012-06-20 18:34:16.640044', 'some_intv' => '30 days', 'arr_ts' => array('2015-06-08 03:54:08.880287', '1994-12-16 21:23:50.224208', '1941-02-18 17:29:52.216309'));
+
+        $entity->hydrate($values);
+        static::$cv_map->saveOne($entity);
+
+        $this->assertInstanceOf('\DateTime', $entity['some_ts'], "'some_ts' is a \DateTime instance.");
+        $this->assertEquals( '2012-06-20 18:34:16.640044', $entity['some_ts']->format('Y-m-d H:i:s.u'), "Timestamp is preserved.");
+        $this->assertInstanceOf('\DateInterval', $entity['some_intv'], "'some_intv' is a \DateInterval instance.");
+        $this->assertEquals('30', $entity['some_intv']->format('%d'), "'some_intv' has 30 days.");
+        $this->assertEquals(3, count($entity['arr_ts']), "'arr_ts' is an array of 3 elements.");
+        $this->assertInstanceOf('\DateTime', $entity['arr_ts'][2], "Third element of 'arr_ts' is a DateTime instance.");
+        $this->assertEquals('1941-02-18 17:29:52.216309', $entity['arr_ts'][2]->format('Y-m-d H:i:s.u'), "Array timestamp is preserved.");
+
+        $entity['arr_ts'] = array('2015-06-08 03:54:08.880287', null,  '1941-02-18 17:29:52.216309');
+        static::$cv_map->updateOne($entity, array('arr_ts'));
+
+        $this->assertEquals(3, count($entity['arr_ts']), "'arr_ts' is an array of 3 elements.");
+        $this->assertTrue(is_null($entity['arr_ts'][1]), "Second element of 'arr_ts' is null.");
+
+        return $entity;
+    }
+
+    /**
+     * @depends testDate
+     **/
+    public function testBool(ConverterEntity $entity)
+    {
+        static::$cv_map->alterBool();
+        $values = array('some_bool' => true, 'arr_bool' => array(true, false, true));
+
+        $entity->hydrate($values);
+        static::$cv_map->saveOne($entity);
+
+        $this->assertTrue($entity['some_bool'], "'some_bool' is boolean and TRUE.");
+        $this->assertEquals(3, count($entity['arr_bool']), "'arr_bool' is an array of 3 elements.");
+        $this->assertFalse($entity['arr_bool'][1], "Second element of 'arr_bool' is FALSE.");
+
+        $entity['arr_bool'] = array(true, false, null, false, null, null);
+
+        static::$cv_map->updateOne($entity, array('arr_bool'));
+
+        $this->assertEquals(6, count($entity['arr_bool']), "'arr_bool' is 6 elements array.");
+        $this->assertTrue(is_null($entity['arr_bool'][2]), "3th element is NULL.");
+        $this->assertFalse($entity['arr_bool'][3], "4th element is FALSE.");
+        $this->assertTrue(is_null($entity['arr_bool'][4]), "5th element is NULL.");
+        $this->assertTrue(is_null($entity['arr_bool'][5]), "6th element is NULL.");
+
+        return $entity;
+    }
+
 }
 
 class ConverterEntityMap extends BaseObjectMap
