@@ -427,7 +427,7 @@ abstract class BaseObjectMap
      */
     protected function checkObject(BaseObject $object, $message)
     {
-        if (get_class($object) !== $this->object_class)
+        if (get_class($object) !== trim($this->object_class, "\\"))
         {
             throw new Exception(sprintf("check '%s' and '%s'. Context is «%s»", get_class($object), $this->object_class, $message));
         }
