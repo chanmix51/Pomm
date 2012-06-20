@@ -310,4 +310,16 @@ class Connection
     {
         return $this->query_filter_chain->execute($map, $sql, $values);
     }
+
+    /**
+     * executeAnonymousQuery
+     * Performs a raw SQL query
+     *
+     * @param String $sql The sql statement to execute.
+     * @return \PDOStatement
+     */
+    public function executeAnonymousQuery($sql)
+    {
+        return $this->getPdo()->query($sql, \PDO::FETCH_LAZY);
+    }
 }
