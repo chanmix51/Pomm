@@ -3,7 +3,7 @@ namespace Pomm\Converter;
 
 use Pomm\Converter\ConverterInterface;
 use Pomm\Exception\Exception;
-use Pomm\Connection\Database;
+use Pomm\Object\BaseObjectMap;
 /**
  * Pomm\Converter\PgEntity - Entity converter
  * 
@@ -15,19 +15,16 @@ use Pomm\Connection\Database;
  */
 class PgEntity implements ConverterInterface
 {
-    protected $database;
-    protected $class_name;
+    protected $map;
 
     /**
      * constructor
      *
-     * @param Pomm\Connection\Database  $database
-     * @param String                    $class_name  Model class to get the Map from.
+     * @param Pomm\Object\BaseObjectMap  $map
      **/
-    public function __construct(Database $database, $class_name)
+    public function __construct(BaseObjectMap $map)
     {
-        $this->database = $database;
-        $this->class_name = $class_name;
+        $this->map = $map;
     }
 
     /**
@@ -35,14 +32,16 @@ class PgEntity implements ConverterInterface
      **/
     public function toPg($data, $type = null)
     {
+        $class_name = $this->map->getObjectClass();
+
         if (!is_object($data))
         {
-            throw new Exception(sprintf("'%s' converter toPG() method expects argument to be a '%s' instance ('%s given).", get_class($this), $this->class_name, gettype($data)));
+            throw new Exception(sprintf("'%s' converter toPG() method expects argument to be a '%s' instance ('%s given).", get_class($this), $class_name, gettype($data)));
         }
 
-        if (! $data instanceof $this->class_name)
+        if (! $data instanceof $class_name)
         {
-            throw new Exception(sprintf("'%s' converter toPG() method expects argument to be a '%s' instance ('%s given).", get_class($this), $this->class_name, get_class($data)));
+            throw new Exception(sprintf("'%s' converter toPG() method expects argument to be a '%s' instance ('%s given).", get_class($this), $class_name, get_class($data)));
         }
 
         if (! $data instanceof \Pomm\Object\BaseObject)
@@ -50,10 +49,7 @@ class PgEntity implements ConverterInterface
             throw new Exception(sprintf("'%s' converter needs '%s' to be children of Pomm\\Object\\BaseObject.", get_class($this), get_class($data)));
         }
 
-        $map = $this->database->createConnection()
-            ->getMapFor($this->class_name);
-
-        return sprintf("ROW(%s)%s", join(',', $map->convertToPg($data->extract())), is_null($type) ? '' : sprintf('::%s', $type));
+        return sprintf("ROW(%s)%s", join(',', $this->map->convertToPg($data->extract())), is_null($type) ? '' : sprintf('::%s', $type));
     }
 
     /**
@@ -61,13 +57,10 @@ class PgEntity implements ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {
-        $map = $this->database->createConnection()
-            ->getMapFor($this->class_name);
-
         $elts = str_getcsv(trim($data, '()'));
 
         $fields = array();
-        foreach ($map->getFieldDefinitions() as $field_name => $pg_type)
+        foreach ($this->map->getFieldDefinitions() as $field_name => $pg_type)
         {
             $fields[$field_name] = array_shift($elts);
         }
@@ -77,7 +70,7 @@ class PgEntity implements ConverterInterface
             $fields['_extra'] = $elts;
         }
 
-        $object = $map->createObject($map->convertFromPg($fields));
+        $object = $this->map->createObject($this->map->convertFromPg($fields));
         $object->_setStatus(\Pomm\Object\BaseObject::EXIST);
 
         return $object;

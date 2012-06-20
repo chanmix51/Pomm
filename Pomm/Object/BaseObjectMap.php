@@ -776,4 +776,15 @@ abstract class BaseObjectMap
         return $this->paginateQuery($this->generateSqlForWhere($where, $suffix), $sql_count, $values, $items_per_page, $page);
     }
 
+    /**
+     * getObjectClass
+     *
+     * Returns object_class definition.
+     *
+     * @return String
+     **/
+    public function getObjectClass()
+    {
+        return $this->object_class;
+    }
 }
