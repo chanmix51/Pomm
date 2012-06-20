@@ -88,10 +88,10 @@ class converter_test extends \lime_test
             $this->is($time->format('Y-m-d H:i:s'), $compare['times'][$index]->format('Y-m-d H:i:s'), 'Formatted date time is matching.');
         }
 
-        $this->object->setThings(array($this->object['something'], $this->object['something']));
+        $this->object->setThings(array('aa', null, '', null, 'bb'));
         $this->map->saveOne($this->object);
         $object = $this->map->findByPk($this->object->get($this->map->getPrimaryKey()));
-        $this->is_deeply($object['things'], array($this->object['something'], $this->object['something']), 'Things is an array of 2 times something.');
+        $this->is_deeply($object['things'], array('aa', null, '', null, 'bb'), 'Array is preserved.');
 
         $this->object->setAreTrue(array(true, false, true, true));
         $this->map->saveOne($this->object);
