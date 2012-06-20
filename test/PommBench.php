@@ -29,16 +29,16 @@ class PommBenchMap extends BaseObjectMap
     public function createTable()
     {
         $sql = sprintf("CREATE SCHEMA %s", reset(preg_split('/\./', $this->object_name)));
-        $this->connection->getDatabase()->executeAnonymousQuery($sql);
+        $this->connection->executeAnonymousQuery($sql);
         $sql = sprintf("CREATE TABLE %s (id SERIAL PRIMARY KEY, data_int int4 NOT NULL, data_char VARCHAR NOT NULL, data_bool bool NOT NULL);", $this->object_name);
-        $this->connection->getDatabase()->executeAnonymousQuery($sql);
+        $this->connection->executeAnonymousQuery($sql);
     }
 
     public function dropTable()
     {
         $objects = preg_split('/\./', $this->object_name);
         $sql = sprintf("DROP SCHEMA %s CASCADE;", reset($objects));
-        $this->connection->getDatabase()->executeAnonymousQuery($sql);
+        $this->connection->executeAnonymousQuery($sql);
     }
 
     public function feedTable($rows)

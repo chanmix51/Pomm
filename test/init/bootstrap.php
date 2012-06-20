@@ -33,16 +33,16 @@ class TestTableMap extends BaseObjectMap
     public function createTable()
     {
         $sql = sprintf("CREATE SCHEMA %s", @reset(preg_split('/\./', $this->object_name)));
-        $this->connection->getDatabase()->executeAnonymousQuery($sql);
+        $this->connection->executeAnonymousQuery($sql);
         $sql = sprintf("CREATE TABLE %s (id SERIAL PRIMARY KEY, created_at TIMESTAMP NOT NULL DEFAULT now(), last_out TIMESTAMP, last_in TIMESTAMP, title VARCHAR(256) NOT NULL, authors VARCHAR(255)[] NOT NULL, is_available bool NOT NULL DEFAULT true, location POINT)", $this->object_name);
-        $this->connection->getDatabase()->executeAnonymousQuery($sql);
+        $this->connection->executeAnonymousQuery($sql);
     }
 
     public function dropTable()
     {
         $objects = preg_split('/\./', $this->object_name);
         $sql = sprintf("DROP TABLE %s CASCADE;", array_shift($objects));
-        $this->connection->getDatabase()->executeAnonymousQuery($sql);
+        $this->connection->executeAnonymousQuery($sql);
     }
 }
 
@@ -89,12 +89,12 @@ class TestConverterMap extends BaseObjectMap
 
     public function createTable()
     {
+        $this->connection->begin();
         try
         {
-            $this->connection->begin();
             $objects = preg_split('/\./', $this->object_name);
             $sql = sprintf("CREATE SCHEMA %s", reset($objects));
-            $this->connection->getDatabase()->executeAnonymousQuery($sql);
+            $this->connection->executeAnonymousQuery($sql);
 
             $sql = sprintf(<<<_
 CREATE TABLE %s (
@@ -113,12 +113,13 @@ CREATE TABLE %s (
 )
 _
                 , $this->object_name);
-            $this->connection->getDatabase()->executeAnonymousQuery($sql);
+            $this->connection->executeAnonymousQuery($sql);
             $this->connection->commit();
         }
         catch (Exception $e)
         {
             $this->connection->rollback();
+
             throw $e;
         }
     }
@@ -127,13 +128,13 @@ _
     {
         $objects = preg_split('/\./', $this->object_name);
         $sql = sprintf("DROP SCHEMA %s CASCADE", reset($objects));
-        $this->connection->getDatabase()->executeAnonymousQuery($sql);
+        $this->connection->executeAnonymousQuery($sql);
     }
 
     public function addPoint()
     {
-        $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_point point", $this->object_name));
-        $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_points point[]", $this->object_name));
+        $this->connection->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_point point", $this->object_name));
+        $this->connection->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_points point[]", $this->object_name));
         $this->connection->getDatabase()->registerConverter('Point', new Converter\PgPoint(), array('point'));
         $this->addField('test_point', 'point');
         $this->addField('test_points', 'point[]');
@@ -141,8 +142,8 @@ _
 
     public function addLseg()
     {
-        $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_lseg lseg", $this->object_name));
-        $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_lsegs lseg[]", $this->object_name));
+        $this->connection->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_lseg lseg", $this->object_name));
+        $this->connection->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_lsegs lseg[]", $this->object_name));
         $this->connection->getDatabase()->registerConverter('Lseg', new Converter\PgLseg(), array('lseg'));
         $this->addField('test_lseg', 'lseg');
         $this->addField('test_lsegs', 'lseg[]');
@@ -150,15 +151,15 @@ _
 
     public function addHStore()
     {
-        $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_hstore hstore", $this->object_name));
+        $this->connection->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_hstore hstore", $this->object_name));
         $this->connection->getDatabase()->registerConverter('HStore', new Converter\PgHStore(), array('hstore'));
         $this->addField('test_hstore', 'hstore');
     }
 
     public function addCircle()
     {
-        $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_circle circle", $this->object_name));
-        $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_circles circle[]", $this->object_name));
+        $this->connection->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_circle circle", $this->object_name));
+        $this->connection->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_circles circle[]", $this->object_name));
         $this->connection->getDatabase()->registerConverter('Circle', new Converter\PgCircle(), array('circle'));
         $this->addField('test_circle', 'circle');
         $this->addField('test_circles', 'circle[]');
@@ -166,8 +167,8 @@ _
 
     public function addInterval()
     {
-        $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_interval interval", $this->object_name));
-        $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_intervals interval[]", $this->object_name));
+        $this->connection->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_interval interval", $this->object_name));
+        $this->connection->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_intervals interval[]", $this->object_name));
         $this->connection->getDatabase()->registerConverter('Interval', new Converter\PgInterval(), array('interval'));
         $this->addField('test_interval', 'interval');
         $this->addField('test_intervals', 'interval[]');
@@ -175,8 +176,8 @@ _
 
     public function addXml()
     {
-        $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_xml xml", $this->object_name));
-        $this->connection->getDatabase()->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_xmls xml[]", $this->object_name));
+        $this->connection->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_xml xml", $this->object_name));
+        $this->connection->executeAnonymousQuery(sprintf("ALTER TABLE %s ADD COLUMN test_xmls xml[]", $this->object_name));
         $this->addField('test_xml', 'xml');
         $this->addField('test_xmls', 'xml[]');
     }
@@ -208,7 +209,6 @@ class TestConverterContainerMap extends BaseObjectMap
         $test_converter_map = $this->connection->getMapFor('Pomm\Test\TestConverter');
 
         $this->connection
-            ->getDatabase()
             ->executeAnonymousQuery(sprintf($sql, $this->object_name, $test_converter_map->getTableName()),
                 $this->getTableName(),
                 $test_converter_map->getTableName());

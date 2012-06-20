@@ -25,7 +25,7 @@ class converter_test extends \lime_test
     public function initialize($service)
     {
         $this->service = $service;
-        $this->connection = $this->service->createConnection();
+        $this->connection = $this->service->getDatabase()->createConnection();
         $this->map = $this->connection->getMapFor('Pomm\Test\TestConverter');
         $this->map->createTable();
 
