@@ -305,8 +305,9 @@ class converter_test extends \lime_test
     public function testEntity()
     {
         $this->info('\\Pomm\\Converter\\PgEntity');
-        $this->map->dropTable();
-        $this->map->createTable();
+        $this->connection
+            ->getDatabase()
+            ->registerConverter('TestConverter', new \Pomm\Converter\PgEntity($this->map), array('pomm_test.converter'));
         $map = $this->connection->getMapFor('Pomm\Test\TestConverterContainer');
         $map->createTable();
         // set an empty string in the entity

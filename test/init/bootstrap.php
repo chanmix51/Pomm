@@ -200,14 +200,6 @@ class TestConverterContainerMap extends BaseObjectMap
         );
         $this->pk_fields    = array('id');
 
-        $this->connection
-            ->getDatabase()
-            ->registerConverter('TestConverter',
-                new \Pomm\Converter\PgEntity(
-                    $this->connection->getDatabase(),
-                    'Pomm\Test\TestConverter'),
-                array('pomm_test.converter')
-            );
     }
 
     public function createTable()
