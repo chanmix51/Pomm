@@ -333,6 +333,38 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
      **/
     public function testLTree(ConverterEntity $entity)
     {
+        static::$cv_map->alterLTree();
+        $values = array(
+            'some_ltree' => array('one', 'two', 'three', 'four'),
+            'arr_ltree' => array(
+                array('a', 'b', 'c', 'd'),
+                array('a', 'b', 'e', 'f')
+            ));
+
+        $entity->hydrate($values);
+        static::$cv_map->saveOne($entity);
+
+        $this->assertTrue(is_array($entity['some_ltree']), "'some_ltree' is an array.");
+        $this->assertEquals($values['some_ltree'], $entity['some_ltree'], "'some_ltree' is preserved.");
+        $this->assertEquals($values['arr_ltree'][0], $entity['arr_ltree'][0], "'arr_ltree' 1st element is preserved.");
+
+        $entity['arr_ltree'] = array(
+            array(),
+            null,
+            $entity['arr_ltree'][0],
+            array(),
+            $entity['arr_ltree'][1],
+            null);
+
+        static::$cv_map->updateOne($entity, array('arr_ltree'));
+
+        $this->assertEquals(array(), $entity['arr_ltree'][0], "Empty ltrees are preserved.");
+        $this->assertTrue(is_null($entity['arr_ltree'][1]), "Nulls are preserved.");
+        $this->assertTrue(is_array($entity['arr_ltree'][2]), "3rd element is an array.");
+        $this->assertEquals($values['arr_ltree'][0], $entity['arr_ltree'][2], "Ltree are preserved.");
+        $this->assertTrue(is_null($entity['arr_ltree'][5]), "5th element is null");
+
+        return $entity;
     }
 }
 
