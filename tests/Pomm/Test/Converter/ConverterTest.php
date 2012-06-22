@@ -52,8 +52,8 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
 
     public static function tearDownAfterClass()
     {
-        $sql = 'DROP SCHEMA pomm_test CASCADE';
-        static::$connection->executeAnonymousQuery($sql);
+//        $sql = 'DROP SCHEMA pomm_test CASCADE';
+//        static::$connection->executeAnonymousQuery($sql);
 
         !is_null(static::$logger) && print_r(static::$logger);
     }
@@ -365,6 +365,28 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_null($entity['arr_ltree'][5]), "5th element is null");
 
         return $entity;
+    }
+
+    /**
+     * @depends testLTree
+     **/
+    public function testSuperConverter(ConverterEntity $entity)
+    {
+        $super_entity = new SuperConverterEntity(array('cv_entities' => array($entity)));
+
+        static::$super_cv_map->saveOne($super_entity);
+
+        $this->assertTrue(is_int($super_entity['id']), "'id' has been generated.");
+        $this->assertTrue(is_array($super_entity['cv_entities']), "'cv_entities' is an array.");
+        $this->assertInstanceOf('Pomm\Test\Converter\ConverterEntity', $super_entity['cv_entities'][0], "'cv_entities' is a ConverterEntity instance.");
+        $this->assertEquals(1, $super_entity['cv_entities'][0]->get('id'), "'id' is 1.");
+        $this->assertEquals(array(1.0, 1.1, null, 1.3), $super_entity['cv_entities'][0]->get('arr_fl'), "'arr_fl' of 'cv_entities' is preserved.");
+
+        $new_entity = new ConverterEntity(array('some_point' => new Type\Point(12,-3)));
+        static::$cv_map->saveOne($new_entity);
+
+        $super_entity->add('cv_entities', $new_entity);
+        static::$super_cv_map->updateOne($super_entity, array('cv_entities'));
     }
 }
 
