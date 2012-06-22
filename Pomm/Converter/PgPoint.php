@@ -33,10 +33,9 @@ class PgPoint implements ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {
-        $data = trim($data, "()");
-        $values = preg_split("/,/", $data);
+        list($x, $y) = preg_split("/,/", trim($data, "()"));
 
-        return new $this->class_name($values[0], $values[1]);
+        return new $this->class_name($x, $y);
     }
 
     /**
@@ -58,6 +57,6 @@ class PgPoint implements ConverterInterface
             throw new Exception(sprintf("Converter PgPoint needs data to be an instance of Pomm\\Type\\Point ('%s' given).", $type));
         }
 
-        return sprintf("point(%f, %f)", $data->x, $data->y);
+        return sprintf("point(%.9e, %.9e)", $data->x, $data->y);
     }
 }
