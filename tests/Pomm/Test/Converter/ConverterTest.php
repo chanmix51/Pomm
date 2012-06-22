@@ -277,6 +277,40 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
 
         return $entity;
     }
+
+    /**
+     * @depends testCircle
+     **/
+    public function testSegment(ConverterEntity $entity)
+    {
+        static::$cv_map->alterSegment();
+        $values = array(
+            'some_lseg' => new Type\Segment(new Type\Point(0.1234E9,-2), new Type\Point(10, -10)),
+            'arr_lseg' => array(new Type\Segment(new Type\Point(2,-2), new Type\Point(0,0)), new Type\Segment(new Type\Point(2,-2), new Type\Point(1000,-1000))),
+        );
+
+        $entity->hydrate($values);
+        static::$cv_map->saveOne($entity);
+
+        $this->assertInstanceOf('\Pomm\Type\Segment', $entity['some_lseg'], "'some_lseg' is a lseg type.");
+        $this->assertInstanceOf('\Pomm\Type\Point', $entity['some_lseg']->point_a, "'some_lseg' point_a is a type Point.");
+        $this->assertInstanceOf('\Pomm\Type\Point', $entity['some_lseg']->point_b, "'some_lseg' point_b is a type Point.");
+        $this->assertTrue(is_array($entity['arr_lseg']), "'arr_lseg' is an array.");
+        $this->assertEquals(2, count($entity['arr_lseg']), "Containing 2 elements.");
+        $this->assertInstanceOf('\Pomm\Type\Segment', $entity['arr_lseg'][1], "'arr_lseg' 2nd element is a lseg type.");
+        $this->assertInstanceOf('\Pomm\Type\Point', $entity['arr_lseg'][1]->point_b, "'arr_lseg' 2nd element's point_b is a type Point.");
+
+        $entity['arr_lseg'] = array(null, $entity['arr_lseg'][0], null,  $entity['arr_lseg'][1], null);
+        static::$cv_map->updateOne($entity, array('arr_lseg'));
+
+        $this->assertTrue(is_array($entity['arr_lseg']), "'arr_lseg' is an array.");
+        $this->assertEquals(5, count($entity['arr_lseg']), "Containing 5 elements.");
+        $this->assertInstanceOf('\Pomm\Type\Segment', $entity['arr_lseg'][1], "'arr_lseg' 2nd element is a lseg type.");
+        $this->assertTrue(is_null($entity['arr_lseg'][2]), '3rd element is null');
+        $this->assertTrue(is_null($entity['arr_lseg'][4]), '5rd element is null');
+
+        return $entity;
+    }
 }
 
 class ConverterEntityMap extends BaseObjectMap
