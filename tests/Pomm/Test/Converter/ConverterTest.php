@@ -220,22 +220,60 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         static::$cv_map->saveOne($entity);
 
         $this->assertInstanceOf('\Pomm\Type\Point', $entity['some_point'], "'some_point' is a Point instance.");
-        $this->assertEquals(47.21262, (float) $entity['some_point']->x, "X coordinate is preserved.");
-        $this->assertEquals(-1.55516, (float) $entity['some_point']->y, "Y coordinate is preserved.");
+        $this->assertEquals(47.21262, $entity['some_point']->x, "X coordinate is preserved.");
+        $this->assertEquals(-1.55516, $entity['some_point']->y, "Y coordinate is preserved.");
         $this->assertTrue(is_array($entity['arr_point']), "'arr_point' is an array.");
         $this->assertEquals(2, count($entity['arr_point']), "Containing 2 elements.");
         $this->assertEquals(-33.969043, $entity['arr_point'][1]->x, "X of the 2nd element is preserved.");
         $this->assertEquals(151.187225, $entity['arr_point'][1]->y, "Y of the 2nd element is preserved.");
 
         $entity['arr_point'] = array(null, $entity['arr_point'][1], null, $entity['arr_point'][0], null);
+        $entity['some_point'] = new Type\Point(0.12345E9, -9.87654E-9);
 
-        static::$cv_map->updateOne($entity, array('arr_point'));
+        static::$cv_map->updateOne($entity, array('arr_point', 'some_point'));
 
+        $this->assertEquals(123450000, $entity['some_point']->x, "X coordinate is preserved.");
+        $this->assertEquals(-9.87654E-9, $entity['some_point']->y, "Y coordinate is preserved.");
         $this->assertTrue(is_array($entity['arr_point']), "'arr_point' is an array.");
         $this->assertEquals(5, count($entity['arr_point']), "Containing 5 elements.");
         $this->assertTrue(is_null($entity['arr_point'][2]), '3rd element is null');
         $this->assertTrue(is_null($entity['arr_point'][4]), '5th element is null');
         $this->assertInstanceOf('\Pomm\Type\Point', $entity['arr_point'][1], "2nd element is a Point instance.");
+
+        return $entity;
+    }
+
+    /**
+     * @depends testPoint
+     **/
+    public function testCircle(ConverterEntity $entity)
+    {
+        static::$cv_map->alterCircle();
+        $values = array(
+            'some_circle' => new Type\Circle(new Type\Point(0.1234E9,-2), 10),
+            'arr_circle' => array(new Type\Circle(new Type\Point(2,-2), 10), new Type\Circle(new Type\Point(0,0), 1))
+        );
+
+        $entity->hydrate($values);
+        static::$cv_map->saveOne($entity);
+
+        $this->assertInstanceOf('\Pomm\Type\Circle', $entity['some_circle'], "'some_circle' is a Circle type.");
+        $this->assertInstanceOf('\Pomm\Type\Point', $entity['some_circle']->center, "'some_circle' center is a type Point.");
+        $this->assertEquals(10, $entity['some_circle']->radius, "'some_circle' radius is preserved.");
+        $this->assertTrue(is_array($entity['arr_circle']), "'arr_circle' is an array.");
+        $this->assertEquals(2, count($entity['arr_circle']), "Containing 2 elements.");
+        $this->assertInstanceOf('\Pomm\Type\Circle', $entity['arr_circle'][1], "'arr_circle' 2nd element is a Circle type.");
+        $this->assertInstanceOf('\Pomm\Type\Point', $entity['arr_circle'][1]->center, "'arr_circle' 2nd element's center is a type Point.");
+        $this->assertEquals(1, $entity['arr_circle'][1]->radius, "'arr_circle' 2nd element's radius is preserved.");
+
+        $entity['arr_circle'] = array(null, $entity['arr_circle'][0], null,  $entity['arr_circle'][1], null);
+        static::$cv_map->updateOne($entity, array('arr_circle'));
+
+        $this->assertTrue(is_array($entity['arr_circle']), "'arr_circle' is an array.");
+        $this->assertEquals(5, count($entity['arr_circle']), "Containing 5 elements.");
+        $this->assertInstanceOf('\Pomm\Type\Circle', $entity['arr_circle'][1], "'arr_circle' 2nd element is a Circle type.");
+        $this->assertTrue(is_null($entity['arr_circle'][2]), '3rd element is null');
+        $this->assertTrue(is_null($entity['arr_circle'][4]), '5rd element is null');
 
         return $entity;
     }
