@@ -7,6 +7,7 @@ use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
 use Pomm\Exception\Exception;
 use Pomm\Converter;
+use Pomm\Type;
 
 class ConverterTest extends \PHPUnit_Framework_TestCase
 {
@@ -165,6 +166,79 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         return $entity;
     }
 
+    protected function checksumBinary($binary)
+    {
+        return md5($binary);
+    }
+
+    /**
+     * @depends testBool
+     *
+     * Tests are volontarily simplistic, read below:
+     *
+     * pg bytea escaping with PHP :
+     * https://bugs.php.net/bug.php?id=59831&thanks=6
+     *
+     * I don't know why PHP seems to strip some chars from bytea when fetching 
+     * results on some large objects wich makes fail tests (See issue #31).
+     *
+     * Arrays of bytea is not supported as PHP returns this field as string and 
+     * it (or myself) was not able to convert strings to binary (See issue #32).
+     *
+     **/
+    public function testBinary(ConverterEntity $entity)
+    {
+        static::$cv_map->alterBinary();
+        $binary = chr(0).chr(27).chr(92).chr(39).chr(32).chr(13);
+        $hash = $this->checksumBinary($binary);
+        $length = strlen($binary);
+
+        $values = array('some_bin' => $binary);
+        $entity->hydrate($values);
+
+        static::$cv_map->saveOne($entity);
+
+        $this->assertEquals($length, strlen($entity['some_bin']), "Binary strings have same length.");
+        $this->assertEquals($hash, $this->checksumBinary($entity['some_bin']), "Small 'some_bin' is preserved.");
+
+
+        return $entity;
+    }
+
+    /**
+     * @depends testBinary
+     **/
+    public function testPoint(ConverterEntity $entity)
+    {
+        static::$cv_map->alterPoint();
+        $values = array(
+            'some_point' => new Type\Point(47.21262, -1.55516), 
+            'arr_point' => array(new Type\Point(6.431264, 3.424915), new Type\Point(-33.969043, 151.187225))
+        );
+
+        $entity->hydrate($values);
+        static::$cv_map->saveOne($entity);
+
+        $this->assertInstanceOf('\Pomm\Type\Point', $entity['some_point'], "'some_point' is a Point instance.");
+        $this->assertEquals(47.21262, (float) $entity['some_point']->x, "X coordinate is preserved.");
+        $this->assertEquals(-1.55516, (float) $entity['some_point']->y, "Y coordinate is preserved.");
+        $this->assertTrue(is_array($entity['arr_point']), "'arr_point' is an array.");
+        $this->assertEquals(2, count($entity['arr_point']), "Containing 2 elements.");
+        $this->assertEquals(-33.969043, $entity['arr_point'][1]->x, "X of the 2nd element is preserved.");
+        $this->assertEquals(151.187225, $entity['arr_point'][1]->y, "Y of the 2nd element is preserved.");
+
+        $entity['arr_point'] = array(null, $entity['arr_point'][1], null, $entity['arr_point'][0], null);
+
+        static::$cv_map->updateOne($entity, array('arr_point'));
+
+        $this->assertTrue(is_array($entity['arr_point']), "'arr_point' is an array.");
+        $this->assertEquals(5, count($entity['arr_point']), "Containing 5 elements.");
+        $this->assertTrue(is_null($entity['arr_point'][2]), '3rd element is null');
+        $this->assertTrue(is_null($entity['arr_point'][4]), '5th element is null');
+        $this->assertInstanceOf('\Pomm\Type\Point', $entity['arr_point'][1], "2nd element is a Point instance.");
+
+        return $entity;
+    }
 }
 
 class ConverterEntityMap extends BaseObjectMap
@@ -227,7 +301,7 @@ class ConverterEntityMap extends BaseObjectMap
 
     public function alterBinary()
     {
-        $this->alterTable(array('some_bin' => 'bytea', 'arr_bin' => 'bytea[]'));
+        $this->alterTable(array('some_bin' => 'bytea'));
     }
 
     public function alterPoint()
@@ -235,7 +309,7 @@ class ConverterEntityMap extends BaseObjectMap
         $this->alterTable(array('some_point' => 'point', 'arr_point' => 'point[]'));
 
         $this->connection->getDatabase()
-            ->register('Point', new Converter\PgPoint(), array('point'));
+            ->registerConverter('Point', new Converter\PgPoint(), array('point'));
     }
 
     public function alterCircle()
@@ -243,7 +317,7 @@ class ConverterEntityMap extends BaseObjectMap
         $this->alterTable(array('some_circle' => 'circle', 'arr_circle' => 'circle[]'));
 
         $this->connection->getDatabase()
-            ->register('Circle', new Converter\PgCircle(), array('circle'));
+            ->registerConverter('Circle', new Converter\PgCircle(), array('circle'));
     }
 
     public function alterSegment()
@@ -251,7 +325,7 @@ class ConverterEntityMap extends BaseObjectMap
         $this->alterTable(array('some_lseg' => 'lseg', 'arr_lseg' => 'lseg[]'));
 
         $this->connection->getDatabase()
-            ->register('Segment', new Converter\PgLseg(), array('lseg'));
+            ->registerConverter('Segment', new Converter\PgLseg(), array('lseg'));
     }
 
     public function alterHStore()
@@ -259,7 +333,7 @@ class ConverterEntityMap extends BaseObjectMap
         $this->alterTable(array('some_hstore' => 'hstore'));
 
         $this->connection->getDatabase()
-            ->register('HStore', new Converter\PgHStore(), array('hstore', 'public.hstore'));
+            ->registerConverter('HStore', new Converter\PgHStore(), array('hstore', 'public.hstore'));
     }
 
     public function alterLTree()
@@ -267,7 +341,7 @@ class ConverterEntityMap extends BaseObjectMap
         $this->alterTable(array('some_ltree' => 'ltree', 'arr_ltree' => 'ltree[]'));
 
         $this->connection->getDatabase()
-            ->register('LTree', new Converter\PgLTree(), array('ltree', 'public.ltree'));
+            ->registerConverter('LTree', new Converter\PgLTree(), array('ltree', 'public.ltree'));
     }
 }
 
