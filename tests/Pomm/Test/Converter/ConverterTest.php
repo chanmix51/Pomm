@@ -311,6 +311,29 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
 
         return $entity;
     }
+
+    /**
+     * @depends testSegment
+     **/
+    function testHStore(ConverterEntity $entity)
+    {
+        static::$cv_map->alterHStore();
+        $values = array('pika' => 'chu', 'plop' => null);
+        $entity['some_hstore'] = $values;
+
+        static::$cv_map->updateOne($entity, array('some_hstore'));
+        $this->assertTrue(is_array($entity['some_hstore']), "'some_hstore' is an array.");
+        $this->assertEquals($values, $entity['some_hstore'], "'some_hstore' array is preserved.");
+
+        return $entity;
+    }
+
+    /**
+     * @depends testHStore
+     **/
+    public function testLTree(ConverterEntity $entity)
+    {
+    }
 }
 
 class ConverterEntityMap extends BaseObjectMap
