@@ -39,11 +39,11 @@ class PgBytea implements ConverterInterface
     {
         if (function_exists('pg_escape_bytea'))
         {
-            return sprintf("bytea '%s'", pg_escape_bytea($data));
+            return sprintf("bytea E'%s'", addcslashes(pg_escape_bytea($data), '\\'));
         }
         else
         {
-            return $this->escByteA($data);
+            return sprintf("bytea E'%s'", addcslashes($this->escByteA($data), '\\'));
         }
     }
 
