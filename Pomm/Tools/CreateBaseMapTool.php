@@ -94,10 +94,21 @@ class CreateBaseMapTool extends CreateFileTool
             }
             else
             {
-                $extends = sprintf("\\%s\\%s\\%sMap", 
-                    sfInflector::camelize($this->options['database']->getName()),
-                    sfInflector::camelize($parent_table_infos['schema']),
-                    sfInflector::camelize($parent_table_infos['table']));
+                if ( $this->options['namespace'] !== '' )
+                {
+                    $extends = sprintf("\\%s\\%s\\%s\\%sMap",
+                        $this->options['namespace'],
+                        sfInflector::camelize($this->options['database']->getName()),
+                        sfInflector::camelize($parent_table_infos['schema']),
+                        sfInflector::camelize($parent_table_infos['table']));
+                }
+                else
+                {
+                    $extends = sprintf("\\%s\\%s\\%sMap",
+                        sfInflector::camelize($this->options['database']->getName()),
+                        sfInflector::camelize($parent_table_infos['schema']),
+                        sfInflector::camelize($parent_table_infos['table']));
+                }
             }
 
             $fields_definition = $this->generateFieldsDefinition(array_diff_key($this->inspector->getTableFieldsInformation($this->options['oid']), $this->inspector->getTableFieldsInformation($inherits)));
