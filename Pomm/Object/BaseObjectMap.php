@@ -329,6 +329,12 @@ abstract class BaseObjectMap
                 continue;
             }
 
+            if (is_null($values[$field_name]))
+            {
+                $out_values[$field_name] = 'NULL';
+                continue;
+            }
+
             if (preg_match('/([a-z0-9_\.-]+)(\[\])?/i', $pg_type, $matchs))
             {
                 if (count($matchs) > 2)
@@ -372,6 +378,12 @@ abstract class BaseObjectMap
         foreach ($values as $name => $value)
         {
             if (is_null($value)) continue;
+
+            if ($value === '')
+            {
+                $out_values[$name] = null;
+                continue;
+            }
 
             $pg_type = array_key_exists($name, $this->field_definitions) ? $this->field_definitions[$name] : null;
 

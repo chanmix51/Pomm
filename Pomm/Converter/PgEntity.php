@@ -1,9 +1,9 @@
 <?php
 namespace Pomm\Converter;
 
-use Pomm\Converter\ConverterInterface;
-use Pomm\Exception\Exception;
-use Pomm\Object\BaseObjectMap;
+use \Pomm\Converter\ConverterInterface;
+use \Pomm\Exception\Exception;
+use \Pomm\Object\BaseObjectMap;
 /**
  * Pomm\Converter\PgEntity - Entity converter
  * 
@@ -49,7 +49,13 @@ class PgEntity implements ConverterInterface
             throw new Exception(sprintf("'%s' converter needs '%s' to be children of Pomm\\Object\\BaseObject.", get_class($this), get_class($data)));
         }
 
-        return sprintf("ROW(%s)%s", join(',', $this->map->convertToPg($data->extract())), is_null($type) ? '' : sprintf('::%s', $type));
+        $fields = array();
+        foreach ($this->map->getFieldDefinitions() as $field_name => $field_type)
+        {
+            $fields[$field_name] = $data->has($field_name) ? $data[$field_name] : null;
+        }
+
+        return sprintf("ROW(%s)%s", join(',', $this->map->convertToPg($fields)), is_null($type) ? '' : sprintf('::%s', $type));
     }
 
     /**
