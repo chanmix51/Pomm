@@ -4,6 +4,7 @@ namespace Pomm\Converter;
 
 use Pomm\Converter\ConverterInterface;
 use Pomm\Type\Point;
+use Pomm\Exception\Exception;
 
 /**
  * Pomm\Converter\PgPoint - Geometric Point converter
@@ -33,6 +34,11 @@ class PgPoint implements ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {
+        if (!preg_match('/([0-9e\-+\.]+,[0-9e\-+\.]+)/', $data))
+        {
+            throw new Exception(sprintf("Bad point representation '%s' (asked type '%s').", $data, $type));
+        }
+
         list($x, $y) = preg_split("/,/", trim($data, "()"));
 
         return new $this->class_name($x, $y);
