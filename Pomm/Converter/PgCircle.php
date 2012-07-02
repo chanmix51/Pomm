@@ -4,6 +4,7 @@ namespace Pomm\Converter;
 use Pomm\Converter\ConverterInterface;
 use Pomm\Type\Point;
 use Pomm\Type\Circle;
+use Pomm\Exception\Exception;
 
 /**
  * Pomm\Converter\PgCircle - Geometric Circle converter
