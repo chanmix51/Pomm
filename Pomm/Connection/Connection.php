@@ -97,6 +97,9 @@ class Connection
         {
             throw new Exception(sprintf('Error connecting to the database with dsn «%s». Driver said "%s".', $connect_string, $e->getMessage()));
         }
+
+        // required for pg8.4 -> pg9.1 compatibility
+        $this->handler->exec('SET standard_conforming_strings TO off');
     }
 
     /*
