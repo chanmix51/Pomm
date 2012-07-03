@@ -43,6 +43,9 @@ class BaseObjectTest extends \PHPUnit_Framework_TestCase
         $entity['array'] = array(1);
         $entity->add('array', 2);
         $this->assertEquals(array(1, 2), $entity->get('array'), 'add() fields to array attributes.');
+
+        unset($entity['array']);
+        $this->assertFalse($entity->has('array'), "Array does not exist anymore.");
     }
 
     /**
@@ -67,11 +70,15 @@ class BaseObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(BaseObject::NONE, $entity->_getStatus(), 'No state at begining.');
         $this->assertTrue($entity->isNew(), 'No state means IS NEW.');
         $this->assertFalse($entity->isModified(), 'No modification.');
-        $entity->_setStatus(BaseObject::EXIST);
+        $entity->_setStatus(BaseObject::EXIST); // fake save
         $this->assertEquals(BaseObject::EXIST, $entity->_getStatus(), 'Status is EXIST.');
         $this->assertFalse($entity->isNew(), 'Not new anymore.');
         $this->assertFalse($entity->isModified(), 'No modification.');
         $entity->setPika('chu');
+        $this->assertFalse($entity->isNew(), 'Not new anymore.');
+        $this->assertTrue($entity->isModified(), 'Modified.');
+        $entity->_setStatus(BaseObject::EXIST); // fake save
+        unset($entity['pika']);
         $this->assertFalse($entity->isNew(), 'Not new anymore.');
         $this->assertTrue($entity->isModified(), 'Modified.');
     }
