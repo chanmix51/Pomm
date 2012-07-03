@@ -1,6 +1,6 @@
 <?php
 
-namespace Pomm\Test\IdentityMap;
+namespace Pomm\Test\Identity;
 
 use Pomm\Connection\Database;
 use Pomm\Object\BaseObject;
@@ -29,7 +29,7 @@ class IdentityMapTest extends \PHPUnit_Framework_TestCase
             $sql = 'CREATE SCHEMA pomm_test';
             $connection->executeAnonymousQuery($sql);
 
-            $map = $connection->getMapFor('Pomm\Test\IdentityMap\Entity');
+            $map = $connection->getMapFor('Pomm\Test\Identity\Entity');
             $map->createTable();
 
             $connection->commit();
@@ -45,9 +45,8 @@ class IdentityMapTest extends \PHPUnit_Framework_TestCase
     public static function tearDownAfterClass()
     {
         $sql = 'DROP SCHEMA pomm_test CASCADE';
-        static::$connection->executeAnonymousQuery($sql);
-
-        !is_null(static::$logger) && print_r(static::$logger);
+        static::$database->createConnection()
+            ->executeAnonymousQuery($sql);
     }
 
     public function testNone()
@@ -56,16 +55,76 @@ class IdentityMapTest extends \PHPUnit_Framework_TestCase
             ->getMapFor('Pomm\Test\Identity\Entity');
         $map->truncateTable();
 
-        $entity1 = $map->saveOne(new Entity(array('some_str' => md5('plop'))));
+        $entity1 = new Entity(array('some_str' => md5('plop')));
+        $map->saveOne($entity1);
+
         $entity2 = $map->findByPk(array('id' => $entity1['id']));
+
+        $this->assertTrue($entity1 == $entity2, "Instances of the same entity have the same values.");
+        $this->assertFalse($entity1 === $entity2, "Instances of the same entity are NOT the same.");
+    }
+
+    public function testStrict()
+    {
+        $map = static::createConnection(new Identity\IdentityMapperStrict())
+            ->getMapFor('Pomm\Test\Identity\Entity');
+        $map->truncateTable();
+
+        $entity1 = new Entity(array('some_str' => md5('plop')));
+        $entity3 = new Entity(array('some_str' => md5('plop')));
+        $map->saveOne($entity1);
+        $map->saveOne($entity3);
+
+        $ts = $entity1['created_at'];
+        unset($entity1['created_at']);
+        $entity1['some_str'] = md5('pika');
+
+        $entity2 = $map->findByPk(array('id' => $entity1['id']));
+
+        $this->assertTrue($entity1 == $entity2, "Instances of the same entity have the same values.");
+        $this->assertTrue($entity1 === $entity2, "Instances of the same entity are the same.");
+        $this->assertEquals(md5('pika'), $entity2['some_str'], "'some_str' has been kept.");
+        $this->assertTrue(is_null($entity2['created_at']), "'created_at' has NOT been synced from the database.");
+        $this->assertFalse($entity3 === $entity2, "Instances of different entities are different.");
+    }
+
+    public function testSmart()
+    {
+        $map = static::createConnection(new Identity\IdentityMapperSmart())
+            ->getMapFor('Pomm\Test\Identity\Entity');
+        $map->truncateTable();
+
+        $entity1 = new Entity(array('some_str' => md5('plop')));
+
+        $map->saveOne($entity1);
+        $entity1['some_str'] = md5('pika');
+        $ts = $entity1['created_at'];
+        unset($entity1['created_at']);
+
+        $entity2 = $map->findByPk(array('id' => $entity1['id']));
+
+        $this->assertTrue($entity1 == $entity2, "Instances of the same entity have the same values.");
+        $this->assertTrue($entity1 === $entity2, "Instances of the same entity are the same.");
+        $this->assertTrue(isset($entity1['created_at']), "'created_at' has been synced from the database.");
+        $this->assertEquals($ts, $entity1['created_at'], "'created_at' is the right value.");
+        $this->assertEquals(md5('pika'), $entity2['some_str'], "'some_str' has been kept.");
+
+        $map->deleteOne($entity2);
+
+        $entity3 = new Entity($entity2->extract());
+        $entity3['some_str'] = md5('plop');
+        $map->saveOne($entity3);
+
+        $this->assertTrue($map->findByPk(array('id' => $entity2['id'])) === $entity3, "Re used 'id' from entity is not bound to old entity.");
     }
 }
+
 
 class EntityMap extends BaseObjectMap
 {
     protected function initialize()
     {
-        $this->object_class = '\Pomm\Test\IdentityMap\Entity';
+        $this->object_class = '\Pomm\Test\Identity\Entity';
         $this->object_name  = 'pomm_test.entity';
 
         $this->addField('id', 'int4');
