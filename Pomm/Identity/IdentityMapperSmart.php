@@ -24,9 +24,9 @@ class IdentityMapperSmart extends IdentityMapperStrict
             {
                 $this->mapper[$crc] = $object;
             }
-            elseif (!$this->mapper[$crc]->isModified())
+            else
             {
-                $this->mapper[$crc]->hydrate($object->extract());
+                $this->mapper[$crc]->hydrate(array_merge($object->extract(), $this->mapper[$crc]->extract()));
             }
         }
         else
