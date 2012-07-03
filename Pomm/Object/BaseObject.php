@@ -302,7 +302,8 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      **/
     public function offsetUnset($offset)
     {
-        $this->offsetSet($offset, null);
+        unset($this->fields[$offset]);
+        $this->status = $this->status | self::MODIFIED;
     }
 
     /**

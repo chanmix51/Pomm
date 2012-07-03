@@ -73,6 +73,14 @@ class BaseObjectTest extends \lime_test
         return $this;
     }
 
+    public function testUnset($field)
+    {
+        unset($this->obj[$field]);
+        $this->ok(!$this->obj->has($field), sprintf("'%s' field does not exist after unset.", $field));
+
+        return $this;
+    }
+
     public function testArrayAccess($values)
     {
         $this->ok($this->obj instanceof \ArrayAccess, "Implements ArrayAccess.");
@@ -162,6 +170,7 @@ $test
     ->testStatus(BaseObject::NONE)
     ->testSet('title', 'my title')
     ->testStatus(BaseObject::MODIFIED)
+    ->testUnset('title')
     ->testSet('authors', array('plop1'))
     ->testAdd('authors', 'plop2', array('plop1', 'plop2'))
     ->testHydrate(array('title' => 'modified title'), $test_values)
