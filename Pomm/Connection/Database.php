@@ -198,7 +198,7 @@ class Database
             }
             else
             {
-                throw new Exception(sprintf("Pg type '%s' is associated with converter '%s' but converter is not registered.", $pg_type, $converter_name));
+                throw new PommException(sprintf("Pg type '%s' is associated with converter '%s' but converter is not registered.", $pg_type, $converter_name));
             }
         }
 
