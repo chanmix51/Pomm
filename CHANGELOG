@@ -1,3 +1,17 @@
+=== 1.0.4
+ *  Changed a use of Exception to PommException
+ *  Smart identity mapper now smart
+ *  Unset in BaseObject was flawed
+ *  Bug in PgEntity with NULL values.
+ *  Postgresql string escaping option
+ *  Bug when fetching or saving NULL values.
+ *  Bug when using --prefix-namespace with inheritance.
+ *  Bug in Ltree converter.
+ *  Bug in Point converter
+ *  Bug in String converter
+ *  Bug in Array converter
+ *  Bug in Collection::isEmpty.
+ *  isNew and isModified return boolean.
 === 1.0.3
  * PgEntity returned entities marked as existing.
  * Generation using inheritance was broken.
