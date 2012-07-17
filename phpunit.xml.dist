@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit bootstrap="./tests/bootstrap/autoload.php">
+    <php>
+        <var name="dsn" value="pgsql://user:pass@host:port/db_name" />
+        <var name="dev" value="false" />
+    </php>
+    <testsuites>
+        <testsuite name="Pomm Test Suite">
+            <directory>./tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

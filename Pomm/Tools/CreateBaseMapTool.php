@@ -63,7 +63,7 @@ class CreateBaseMapTool extends CreateFileTool
         }
 
         $map_file = $this->generateMapFile();
-        $path = sprintf('%s/Base/%sMap.php', $this->getDestinationPath(), $this->options['class_name']);
+        $path = sprintf('%s%sBase%s%sMap.php', $this->getDestinationPath(), DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $this->options['class_name']);
         $this->saveFile($path, $map_file);
         $this->createEmptyFilesIfNotExist();
     }
@@ -182,7 +182,7 @@ EOD;
      **/
     protected function createEmptyFilesIfNotExist()
     {
-       $file = sprintf("%s/%s.php", $this->getDestinationPath(), $this->options['class_name']);
+       $file = sprintf("%s%s%s.php", $this->getDestinationPath(), DIRECTORY_SEPARATOR, $this->options['class_name']);
        if (!file_exists($file))
        {
            $tool = new CreateEntityTool(array(
@@ -195,7 +195,7 @@ EOD;
            $tool->execute();
        }
 
-       $file = sprintf("%s/%sMap.php", $this->getDestinationPath(), $this->options['class_name']);
+       $file = sprintf("%s%s%sMap.php", $this->getDestinationPath(), DIRECTORY_SEPARATOR, $this->options['class_name']);
        if (!file_exists($file))
        {
            $tool = new CreateMapTool(array(

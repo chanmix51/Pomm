@@ -19,7 +19,7 @@ class PgLTree implements ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {
-        return preg_split('/\./', $data);
+        return strlen($data) > 0 ? preg_split('/\./', $data) : array();
     }
 
     /**

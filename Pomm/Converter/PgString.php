@@ -20,6 +20,7 @@ class PgString implements ConverterInterface
     public function toPg($data, $type = null)
     {
         $data = str_replace("'", "''", $data);
+        $data = str_replace("\\", "\\\\", $data);
         $type = is_null($type) ? '' : sprintf("%s ", $type);
         $data = sprintf("%s'%s'",  $type, $data);
 

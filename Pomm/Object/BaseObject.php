@@ -252,7 +252,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      */
     public function isNew()
     {
-        return ! $this->status & self::EXIST;
+        return (boolean) (! $this->status & self::EXIST);
     }
 
     /**
@@ -264,7 +264,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      */
     public function isModified()
     {
-        return $this->status & self::MODIFIED;
+        return (boolean) ($this->status & self::MODIFIED);
     }
 
     /**
@@ -302,7 +302,11 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      **/
     public function offsetUnset($offset)
     {
-        $this->offsetSet($offset, null);
+        if ($this->has($offset))
+        {
+            unset($this->fields[$offset]);
+            $this->status = $this->status | self::MODIFIED;
+        }
     }
 
     /**

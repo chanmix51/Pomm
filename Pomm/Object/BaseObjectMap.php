@@ -329,6 +329,12 @@ abstract class BaseObjectMap
                 continue;
             }
 
+            if (is_null($values[$field_name]))
+            {
+                $out_values[$field_name] = 'NULL';
+                continue;
+            }
+
             if (preg_match('/([a-z0-9_\.-]+)(\[\])?/i', $pg_type, $matchs))
             {
                 if (count($matchs) > 2)
@@ -372,6 +378,12 @@ abstract class BaseObjectMap
         foreach ($values as $name => $value)
         {
             if (is_null($value)) continue;
+
+            if ($value === '')
+            {
+                $out_values[$name] = null;
+                continue;
+            }
 
             $pg_type = array_key_exists($name, $this->field_definitions) ? $this->field_definitions[$name] : null;
 
@@ -427,7 +439,7 @@ abstract class BaseObjectMap
      */
     protected function checkObject(BaseObject $object, $message)
     {
-        if (get_class($object) !== $this->object_class)
+        if (get_class($object) !== trim($this->object_class, "\\"))
         {
             throw new Exception(sprintf("check '%s' and '%s'. Context is «%s»", get_class($object), $this->object_class, $message));
         }
