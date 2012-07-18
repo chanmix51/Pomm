@@ -1105,38 +1105,33 @@ Pomm comes with ``Tools`` classes to assist the user in some common tasks. The m
 
   require __DIR__.'/vendor/pomm/test/autoload.php';
 
-  $service = new Pomm\Service(array(
-      'default' => array(
-          'dsn' => 'pgsql://nss_user:nss_password@localhost/nss_db'
-  )));
+  $database = new Pomm\Connection\Database(array(
+          'dsn'  => 'pgsql://nss_user:nss_password@localhost/nss_db',
+          'name' => 'my_db'
+          ));
 
   $scan = new Pomm\Tools\ScanSchemaTool(array(
-      'dir'=> __DIR__,
+      'prefix_dir'=> __DIR__,
       'schema' => 'transfo',
-      'database' => $service->getDatabase(),
+      'database' => $database
   ));
 
   $scan->execute();
 
-This will parse the postgresql's schema named *transfo* to scan it for tables and views. Then it will generate automatically the *BaseMap* files with the class structure and if map files or entity files do not exist, will create them. 
+This will parse the postgresql's schema named *transfo* to scan it for tables and views. Then it will generate automatically the *BaseMap* files with the class structure and if map files or entity files do not exist, will create them. By default, with the code above, the following tree structure will be created from the directory this code is invoked::
 
-Database tools
-==============
+    /prefix/dir/MyDb
+    └── Transfo
+        ├── Base
+        │   └── TransformerMap.php
+        ├── TransformerMap.php
+        └── Transformer.php
 
-Pomm comes with a handy set of SQL tools. These functions are coded with PlPgsql so need that language to be created in the database. 
+By default, the directory structure will be "/%dbname%/%schema%" hence the namespace structure be the same to follow the PSR-0 specification. It is possible you define your own using the namespace option with the `%dbname%` and `%schema%` placeholders. Here are the available options:
 
-is_email(varchar)
-  This function returns true if the parameter is a valid email and false otherwise
-is_url(varchar)
-  This function returns true if the parameter is a valid url and false otherwise
-transliterate(varchar)
-  This function replace all accentuated characters by non accentuated Latin equivalent.
-slugify(varchar)
-  This returns the given string but transliterated, lowered, and all non alphanumerical characters replaced by a dash. This is useful to create meaningful urls.
-cut_nicely(varchar, length)
-  This function cut a string after a certain length but only on non alphanumerical characters not to cut words.
-array_merge(anyelement[], anyelement[])
-  Return the merge of both arrays but similar values are present only once in the result.
-update_updated_at
-  This is for triggers to keep the ``updated_at`` fields updated.
+ * `prefix_dir` the directory in which to create the model tree.
+ * `database` a `Database` instance.
+ * `schema` (optionnal) the schema to scan (default public).
+ * `namespace` (optionnal) a string containing the namespace format (default \%dbname%\%schema%).
+ * `parent_namespace` (optionnal) a string containing the namespace format of the parent's namespace (default \%dbname%\%schema%).
 
