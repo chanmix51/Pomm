@@ -1,3 +1,8 @@
+=== 1.1-dev
+ * PgEntity constructor now takes Map instance as argument (#30).
+ * Anonymous query into Connection (#29).
+ * Fixed converter / mapper bugs as in 1.0 branch.
+ * Migrated tests to phpunit, deleted old tests (#26).
 === 1.0.3
  * PgEntity returned entities marked as existing.
  * Generation using inheritance was broken.
