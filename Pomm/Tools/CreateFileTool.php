@@ -24,6 +24,10 @@ abstract class CreateFileTool extends BaseTool
      * * database   a Database instance
      * * prefix_dir where to generate the dirs
      *
+     * options with default values
+     * * schema     "public" the schema to search tables or views
+     * * namespace  "\%dbname%\%schema%" the namespace string format
+     *
      * @see Pomm\Tools\BaseTool
      **/
     protected function configure()
@@ -31,7 +35,7 @@ abstract class CreateFileTool extends BaseTool
         $this->options->mustHave('prefix_dir');
         $this->options->mustHave('database');
         $this->options->setDefaultValue('schema', 'public');
-        $this->options->setDefaultValue('namespace', '');
+        $this->options->setDefaultValue('namespace', '\%dbname%\%schema%');
     }
 
     /**
@@ -43,34 +47,40 @@ abstract class CreateFileTool extends BaseTool
      **/
     public function getDestinationPath()
     {
-        $dir = array($this->options['prefix_dir'], sfInflector::camelize($this->options['database']->getName()));
-        $schema_dir = sfInflector::camelize($this->options['schema']);
-
-        if ($schema_dir === 'Public') 
-        {
-            $schema_dir = 'PublicSchema';
-        }
-
-        $dir[] = $schema_dir;
-
-        return join(DIRECTORY_SEPARATOR, $dir);
+        return $this->options['prefix_dir'].str_replace('\\', DIRECTORY_SEPARATOR, $this->getNamespace());
     }
 
     /**
      * getNamespace()
      *
-     * Get the namespace.
+     * Get the namespace from given option namespace.
      *
      * @return String
      **/
     protected function getNamespace()
     {
-        $namespace = $this->options['namespace'] !== '' ? array($this->options['namespace']) : array();
-        $namespace[] = sfInflector::camelize($this->options['database']->getName());
-        $namespace[] = $this->options['schema'] == 'public' ? 'PublicSchema' : sfInflector::camelize($this->options['schema']);
-
-        return join('\\', $namespace);
+        return $this->parseNamespace($this->options['namespace']);
     }
+
+    /**
+     * parseNamespace
+     *
+     * Return a well formatted namespace from the given namespace string.
+     * Currently accepting the following placeholders:
+     * * %dbname%   will be replaced with the database's name.
+     * * %schema%   will be replaced with the schema name.
+     *
+     * @param string string
+     * @return string
+     **/
+    protected function parseNamespace($string)
+    {
+        $string = str_replace('%dbname%', sfInflector::camelize($this->options['database']->getName()), $string);
+        $string = str_replace('%schema%', $this->options['schema'] == 'public' ? 'PublicSchema' : sfInflector::camelize($this->options['schema']), $string);
+
+        return $string;
+    }
+
     /**
      * saveFile 
      *
@@ -81,7 +91,11 @@ abstract class CreateFileTool extends BaseTool
      **/
     protected function saveFile($path, $content)
     {
-        $this->createDirIfNotExist(dirname($path));
+        if (!$this->createDirIfNotExist(dirname($path)))
+        {
+            throw new ToolException(sprintf("Could not create directories for file '%s'.", $path));
+        }
+
         file_put_contents($path, $content);
     }
 

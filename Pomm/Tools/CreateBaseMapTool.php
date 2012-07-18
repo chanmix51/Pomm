@@ -4,6 +4,7 @@ namespace Pomm\Tools;
 
 use Pomm\External\sfInflector;
 use Pomm\Tools\Inspector;
+use Pomm\Exception\ToolException;
 
 /**
  * Pomm\Tools\CreateBaseMapTool - Create a BaseMap class from the database.
@@ -28,6 +29,7 @@ class CreateBaseMapTool extends CreateFileTool
      *
      * other options:
      * * parent_namespace   override default namespace for parent
+     * * namespace          the namespace format (default \%dbname%\%schema)
      *
      * @see Pomm\Tools\BaseTool
      **/
@@ -65,6 +67,7 @@ class CreateBaseMapTool extends CreateFileTool
         $map_file = $this->generateMapFile();
         $path = sprintf('%s%sBase%s%sMap.php', $this->getDestinationPath(), DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $this->options['class_name']);
         $this->saveFile($path, $map_file);
+
         $this->createEmptyFilesIfNotExist();
     }
 
@@ -90,25 +93,13 @@ class CreateBaseMapTool extends CreateFileTool
 
             if ($this->options->hasParameter('parent_namespace'))
             {
-                $extends = sprintf("\\%s\\%sMap", $this->options['parent_namespace'], sfInflector::camelize($parent_table_infos['table']));
+                $extends = sprintf("%s\\%sMap", $this->parseNamespace($this->options['parent_namespace']), sfInflector::camelize($parent_table_infos['table']));
             }
             else
             {
-                if ( $this->options['namespace'] !== '' )
-                {
-                    $extends = sprintf("\\%s\\%s\\%s\\%sMap",
-                        $this->options['namespace'],
-                        sfInflector::camelize($this->options['database']->getName()),
-                        sfInflector::camelize($parent_table_infos['schema']),
-                        sfInflector::camelize($parent_table_infos['table']));
-                }
-                else
-                {
-                    $extends = sprintf("\\%s\\%s\\%sMap",
-                        sfInflector::camelize($this->options['database']->getName()),
-                        sfInflector::camelize($parent_table_infos['schema']),
-                        sfInflector::camelize($parent_table_infos['table']));
-                }
+                $extends = sprintf("%s\\%sMap",
+                    $this->getNamespace(),
+                    sfInflector::camelize($parent_table_infos['table']));
             }
 
             $fields_definition = $this->generateFieldsDefinition(array_diff_key($this->inspector->getTableFieldsInformation($this->options['oid']), $this->inspector->getTableFieldsInformation($inherits)));
