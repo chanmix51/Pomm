@@ -217,9 +217,9 @@ abstract class BaseObjectMap
      * 
      * @return Pomm\Object\Collection
      */
-    public function findAll()
+    public function findAll($suffix = '')
     {
-        return $this->query(sprintf('SELECT %s FROM %s;', join(', ', $this->getSelectFields()), $this->object_name), array());
+        return $this->query(sprintf('SELECT %s FROM %s %s;', join(', ', $this->getSelectFields()), $this->object_name, $suffix), array());
     }
 
     /**

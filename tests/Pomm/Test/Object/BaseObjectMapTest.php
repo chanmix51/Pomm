@@ -189,8 +189,30 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
 
         static::$map->deleteOne($entity);
         $this->assertTrue(is_null(static::$map->findByPk($entity->get(static::$map->getPrimaryKey()))), "Object does not exist in the DB anymore.");
+
+        return $entity;
     }
 
+    /**
+     * @depends testChangePrimaryKey
+     **/
+    public function testFindAll(BaseEntity $entity)
+    {
+        static::$map->insertSomeData();
+        $raw_res = static::$map->findAll();
+        $ordered_res = static::$map->findAll('ORDER BY name ASC');
+        $limited_res = static::$map->findAll('LIMIT 3');
+
+        $this->assertEquals(5, $raw_res->count(), "5 results.");
+
+        $this->assertEquals(5, $ordered_res->count(), "5 results.");
+        foreach ($ordered_res as $index => $result) 
+        {
+            $this->assertEquals( 5 - $index, $result['id'], "Names are the other way than ids.");
+        }
+
+        $this->assertEquals(3, $limited_res->count(), "We have 3 results.");
+    }
 }
 
 class BaseEntityMap extends BaseObjectMap
@@ -249,6 +271,14 @@ class BaseEntityMap extends BaseObjectMap
         $this->connection->executeAnonymousQuery($sql);
     }
 
+    public function insertSomeData()
+    {
+        $sql = sprintf('TRUNCATE TABLE %s', $this->getTableName());
+        $this->connection->executeAnonymousQuery($sql);
+
+        $sql = sprintf("INSERT INTO %s (id, name, some_data) VALUES (1, 'echo', 'data'), (4, 'bravo', 'data'), (3, 'charly', 'data'), (2, 'dingo', 'data'), (5, 'alpha', 'data')", $this->getTableName());
+        $this->connection->executeAnonymousQuery($sql);
+    }
 }
 
 class BaseEntity extends BaseObject
