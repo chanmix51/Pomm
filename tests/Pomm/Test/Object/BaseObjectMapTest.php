@@ -245,7 +245,7 @@ class BaseEntityMap extends BaseObjectMap
 
     public function changeToNoPrimaryKey()
     {
-        $sql = sprintf('ALTER TABLE %s DROP CONSTRAINT pomm_test_pkey', $this->getTableName());;
+        $sql = sprintf('ALTER TABLE %s DROP CONSTRAINT base_entity_pkey', $this->getTableName());;
         $this->connection->executeAnonymousQuery($sql);
     }
 
