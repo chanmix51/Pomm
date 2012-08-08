@@ -17,6 +17,7 @@ class Collection implements \Iterator, \Countable
 {
     protected $stmt;
     protected $object_map;
+    protected $cache = false;
     protected $position = 0;
     protected $filters = array();
     protected $fetched = array();
@@ -32,6 +33,25 @@ class Collection implements \Iterator, \Countable
         $this->stmt = $stmt;
         $this->object_map = $object_map;
         $this->position = $this->stmt === false ? null : 0;
+    }
+
+    /**
+     * setCacheObjects
+     *
+     * Enable or disable fetched objects cache. This might be interesting if
+     * you plan to iterate several times over a Collection. If disabled, the
+     * CURSOR can not be reset so results can not be fetched a second time.
+     * When enabled every result is kept in memory so this could lead to huge
+     * memory consumption. If the option is set to true after any results
+     * have been fetched, they are lost. The option is disabled by default the
+     * class definition.
+     *
+     * @param Boolean defaut true
+     **/
+
+    public function setCacheObjects($flag = true)
+    {
+        $this->cache = $flag;
     }
 
     /**
@@ -93,7 +113,7 @@ class Collection implements \Iterator, \Countable
 
     public function get($index)
     {
-        if (isset($this->fetched[$index]))
+        if ($this->cache === true && isset($this->fetched[$index]))
         {
             return $this->fetched[$index];
         }
@@ -113,7 +133,7 @@ class Collection implements \Iterator, \Countable
         }
 
         $fetched = $this->object_map->createObjectFromPg($values);
-        $this->fetched[] = $fetched;
+        $this->cache === true && $this->fetched[] = $fetched;
 
         return $fetched;
     }

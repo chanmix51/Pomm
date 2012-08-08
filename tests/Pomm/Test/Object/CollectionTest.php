@@ -88,6 +88,21 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $collection->count(), "Collection has no results.");
         $this->assertTrue($collection->isEmpty(), "Collection IS empty.");
     }
+
+    public function testCache()
+    {
+        $collection = static::$map->findAll();
+        $collection->setCacheObjects(true);
+
+        foreach ($collection as $result)
+        {
+        }
+
+        foreach ($collection as $index => $result)
+        {
+            $this->assertTrue( $index + 1 == $result['id'], "Index follows status.");
+        }
+    }
 }
 
 class CollectionEntityMap extends BaseObjectMap
