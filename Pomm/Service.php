@@ -82,20 +82,6 @@ class Service
     }
 
     /**
-     * executeAnonymousQuery
-     * Performs a raw SQL query
-     *
-     * @param string $sql
-     * @param string $database
-     * @access public
-     * @return \PDOStatement
-     */
-    public function executeAnonymousQuery($sql, $name = null)
-    {
-        return $this->getDatabase($name)->executeAnonymousQuery($sql);
-    }
-
-    /**
      * createConnection
      * Shortcut to get a connection from a database
      *
