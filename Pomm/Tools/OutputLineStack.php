@@ -7,7 +7,7 @@ class OutputLineStack implements \Iterator, \Countable
 {
     public $stack = array();
     public $level;
-    public $iterator = 0;
+    public $iterator;
 
     /**
      * __construct
@@ -78,7 +78,7 @@ class OutputLineStack implements \Iterator, \Countable
      **/
     public function rewind()
     {
-        $this->iterator = 0;
+        $this->iterator = null;
     }
 
     /**
@@ -88,6 +88,11 @@ class OutputLineStack implements \Iterator, \Countable
      **/
     public function current()
     {
+        if (is_null($this->iterator))
+        {
+            $this->next();
+        }
+
         return $this->stack[$this->iterator];
     }
 
@@ -108,7 +113,14 @@ class OutputLineStack implements \Iterator, \Countable
      **/
     public function next()
     {
-        $this->iterator++;
+        if (!is_null($this->iterator))
+        {
+            $this->iterator++;
+        }
+        else
+        {
+            $this->iterator = 0;
+        }
 
         while ($this->valid() && ! ($this->stack[$this->iterator]->getLevel() & $this->level))
         {
@@ -123,6 +135,11 @@ class OutputLineStack implements \Iterator, \Countable
      **/
     public function valid()
     {
+        if (is_null($this->iterator))
+        {
+            $this->next();
+        }
+
         return $this->iterator < count($this->stack);
     }
 
