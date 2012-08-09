@@ -23,9 +23,9 @@ class CreateBaseMapTool extends CreateFileTool
      * configure
      *
      * mandatory options:
-     * * table      the db table to be mapped
-     * * database   a Database instance
-     * * prefix_dir where to generate the dirs
+     * * table or oid     the db table to be mapped
+     * * database         a Database instance
+     * * prefix_dir       where to generate the dirs
      *
      * other options:
      * * parent_namespace   override default namespace for parent
@@ -36,7 +36,9 @@ class CreateBaseMapTool extends CreateFileTool
     protected function configure()
     {
         parent::configure();
+
         $this->inspector = new Inspector($this->options['database']->createConnection());
+
         if (!$this->options->hasParameter('oid'))
         {
             $this->options->mustHave('table');
@@ -47,6 +49,8 @@ class CreateBaseMapTool extends CreateFileTool
             $infos = $this->inspector->getTableInformation($this->options['oid']);
             $this->options['table'] = $infos['table'];
         }
+
+        $this->output_stack->add(sprintf("Table oid '%d' is '%s'.", $this->options['oid'], $this->options['table']));
 
         $this->options->setDefaultValue('class_name', sfInflector::camelize($this->options['table']));
         $this->options->setDefaultValue('extends', 'BaseObjectMap');
@@ -66,7 +70,10 @@ class CreateBaseMapTool extends CreateFileTool
 
         $map_file = $this->generateMapFile();
         $path = sprintf('%s%sBase%s%sMap.php', $this->getDestinationPath(), DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $this->options['class_name']);
+        $this->output_stack->add(sprintf("Generating map file '%s' for table '%s.%s'.", $path, $this->options['schema'], $this->options['table']), OutputLine::LEVEL_INFO);
         $this->saveFile($path, $map_file);
+
+        $this->output_stack->add(sprintf("Saving file '%s'.", $path));
 
         $this->createEmptyFilesIfNotExist();
     }
@@ -102,6 +109,7 @@ class CreateBaseMapTool extends CreateFileTool
                     sfInflector::camelize($parent_table_infos['table']));
             }
 
+            $this->output_stack->add(sprintf("Detected inheritance to table '%s'.", $parent_table_infos['table']));
             $fields_definition = $this->generateFieldsDefinition(array_diff_key($this->inspector->getTableFieldsInformation($this->options['oid']), $this->inspector->getTableFieldsInformation($inherits)));
             $parent_call = "        parent::initialize();\n";
         }
@@ -176,6 +184,7 @@ EOD;
        $file = sprintf("%s%s%s.php", $this->getDestinationPath(), DIRECTORY_SEPARATOR, $this->options['class_name']);
        if (!file_exists($file))
        {
+           $this->output_stack->add(sprintf("Create Entity class file."));
            $tool = new CreateEntityTool(array(
                'prefix_dir' => $this->options['prefix_dir'],
                'class'      => $this->options['class_name'],
@@ -184,11 +193,13 @@ EOD;
                'database'   => $this->options['database']
            ));
            $tool->execute();
+           $this->output_stack->mergeStack($tool->getOutputStack());
        }
 
        $file = sprintf("%s%s%sMap.php", $this->getDestinationPath(), DIRECTORY_SEPARATOR, $this->options['class_name']);
        if (!file_exists($file))
        {
+           $this->output_stack->add(sprintf("Create EntityMap class file."));
            $tool = new CreateMapTool(array(
                'prefix_dir' => $this->options['prefix_dir'],
                'class'      => $this->options['class_name'],
@@ -197,6 +208,12 @@ EOD;
                'database'   => $this->options['database']
            ));
            $tool->execute();
+           $this->output_stack->mergeStack($tool->getOutputStack());
        }
+    }
+
+    public function getOutputLineStack()
+    {
+        return $this->output_stack;
     }
 }

@@ -51,10 +51,14 @@ class ScanSchemaTool extends CreateFileTool
 
         foreach ($inspector->getTablesInSchema($this->options['schema']) as $table_oid)
         {
+            $this->output_stack->add(sprintf("Get table oid '%d'.", $table_oid));
             $this->options['oid'] = $table_oid;
             $tool = new CreateBaseMapTool($this->options->getParameters());
 
             $tool->execute();
+            $this->output_stack->mergeStack($tool->getOutputStack());
         }
+
+        $this->output_stack->add(sprintf("Finished scanning schema '%s'.", $this->options['schema']), OutputLine::LEVEL_INFO);
     }
 }

@@ -110,6 +110,8 @@ abstract class CreateFileTool extends BaseTool
     {
         if (!file_exists($dir)) 
         {
+            $this->output_stack->add(sprintf("Create directory '%s'.", $dir));
+
             return @mkdir($dir, 0755, true);
         }
 

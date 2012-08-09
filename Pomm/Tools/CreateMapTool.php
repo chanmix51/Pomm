@@ -49,6 +49,7 @@ class CreateMapTool extends CreateFileTool
     {
         $content = $this->generateMapFile();
         $path = sprintf("%s/%sMap.php", $this->getDestinationPath(), $this->options['class']);
+        $this->output_stack->add(sprintf("Create empty EntityMap class file '%s'.", $path), OutputLine::LEVEL_INFO);
         $this->saveFile($path, $content);
     }
 

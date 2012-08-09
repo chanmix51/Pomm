@@ -18,6 +18,7 @@ use Pomm\External\sfInflector;
 abstract class BaseTool
 {
     protected $options;
+    protected $output_stack;
 
     /**
      * __construct
@@ -28,6 +29,8 @@ abstract class BaseTool
     public final function __construct(Array $options = array())
     {
         $this->options = new ParameterHolder($options);
+        $this->output_stack = new OutputLineStack($this->options->hasParameter('output_level') ? $this->options->get('output_level') : OutputLine::LEVEL_ALL);
+
         $this->configure();
     }
 
@@ -51,4 +54,14 @@ abstract class BaseTool
      * @access protected
      **/
     protected abstract function execute();
+
+    /**
+     * getOutputStack
+     *
+     * @return OutputLineStack
+     **/
+    public function getOutputStack()
+    {
+        return $this->output_stack;
+    }
 }
