@@ -16,6 +16,10 @@ class OutputLine
     protected $message;
     protected $timestamp;
 
+    /**
+     * __construct
+     *
+     **/
     public function __construct($message, $level)
     {
         $this->message = $message;
@@ -23,16 +27,31 @@ class OutputLine
         $this->timestamp = new \DateTime();
     }
 
+    /**
+     * getLevel
+     *
+     * @return Integer Current line's severity level.
+     **/
     public function getLevel()
     {
         return $this->level;
     }
 
+    /**
+     * __toString
+     *
+     * @return String
+     **/
     public function __toString()
     {
         return sprintf("%s | %-10s | %s", $this->timestamp->format("Y-m-d H:i:s.u"), $this->getFormattedLevel(), $this->message);
     }
 
+    /**
+     * getFormattedLevel
+     *
+     * @return String
+     **/
     public function getFormattedLevel()
     {
         switch($this->level)
