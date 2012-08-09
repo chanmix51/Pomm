@@ -59,7 +59,7 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
         $sql = 'DROP SCHEMA pomm_test CASCADE';
         static::$connection->executeAnonymousQuery($sql);
 
-        //exec(sprintf("rm -r %s", static::$tmp_dir.DIRECTORY_SEPARATOR."TestDb"));
+        exec(sprintf("rm -r %s", static::$tmp_dir.DIRECTORY_SEPARATOR."TestDb"));
     }
 
     protected function checkFiles($table, $class, $md5sums, $other_options = array())
