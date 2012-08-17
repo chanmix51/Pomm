@@ -1,7 +1,7 @@
 {
     "name": "pomm/pomm",
     "type": "library",
-    "description":  "PHP Object Model Manager for Postgesql",
+    "description":  "PHP Object Model Manager for Postgresql",
     "keywords": ["orm", "postgresql", "database"],
     "homepage": "http://pomm.coolkeums.org",
     "license":  "MIT",
