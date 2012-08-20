@@ -317,7 +317,13 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
      **/
     function testHStore(ConverterEntity $entity)
     {
-        static::$cv_map->alterHStore();
+        if (static::$cv_map->alterHStore() === false)
+        {
+            $this->markTestSkipped("HStore extension could not be found in Postgres, tests skipped.");
+
+            return $entity;
+        }
+
         $values = array('pika' => 'chu', 'plop' => null);
         $entity['some_hstore'] = $values;
 
@@ -329,11 +335,17 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @depends testHStore
+     * @depends testSegment
      **/
     public function testLTree(ConverterEntity $entity)
     {
-        static::$cv_map->alterLTree();
+        if (static::$cv_map->alterLTree() === false)
+        {
+            $this->markTestSkipped("Ltree extension could not be found in Postgres, tests skipped.");
+
+            return $entity;
+        }
+
         $values = array(
             'some_ltree' => array('one', 'two', 'three', 'four'),
             'arr_ltree' => array(
@@ -368,7 +380,38 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @depends testLTree
+     * @depends testSegment
+     **/
+    public function testTsRange(ConverterEntity $entity)
+    {
+        if (static::$cv_map->alterTsRange() === false)
+        {
+            $this->markTestSkipped("tsrange type could not be found, maybe Postgres version < 9.2. Tests skipped.");
+
+            return $entity;
+        }
+
+        $value = new Type\TsRange(new \DateTime('2012-08-20'), new \DateTime('2012-09-01'), true);
+        $entity['some_tsrange'] = $value;
+
+        static::$cv_map->updateOne($entity, array('some_tsrange'));
+
+        $this->assertInstanceOf('\Pomm\Type\TsRange', $entity['some_tsrange'], "'some_tsrange' is a 'TsRange' type.");
+        $this->assertEquals($value->start->format('U'), $entity['some_tsrange']->start->format('U'), "Timestamps are equal.");
+
+        $entity['arr_tsrange'] = array($value, new Type\TsRange(new \DateTime('2012-12-21'), new \DateTime('2012-12-21 12:21:59')));
+
+        static::$cv_map->updateOne($entity, array('some_tsrange', 'arr_tsrange'));
+
+        $this->assertEquals(2, count($entity['arr_tsrange']), "There are 2 elements in the array.");
+        $this->assertInstanceOf('\Pomm\Type\TsRange', $entity['arr_tsrange'][1], "'arr_tsrange' element 1 is a 'TsRange' type.");
+        $this->assertEquals(44519, $entity['arr_tsrange'][1]->end->format('U') - $entity['arr_tsrange'][1]->start->format('U'), "Range is preserved.");
+
+        return $entity;
+    }
+
+    /**
+     * @depends testSegment
      **/
     public function testSuperConverter(ConverterEntity $entity)
     {
@@ -436,6 +479,15 @@ class ConverterEntityMap extends BaseObjectMap
         }
     }
 
+    protected function checkType($type)
+    {
+        $sql = sprintf("SELECT pg_namespace.nspname FROM pg_type JOIN pg_namespace ON pg_type.typnamespace = pg_namespace.oid WHERE typname = '%s'", $type);
+
+        return $this->connection
+            ->executeAnonymousQuery($sql)
+            ->fetchColumn(0);
+    }
+
     public function alterText()
     {
         $this->alterTable(array('some_char' => 'char(10)', 'some_varchar' => 'varchar', 'some_text' => 'text', 'arr_varchar' => 'varchar[]'));
@@ -482,18 +534,41 @@ class ConverterEntityMap extends BaseObjectMap
 
     public function alterHStore()
     {
+        if ($schema = $this->checkType('hstore') === false)
+        {
+            return false;
+        }
+
         $this->alterTable(array('some_hstore' => 'hstore'));
 
         $this->connection->getDatabase()
-            ->registerConverter('HStore', new Converter\PgHStore(), array('hstore', 'public.hstore'));
+            ->registerConverter('HStore', new Converter\PgHStore(), array('hstore', 'public.hstore', $schema.'.hstore'));
     }
 
     public function alterLTree()
     {
+        if ($schema = $this->checkType('ltree') === false)
+        {
+            return false;
+        }
+
         $this->alterTable(array('some_ltree' => 'ltree', 'arr_ltree' => 'ltree[]'));
 
         $this->connection->getDatabase()
-            ->registerConverter('LTree', new Converter\PgLTree(), array('ltree', 'public.ltree'));
+            ->registerConverter('LTree', new Converter\PgLTree(), array('ltree', 'public.ltree', $schema.'.ltree'));
+    }
+
+    public function alterTsRange()
+    {
+        if ($schema = $this->checkType('tsrange') === false)
+        {
+            return false;
+        }
+
+        $this->alterTable(array('some_tsrange' => 'tsrange', 'arr_tsrange' => 'tsrange[]'));
+
+        $this->connection->getDatabase()
+            ->registerConverter('tsrange', new Converter\PgTsRange(), array('tsrange', 'public.tsrange', $schema.'.tsrange'));
     }
 }
 
