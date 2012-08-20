@@ -85,7 +85,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     /**
      * __call
      *
-     * Allows dynamic methods getXxx, setXxx, hasXxx or addXxx.
+     * Allows dynamic methods getXxx, setXxx, hasXxx, addXxx or clearXxx.
      *
      * @param mixed $method
      * @param mixed $arguments
@@ -93,7 +93,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      */
     public function __call($method, $arguments)
     {
-        list($operation, $attribute) = preg_split('/-/', preg_replace('/([A-Z])/', '-\1', $method, 1));
+        list($operation, $attribute) = preg_split('/(?=[A-Z])/', $method, 2);
         $attribute = sfInflector::underscore($attribute);
 
         switch($operation)
