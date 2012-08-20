@@ -100,11 +100,11 @@ class CreateBaseMapTool extends CreateFileTool
 
             if ($this->options->hasParameter('parent_namespace'))
             {
-                $extends = sprintf("%s\\%sMap", $this->parseNamespace($this->options['parent_namespace']), sfInflector::camelize($parent_table_infos['table']));
+                $extends = sprintf("\\%s\\%sMap", $this->parseNamespace($this->options['parent_namespace']), sfInflector::camelize($parent_table_infos['table']));
             }
             else
             {
-                $extends = sprintf("%s\\%sMap",
+                $extends = sprintf("\\%s\\%sMap",
                     $this->getNamespace(),
                     sfInflector::camelize($parent_table_infos['table']));
             }

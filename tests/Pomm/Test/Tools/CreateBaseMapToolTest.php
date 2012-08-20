@@ -92,9 +92,9 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
             'PommTest');
 
         $this->checkFiles('pika', 'Pika', array(
-            "5e0302567dd1369431a36d42077e9feb" => sprintf("%s%sBase%s%s", $path, DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, 'PikaMap.php'),
-            "80e61a721e9ac0359f043c116e5ad69c" => sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'Pika.php'),
-            "cf825f977b80adef5e82347f05420e48" => sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'PikaMap.php'))
+            "af8594137516d9ff83d30d728fbf0404" => sprintf("%s%sBase%s%s", $path, DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, 'PikaMap.php'),
+            "801c71fac28e0ae40d22fb3f61c208d6" => sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'Pika.php'),
+            "80dd30f55c806c327785890e31002027" => sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'PikaMap.php'))
         );
     }
 
@@ -107,10 +107,10 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
             'PommTestProd');
 
         $this->checkFiles('chu', 'Chu', array(
-            "3c4eca9218cfb19616a30199d1ab6f42" => sprintf("%s%sBase%s%s", $path, DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, 'ChuMap.php'),
-            "2837595ac30c5af17f574de22056dd43" => sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'Chu.php'),
-            "eb5747cc22af2d62a0147632f4293e8e" => sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'ChuMap.php')),
-            array('namespace' => '\%dbname%\%schema%Prod', 'parent_namespace' => '\%dbname%\%schema%')
+            "337fc982688065df8b131e631f9a7500" => sprintf("%s%sBase%s%s", $path, DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, 'ChuMap.php'),
+            "a077d9766440ebbd4502194cfec964ea" => sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'Chu.php'),
+            "fc7ad4f4ae80b9dd0cf6cb7a95d510f6" => sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'ChuMap.php')),
+            array('namespace' => '%dbname%\%schema%Prod', 'parent_namespace' => '\%dbname%\%schema%')
         );
     }
 }

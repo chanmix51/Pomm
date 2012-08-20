@@ -35,7 +35,7 @@ abstract class CreateFileTool extends BaseTool
         $this->options->mustHave('prefix_dir');
         $this->options->mustHave('database');
         $this->options->setDefaultValue('schema', 'public');
-        $this->options->setDefaultValue('namespace', '\%dbname%\%schema%');
+        $this->options->setDefaultValue('namespace', '%dbname%\%schema%');
     }
 
     /**
@@ -47,7 +47,7 @@ abstract class CreateFileTool extends BaseTool
      **/
     public function getDestinationPath()
     {
-        return $this->options['prefix_dir'].str_replace('\\', DIRECTORY_SEPARATOR, $this->getNamespace());
+        return $this->options['prefix_dir'].DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $this->getNamespace());
     }
 
     /**
