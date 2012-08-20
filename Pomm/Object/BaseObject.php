@@ -85,7 +85,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     /**
      * __call
      *
-     * Allows dynamic methods getXXX, setXXX, hasXXX or addXXX.
+     * Allows dynamic methods getXxx, setXxx, hasXxx or addXxx.
      *
      * @param mixed $method
      * @param mixed $arguments
@@ -93,8 +93,8 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      */
     public function __call($method, $arguments)
     {
-        $operation = substr(strtolower($method), 0, 3);
-        $attribute = sfInflector::underscore(substr($method, 3));
+        list($operation, $attribute) = preg_split('/-/', preg_replace('/([A-Z])/', '-\1', $method, 1));
+        $attribute = sfInflector::underscore($attribute);
 
         switch($operation)
         {
@@ -106,6 +106,8 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
             return $this->add($attribute, $arguments[0]);
         case 'has':
             return $this->has($attribute);
+        case 'clear':
+            return $this->clear($attribute);
         default:
             throw new Exception(sprintf('No such method "%s:%s()"', get_class($this), $method));
         }
@@ -244,6 +246,23 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
+     * clear
+     *
+     * Drop an attribute from the varholder.
+     *
+     * @final
+     * @param String $offset   Attribute name.
+     **/
+    public final function clear($offset)
+    {
+        if ($this->has($offset))
+        {
+            unset($this->fields[$offset]);
+            $this->status = $this->status | self::MODIFIED;
+        }
+    }
+
+    /**
      * isNew
      *
      * is the current object self::NEW (does not it exist in the database already ?).
@@ -302,11 +321,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      **/
     public function offsetUnset($offset)
     {
-        if ($this->has($offset))
-        {
-            unset($this->fields[$offset]);
-            $this->status = $this->status | self::MODIFIED;
-        }
+        $this->clear($offset);
     }
 
     /**

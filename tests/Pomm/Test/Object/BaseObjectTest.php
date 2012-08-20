@@ -46,6 +46,16 @@ class BaseObjectTest extends \PHPUnit_Framework_TestCase
 
         unset($entity['array']);
         $this->assertFalse($entity->has('array'), "Array does not exist anymore.");
+
+        $entity['array'] = array(1);
+        $entity->_setStatus(BaseObject::NONE);
+        $entity->clearArray();
+        $this->assertFalse($entity->has('array'), "Array does not exist anymore.");
+        $this->assertEquals(BaseObject::MODIFIED, $entity->_getStatus(), "Entity is modified when clear is called.");
+
+        $entity['array'] = array(1);
+        $entity->clear('array');
+        $this->assertFalse($entity->has('array'), "Array does not exist anymore.");
     }
 
     /**
