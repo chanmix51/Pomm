@@ -415,7 +415,7 @@ Entities also propose mechanisms to check what state are their data compared to 
 
 So, of course, an entity can be in both states EXIST and MODIFIED or NONE of them. The ``BaseObject`` class grants you with several methoods to check this internal state: ``isNew()``, ``isModified()`` or you can directly access the ``_state`` attribute from within your class definition::
 
-  $entity = $map->createOne();
+  $entity = $map->createObject();
   $entity->isNew();           // true
   $entity->isModified();      // false
   $entity->setPika('chu');
@@ -578,7 +578,7 @@ The main goal of the map classes is to provide a layer between your database and
 
 ::
 
-  $entity = $map->createOne(array('pika' => 'chu', 'plop' => false));
+  $entity = $map->createObject(array('pika' => 'chu', 'plop' => false));
 
   $map->saveOne($entity);     // INSERT
 
