@@ -19,7 +19,7 @@ class PgNumber implements ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {
-        return $data;
+        return $data + 0;
     }
 
     /**
@@ -27,6 +27,6 @@ class PgNumber implements ConverterInterface
      **/
     public function toPg($data, $type = null)
     {
-        return $data;
+        return $data + 0;
     }
 }
