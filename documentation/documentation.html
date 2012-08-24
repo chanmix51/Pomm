@@ -803,7 +803,7 @@ $entity-&gt;get('pika');   // chu
 <dd>This instance has been modified with mutators.</dd>
 </dl>
 <p>So, of course, an entity can be in both states EXIST and MODIFIED or NONE of them. The <tt class="docutils literal">BaseObject</tt> class grants you with several methoods to check this internal state: <tt class="docutils literal">isNew()</tt>, <tt class="docutils literal">isModified()</tt> or you can directly access the <tt class="docutils literal">_state</tt> attribute from within your class definition:</p>
-<pre class="literal-block">$entity = $map-&gt;createOne();
+<pre class="literal-block">$entity = $map-&gt;createObject();
 $entity-&gt;isNew();           // true
 $entity-&gt;isModified();      // false
 $entity-&gt;setPika('chu');
@@ -961,7 +961,7 @@ class AverageStudentScoreMap extends BaseObjectMap
 <div class="section" id="create-update-drop">
 <h3><a class="toc-backref" href="#id37">Create, update, drop</a></h3>
 <p>The main goal of the map classes is to provide a layer between your database and your entities. They provide you with basic tools to save, update and delete your entities trough <tt class="docutils literal">saveOne()</tt>, <tt class="docutils literal">updateOne()</tt> and <tt class="docutils literal">deleteOne()</tt> methods.</p>
-<pre class="literal-block">$entity = $map-&gt;createOne(array('pika' =&gt; 'chu', 'plop' =&gt; false));
+<pre class="literal-block">$entity = $map-&gt;createObject(array('pika' =&gt; 'chu', 'plop' =&gt; false));
 
 $map-&gt;saveOne($entity);     // INSERT
 
