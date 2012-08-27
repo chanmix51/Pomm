@@ -219,7 +219,7 @@ abstract class BaseObjectMap
      */
     public function findAll($suffix = '')
     {
-        return $this->query(sprintf('SELECT %s FROM %s %s;', join(', ', $this->getSelectFields()), $this->object_name, $suffix), array());
+        return $this->query(sprintf('SELECT %s FROM %s %s;', $this->joinSelectFieldsWithAlias(), $this->object_name, $suffix), array());
     }
 
     /**
@@ -236,7 +236,7 @@ abstract class BaseObjectMap
      **/
     protected function generateSqlForWhere($where, $suffix = null)
     {
-        $sql = sprintf('SELECT %s FROM %s WHERE %s', join(', ', $this->getSelectFields()), $this->object_name, $where); 
+        $sql = sprintf('SELECT %s FROM %s WHERE %s', $this->joinSelectFieldsWithAlias(), $this->object_name, $where); 
 
         if (!is_null($suffix)) 
         {
@@ -455,7 +455,7 @@ abstract class BaseObjectMap
      */
     public function deleteByPk(Array $pk)
     {
-        $sql = sprintf('DELETE FROM %s WHERE %s RETURNING %s', $this->object_name, $this->createSqlAndFrom($pk), join(', ', $this->getSelectFields()));
+        $sql = sprintf('DELETE FROM %s WHERE %s RETURNING %s', $this->object_name, $this->createSqlAndFrom($pk), $this->joinSelectFieldsWithAlias());
 
         return $this->query($sql, array_values($pk));
     }
@@ -474,14 +474,14 @@ abstract class BaseObjectMap
 
         if ($object->_getStatus() & BaseObject::EXIST)
         {
-            $sql = sprintf('UPDATE %s SET %s WHERE %s RETURNING %s;', $this->object_name, $this->parseForUpdate($object), $this->createSqlAndFrom($object->get($this->getPrimaryKey())), join(', ', $this->getSelectFields()));
+            $sql = sprintf('UPDATE %s SET %s WHERE %s RETURNING %s;', $this->object_name, $this->parseForUpdate($object), $this->createSqlAndFrom($object->get($this->getPrimaryKey())), $this->joinSelectFieldsWithAlias());
 
             $collection = $this->query($sql, array_values($object->get($this->getPrimaryKey())));
         }
         else
         {
             $pg_values = $this->convertToPg($object->extract());
-            $sql = sprintf('INSERT INTO %s (%s) VALUES (%s) RETURNING %s;', $this->object_name, join(',', array_keys($pg_values)), join(',', array_values($pg_values)), join(', ', $this->getSelectFields()));
+            $sql = sprintf('INSERT INTO %s (%s) VALUES (%s) RETURNING %s;', $this->object_name, join(',', array_keys($pg_values)), join(',', array_values($pg_values)), $this->joinSelectFieldsWithAlias());
 
             $collection = $this->query($sql, array());
         }
@@ -532,7 +532,7 @@ abstract class BaseObjectMap
         }
 
 
-        $sql = sprintf("UPDATE %s SET %s WHERE %s RETURNING %s;", $this->object_name, join(', ', $updates), $this->createSqlAndFrom($object->get($this->getPrimaryKey())), join(', ', $this->getSelectFields()));
+        $sql = sprintf("UPDATE %s SET %s WHERE %s RETURNING %s;", $this->object_name, join(', ', $updates), $this->createSqlAndFrom($object->get($this->getPrimaryKey())), $this->joinSelectFieldsWithAlias());
         $collection = $this->query($sql, array_values($object->get($this->getPrimaryKey())));
 
         if ($collection->count())
@@ -656,10 +656,12 @@ abstract class BaseObjectMap
         $fields = array();
         $alias  = is_null($alias) ? '' : $alias.".";
 
-        return array_map(function($name) use ($alias) {
-                return sprintf("%s%s", $alias, $name);
-            }, 
-            array_keys($this->field_definitions));
+        foreach ($this->field_definitions as $name => $type)
+        {
+            $fields[$name] = sprintf("%s%s", $alias, $name);
+        }
+
+        return $fields;
     }
 
     /**
@@ -799,4 +801,19 @@ abstract class BaseObjectMap
     {
         return $this->object_class;
     }
+
+    /**
+     * joinSelectFieldsWithAlias
+     *
+     * This is used when queries need to format fields aliases.
+     * 
+     * @return String
+     **/
+    public function joinSelectFieldsWithAlias($alias = null)
+    {
+        $fields = $this->getSelectFields($alias);
+
+        return join(', ', array_map(function($name, $alias) { return sprintf("%s AS %s", $name, $alias); }, $fields, array_keys($fields)));
+    }
+
 }
