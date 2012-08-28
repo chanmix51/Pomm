@@ -103,6 +103,15 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue( $index + 1 == $result['id'], "Index follows status.");
         }
     }
+
+    public function testExtract()
+    {
+        $collection = static::$map->findWhere('id < ?', array(5));
+        $collection->setCacheObjects();
+
+        $this->assertEquals(array('Pomm\Test\Object\CollectionEntity' => array(array('id' => 1), array('id' => 2), array('id' => 3), array('id' => 4))), $collection->extract(), 'Extract is an array of extracts.');
+        $this->assertEquals(array('plop' => array(array('id' => 1), array('id' => 2), array('id' => 3), array('id' => 4))), $collection->extract('plop'), 'Extract is an array of extracts.');
+    }
 }
 
 class CollectionEntityMap extends BaseObjectMap

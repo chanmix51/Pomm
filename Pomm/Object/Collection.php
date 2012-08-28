@@ -287,4 +287,27 @@ class Collection implements \Iterator, \Countable
     {
         return $this->position % 2 ? 'odd' : 'even';
     }
+
+    /**
+     * extract
+     *
+     * Return an array of results. Useful if you want to serialize a result or 
+     * export it as a JSON format. Filters are still executed on all the 
+     * fetched results.
+     *
+     * @param String $name The name of the resultset (Defaults to entity FQCN)
+     * @return Array
+     **/
+    public function extract($name = null)
+    {
+        $name = is_null($name) ? $this->object_map->getObjectClass() : $name;
+        $results = array();
+
+        foreach ($this as $result)
+        {
+            $results[] = $result->extract();
+        }
+
+        return array($name => $results);
+    }
 }
