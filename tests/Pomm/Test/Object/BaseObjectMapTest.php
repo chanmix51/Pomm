@@ -66,6 +66,10 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('plop', $entity['some_data'], "'some_data' is unchanged.");
         $this->assertFalse($entity['bool_data'], "Bool data has been added.");
 
+        $another_entity = static::$map->createAndSaveObject(Array('some_data' => 'more plop'));
+        $this->assertTrue((boolean) ($another_entity->_getStatus() & BaseObject::EXIST), "Object now exists in database.");
+        $this->assertEquals('more plop', $another_entity['some_data'], "'some_data' is unchanged.");
+
         return $entity;
     }
 
@@ -171,16 +175,15 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
     public function testChangePrimaryKey(BaseEntity $entity)
     {
         static::$map->changeToMultiplePrimaryKey();
-        $entity = static::$map->createObject(array('name' => 'plop', 'some_data' => 'plop'));
+        $entity = static::$map->createAndSaveObject(array('name' => 'plop', 'some_data' => 'plop'));
 
-        static::$map->saveOne($entity);
-        $this->assertEquals(array('id' => 2, 'name' => 'plop'), $entity->get(static::$map->getPrimaryKey()), "Primary key is retrieved.");
+        $this->assertEquals(array('id' => 3, 'name' => 'plop'), $entity->get(static::$map->getPrimaryKey()), "Primary key is retrieved.");
 
         $entity['bool_data'] = true;
         static::$map->saveOne($entity);
 
         $this->assertTrue($entity['bool_data'], "'bool_data' is updated.");
-        $this->assertEquals(array('id' => 2, 'name' => 'plop'), $entity->get(static::$map->getPrimaryKey()), "Primary key has not changed.");
+        $this->assertEquals(array('id' => 3, 'name' => 'plop'), $entity->get(static::$map->getPrimaryKey()), "Primary key has not changed.");
 
         $entity['some_data'] = 'other data';
         static::$map->updateOne($entity, array('some_data'));

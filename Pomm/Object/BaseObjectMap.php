@@ -75,6 +75,23 @@ abstract class BaseObjectMap
         $this->virtual_fields[$name] = $type;
     }
 
+    /** 
+     * createAndSaveObject
+     *
+     * Create a new instance of the corresponding model class and save it in 
+     * the database.
+     *
+     * @param Array $values
+     * @return BaseObject
+     **/
+    public function createAndSaveObject(Array $values)
+    {
+        $object = $this->createObject($values);
+        $this->saveOne($object);
+
+        return $object;
+    }
+
     /**
      * createObject 
      *
@@ -815,5 +832,4 @@ abstract class BaseObjectMap
 
         return join(', ', array_map(function($name, $alias) { return sprintf("%s AS %s", $name, $alias); }, $fields, array_keys($fields)));
     }
-
 }
