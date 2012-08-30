@@ -107,15 +107,26 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $entity['some_text'], "Empty strings are ok.");
         $this->assertEquals(array(null, '123', null, '', null, 'abc'), $entity['arr_varchar'], "Char arrays can contain nulls and emtpy strings.");
 
+        if (static::$cv_map->checkType('json') !== false)
+        {
+            $entity['some_json'] = json_encode(array('plop' => array('pika' => 'chu', 'lot of' => array(1, 2, 3, 4, 5))));
+            static::$cv_map->updateOne($entity, array('some_json'));
+
+            $this->assertEquals('{"plop":{"pika":"chu","lot of":[1,2,3,4,5]}}', $entity['some_json'], "Json type is kept unchanged.");
+        }
+        else
+        {
+            $this->markTestSkipped("Json type is supported since postgresql 9.2. Test skipped.");
+        }
+
+
         return $entity;
     }
 
-    /**
-     * @depends testString
-     **/
-    public function testDate(ConverterEntity $entity)
+    public function testDate()
     {
         static::$cv_map->alterDate();
+        $entity = static::$cv_map->findAll()->current();
         $values = array('some_ts' => '2012-06-20 18:34:16.640044', 'some_intv' => '30 days', 'arr_ts' => array('2015-06-08 03:54:08.880287', '1994-12-16 21:23:50.224208', '1941-02-18 17:29:52.216309'));
 
         $entity->hydrate($values);
