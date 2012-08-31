@@ -285,7 +285,7 @@ class Where
         $values = array();
         foreach($this->stack as $offset => $where)
         {
-            $values = array_merge($values, $where->getValues());
+            $values = array_merge($values, is_array($where->getValues()) ? $where->getValues() : array($where->getValues()));
         }
 
         return $values;
