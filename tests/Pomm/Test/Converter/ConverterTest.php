@@ -76,16 +76,12 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0.000, $entity['fixed'], "PHP 0.0001 <=> PG 0.000 numeric");
         $this->assertEquals(1000000, $entity['fl'], "PHP 1000000.000001 <=> PG 1e+6");
         $this->assertEquals(array(1.0, 1.1, null, 1.3), $entity['arr_fl'], "Float array preserves null.");
-
-        return $entity;
     }
 
-    /**
-     * @depends testInteger
-     **/
-    public function testString(ConverterEntity $entity)
+    public function testString()
     {
         static::$cv_map->alterText();
+        $entity = static::$cv_map->findAll()->current();
         $values = array('some_char' => 'abcdefghij', 'some_varchar' => '1234567890 abcdefghij', 'some_text' => 'Lorem Ipsum', 'arr_varchar' => array('pika', 'chu'));
 
         $entity->hydrate($values);
@@ -109,6 +105,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
 
         if (static::$cv_map->checkType('json') !== false)
         {
+            static::$cv_map->alterJson();
             $entity['some_json'] = json_encode(array('plop' => array('pika' => 'chu', 'lot of' => array(1, 2, 3, 4, 5))));
             static::$cv_map->updateOne($entity, array('some_json'));
 
@@ -149,12 +146,10 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         return $entity;
     }
 
-    /**
-     * @depends testDate
-     **/
-    public function testBool(ConverterEntity $entity)
+    public function testBool()
     {
         static::$cv_map->alterBool();
+        $entity = static::$cv_map->findAll()->current();
         $values = array('some_bool' => true, 'arr_bool' => array(true, false, true));
 
         $entity->hydrate($values);
@@ -183,8 +178,6 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @depends testBool
-     *
      * Tests are volontarily simplistic, read below:
      *
      * pg bytea escaping with PHP :
@@ -197,9 +190,10 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
      * it (or myself) was not able to convert strings to binary (See issue #32).
      *
      **/
-    public function testBinary(ConverterEntity $entity)
+    public function testBinary()
     {
         static::$cv_map->alterBinary();
+        $entity = static::$cv_map->findAll()->current();
         $binary = chr(0).chr(27).chr(92).chr(39).chr(32).chr(13);
         $hash = $this->checksumBinary($binary);
         $length = strlen($binary);
@@ -216,12 +210,10 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         return $entity;
     }
 
-    /**
-     * @depends testBinary
-     **/
-    public function testPoint(ConverterEntity $entity)
+    public function testPoint()
     {
         static::$cv_map->alterPoint();
+        $entity = static::$cv_map->findAll()->current();
         $values = array(
             'some_point' => new Type\Point(47.21262, -1.55516), 
             'arr_point' => array(new Type\Point(6.431264, 3.424915), new Type\Point(-33.969043, 151.187225))
@@ -254,12 +246,10 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         return $entity;
     }
 
-    /**
-     * @depends testPoint
-     **/
-    public function testCircle(ConverterEntity $entity)
+    public function testCircle()
     {
         static::$cv_map->alterCircle();
+        $entity = static::$cv_map->findAll()->current();
         $values = array(
             'some_circle' => new Type\Circle(new Type\Point(0.1234E9,-2), 10),
             'arr_circle' => array(new Type\Circle(new Type\Point(2,-2), 10), new Type\Circle(new Type\Point(0,0), 1))
@@ -289,12 +279,10 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         return $entity;
     }
 
-    /**
-     * @depends testCircle
-     **/
-    public function testSegment(ConverterEntity $entity)
+    public function testSegment()
     {
         static::$cv_map->alterSegment();
+        $entity = static::$cv_map->findAll()->current();
         $values = array(
             'some_lseg' => new Type\Segment(new Type\Point(0.1234E9,-2), new Type\Point(10, -10)),
             'arr_lseg' => array(new Type\Segment(new Type\Point(2,-2), new Type\Point(0,0)), new Type\Segment(new Type\Point(2,-2), new Type\Point(1000,-1000))),
@@ -319,44 +307,36 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Pomm\Type\Segment', $entity['arr_lseg'][1], "'arr_lseg' 2nd element is a lseg type.");
         $this->assertTrue(is_null($entity['arr_lseg'][2]), '3rd element is null');
         $this->assertTrue(is_null($entity['arr_lseg'][4]), '5rd element is null');
-
-        return $entity;
     }
 
-    /**
-     * @depends testSegment
-     **/
-    function testHStore(ConverterEntity $entity)
+    function testHStore()
     {
         if (static::$cv_map->alterHStore() === false)
         {
             $this->markTestSkipped("HStore extension could not be found in Postgres, tests skipped.");
 
-            return $entity;
+            return;
         }
 
+        $entity = static::$cv_map->findAll()->current();
         $values = array('pika' => 'chu', 'plop' => null);
         $entity['some_hstore'] = $values;
 
         static::$cv_map->updateOne($entity, array('some_hstore'));
         $this->assertTrue(is_array($entity['some_hstore']), "'some_hstore' is an array.");
         $this->assertEquals($values, $entity['some_hstore'], "'some_hstore' array is preserved.");
-
-        return $entity;
     }
 
-    /**
-     * @depends testSegment
-     **/
-    public function testLTree(ConverterEntity $entity)
+    public function testLTree()
     {
         if (static::$cv_map->alterLTree() === false)
         {
             $this->markTestSkipped("Ltree extension could not be found in Postgres, tests skipped.");
 
-            return $entity;
+            return;
         }
 
+        $entity = static::$cv_map->findAll()->current();
         $values = array(
             'some_ltree' => array('one', 'two', 'three', 'four'),
             'arr_ltree' => array(
@@ -386,46 +366,12 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_array($entity['arr_ltree'][2]), "3rd element is an array.");
         $this->assertEquals($values['arr_ltree'][0], $entity['arr_ltree'][2], "Ltree are preserved.");
         $this->assertTrue(is_null($entity['arr_ltree'][5]), "5th element is null");
-
-        return $entity;
     }
 
-    /**
-     * @depends testSegment
-     **/
-    public function testTsRange(ConverterEntity $entity)
+
+    public function testSuperConverter()
     {
-        if (static::$cv_map->alterTsRange() === false)
-        {
-            $this->markTestSkipped("tsrange type could not be found, maybe Postgres version < 9.2. Tests skipped.");
-
-            return $entity;
-        }
-
-        $value = new Type\TsRange(new \DateTime('2012-08-20'), new \DateTime('2012-09-01'), true);
-        $entity['some_tsrange'] = $value;
-
-        static::$cv_map->updateOne($entity, array('some_tsrange'));
-
-        $this->assertInstanceOf('\Pomm\Type\TsRange', $entity['some_tsrange'], "'some_tsrange' is a 'TsRange' type.");
-        $this->assertEquals($value->start->format('U'), $entity['some_tsrange']->start->format('U'), "Timestamps are equal.");
-
-        $entity['arr_tsrange'] = array($value, new Type\TsRange(new \DateTime('2012-12-21'), new \DateTime('2012-12-21 12:21:59')));
-
-        static::$cv_map->updateOne($entity, array('some_tsrange', 'arr_tsrange'));
-
-        $this->assertEquals(2, count($entity['arr_tsrange']), "There are 2 elements in the array.");
-        $this->assertInstanceOf('\Pomm\Type\TsRange', $entity['arr_tsrange'][1], "'arr_tsrange' element 1 is a 'TsRange' type.");
-        $this->assertEquals(44519, $entity['arr_tsrange'][1]->end->format('U') - $entity['arr_tsrange'][1]->start->format('U'), "Range is preserved.");
-
-        return $entity;
-    }
-
-    /**
-     * @depends testSegment
-     **/
-    public function testSuperConverter(ConverterEntity $entity)
-    {
+        $entity = static::$cv_map->findAll()->current();
         $super_entity = new SuperConverterEntity(array('cv_entities' => array($entity)));
 
         static::$super_cv_map->saveOne($super_entity);
@@ -490,7 +436,7 @@ class ConverterEntityMap extends BaseObjectMap
         }
     }
 
-    protected function checkType($type)
+    public function checkType($type)
     {
         $sql = sprintf("SELECT pg_namespace.nspname FROM pg_type JOIN pg_namespace ON pg_type.typnamespace = pg_namespace.oid WHERE typname = '%s'", $type);
 
@@ -581,6 +527,20 @@ class ConverterEntityMap extends BaseObjectMap
         $this->connection->getDatabase()
             ->registerConverter('tsrange', new Converter\PgTsRange(), array('tsrange', 'public.tsrange', $schema.'.tsrange'));
     }
+
+    public function alterJson()
+    {
+        if ($schema = $this->checkType('json') === false)
+        {
+            return false;
+        }
+
+        $this->alterTable(array('some_json' => 'json'));
+
+        $this->connection->getDatabase()
+            ->registerTypeForConverter('json', 'String');
+    }
+
 }
 
 class ConverterEntity extends BaseObject
