@@ -37,6 +37,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testParse()
     {
         $where = Where::create();
+        $this->checkToString($where, 'true', array());
         $where1 = clone $where;
         $where1->andWhere('A', array(1));
         $this->checkToString($where1, 'A', array(1));

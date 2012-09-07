@@ -31,7 +31,7 @@ class Where
      * @param Array  $values  Optional elements' values.
      * @return Pomm\Query\Where
      **/
-    public static function create($element = null, $values = array())
+    public static function create($element = null, Array $values = array())
     {
         return new self($element, $values);
     }
@@ -46,7 +46,7 @@ class Where
      * @param Array  $values
      * @return Pomm\Query\Where
      **/
-    public static function createWhereIn($element, $values)
+    public static function createWhereIn($element, Array $values)
     {
         $escaped_values = array();
         for ($index = 1; $index <= count($values); $index++)
@@ -63,7 +63,7 @@ class Where
      * @param String $element  (optional)
      * @param Array  $values   (optional)
      **/
-    public function __construct($element = null, $values = array())
+    public function __construct($element = null, Array $values = array())
     {
         if (!is_null($element))
         {
@@ -126,7 +126,7 @@ class Where
      * @param String $operator 
      * @return Pomm\Query\Where
      **/
-    public function addWhere($element, $values, $operator)
+    public function addWhere($element, Array $values, $operator)
     {
         if (!$element instanceof Where)
         {
@@ -173,7 +173,7 @@ class Where
      * @param Array $values 
      * @return Pomm\Query\Where
      **/
-    public function andWhere($element, $values = array())
+    public function andWhere($element, Array $values = array())
     {
         return $this->addWhere($element, $values, 'AND');
     }
@@ -185,7 +185,7 @@ class Where
      * @param Array $values 
      * @return Pomm\Query\Where
      **/
-    public function orWhere($element, $values = array())
+    public function orWhere($element, Array $values = array())
     {
         return $this->addWhere($element, $values, 'OR');
     }
