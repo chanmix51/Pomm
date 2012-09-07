@@ -101,7 +101,7 @@ class converter_test extends \lime_test
         $this->object->setPrecisions(array($this->object['precision'], $this->object['precision'] * 2));
         $this->map->saveOne($this->object);
         $object = $this->map->findByPk($this->object->get($this->map->getPrimaryKey()));
-        $this->is_deeply($object['precisions'], array($this->object['precision'], (string) ($this->object['precision'] * 2)), "Precisions is an array of precision && * 2");
+        $this->is_deeply($object['precisions'], array($this->object['precision'], ($this->object['precision'] * 2)), "Precisions is an array of precision && * 2");
 
         return $this;
     }
