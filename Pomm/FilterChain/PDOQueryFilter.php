@@ -42,7 +42,6 @@ class PDOQueryFilter implements FilterInterface
      */
     protected function prepareStatement()
     {
-        // return $this->filter_chain->getConnection()->getPdo()->prepare($this->filter_chain->getSql(), array(\PDO::ATTR_CURSOR => \PDO::CURSOR_SCROLL));
         return $this->filter_chain->getConnection()->getPdo()->prepare($this->filter_chain->getSql());
     }
 
@@ -70,6 +69,11 @@ class PDOQueryFilter implements FilterInterface
             else
             {
                 $type = null;
+            }
+
+            if ($value instanceof \DateTime)
+            {
+                $value = $value->format('Y-m-d H:i:s.u');
             }
 
             if (is_null($type))
