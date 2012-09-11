@@ -824,6 +824,7 @@ abstract class BaseObjectMap
      *
      * This is used when queries need to format fields aliases.
      * 
+     * @param String Optionnal table alias.
      * @return String
      **/
     public function joinSelectFieldsWithAlias($alias = null)
