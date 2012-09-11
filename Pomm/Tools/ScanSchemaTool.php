@@ -49,9 +49,17 @@ class ScanSchemaTool extends CreateFileTool
 
         $inspector = new Inspector($this->options['database']->createConnection());
 
+        $no_tables = $this->options->hasParameter('exclude') ?  array_flip($inspector->getTablesOids($this->options['schema'], $this->options['exclude'])) : array();
+
         foreach ($inspector->getTablesInSchema($this->options['schema']) as $table_oid)
         {
             $this->output_stack->add(sprintf("Get table oid '%d'.", $table_oid));
+            if (array_key_exists($table_oid, $no_tables))
+            {
+                $this->output_stack->add(sprintf("Table '%s' (oid %d) excluded.", $no_tables[$table_oid], $table_oid));
+                continue;
+            }
+
             $this->options['oid'] = $table_oid;
             $tool = new CreateBaseMapTool($this->options->getParameters());
 

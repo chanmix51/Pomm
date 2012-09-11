@@ -4,6 +4,7 @@ namespace Pomm\Tools;
 
 use Pomm\Connection\Connection;
 use Pomm\Exception\Exception;
+use Pomm\Exception\ToolException;
 
 /**
  * Inspector - The database inspection tool.
@@ -48,6 +49,51 @@ class Inspector
         }
 
         return $oid;
+    }
+
+    /**
+     * getTablesOids()
+     *
+     * Return tables oid
+     *
+     * @param String schema name
+     * @param Array  tables name
+     * @return Array associative array with name => oid
+     **/
+    public function getTablesOids($schema, Array $names)
+    {
+        $sql = <<<SQL
+SELECT 
+  c.relname AS table_name, 
+  c.oid 
+FROM 
+  pg_catalog.pg_class c
+    LEFT JOIN pg_catalog.pg_namespace n ON 
+      n.oid = c.relnamespace 
+WHERE 
+    n.nspname = '%s' 
+  AND 
+    c.relname ~ ANY(ARRAY[%s]::varchar[])
+SQL;
+
+        $pdo = $this->connection->getPdo()->query(sprintf(
+            $sql,
+            $schema,
+            join(', ', array_map(function($val) { return sprintf("'^(%s)$'", $val); }, $names))
+        ));
+
+        if ($pdo === false)
+        {
+            throw new ToolException(sprintf("Could not query the database."));
+        }
+
+        $tables = array();
+        foreach($pdo->fetchAll(\PDO::FETCH_ASSOC) AS $row)
+        {
+            $tables[$row['table_name']] = $row['oid'];
+        }
+
+        return $tables;
     }
 
     /**
