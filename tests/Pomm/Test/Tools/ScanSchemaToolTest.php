@@ -84,4 +84,20 @@ class ScanSchemaToolTest extends \PHPUnit_Framework_TestCase
         $this->assertFileNotExists($path.DIRECTORY_SEPARATOR.'Base'.DIRECTORY_SEPARATOR.'Pika2Map.php');
         $this->assertFileExists($path.DIRECTORY_SEPARATOR.'Base'.DIRECTORY_SEPARATOR.'Pika3Map.php');
     }
+
+    public function testScanAll()
+    {
+        $tool = new ScanSchemaTool(array(
+            'prefix_dir' => static::$tmp_dir,
+            'database' => static::$connection->getDatabase(),
+            'schema' => 'pomm_test'
+        ));
+
+        $tool->execute();
+
+        $path = static::$tmp_dir.DIRECTORY_SEPARATOR.'TestDb'.DIRECTORY_SEPARATOR.'PommTest';
+        $this->assertFileExists($path.DIRECTORY_SEPARATOR.'Pika2.php');
+        $this->assertFileExists($path.DIRECTORY_SEPARATOR.'Pika2Map.php');
+        $this->assertFileExists($path.DIRECTORY_SEPARATOR.'Base'.DIRECTORY_SEPARATOR.'Pika2Map.php');
+    }
 }

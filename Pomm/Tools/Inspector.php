@@ -148,14 +148,14 @@ SQL;
      **/
     public function getTableFieldsInformation($oid)
     {
-        $sql = <<<_
+        $sql = <<<SQL
 SELECT 
   a.attname,
   t.typname AS type,
   n.nspname AS type_namespace,
   (
     SELECT 
-        substring(pg_catalog.pg_get_expr(d.adbin, d.adrelid) for 128) 
+      substring(pg_catalog.pg_get_expr(d.adbin, d.adrelid) for 128) 
     FROM 
       pg_catalog.pg_attrdef d 
     WHERE 
@@ -176,12 +176,12 @@ FROM
 WHERE 
     a.attrelid = %d
   AND 
-    a.attnum > 0 AND 
-  NOT 
-    a.attisdropped 
+    a.attnum > 0 
+  AND 
+    NOT a.attisdropped 
 ORDER BY 
   a.attnum
-_;
+SQL;
         $sql = sprintf($sql, $oid);
 
         $pdo = $this->connection->getPdo()->query($sql);
