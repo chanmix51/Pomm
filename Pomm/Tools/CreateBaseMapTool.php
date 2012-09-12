@@ -111,7 +111,12 @@ class CreateBaseMapTool extends CreateFileTool
                 }
             }
 
-            $fields_definition = $this->generateFieldsDefinition(array_diff_key($this->inspector->getTableFieldsInformation($this->options['oid']), $this->inspector->getTableFieldsInformation($inherits)));
+            $fields_definition = $this->generateFieldsDefinition(array_udiff(
+                $this->inspector->getTableFieldsInformation($this->options['oid']),
+                $this->inspector->getTableFieldsInformation($inherits),
+                function($a, $b) { return $a['attname'] === $b['attname'] ? 0 : -1; }
+            ));
+
             $parent_call = "        parent::initialize();\n";
         }
         else
