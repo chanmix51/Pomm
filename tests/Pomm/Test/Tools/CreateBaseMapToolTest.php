@@ -35,13 +35,16 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
             $sql = 'CREATE SCHEMA pomm_test';
             static::$connection->executeAnonymousQuery($sql);
 
-            $sql = 'CREATE TABLE pomm_test.pika (id serial PRIMARY KEY, some_char char(10), some_varchar varchar, fixed_arr numeric(4,3)[])';
+            $sql = 'CREATE TABLE pomm_test.pika (id serial PRIMARY KEY, some_char char(10), some_varchar varchar)';
             static::$connection->executeAnonymousQuery($sql);
 
             $sql = 'CREATE TYPE pomm_test.some_type AS (ts timestamp, md5 char(32))';
             static::$connection->executeAnonymousQuery($sql);
 
             $sql = 'CREATE TABLE pomm_test.chu (some_some_type pomm_test.some_type) INHERITS (pomm_test.pika)';
+            static::$connection->executeAnonymousQuery($sql);
+
+            $sql = 'ALTER TABLE pomm_test.pika ADD COLUMN fixed_arr numeric(4,3)[]';
             static::$connection->executeAnonymousQuery($sql);
 
             static::$connection->commit();
@@ -59,7 +62,7 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
         $sql = 'DROP SCHEMA pomm_test CASCADE';
         static::$connection->executeAnonymousQuery($sql);
 
-        exec(sprintf("rm -r %s", static::$tmp_dir.DIRECTORY_SEPARATOR."TestDb"));
+        #exec(sprintf("rm -r %s", static::$tmp_dir.DIRECTORY_SEPARATOR."TestDb"));
     }
 
     protected function checkFiles($table, $class, $md5sums, $other_options = array())
