@@ -68,12 +68,12 @@ class PDOQueryFilter implements FilterInterface
             }
             else
             {
-                $type = null;
-            }
+                if ($value instanceof \DateTime)
+                {
+                    $value = $value->format('Y-m-d H:i:s.u');
+                }
 
-            if ($value instanceof \DateTime)
-            {
-                $value = $value->format('Y-m-d H:i:s.u');
+                $type = null;
             }
 
             if (is_null($type))
