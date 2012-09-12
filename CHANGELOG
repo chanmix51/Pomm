@@ -1,3 +1,8 @@
+=== 1.0.5
+ *  Bug in parent fields detection in map generation.
+ *  Where values are type hinted as Array.
+ *  Typo in documentation. (kcivey)
+ *  Force number conversion in PgNumber. (kcivey)
 === 1.0.4
  *  Changed a use of Exception to PommException
  *  Smart identity mapper now smart
