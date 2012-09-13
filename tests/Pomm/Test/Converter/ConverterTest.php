@@ -391,6 +391,39 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(-3, $super_entity['cv_entities'][1]['some_point']->y, "With y = -3");
         $this->assertTrue(is_null($super_entity['cv_entities'][1]['some_bin']), "'some_bin' is null.");
     }
+
+    public function testTsExtendedEntity()
+    {
+        $ts_entity_map = static::$connection
+            ->getMapFor('\Pomm\Test\Converter\TsEntity');
+        $ts_entity_map->createTable();
+
+        $ts_extended_entity_map = static::$connection
+            ->getMapFor('\Pomm\Test\Converter\TsExtendedEntity');
+        $ts_extended_entity_map->createTable($ts_entity_map);
+
+        $collection = $ts_extended_entity_map->findAll();
+        $ts_extended_entity = $collection->current();
+
+        $this->assertInstanceOf('\Pomm\Test\Converter\TsEntity', $ts_extended_entity['p1'], "'p1' is a \\DateTime instance.");
+        $this->assertEquals('2000-02-29', $ts_extended_entity['p1']['p1']->format('Y-m-d'), 'Timestamp is preserved.');
+
+        foreach (array('1999-12-31 23:59:59.999999', '2005-01-29 23:01:58.000000') AS $key => $ts)
+        {
+            $this->assertEquals($ts, $ts_extended_entity['p2'][$key]['p1']->format('Y-m-d H:i:s.u'), 'Timestamp array is preserved.');
+        }
+
+        $ts_over_extended_entity_map = static::$connection
+            ->getMapFor('\Pomm\Test\Converter\TsOverExtendedEntity');
+        $ts_over_extended_entity_map->createTable($ts_extended_entity_map);
+
+        $collection = $ts_over_extended_entity_map->findAll();
+        $ts_over_extended_entity = $collection->current();
+
+        $this->assertInstanceOf('\Pomm\Test\Converter\TsExtendedEntity', $ts_over_extended_entity['p1'], "'p1' is a TsExtendedEntity instance.");
+        $this->assertTrue(is_array($ts_over_extended_entity['p2']), "'p2' is an Array.");
+        $this->assertInstanceOf('\Pomm\Test\Converter\TsExtendedEntity', $ts_over_extended_entity['p2'][0], "Which contains TsExtendedEntity instances.");
+    }
 }
 
 class ConverterEntityMap extends BaseObjectMap
@@ -573,5 +606,96 @@ class SuperConverterEntityMap extends BaseObjectMap
 }
 
 class SuperConverterEntity extends BaseObject
+{
+}
+
+class TsEntityMap extends BaseObjectMap
+{
+    protected function initialize()
+    {
+        $this->object_class = '\Pomm\Test\Converter\TsEntity';
+        $this->object_name = "( VALUES ('1999-12-31 23:59:59.999999'::timestamp) ) AS ts_entity (p1)";
+
+        $this->addField('p1', 'timestamp');
+
+        $this->pk_fields = array();
+    }
+
+    public function createTable()
+    {
+        $sql = 'CREATE TYPE pomm_test.ts_entity AS (p1 timestamp)';
+        $this->connection
+            ->executeAnonymousQuery($sql);
+    }
+}
+
+class TsEntity extends BaseObject
+{
+}
+
+class TsExtendedEntityMap extends BaseObjectMap
+{
+    protected function initialize()
+    {
+        $this->object_class = '\Pomm\Test\Converter\TsExtendedEntity';
+        $this->object_name  = <<<SQL
+( VALUES 
+  ( ROW('2000-02-29'::timestamp)::pomm_test.ts_entity, ARRAY[ROW('1999-12-31 23:59:59.999999'::timestamp)::pomm_test.ts_entity, ROW('2005-01-29 23:01:58'::timestamp)::pomm_test.ts_entity]::pomm_test.ts_entity[] ),
+  ( ROW('2004-02-29'::timestamp)::pomm_test.ts_entity, ARRAY[ROW('1989-12-31 23:59:59.999999'::timestamp)::pomm_test.ts_entity, ROW('2005-01-29 23:01:58'::timestamp)::pomm_test.ts_entity]::pomm_test.ts_entity[] )
+) ts_extended_entity (p1, p2)
+SQL;
+
+        $this->addField('p1', 'pomm_test.ts_entity');
+        $this->addField('p2', 'pomm_test.ts_entity[]');
+
+        $this->pk_fields = array();
+    }
+
+    public function createTable(TsEntityMap $map)
+    {
+        $sql = 'CREATE TYPE pomm_test.ts_extended_entity AS (p1 pomm_test.ts_entity, p2 pomm_test.ts_entity[])';
+        $this->connection
+            ->executeAnonymousQuery($sql);
+
+        $this->connection
+            ->getDatabase()
+            ->registerConverter('TsEntityConverter', new Converter\PgEntity($map), array('pomm_test.ts_entity', 'ts_entity'));
+    }
+}
+
+class TsExtendedEntity extends BaseObject
+{
+}
+
+class TsOverExtendedEntityMap extends BaseObjectMap
+{
+    protected function initialize()
+    {
+        $this->object_class = '\Pomm\Test\Converter\TsOverExtendedEntity';
+        $this->object_name  = <<<SQL
+( VALUES 
+  ( ROW(ROW('2000-02-29'::timestamp)::pomm_test.ts_entity, ARRAY[ROW('1999-12-31 23:59:59.999999'::timestamp)::pomm_test.ts_entity, ROW('2005-01-29 23:01:58'::timestamp)::pomm_test.ts_entity]::pomm_test.ts_entity[] )::pomm_test.ts_extended_entity, ARRAY[ROW(ROW('2004-02-29'::timestamp)::pomm_test.ts_entity, ARRAY[ROW('1989-12-31 23:59:59.999999'::timestamp)::pomm_test.ts_entity, ROW('2005-01-29 23:01:58'::timestamp)::pomm_test.ts_entity]::pomm_test.ts_entity[])::pomm_test.ts_extended_entity]::pomm_test.ts_extended_entity[] )
+) ts_over_extended_entity (p1, p2)
+SQL;
+
+        $this->addField('p1', 'pomm_test.ts_extended_entity');
+        $this->addField('p2', 'pomm_test.ts_extended_entity[]');
+
+        $this->pk_fields = array();
+    }
+
+    public function createTable(TsExtendedEntityMap $map)
+    {
+        $sql = 'CREATE TYPE pomm_test.ts_over_extended_entity AS (p1 pomm_test.ts_extended_entity, p2 pomm_test.ts_extended_entity[])';
+        $this->connection
+            ->executeAnonymousQuery($sql);
+
+        $this->connection
+            ->getDatabase()
+            ->registerConverter('TsExtendedEntityConverter', new Converter\PgEntity($map), array('pomm_test.ts_extended_entity', 'pomm_test.extended_entity'));
+    }
+}
+
+class TsOverExtendedEntity extends BaseObject 
 {
 }
