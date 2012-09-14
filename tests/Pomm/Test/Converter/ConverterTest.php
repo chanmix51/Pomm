@@ -103,9 +103,8 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $entity['some_text'], "Empty strings are ok.");
         $this->assertEquals(array(null, '123', null, '', null, 'abc'), $entity['arr_varchar'], "Char arrays can contain nulls and emtpy strings.");
 
-        if (static::$cv_map->checkType('json') !== false)
+        if (static::$cv_map->alterJson() !== false)
         {
-            static::$cv_map->alterJson();
             $entity['some_json'] = json_encode(array('plop' => array('pika' => 'chu', 'lot of' => array(1, 2, 3, 4, 5))));
             static::$cv_map->updateOne($entity, array('some_json'));
 
@@ -368,6 +367,34 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_null($entity['arr_ltree'][5]), "5th element is null");
     }
 
+    public function testTsRange()
+    {
+        if (static::$cv_map->alterTsRange() === false)
+        {
+            $this->markTestSkipped("tsrange type could not be found, maybe Postgres version < 9.2. Tests skipped.");
+
+            return;
+        }
+
+        $entity = static::$cv_map->findAll()->current();
+        $value = new Type\TsRange(new \DateTime('2012-08-20'), new \DateTime('2012-09-01'), true);
+        $entity['some_tsrange'] = $value;
+
+        static::$cv_map->updateOne($entity, array('some_tsrange'));
+
+        $this->assertInstanceOf('\Pomm\Type\TsRange', $entity['some_tsrange'], "'some_tsrange' is a 'TsRange' type.");
+        $this->assertEquals($value->start->format('U'), $entity['some_tsrange']->start->format('U'), "Timestamps are equal.");
+
+        $entity['arr_tsrange'] = array($value, new Type\TsRange(new \DateTime('2012-12-21'), new \DateTime('2012-12-21 12:21:59')));
+
+        static::$cv_map->updateOne($entity, array('some_tsrange', 'arr_tsrange'));
+
+        $this->assertEquals(2, count($entity['arr_tsrange']), "There are 2 elements in the array.");
+        $this->assertInstanceOf('\Pomm\Type\TsRange', $entity['arr_tsrange'][1], "'arr_tsrange' element 1 is a 'TsRange' type.");
+        $this->assertEquals(44519, $entity['arr_tsrange'][1]->end->format('U') - $entity['arr_tsrange'][1]->start->format('U'), "Range is preserved.");
+
+        return $entity;
+    }
 
     public function testSuperConverter()
     {
