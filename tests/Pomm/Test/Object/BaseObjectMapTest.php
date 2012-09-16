@@ -70,6 +70,9 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue((boolean) ($another_entity->_getStatus() & BaseObject::EXIST), "Object now exists in database.");
         $this->assertEquals('more plop', $another_entity['some_data'], "'some_data' is unchanged.");
 
+        $this->assertTrue($another_entity->has('ts_data'), "'ts_data' exists even when null.");
+        $this->assertTrue(is_null($another_entity['ts_data']), "'ts_data' is null.");
+
         return $entity;
     }
 
@@ -285,7 +288,7 @@ class BaseEntityMap extends BaseObjectMap
         $sql = sprintf('TRUNCATE TABLE %s', $this->getTableName());
         $this->connection->executeAnonymousQuery($sql);
 
-        $sql = sprintf("INSERT INTO %s (id, name, some_data, ts_data) VALUES (1, 'echo', 'data', '1975-06-29 21:15:43.123456'), (4, 'bravo', 'data', '1978-07-21 09:49:12.123456'), (3, 'charly', 'data', '1986-12-21 18:32:45.123456'), (2, 'dingo', 'data', '1993-06-29 02:45:33.123456'), (5, 'alpha', 'data', '2007-09-08 04:01:00.000000')", $this->getTableName());
+        $sql = sprintf("INSERT INTO %s (id, name, some_data, ts_data) VALUES (1, 'echo', 'data', '1975-06-29 21:15:43.123456'), (4, 'bravo', 'data', null), (3, 'charly', 'data', '1986-12-21 18:32:45.123456'), (2, 'dingo', 'data', '1993-06-29 02:45:33.123456'), (5, 'alpha', 'data', '2007-09-08 04:01:00.000000')", $this->getTableName());
         $this->connection->executeAnonymousQuery($sql);
     }
 }
