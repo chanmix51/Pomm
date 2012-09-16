@@ -49,7 +49,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      * @param String $default  Default value if var does not exist.
      * @return mixed
      */
-    public final function get($var, $default = null)
+    public final function get($var)
     {
         if (is_scalar($var))
         {
@@ -59,7 +59,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
             }
             else
             {
-                return $default;
+                throw new Exception(sprintf("No such key '%s'.", $var));
             }
         }
         elseif (is_array($var))
@@ -79,7 +79,8 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      */
     public final function has($var)
     {
-        return array_key_exists($var, $this->fields);
+        return array_key_exists($var, $this->fields) 
+            || method_exists($this, sprintf("get%s", sfInflector::camelize($var)));
     }
 
     /**

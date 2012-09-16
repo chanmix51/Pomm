@@ -3,6 +3,7 @@
 namespace Pomm\Test\Object;
 
 use Pomm\Object\BaseObject;
+use Pomm\External\sfInflector;
 
 class BaseObjectTest extends \PHPUnit_Framework_TestCase
 {
@@ -60,6 +61,7 @@ class BaseObjectTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getEntities
+     * @expectedException \Pomm\Exception\Exception
      **/
     public function testAccessors(Entity $entity, Array $values)
     {
@@ -69,7 +71,17 @@ class BaseObjectTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($value, $entity[$key], "Array access.");
             $method = 'get'.ucwords($key);
             $this->assertEquals($value, $entity->{$method}(), "Getter access.");
+            $this->assertTrue($entity->has($key), "Key exists");
+            $method = 'has'.sfInflector::camelize($key);
+            $this->assertTrue($entity->{$method}(), "Key exists");
         }
+
+        $this->assertTrue($entity->getPlop(), "'plop' is always true.");
+        $this->assertTrue($entity->hasPlop(), "'plop' always exists.");
+        $this->assertTrue($entity->offsetExists('plop'), "'plop' exists as an array key.");
+        $this->assertTrue(!$entity->has('pika'), "'pika' never exists.");
+
+        $entity->getPika();
     }
 
     /**
@@ -96,4 +108,8 @@ class BaseObjectTest extends \PHPUnit_Framework_TestCase
 
 class Entity extends BaseObject
 {
+    public function getPlop()
+    {
+        return true;
+    }
 }

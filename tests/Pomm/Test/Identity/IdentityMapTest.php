@@ -84,7 +84,7 @@ class IdentityMapTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($entity1 == $entity2, "Instances of the same entity have the same values.");
         $this->assertTrue($entity1 === $entity2, "Instances of the same entity are the same.");
         $this->assertEquals(md5('pika'), $entity2['some_str'], "'some_str' has been kept.");
-        $this->assertTrue(is_null($entity2['created_at']), "'created_at' has NOT been synced from the database.");
+        $this->assertTrue(!$entity2->hasCreatedAt(), "'created_at' has NOT been synced from the database.");
         $this->assertFalse($entity3 === $entity2, "Instances of different entities are different.");
     }
 
