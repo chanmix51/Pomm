@@ -5,6 +5,7 @@ php:
 services: postgresql
 before_script:
   - psql -c 'CREATE DATABASE pomm_test' -U postgres -h 127.0.0.1
+  - psql -c 'CREATE EXTENSION hstore' -U postgres -h 127.0.0.1 pomm_test
 script: phpunit --configuration tests/phpunit.travis.xml
 
 branches;
