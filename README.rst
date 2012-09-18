@@ -6,6 +6,10 @@ POMM: The PHP Object Model Manager for Postgresql
 
 This is the DEVEL branch of Pomm. If you want to use the stable version, please use the 1.0 branch for now. 
 
+
+.. image:: https://secure.travis-ci.org/chanmix51/Pomm.png
+   :target: http://travis-ci.org/#!/chanmix51/Pomm
+
 What is Pomm ?
 **************
 **Pomm** is a *lightweight*, *fast*, *efficient* and *powerful* PHP object manager for the Postgresql relational database. **Pomm is not an ORM**, it is more like an object hydrator above PDO implementing the `identity map <http://en.wikipedia.org/wiki/Identity_map>`_ design pattern and proposing convenient functionalities. Dropping the abstraction layer makes programmers able to take advantage of most of Postgresql's awesome features.
@@ -35,7 +39,7 @@ Once you have designed your database using your favorite tool, Pomm can generate
 
 Lazy hydration and on the fly type conversion
 *********************************************
-`Queries <http://pomm.coolkeums.org/documentation/manual#custom-queries>`_ return `collections <http://pomm.coolkeums.org/documentation/manual#collections>`_ which are scrollable iterators on results. Fetched objects are hydrated on demand for minimal memory consumption and data are `converted <http://pomm.coolkeums.org/documentation/manual#database-and-converters>`_ from/to Postgresql. Boolean in Pg are boolean in PHP, `arrays <http://www.postgresql.org/docs/8.4/static/arrays.html>`_ in Pg are arrays in PHP, `geometric types <http://www.postgresql.org/docs/8.4/static/datatype-geometric.html>`_ are converted into geometric PHP objects. Of course this is extendible and custom database types can be converted into custom PHP classes. Almost all standard and geometric types are supported plus `period <http://temporal.projects.postgresql.org/reference.html>`_, `HStore <http://www.postgresql.org/docs/8.4/static/hstore.html>`_ and `ltree <http://www.postgresql.org/docs/8.4/static/ltree.html>`_ extensions.
+`Queries <http://pomm.coolkeums.org/documentation/manual#custom-queries>`_ return `collections <http://pomm.coolkeums.org/documentation/manual#collections>`_ which are scrollable iterators on results. Fetched objects are hydrated on demand for minimal memory consumption and data are `converted <http://pomm.coolkeums.org/documentation/manual#database-and-converters>`_ from/to Postgresql. Boolean in Pg are boolean in PHP, `arrays <http://www.postgresql.org/docs/8.4/static/arrays.html>`_ in Pg are arrays in PHP, `geometric types <http://www.postgresql.org/docs/8.4/static/datatype-geometric.html>`_ are converted into geometric PHP objects. Of course this is extendible and custom database types can be converted into custom PHP classes. Almost all standard and geometric types are supported plus `range <http://www.postgresql.org/docs/9.2/static/rangetypes.html>`_, `HStore <http://www.postgresql.org/docs/8.4/static/hstore.html>`_ and `ltree <http://www.postgresql.org/docs/8.4/static/ltree.html>`_ extensions.
 
 SQL queries, virtual fields, finders and pagers
 ***********************************************
