@@ -168,6 +168,22 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
     /**
      * @depends testQuery
      **/
+    public function testUpdateByPk(BaseEntity $entity)
+    {
+        $dt = new \DateTime();
+
+        $entity = static::$map->updateByPk($entity->get(static::$map->getPrimaryKey()), array('bool_data' => false, 'ts_data' => $dt));
+
+        $this->assertTrue(!$entity->isModified(), "Object is not marked as modified.");
+        $this->assertTrue(!$entity['bool_data'], "Bool data is false.");
+        $this->assertEquals($dt->format('U'), $entity['ts_data']->format('U'), "Timestamps are equals.");
+
+        return $entity;
+    }
+
+    /**
+     * @depends testUpdateByPk
+     **/
     public function testDelete(BaseEntity $entity)
     {
         static::$map->deleteOne($entity);
