@@ -57,18 +57,18 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
      **/
     public function testSave(BaseEntity $entity)
     {
-        $entity['some_data'] = 'plop';
+        $entity['some data'] = 'plop';
         static::$map->saveOne($entity);
 
         $this->assertTrue((boolean) ($entity->_getStatus() & BaseObject::EXIST), "Object now exists in database.");
         $this->assertFalse($entity->isModified(), "Entity has not been modified since last persist operation.");
         $this->assertEquals(1, $entity['id'], "Entity has an ID.");
-        $this->assertEquals('plop', $entity['some_data'], "'some_data' is unchanged.");
+        $this->assertEquals('plop', $entity['some data'], "'some data' is unchanged.");
         $this->assertFalse($entity['bool_data'], "Bool data has been added.");
 
-        $another_entity = static::$map->createAndSaveObject(Array('some_data' => 'more plop'));
+        $another_entity = static::$map->createAndSaveObject(Array('some data' => 'more plop'));
         $this->assertTrue((boolean) ($another_entity->_getStatus() & BaseObject::EXIST), "Object now exists in database.");
-        $this->assertEquals('more plop', $another_entity['some_data'], "'some_data' is unchanged.");
+        $this->assertEquals('more plop', $another_entity['some data'], "'some data' is unchanged.");
 
         $this->assertTrue($another_entity->has('ts_data'), "'ts_data' exists even when null.");
         $this->assertTrue(is_null($another_entity['ts_data']), "'ts_data' is null.");
@@ -81,13 +81,13 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
      **/
     public function testSaveUpdate(BaseEntity $entity)
     {
-        $entity['some_data'] = 'pika chu';
+        $entity['some data'] = 'pika chu';
         $entity['bool_data'] = true;
         static::$map->saveOne($entity);
         $this->assertTrue((boolean) ($entity->_getStatus() & BaseObject::EXIST), "Object exists in database.");
         $this->assertFalse($entity->isModified(), "Entity has not been modified since last persist operation.");
         $this->assertEquals(1, $entity['id'], "Entity has an ID.");
-        $this->assertEquals('pika chu', $entity['some_data'], "'some_data' has been updated.");
+        $this->assertEquals('pika chu', $entity['some data'], "'some data' has been updated.");
         $this->assertTrue($entity['bool_data'], "'bool_data' has been updated.");
 
         return $entity;
@@ -98,14 +98,14 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
      **/
     public function testUpdate(BaseEntity $entity)
     {
-        $entity['some_data'] = 'some other data';
+        $entity['some data'] = 'some other data';
         $entity['bool_data'] = false;
         $entity['ts_data'] = new \DateTime('2012-09-12 00:09:42.123456');
-        static::$map->updateOne($entity, array('some_data', 'ts_data'));
+        static::$map->updateOne($entity, array('some data', 'ts_data'));
         $this->assertTrue((boolean) ($entity->_getStatus() & BaseObject::EXIST), "Object exists in database.");
         $this->assertFalse($entity->isModified(), "Entity has not been modified since last persist operation.");
         $this->assertEquals(1, $entity['id'], "Entity has an ID.");
-        $this->assertEquals('some other data', $entity['some_data'], "'some_data' has been updated.");
+        $this->assertEquals('some other data', $entity['some data'], "'some data' has been updated.");
         $this->assertTrue($entity['bool_data'], "'bool_data' has been overwritten with database value.");
         $this->assertEquals('2012-09-12 00:09:42.123456', $entity['ts_data']->format('Y-m-d H:i:s.u'), "Timestamp is set.");
 
@@ -117,11 +117,11 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
      **/
     public function testFindWhere(BaseEntity $entity)
     {
-        $test_entity = static::$map->findWhere('some_data = ?', array($entity['some_data']), 'ORDER BY id DESC LIMIT 1')->current();
+        $test_entity = static::$map->findWhere('"some data" = ?', array($entity['some data']), 'ORDER BY id DESC LIMIT 1')->current();
         $this->assertNotSame($entity, $test_entity, "Entities are not the same instance 'check ident mapper'.");
         $this->assertEquals($entity['id'], $test_entity['id'], "Entities have the same id.");
 
-        $test_entity = static::$map->findWhere(Where::create('some_data = ?', array($entity['some_data'])), null, 'ORDER BY id DESC LIMIT 1')->current();
+        $test_entity = static::$map->findWhere(Where::create('"some data" = ?', array($entity['some data'])), null, 'ORDER BY id DESC LIMIT 1')->current();
         $this->assertNotSame($entity, $test_entity, "Entities are not the same instance 'check ident mapper'.");
         $this->assertEquals($entity['id'], $test_entity['id'], "Entities have the same id.");
 
@@ -199,7 +199,7 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
     public function testChangePrimaryKey(BaseEntity $entity)
     {
         static::$map->changeToMultiplePrimaryKey();
-        $entity = static::$map->createAndSaveObject(array('name' => 'plop', 'some_data' => 'plop'));
+        $entity = static::$map->createAndSaveObject(array('name' => 'plop', 'some data' => 'plop'));
 
         $this->assertEquals(array('id' => 3, 'name' => 'plop'), $entity->get(static::$map->getPrimaryKey()), "Primary key is retrieved.");
 
@@ -209,10 +209,10 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($entity['bool_data'], "'bool_data' is updated.");
         $this->assertEquals(array('id' => 3, 'name' => 'plop'), $entity->get(static::$map->getPrimaryKey()), "Primary key has not changed.");
 
-        $entity['some_data'] = 'other data';
-        static::$map->updateOne($entity, array('some_data'));
+        $entity['some data'] = 'other data';
+        static::$map->updateOne($entity, array('some data'));
 
-        $this->assertEquals('other data', $entity['some_data'], "'some_data' has been updated.");
+        $this->assertEquals('other data', $entity['some data'], "'some data' has been updated.");
 
         static::$map->deleteOne($entity);
         $this->assertTrue(is_null(static::$map->findByPk($entity->get(static::$map->getPrimaryKey()))), "Object does not exist in the DB anymore.");
@@ -249,7 +249,7 @@ class BaseEntityMap extends BaseObjectMap
         $this->object_class =  'Pomm\Test\Object\BaseEntity';
         $this->object_name  =  'pomm_test.base_entity';
         $this->addField('id', 'int4');
-        $this->addField('some_data', 'varchar');
+        $this->addField('some data', 'varchar');
         $this->addField('bool_data', 'bool');
         $this->addField('ts_data', 'timestamp');
         $this->pk_fields    = array('id');
@@ -261,7 +261,7 @@ class BaseEntityMap extends BaseObjectMap
             $this->connection->begin();
             $sql = "CREATE SCHEMA pomm_test";
             $this->connection->executeAnonymousQuery($sql);
-            $sql = sprintf("CREATE TABLE %s (id serial PRIMARY KEY, some_data varchar NOT NULL, bool_data boolean NOT NULL DEFAULT false, ts_data timestamp)", $this->getTableName());
+            $sql = sprintf("CREATE TABLE %s (id serial PRIMARY KEY, \"some data\" varchar NOT NULL, bool_data boolean NOT NULL DEFAULT false, ts_data timestamp)", $this->getTableName());
             $this->connection->executeAnonymousQuery($sql);
             $this->connection->commit();
         } catch (Exception $e) {
@@ -304,7 +304,7 @@ class BaseEntityMap extends BaseObjectMap
         $sql = sprintf('TRUNCATE TABLE %s', $this->getTableName());
         $this->connection->executeAnonymousQuery($sql);
 
-        $sql = sprintf("INSERT INTO %s (id, name, some_data, ts_data) VALUES (1, 'echo', 'data', '1975-06-29 21:15:43.123456'), (4, 'bravo', 'data', null), (3, 'charly', 'data', '1986-12-21 18:32:45.123456'), (2, 'dingo', 'data', '1993-06-29 02:45:33.123456'), (5, 'alpha', 'data', '2007-09-08 04:01:00.000000')", $this->getTableName());
+        $sql = sprintf("INSERT INTO %s (id, name, \"some data\", ts_data) VALUES (1, 'echo', 'data', '1975-06-29 21:15:43.123456'), (4, 'bravo', 'data', null), (3, 'charly', 'data', '1986-12-21 18:32:45.123456'), (2, 'dingo', 'data', '1993-06-29 02:45:33.123456'), (5, 'alpha', 'data', '2007-09-08 04:01:00.000000')", $this->getTableName());
         $this->connection->executeAnonymousQuery($sql);
     }
 }

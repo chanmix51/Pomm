@@ -390,7 +390,7 @@ abstract class BaseObjectMap
         $where = $this->createSqlAndFrom($pk);
         $sql  = sprintf("UPDATE %s SET %s WHERE %s RETURNING %s",
             $this->getTableName(),
-            join(', ', array_map(function($key, $value) { return sprintf("%s = %s", $key, $value); }, array_keys($values), $this->convertToPg($values))),
+            join(', ', array_map(function($key, $value) { return sprintf("\"%s\" = %s", $key, $value); }, array_keys($values), $this->convertToPg($values))),
             (string) $where,
             $this->joinSelectFieldsWithAlias()
         );
@@ -436,7 +436,7 @@ abstract class BaseObjectMap
         else
         {
             $pg_values = $this->convertToPg($object->extract());
-            $sql = sprintf('INSERT INTO %s (%s) VALUES (%s) RETURNING %s;', $this->object_name, join(',', array_keys($pg_values)), join(',', array_values($pg_values)), $this->joinSelectFieldsWithAlias());
+            $sql = sprintf('INSERT INTO %s (%s) VALUES (%s) RETURNING %s;', $this->object_name, join(',', array_map(function($val) { return sprintf('"%s"', $val); }, array_keys($pg_values))), join(',', array_values($pg_values)), $this->joinSelectFieldsWithAlias());
 
             $collection = $this->query($sql, array());
         }
@@ -483,11 +483,16 @@ abstract class BaseObjectMap
         $updates = array();
         foreach($this->convertToPg($values) as $field => $value)
         {
-            $updates[] = sprintf("%s = %s", $field, $value);
+            $updates[] = sprintf("\"%s\" = %s", $field, $value);
         }
 
 
-        $sql = sprintf("UPDATE %s SET %s WHERE %s RETURNING %s;", $this->object_name, join(', ', $updates), $this->createSqlAndFrom($object->get($this->getPrimaryKey())), $this->joinSelectFieldsWithAlias());
+        $sql = sprintf("UPDATE %s SET %s WHERE %s RETURNING %s;", 
+            $this->object_name, 
+            join(', ', $updates), 
+            $this->createSqlAndFrom($object->get($this->getPrimaryKey())),
+            $this->joinSelectFieldsWithAlias()
+        );
         $collection = $this->query($sql, array_values($object->get($this->getPrimaryKey())));
 
         if ($collection->count())
@@ -563,7 +568,7 @@ abstract class BaseObjectMap
 
         foreach ($this->field_definitions as $name => $type)
         {
-            $fields[$name] = sprintf("%s%s", $alias, $name);
+            $fields[$name] = sprintf("%s\"%s\"", $alias, $name);
         }
 
         return $fields;
@@ -581,7 +586,7 @@ abstract class BaseObjectMap
     {
         $fields = $this->getSelectFields($alias);
 
-        return join(', ', array_map(function($name, $alias) { return sprintf("%s AS %s", $name, $alias); }, $fields, array_keys($fields)));
+        return join(', ', array_map(function($name, $alias) { return sprintf("%s AS \"%s\"", $name, $alias); }, $fields, array_keys($fields)));
     }
 
     /**
@@ -850,7 +855,7 @@ abstract class BaseObjectMap
         foreach ($this->convertToPg($object->extract()) as $field_name => $field_value)
         {
             if (array_key_exists($field_name, array_flip($this->getPrimaryKey()))) continue;
-            $tmp[] = sprintf('%s=%s', $field_name, $field_value);
+            $tmp[] = sprintf('"%s"=%s', $field_name, $field_value);
         }
 
         return implode(',', $tmp);
