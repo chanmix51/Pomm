@@ -9,6 +9,6 @@ before_script:
   - psql -c 'CREATE EXTENSION ltree' -U postgres -h 127.0.0.1 pomm_test
 script: phpunit --configuration tests/phpunit.travis.xml
 
-branches;
+branches:
   only:
     - master
