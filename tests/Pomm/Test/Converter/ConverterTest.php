@@ -123,7 +123,11 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
     {
         static::$cv_map->alterDate();
         $entity = static::$cv_map->findAll()->current();
-        $values = array('some_ts' => '2012-06-20 18:34:16.640044', 'some_intv' => '30 days', 'arr_ts' => array('2015-06-08 03:54:08.880287', '1994-12-16 21:23:50.224208', '1941-02-18 17:29:52.216309'));
+        $values = array(
+            'some_ts' => '2012-06-20 18:34:16.640044',
+            'some_intv' => '37 years 3 months 7 days 2 hours 14 minutes 46 seconds',
+            'arr_ts' => array('2015-06-08 03:54:08.880287', '1994-12-16 21:23:50.224208', '1941-02-18 17:29:52.216309')
+        );
 
         $entity->hydrate($values);
         static::$cv_map->saveOne($entity);
@@ -131,7 +135,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\DateTime', $entity['some_ts'], "'some_ts' is a \DateTime instance.");
         $this->assertEquals( '2012-06-20 18:34:16.640044', $entity['some_ts']->format('Y-m-d H:i:s.u'), "Timestamp is preserved.");
         $this->assertInstanceOf('\DateInterval', $entity['some_intv'], "'some_intv' is a \DateInterval instance.");
-        $this->assertEquals('30', $entity['some_intv']->format('%d'), "'some_intv' has 30 days.");
+        $this->assertEquals('37 years 3 mons 7 days 02:14:46', $entity['some_intv']->format("%y years %m mons %d days %H:%i:%s"), "'some_intv' is '37 years 3 mons 7 days 02:14:46'.");
         $this->assertEquals(3, count($entity['arr_ts']), "'arr_ts' is an array of 3 elements.");
         $this->assertInstanceOf('\DateTime', $entity['arr_ts'][2], "Third element of 'arr_ts' is a DateTime instance.");
         $this->assertEquals('1941-02-18 17:29:52.216309', $entity['arr_ts'][2]->format('Y-m-d H:i:s.u'), "Array timestamp is preserved.");

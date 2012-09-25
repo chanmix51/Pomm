@@ -21,7 +21,7 @@ class PgInterval implements ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {
-        if (!preg_match("/(?:([0-9]+) year ?)?(?:([0-9]+) mons ?)?(?:([0-9]+) days ?)?(?:([1-9]{1,2}):([0-9]{1,2}):([0-9\.]+))?/", $data, $matchs))
+        if (!preg_match("/(?:([0-9]+) years ?)?(?:([0-9]+) mons ?)?(?:([0-9]+) days ?)?(?:([0-9]{1,2}):([0-9]{1,2}):([0-9]+))?/", $data, $matchs))
         {
             throw new Exception(sprintf("Data '%s' is not a pg interval representation.", $data));
         }
@@ -47,7 +47,6 @@ class PgInterval implements ConverterInterface
             $data = \DateInterval::createFromDateString($data);
         }
 
-
-        return sprintf("interval '%s'", $data->format('%y year %m mon %d day %H:%I:%S'));
+        return sprintf("interval '%s'", $data->format('%Y years %M months %D days %H:%i:%S'));
     }
 }
