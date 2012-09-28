@@ -52,6 +52,6 @@ class PgTsRange implements ConverterInterface
             throw new Exception(sprintf("PgTsRange converter expects 'TsRange' data to convert. '%s' given.", gettype($data)));
         }
 
-        return sprintf("tsrange '%s'", (string) $data);
+        return sprintf("%s '%s\"%s\", \"%s\"%s'", $type, $data->start_included ? '[' : '(', $data->start->format('Y-m-d H:i:s.u'), $data->end->format('Y-m-d H:i:s.u'), $data->end_included ? ']' : ')');
     }
 }
