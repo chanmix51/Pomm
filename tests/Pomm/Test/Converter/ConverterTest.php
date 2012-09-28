@@ -400,6 +400,38 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         return $entity;
     }
 
+    public function testNumberRangeConverter()
+    {
+        if (static::$cv_map->alterNumberRange() === false)
+        {
+            $this->markTestSkipped("Range types could not be found, maybe Postgres version < 9.2. Tests skipped.");
+
+            return;
+        }
+
+        $entity = static::$cv_map->findAll()->current();
+
+        $entity['some_int4range'] = new Type\NumberRange(-5, 45, true, false);
+        $entity['some_int8range'] = new Type\NumberRange(4452940833, 4553946490);
+        $entity['some_numrange']  = new Type\NumberRange(29.76607095, 30.44125206, false, false);
+        $entity['arr_numrange']   = array(new Type\NumberRange(1.1, 1.2), new Type\NumberRange(2.2, 2.4, true, false), new Type\NumberRange(3.3, 3.6, false, false));
+
+        static::$cv_map->updateOne($entity, array('some_int8range', 'some_int4range', 'some_numrange', 'arr_numrange'));
+
+        $this->assertEquals(new Type\NumberRange(-5, 45, true, false), $entity['some_int4range'], "Int4range is ok.");
+        $this->assertEquals(new Type\NumberRange(4452940834, 4553946490, true), $entity->getSomeInt8range(), "Int8range is ok.");
+        $this->assertEquals(new Type\NumberRange(29.76607095, 30.44125206, false, false), $entity['some_numrange'], "Numrange is ok.");
+        $this->assertTrue(is_array($entity['arr_numrange']), "'arr_numrange' is an array.");
+
+        for($x = 1; $x <= count($entity['arr_numrange']); $x++)
+        {
+            $range = $entity['arr_numrange'][$x - 1];
+            $this->assertInstanceOf('\Pomm\Type\NumberRange', $range, "Instance 'NumberRange'.");
+            $this->assertEquals((float) $x * 1.1, $range->start, "Range start is ok.");
+            $this->assertEquals((float) $x * 1.2, $range->end, "Range en is ok.");
+        }
+    }
+
     public function testSuperConverter()
     {
         $entity = static::$cv_map->findAll()->current();
@@ -600,11 +632,17 @@ class ConverterEntityMap extends BaseObjectMap
         }
 
         $this->alterTable(array('some_json' => 'json'));
-
-        $this->connection->getDatabase()
-            ->registerTypeForConverter('json', 'String');
     }
 
+    public function alterNumberRange()
+    {
+        if ($schema = $this->checkType('numrange') === false)
+        {
+            return false;
+        }
+
+        $this->alterTable(array('some_int4range' => 'int4range', 'some_int8range' => 'int8range', 'some_numrange' => 'numrange', 'arr_numrange' => 'numrange[]'));
+    }
 }
 
 class ConverterEntity extends BaseObject

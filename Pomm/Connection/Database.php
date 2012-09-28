@@ -241,6 +241,7 @@ class Database
         $this->registerConverter('Timestamp', new Converter\PgTimestamp(), array('timestamp', 'date', 'time'));
         $this->registerConverter('Interval', new Converter\PgInterval(), array('interval'));
         $this->registerConverter('Binary', new Converter\PgBytea(), array('bytea'));
+        $this->registerConverter('NumberRange', new Converter\PgNumberRange(), array('int4range', 'int8range', 'numrange'));
     }
 
     /**
