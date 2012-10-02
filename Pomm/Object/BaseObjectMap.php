@@ -592,26 +592,21 @@ abstract class BaseObjectMap
     /**
      * getRemoteSelectFields
      *
-     * Return the select fields formatted as table{%s} for use with 
+     * Return the select fields aliased as table{%s} for use with 
      * createFromForeign filter.
      *
-     * @deprecated
      * @param String $alias Optional alias prefix.
      * @return Array $fields
      **/
     public function getRemoteSelectFields($alias = null)
     {
-        $fields = $this->getSelectFields();
-        $alias = is_null($alias) ? '' : sprintf("%s.", $alias);
-        $table = $this->getTableName();
-        $table = strpos($table, '.') ? substr(strstr($table, '.'), 1) : $table;
+        $fields = array();
+        foreach ($this->getSelectFields($alias) as $field_alias => $field_name)
+        {
+            $fields[sprintf("%s{%s}", $this->getTableName(), $field_alias)] = $field_name;
+        }
 
-        return array_map(function($field) use ($table, $alias) { 
-            return sprintf('%s AS "%s{%s}"', 
-                $alias.$field,
-                $table,
-                $field
-            ); }, $fields);
+        return $fields;
     }
 
     /**
@@ -621,7 +616,6 @@ abstract class BaseObjectMap
      * and set it in the values with the table name as key. All the values used 
      * to hydrate the object are removed from the array.
      *
-     * @deprecated
      * @param Array $@old_values
      * @return Array 
      **/

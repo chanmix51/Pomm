@@ -2,11 +2,6 @@
 POMM: The PHP Object Model Manager for Postgresql
 =================================================
 
-**Important** 
-
-This is the DEVEL branch of Pomm. If you want to use the stable version, please use the 1.0 branch for now. 
-
-
 .. image:: https://secure.travis-ci.org/chanmix51/Pomm.png
    :target: http://travis-ci.org/#!/chanmix51/Pomm
 
@@ -93,7 +88,7 @@ How to contribute to Pomm ?
 
 That's very easy with github:
 
-* Send feedback to `@chanmix51 <https://twitter.com/#!/chanmix51>`_ on twitter or by mail at <hubert DOT greg AT gmail DOT com>
+* Send feedback to `@PommProject <https://twitter.com/#!/PommProject>`_ on twitter or by mail at <hubert DOT greg AT gmail DOT com>
 * Report bugs (very appreciated)
 * Fork and PR (very very appreciated)
-* Send vacuum tubes to the author (actual preferred are russian 6Φ12Π)
+* Send vacuum tubes to the author (actual preferred are russians 6Φ12Π, 6Ж43Π, 6Ж38Π, 6C19Π)

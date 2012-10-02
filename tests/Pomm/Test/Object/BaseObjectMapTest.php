@@ -194,6 +194,16 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @depends testUpdateByPk
+     **/
+    public function testGetRemoteSelectFields()
+    {
+        $fields = static::$map->getRemoteSelectFields('plop');
+        $fields = join(', ', array_map(function($alias, $field) { return sprintf('%s AS "%s"', $field, $alias); }, array_keys($fields), $fields));
+        $this->assertEquals('plop."id" AS "pomm_test.base_entity{id}", plop."some data" AS "pomm_test.base_entity{some data}", plop."bool_data" AS "pomm_test.base_entity{bool_data}", plop."ts_data" AS "pomm_test.base_entity{ts_data}"', $fields, "Remote fields are ok");
+    }
+
+    /**
      * @depends testDelete
      **/
     public function testChangePrimaryKey(BaseEntity $entity)
