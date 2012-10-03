@@ -2,7 +2,7 @@
 
 namespace Pomm\Object;
 
-use Pomm\Exception\Exception;
+use \Pomm\Exception\Exception;
 
 /**
  * Collection 

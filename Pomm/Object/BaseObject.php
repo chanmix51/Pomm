@@ -2,8 +2,8 @@
 
 namespace Pomm\Object;
 
-use Pomm\Exception\Exception;
-use Pomm\External\sfInflector;
+use \Pomm\Exception\Exception;
+use \Pomm\External\sfInflector;
 
 /**
  * BaseObject - Parent for entity classes
