@@ -1,11 +1,11 @@
 <?php
 namespace Pomm\Object;
 
-use Pomm\Exception\Exception;
-use Pomm\Exception\SqlException;
-use Pomm\Query\Where;
-use Pomm\Connection\Connection;
-use Pomm\Type as Type;
+use \Pomm\Exception\Exception;
+use \Pomm\Exception\SqlException;
+use \Pomm\Query\Where;
+use \Pomm\Connection\Connection;
+use \Pomm\Type as Type;
 
 /**
  * BaseObjectMap 
@@ -81,7 +81,7 @@ abstract class BaseObjectMap
      * Return a new instance of the corresponding model class.
      * 
      * @param Array $values     Optional starting values.
-     * @return BaseObject
+     * @return \Pomm\Object\BaseObject
      */
     public function createObject(Array $values = null)
     {
@@ -125,9 +125,9 @@ abstract class BaseObjectMap
      * __construct 
      *
      * This constructor is intended to be used by
-     * Pomm\Connection\Connection::getMapFor($class_name) to chain calls.
+     * \Pomm\Connection\Connection::getMapFor($class_name) to chain calls.
      *
-     * @param Pomm\Connection\Connection $connection 
+     * @param \Pomm\Connection\Connection $connection 
      */
     public function __construct(Connection $connection)
     {
@@ -169,7 +169,7 @@ abstract class BaseObjectMap
      * 
      * @param String  $sql    SQL statement.
      * @param Array  $values Optional parameters for the prepared query.
-     * @return Pomm\Object\Collection
+     * @return \Pomm\Object\Collection
      */
     public function query($sql, $values = array())
     {
@@ -183,7 +183,7 @@ abstract class BaseObjectMap
      * 
      * @access protected
      * @param array $values 
-     * @return Pomm\Query\Where
+     * @return \Pomm\Query\Where
      */
     protected function createSqlAndFrom($values)
     {
@@ -199,11 +199,11 @@ abstract class BaseObjectMap
     /**
      * createCollectionFromStatement
      *
-     * Creates a Pomm\Object\Collection instance from a PDOStatement.
+     * Creates a \Pomm\Object\Collection instance from a PDOStatement.
      * 
      * @access protected
      * @param PDOStatement $stmt 
-     * @return Pomm\Object\Collection
+     * @return \Pomm\Object\Collection
      */
     protected function createCollectionFromStatement(\PDOStatement $stmt)
     {
@@ -215,7 +215,7 @@ abstract class BaseObjectMap
      *
      * The simplest query on a table.
      * 
-     * @return Pomm\Object\Collection
+     * @return \Pomm\Object\Collection
      */
     public function findAll()
     {
@@ -230,7 +230,7 @@ abstract class BaseObjectMap
      * @see BaseObject::findWhere()
      * @see BaseObject::paginateFindWhere()
      * @access protected
-     * @param Mixed  $where   Can be a String or Pomm\Query\Where instance.
+     * @param Mixed  $where   Can be a String or \Pomm\Query\Where instance.
      * @param String $suffix  ORDER BY, LIMIT etc.
      * @return String   The SQL query.
      **/
@@ -254,7 +254,7 @@ abstract class BaseObjectMap
      * @param String $where 
      * @param Array  $values 
      * @param String $suffix
-     * @return Pomm\Object\Collection
+     * @return \Pomm\Object\Collection
      */
     public function findWhere($where, $values = array(), $suffix = null)
     {
@@ -266,7 +266,7 @@ abstract class BaseObjectMap
             }
             else
             {
-                throw new Exception(sprintf("findWhere expects a Pomm\\Query\\Where instance, '%s' given.", get_class($where)));
+                throw new Exception(sprintf("findWhere expects a \\Pomm\\Query\\Where instance, '%s' given.", get_class($where)));
             }
         }
 
@@ -291,7 +291,7 @@ abstract class BaseObjectMap
      * Retrieve the corresponing entity from the database if it exists.
      *
      * @param Array $values Key value of the PK.
-     * @return Pomm\Object\BaseObject
+     * @return \Pomm\Object\BaseObject
      */
     public function findByPk(Array $values)
     {
@@ -433,7 +433,7 @@ abstract class BaseObjectMap
      * exception.
      *
      * @access protected
-     * @param Pomm\Object\BaseObject $object 
+     * @param \Pomm\Object\BaseObject $object 
      * @param String                 $message  Will be set in the Exception.
      * @access protected
      */
@@ -451,7 +451,7 @@ abstract class BaseObjectMap
      * Delete a record from the database given the PK.
      * 
      * @param Array $pk 
-     * @return Pomm\Object\Collection
+     * @return \Pomm\Object\Collection
      */
     public function deleteByPk(Array $pk)
     {
@@ -465,8 +465,8 @@ abstract class BaseObjectMap
      *
      * Use this to insert or update an object.
      *
-     * @param Pomm\Object\BaseObject $object 
-     * @return Pomm\Object\BaseObject Saved instance.
+     * @param \Pomm\Object\BaseObject $object 
+     * @return \Pomm\Object\BaseObject Saved instance.
      */
     public function saveOne(BaseObject &$object)
     {
@@ -501,9 +501,9 @@ abstract class BaseObjectMap
      * Because this can trigger other changes in the database, the object is 
      * reloaded and all other changes are discarded.
      *
-     * @param Pomm\Object\BaseObject $object
+     * @param \Pomm\Object\BaseObject $object
      * @param Array                  $fields Only these fields will be updated.
-     * @return Pomm\Object\BaseObject 
+     * @return \Pomm\Object\BaseObject 
      **/
     public function updateOne(BaseObject &$object, Array $fields)
     {
@@ -549,7 +549,7 @@ abstract class BaseObjectMap
      * Format the converted values for UPDATE query.
      * 
      * @access protected
-     * @param  Pomm\Object\BaseObject $object 
+     * @param  \Pomm\Object\BaseObject $object 
      * @return String
      */
     protected function parseForUpdate($object)
@@ -598,8 +598,8 @@ abstract class BaseObjectMap
      *
      * Delete the record tied with the given entity.
      * 
-     * @param Pomm\Object\BaseObject $object 
-     * @return Pomm\Object\BaseObject 
+     * @param \Pomm\Object\BaseObject $object 
+     * @return \Pomm\Object\BaseObject 
      */
     public function deleteOne(BaseObject &$object)
     {
@@ -619,7 +619,7 @@ abstract class BaseObjectMap
      * When grouping by all fields, this returns the fields with 
      * the given alias (default null).
      *
-     * @see Pomm\Object\BaseObjectMap::getField()
+     * @see \Pomm\Object\BaseObjectMap::getField()
      * @param String $alias Optional table alias prefix.
      * @return Array fields to be grouped.
      **/
@@ -634,7 +634,7 @@ abstract class BaseObjectMap
      * Get the list of fields to SELECT.
      * When selecting all fields, this is better than *.
      *
-     * @see Pomm\Object\BaseObjectMap::getField()
+     * @see \Pomm\Object\BaseObjectMap::getField()
      * @param String $alias the table alias in the query.
      * @return Array
      **/
@@ -732,7 +732,7 @@ abstract class BaseObjectMap
      * @param Array   $values    query parameters.
      * @param Integer $items_per_page
      * @param Integer $page      page index.
-     * @return Pomm\Object\Pager
+     * @return \Pomm\Object\Pager
      **/
     public function paginateQuery($sql, $sql_count, $values, $items_per_page, $page = 1)
     {
@@ -764,7 +764,7 @@ abstract class BaseObjectMap
      * @param String   $suffix   Order by.
      * @param Integer  $items_per_page
      * @param Integer  $page     Page index.
-     * @return Pomm\Object\Pager
+     * @return \Pomm\Object\Pager
      **/
     public function paginateFindWhere($where, $values, $suffix, $items_per_page, $page = 1)
     {
@@ -776,7 +776,7 @@ abstract class BaseObjectMap
             }
             else
             {
-                throw new Exception(sprintf("findWhere expects a Pomm\\Query\\Where instance, '%s' given.", get_class($where)));
+                throw new Exception(sprintf("findWhere expects a \\Pomm\\Query\\Where instance, '%s' given.", get_class($where)));
             }
         }
 

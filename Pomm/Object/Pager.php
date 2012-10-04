@@ -2,7 +2,7 @@
 
 namespace Pomm\Object;
 
-use Pomm\Exception\Exception;
+use \Pomm\Exception\Exception;
 
 /**
  * Pager 
@@ -41,7 +41,7 @@ class Pager
      *
      * Return the Pager's collection.
      *
-     * @return Pomm\Object\Collection
+     * @return \Pomm\Object\Collection
      **/
     public function getCollection()
     {
