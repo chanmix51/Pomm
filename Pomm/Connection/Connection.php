@@ -32,6 +32,7 @@ class Connection
     protected $in_transaction = false;
     protected $identity_mapper;
     protected $query_filter_chain;
+    protected $maps = array();
 
     /**
      * __construct()
@@ -137,15 +138,20 @@ class Connection
      * Returns a Map instance of the given model name.
      * 
      * @param  String $class The fully qualified class name of the associated entity.
+     * @param  Bool   $force Force the creation of a new Map instance.
      * @access public
-     * @return BaseObjectMap
+     * @return \Pomm\Object\BaseObjectMap
      */
-    public function getMapFor($class)
+    public function getMapFor($class, $force = false)
     {
         $class_name = $class.'Map';
-        $object = new $class_name($this);
 
-        return $object;
+        if ($force === true or !array_key_exists($class_name, $this->maps))
+        {
+            $this->maps[$class] = new $class_name($this);
+        }
+
+        return $this->maps[$class];
     }
 
     /**
