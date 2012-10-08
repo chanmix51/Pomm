@@ -286,7 +286,7 @@ abstract class BaseObjectMap
      */
     public function findAll($suffix = '')
     {
-        return $this->query(sprintf('SELECT %s FROM %s %s;', $this->joinSelectFieldsWithAlias(), $this->object_name, $suffix), array());
+        return $this->query(sprintf('SELECT %s FROM %s %s;', $this->formatFieldsWithAlias('getSelectFields'), $this->object_name, $suffix), array());
     }
 
     /**
@@ -392,7 +392,7 @@ abstract class BaseObjectMap
             $this->getTableName(),
             join(', ', array_map(function($key, $value) { return sprintf("\"%s\" = %s", $key, $value); }, array_keys($values), $this->convertToPg($values))),
             (string) $where,
-            $this->joinSelectFieldsWithAlias()
+            $this->formatFieldsWithAlias('getSelectFields')
         );
 
         return $this
@@ -410,7 +410,7 @@ abstract class BaseObjectMap
      */
     public function deleteByPk(Array $pk)
     {
-        $sql = sprintf('DELETE FROM %s WHERE %s RETURNING %s', $this->object_name, $this->createSqlAndFrom($pk), $this->joinSelectFieldsWithAlias());
+        $sql = sprintf('DELETE FROM %s WHERE %s RETURNING %s', $this->object_name, $this->createSqlAndFrom($pk), $this->formatFieldsWithAlias('getSelectFields'));
 
         return $this->query($sql, array_values($pk));
     }
@@ -429,14 +429,14 @@ abstract class BaseObjectMap
 
         if ($object->_getStatus() & BaseObject::EXIST)
         {
-            $sql = sprintf('UPDATE %s SET %s WHERE %s RETURNING %s;', $this->object_name, $this->parseForUpdate($object), $this->createSqlAndFrom($object->get($this->getPrimaryKey())), $this->joinSelectFieldsWithAlias());
+            $sql = sprintf('UPDATE %s SET %s WHERE %s RETURNING %s;', $this->object_name, $this->parseForUpdate($object), $this->createSqlAndFrom($object->get($this->getPrimaryKey())), $this->formatFieldsWithAlias('getSelectFields'));
 
             $collection = $this->query($sql, array_values($object->get($this->getPrimaryKey())));
         }
         else
         {
             $pg_values = $this->convertToPg($object->extract());
-            $sql = sprintf('INSERT INTO %s (%s) VALUES (%s) RETURNING %s;', $this->object_name, join(',', array_map(function($val) { return sprintf('"%s"', $val); }, array_keys($pg_values))), join(',', array_values($pg_values)), $this->joinSelectFieldsWithAlias());
+            $sql = sprintf('INSERT INTO %s (%s) VALUES (%s) RETURNING %s;', $this->object_name, join(',', array_map(function($val) { return sprintf('"%s"', $val); }, array_keys($pg_values))), join(',', array_values($pg_values)), $this->formatFieldsWithAlias('getSelectFields'));
 
             $collection = $this->query($sql, array());
         }
@@ -491,7 +491,7 @@ abstract class BaseObjectMap
             $this->object_name, 
             join(', ', $updates), 
             $this->createSqlAndFrom($object->get($this->getPrimaryKey())),
-            $this->joinSelectFieldsWithAlias()
+            $this->formatFieldsWithAlias('getSelectFields')
         );
         $collection = $this->query($sql, array_values($object->get($this->getPrimaryKey())));
 
@@ -575,18 +575,43 @@ abstract class BaseObjectMap
     }
 
     /**
-     * joinSelectFieldsWithAlias
+     * formatFieldsWithAlias
      *
-     * This is used when queries need to format fields aliases.
+     * This is used when queries need to format fields with column aliases.
      * 
+     * @param String This current map's getFields() method name.
      * @param String Optionnal table alias.
      * @return String
      **/
-    public function joinSelectFieldsWithAlias($alias = null)
+    public function formatFieldsWithAlias($field_method, $table_alias = null)
     {
-        $fields = $this->getSelectFields($alias);
+        if (!method_exists($this, $field_method))
+        {
+            throw new Exception(sprintf("'%s' method does not exist.", $field_method));
+        }
 
-        return join(', ', array_map(function($name, $alias) { return sprintf("%s AS \"%s\"", $name, $alias); }, $fields, array_keys($fields)));
+        $fields = call_user_func(array($this, $field_method), $table_alias);
+
+        return join(', ', array_map(function($name, $table_alias) { return sprintf("%s AS \"%s\"", $name, $table_alias); }, $fields, array_keys($fields)));
+    }
+
+    /**
+     * formatFields
+     *
+     * This is used when queries need formatted fields with no column alias.
+     *
+     * @param String This current map's getFields() method name.
+     * @param String Optionnal table alias.
+     * @return String
+     **/
+    public function formatFields($field_method, $table_alias = null)
+    {
+        if (!method_exists($this, $field_method))
+        {
+            throw new Exception(sprintf("'%s' method does not exist.", $field_method));
+        }
+
+        return join(', ', call_user_func(array($this, $field_method), $table_alias));
     }
 
     /**
@@ -823,7 +848,7 @@ abstract class BaseObjectMap
      **/
     protected function generateSqlForWhere($where, $suffix = null)
     {
-        $sql = sprintf('SELECT %s FROM %s WHERE %s', $this->joinSelectFieldsWithAlias(), $this->object_name, $where); 
+        $sql = sprintf('SELECT %s FROM %s WHERE %s', $this->formatFieldsWithAlias('getSelectFields'), $this->object_name, $where); 
 
         if (!is_null($suffix)) 
         {
