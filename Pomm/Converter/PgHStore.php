@@ -23,9 +23,10 @@ class PgHStore implements ConverterInterface
         $split = preg_split('/[,\s]*"([^"]+)"[,\s]*|[,=>\s]+/', $data, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
         $hstore = array();
 
-        for ($index = 0; $index < count($split); $index = $index + 2)
+        for ($index = 0; $index < count($split) - 1; $index = $index + 2)
         {
-            $hstore[$split[$index]] = $split[$index + 1] != 'NULL' ? $split[$index + 1] : null;
+            $hstore[$split[$index]] = 
+                $split[$index + 1] != 'NULL' ? $split[$index + 1] : null;
         }
 
         return $hstore;
