@@ -70,7 +70,7 @@ class PgEntity implements ConverterInterface
         $fields = array();
         foreach ($this->map->getFieldDefinitions() as $field_name => $pg_type)
         {
-            $fields[$field_name] = array_shift($elts);
+            $fields[$field_name] = stripcslashes(array_shift($elts));
         }
 
         if (count($elts) > 0)
