@@ -83,8 +83,7 @@ class PgEntity implements ConverterInterface
             $fields['_extra'] = $elts;
         }
 
-        $object = $map->createObject($map->convertFromPg($fields));
-        $object->_setStatus(\Pomm\Object\BaseObject::EXIST);
+        $object = $map->createObjectFromPg($fields);
 
         return $object;
     }

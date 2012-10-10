@@ -120,8 +120,8 @@ class Database
      *
      * Opens a new connection to the database
      * @access public
-     * @param  IdentityMapperInterface $mapper An optional instance of a data mapper.
-     * @return Connection
+     * @param  \Pomm\Identity\IdentityMapperInterface $mapper An optional instance of a data mapper.
+     * @return \Pomm\Connection\Connection
      **/
     public function createConnection(\Pomm\Identity\IdentityMapperInterface $mapper = null)
     {
@@ -146,9 +146,9 @@ class Database
      * Register a new converter
      * @access public
      * @param  String             $name      The name of the converter.
-     * @param  ConverterInterface $converter A converter instance.
+     * @param  \Pomm\Converter\ConverterInterface $converter A converter instance.
      * @param  Array              $pg_types  An array of the mapped postgresql's types.
-     * @return Pomm\Connection\Database
+     * @return \Pomm\Connection\Database
      **/
     public function registerConverter($name, Converter\ConverterInterface $converter, Array $pg_types)
     {
@@ -169,7 +169,7 @@ class Database
      *
      * @access public
      * @param  string $name       Converter desgination.
-     * @return ConverterInterface Converter instance.
+     * @return \Pomm\Converter\ConverterInterface Converter instance.
      **/
     public function getConverterFor($name)
     {
@@ -184,7 +184,7 @@ class Database
      * @access public
      * @param  String $pg_type Type name.
      * @return String Converter instance.
-     * @throw  Pomm\Exception\Exception if not found.
+     * @throw  \Pomm\Exception\Exception if not found.
      **/
     public function getConverterForType($pg_type)
     {
@@ -214,7 +214,7 @@ class Database
      * @acces public
      * @param String $type           Type name
      * @param String $converter_name Converter designation.
-     * @return Pomm\Connection\Database
+     * @return \Pomm\Connection\Database
      **/
     public function registerTypeForConverter($type, $converter_name)
     {
