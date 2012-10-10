@@ -343,7 +343,7 @@ $test
     ->testPoint(new Type\Point(9.8765E-9,1.23456E12))
     ->testPoint(new Type\Point(47.123456,-0.654321))
     ->testLseg(new Type\Segment(new Type\Point(1,1), new Type\Point(2,2)))
-    ->testHStore(array('plop' => 1, 'pika' => 'chu'))
+    ->testHStore(array('plop' => 1, 'pika' => 'chu', 'a' => '', 'b' => null, 'c' => '"'))
     ->testHStore(array('a' => null, 'b' => 2))
     ->testCircle(new Type\Circle(new Type\Point(1,2), 3))
     ->testInterval(\DateInterval::createFromDateString('1 years 8 months 30 days 14 hours 25 minutes 7 seconds'))

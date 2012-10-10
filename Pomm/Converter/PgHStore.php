@@ -16,23 +16,24 @@ use Pomm\Exception\Exception as PommException;
 class PgHStore implements ConverterInterface
 {
     /**
-     * @see Pomm\Converter\ConverterInterface
+     * @see \Pomm\Converter\ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {
-        $split = preg_split('/[,\s]*"([^"]+)"[,\s]*|[,=>\s]+/', $data, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-        $hstore = array();
+        if ($data === 'NULL') return null;
 
-        for ($index = 0; $index < count($split); $index = $index + 2)
+        @eval(sprintf("\$hstore = array(%s);", $data));
+
+        if (!(isset($hstore) and is_array($hstore)))
         {
-            $hstore[$split[$index]] = $split[$index + 1] != 'NULL' ? $split[$index + 1] : null;
+            throw new PommException(sprintf("Could not parse hstore string '%s' to array.", $data));
         }
 
         return $hstore;
     }
 
     /**
-     * @see Pomm\Converter\ConverterInterface
+     * @see \Pomm\Converter\ConverterInterface
      **/
     public function toPg($data, $type = null)
     {
@@ -51,10 +52,10 @@ class PgHStore implements ConverterInterface
             }
             else
             {
-                $insert_values[] = sprintf('"%s" => "%s"', $key, $value);
+                $insert_values[] = sprintf('"%s" => "%s"', addcslashes($key, '\"'), addcslashes($value, '\"'));
             }
         }
 
-        return sprintf("'%s'::hstore", join(', ', $insert_values));
+        return sprintf("%s(\$hst\$%s\$hst\$)", $type, join(', ', $insert_values));
     }
 }
