@@ -322,7 +322,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         }
 
         $entity = static::$cv_map->findAll()->current();
-        $values = array('pika' => 'chu', 'plop' => null);
+        $values = array('pika' => 'chu', 'plop' => null, 'grum' => '', 'quote' => '"', '"a"=>"b,a"' => '"c" => "d,a"' );
         $entity['some_hstore'] = $values;
 
         static::$cv_map->updateOne($entity, array('some_hstore'));
