@@ -70,11 +70,14 @@ class Collection implements \Iterator, \Countable
      * Register a callable as filter.
      *
      * @param Callable $callable May be anonymous function.
+     * @return \Pomm\Object\Collection
      **/
 
     public function registerFilter($callable)
     {
         $this->filters[] = $callable;
+
+        return $this;
     }
 
     /**
@@ -83,12 +86,15 @@ class Collection implements \Iterator, \Countable
      * Unregister a filter.
      *
      * @param Callable the callable to unregister.
+     * @return \Pomm\Object\Collection
      **/
     public function unregisterFilter($callable)
     {
         $this->filters = array_map(function($value) use ($callable) {
             return $value == $callable ? $value : null;
         }, $this->filters);
+
+        return $this;
     }
 
     /**
@@ -96,10 +102,13 @@ class Collection implements \Iterator, \Countable
      *
      * Remove all filters.
      *
+     * @return \Pomm\Object\Collection
      **/
     public function resetFilters()
     {
         $this->filters = array();
+
+        return $this;
     }
 
     /**

@@ -637,6 +637,7 @@ abstract class BaseObjectMap
     /**
      * createFromForeign
      *
+     * This method is intended to be used as a Collection filter.
      * Hydrate an object from the values with keys formated like table{field}
      * and set it in the values with the table name as key. All the values used 
      * to hydrate the object are removed from the array.
