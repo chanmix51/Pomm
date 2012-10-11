@@ -7,6 +7,28 @@ use Pomm\External\sfInflector;
 
 class BaseObjectTest extends \PHPUnit_Framework_TestCase
 {
+    public function testExtract()
+    {
+        $values = array('pika' => 'chu', 'plop' => null, 'always_true' => true, 'some_in' => 1);
+        $entity = new Entity($values);
+
+        $this->assertEquals($values, $entity->extract(), "Extract preserves scalars.");
+
+        $entity->set('re_values', $values);
+        $values['re_values'] = $values;
+        $this->assertEquals($values, $entity->extract(), "Extract preserves arrays.");
+
+        $sub_values = array('sub_key' => 'sub_value', 'sub_array' => array(1, 2, 3, 4));
+        $sub_entity = new Entity($sub_values);
+        $entity->set('sub_entity', $sub_entity);
+        $values['sub_entity'] = $sub_values;
+        $this->assertEquals($values, $entity->extract(), "Extract also sub entities.");
+
+        $values['sub_entities_arr'] = array($sub_values, $sub_values, $sub_values);
+        $entity->set('sub_entities_arr', array($sub_entity, $sub_entity, $sub_entity));
+        $this->assertEquals($values, $entity->extract(), "Extract also arrays of sub entities.");
+    }
+
     public function getEntities()
     {
         $data = array('first' => 1, 'second' => 2, 'third' => 'plop', 'fourth' => array('one', 'two', 'three'), 'fifth' => '2012-06-18 14:42:07.123456');

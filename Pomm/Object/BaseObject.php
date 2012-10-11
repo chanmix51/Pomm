@@ -172,11 +172,44 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     /**
      * extract
      *
-     * Returns the fields array.
+     * Returns the fields flatten as arrays.
+     *
+     * The complex stuff in here is when there is an array, since all elements 
+     * in arrays are the same type, we check only its first value to know if we need 
+     * to traverse it or not.
      *
      * @return Array
      */
     public function extract()
+    {
+        $array_recurse = function($val) use (&$array_recurse)
+        {
+            if (is_scalar($val)) 
+                return $val;
+            if (is_array($val)) 
+            {
+                if (is_array(current($val)) || (is_object(current($val)) && current($val) instanceof \Pomm\Object\BaseObject))
+                {
+                    return array_map($array_recurse, $val);
+                }
+                else return $val;
+            }
+            if (is_object($val) && $val instanceof \Pomm\Object\BaseObject) 
+                return $val->extract();
+            return $val;
+        };
+
+        return array_map($array_recurse, $this->fields);
+    }
+
+    /**
+     * getFields
+     *
+     * Return the fields array.
+     *
+     * @return Array
+     **/
+    public function getFields()
     {
         return $this->fields;
     }

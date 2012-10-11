@@ -78,6 +78,9 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(1.0, 1.1, null, 1.3), $entity['arr_fl'], "Float array preserves null.");
     }
 
+    /**
+     * @depends testInteger
+     **/
     public function testString()
     {
         static::$cv_map->alterText();
@@ -119,6 +122,9 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         return $entity;
     }
 
+    /**
+     * @depends testInteger
+     **/
     public function testDate()
     {
         static::$cv_map->alterDate();
@@ -149,6 +155,9 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         return $entity;
     }
 
+    /**
+     * @depends testInteger
+     **/
     public function testBool()
     {
         static::$cv_map->alterBool();
@@ -192,6 +201,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
      * Arrays of bytea is not supported as PHP returns this field as string and 
      * it (or myself) was not able to convert strings to binary (See issue #32).
      *
+     * @depends testInteger
      **/
     public function testBinary()
     {
@@ -213,6 +223,9 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         return $entity;
     }
 
+    /**
+     * @depends testInteger
+     **/
     public function testPoint()
     {
         static::$cv_map->alterPoint();
@@ -249,6 +262,9 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         return $entity;
     }
 
+    /**
+     * @depends testInteger
+     **/
     public function testCircle()
     {
         static::$cv_map->alterCircle();
@@ -282,6 +298,9 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         return $entity;
     }
 
+    /**
+     * @depends testInteger
+     **/
     public function testSegment()
     {
         static::$cv_map->alterSegment();
@@ -312,6 +331,9 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_null($entity['arr_lseg'][4]), '5rd element is null');
     }
 
+    /**
+     * @depends testInteger
+     **/
     function testHStore()
     {
         if (static::$cv_map->alterHStore() === false)
@@ -330,6 +352,9 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($values, $entity['some_hstore'], "'some_hstore' array is preserved.");
     }
 
+    /**
+     * @depends testInteger
+     **/
     public function testLTree()
     {
         if (static::$cv_map->alterLTree() === false)
@@ -371,6 +396,9 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_null($entity['arr_ltree'][5]), "5th element is null");
     }
 
+    /**
+     * @depends testInteger
+     **/
     public function testTsRange()
     {
         if (static::$cv_map->alterTsRange() === false)
@@ -400,6 +428,9 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         return $entity;
     }
 
+    /**
+     * @depends testInteger
+     **/
     public function testNumberRangeConverter()
     {
         if (static::$cv_map->alterNumberRange() === false)
@@ -432,6 +463,9 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @depends testInteger
+     **/
     public function testSuperConverter()
     {
         $entity = static::$cv_map->findAll()->current();
@@ -455,6 +489,9 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_null($super_entity['cv_entities'][1]['some_bin']), "'some_bin' is null.");
     }
 
+    /**
+     * @depends testInteger
+     **/
     public function testTsExtendedEntity()
     {
         $ts_entity_map = static::$connection

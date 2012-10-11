@@ -435,7 +435,7 @@ abstract class BaseObjectMap
         }
         else
         {
-            $pg_values = $this->convertToPg($object->extract());
+            $pg_values = $this->convertToPg($object->getFields());
             $sql = sprintf('INSERT INTO %s (%s) VALUES (%s) RETURNING %s;', $this->object_name, join(',', array_map(function($val) { return sprintf('"%s"', $val); }, array_keys($pg_values))), join(',', array_values($pg_values)), $this->formatFieldsWithAlias('getSelectFields'));
 
             $collection = $this->query($sql, array());
@@ -871,7 +871,7 @@ abstract class BaseObjectMap
     {
         $tmp = array();
 
-        foreach ($this->convertToPg($object->extract()) as $field_name => $field_value)
+        foreach ($this->convertToPg($object->getFields()) as $field_name => $field_value)
         {
             if (array_key_exists($field_name, array_flip($this->getPrimaryKey()))) continue;
             $tmp[] = sprintf('"%s"=%s', $field_name, $field_value);
