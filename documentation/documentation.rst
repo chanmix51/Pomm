@@ -10,14 +10,13 @@ Overview
 
 Pomm is a fast, lightweight, efficient model manager for Postgresql written in PHP. It can be seen as an enhanced object hydrator above PDO with the following features:
 
- * Database Inspector to build automatically your PHP model files. Table inheritance from Pg will make your model class to inherit from each other.
- * Namespaces are used to ovoid collision between objects located in different Pg schemas.
- * Types are converted on the fly. 't' and 'f' Pg booleans are converted into PHP booleans, so are binary, arrays, geometric and your own data types.
- * Queries results are fetched on demand to keep minimal memory fingerprint.
- * It is possible to register anonymous PHP functions to filter fetched results prior to hydration.
- * Model objects are extensible, simply add fields in your SELECT statements.
- * Pomm uses an identity mapper, fetching twice the same rows will return same instances.
- * You can register code to be executed before and/or after each query (logs, filters, event systems ...)
+ * Database Inspector to build automatically your PHP model files (support inheritance).
+ * Namespaces to ovoid collision between objects located in different Pg schemas.
+ * PHP <=> Postgres type converter that support HStore, geometric types, objects, ranges etc.
+ * Lazy fetching for results.
+ * Pre and post hydration filters trough PHP callables.
+ * Field selector methods for all SQL queries.
+ * Identity mapper with several different algorithms available.
 
 ************************
 Databases and converters
@@ -29,7 +28,9 @@ Service: the database provider
 Database class and isolation level
 -----------------------------------
 
-The ``Service`` class just stores your ``Database`` instances and provides convenient methods to create connections from them. There are several ways to declare databases to the service class. Either you use the constructor passing an array "name" => "connection parameters" or you can use the ``setDatabase()`` method of the service class.::
+The ``Service`` class just stores your ``Database`` instances and provides convenient methods to create connections from them. It is mainly intended to be used with dependency injection containers used by some popular frameworks. 
+
+There are several ways to declare databases to the service class. Either you use the constructor passing an array "name" => "connection parameters" or you can use the ``setDatabase()`` method of the service class.::
 
     # The two examples below are equivalent
     # Using the constructor
@@ -60,25 +61,27 @@ The *setDatabase* method is used internally by the constructor. The parameters m
  * ``dsn`` (mandatory): a URL like string to connect the database. It is in the form ``pgsql://user:password@host:port/database_name``
  * ``class``: The *Database* class to instantiate as a database. This class must extend ``Pomm\Database`` as we will see below.
  * ``isolation``: transaction isolation level. (default is ``ISOLATION_READ_COMMITTED``, see `Standard transactions`_)
- * ``name``: the database alias name. If none is provided, the database real name is substitued. This option is notably used for namespacing map classes during database introspection (see `PHP tools`_ and `Introspected tables`_).
+ * ``name``: the database alias name. If none is provided, the database real name is substituted. This option is notably used for namespacing map classes during database introspection (see `PHP tools`_ and `Introspected tables`_).
 
 Once registered, you can retrieve the databases with their name by calling the *getDatabase* method passing the name as argument. If no name is given, the first declared *Database* will be returned.
 
 DSN
 ---
 
-The **dsn** parameter format is important because it interacts with the server's access policy.
+The **dsn** parameter format is important because it interacts with Postgresql server's access policy.
 
  * **socket connection**
- * ``pgsql://user/database`` Connect *user* to the db *database* without password through the Unix socket system. This is the DSN's shortest form.
+ * ``pgsql://user/database`` Connect *user* to the db *database* without password through the Unix socket system. 
  * ``pgsql://user:pass/database`` The same but with password.
  * ``pgsql://user:pass@!/path/to/socket!/database`` When the socket is not in the default directory, it is possible to specify it in the host part of the DSN. Note it is surrounded by '!' and there are NO ending /. Using the «!» as delimiter assumes there are no «!» in your socket's path. But you don't have «!» in your socket's path do you ?
- * ``pgsql://user@!/path/to/socket!:port/database`` Postgresql's listening socket name are the same as TCP ports. If different than default socket, specify it in the port part.
+ * ``pgsql://user@!/path/to/socket!:port/database`` Postgresql's listening socket's names are the same as TCP ports. If different than default socket, specify it in the port part.
+
+
  * **TCP connection**
  * ``pgsql://user@host/database`` Connect *user* to the db *database* on host *host* using TCP/IP.
  * ``pgsql://user:pass@host:port/database`` The same but with password and TCP port specified. 
 
-The ``identity_mapper`` option gives you the opportunity to register an identity mapper. When connections are created, they will instantiate the given class. By default, the Smart IM is loaded. This can be overridden for specific connections (see the identity mapper section below).
+The ``identity_mapper`` option gives you the opportunity to register a default identity mapper. When connections are created, they will instantiate the given class. By default, the Smart IM is loaded. This can be overridden for specific connections (see the `identity mapper`_ section below).
 
 Converters
 ==========
@@ -86,7 +89,7 @@ Converters
 Built-in converters
 -------------------
 
-The ``Database`` class brings access to mechanisms to create connections and also to register converters. A ``Converter`` is a class that translates a data type from Postgresql to PHP and from PHP to Postgresql. 
+The ``Database`` class brings access to mechanisms to create connections and also to register converters. A ``Converter`` is a class that translates a data type between PHP and Postgresql.
 
 By default, the following converters are registered, this means you can use them without configuring anything:
  * ``Boolean``: convert postgresql booleans 't' and 'f' to/from PHP boolean values
@@ -115,15 +118,14 @@ Postgresql contribs come with handy extra data type (like HStore, a key => value
   # The following line registers the HStore converter to the default 
   # database.
   
-  $service
-    ->getDatabase()
+    $database
     ->registerConverter(
       'HStore', 
        new Pomm\Converter\PgHStore(), 
-       array('hstore')
+       array('public.hstore')
       );
 
-Arguments to instanciate a ``Converter`` are the following:
+Arguments to instantiate a ``Converter`` are the following:
  * the first argument is the converter name. It is used in the map classes to link with fields (see `Map Classes`_ below).
  * the second argument is the instance of the ``Converter``
  * the third argument is a type or a set of types for Pomm to link them with the given converter.
@@ -155,15 +157,16 @@ Domains
 
 In case your database uses ``DOMAIN`` types you can add them to an already registered converter. The ``registerTypeForConverter()`` method stands for that.::
 
-    $service->getDatabase('default')
-      ->registerTypeForConverter('email', 'String');
-      ;
+    $database
+      ->registerTypeForConverter('email_address', 'String');
 
-In the example above, the database contains a domain ``email`` which is a subtype of ``varchar`` so it is associated with the built-in converter ``String``.
+In the example above, the database contains a domain ``email_address`` which is a subtype of ``varchar`` so it is associated with the built-in converter ``String``.
+
+**Note** ``registerTypeForConverter`` and ``registerConverter`` methods implement the fluid interface so you can chain calls.
 
 Custom types
 ------------
-Composite types are particularly useful to store complex set of data. In fact, with Postgresql, defining a table automatically defines the according type. Hydrating type instances with postgresql values are the work of your custom converters. Let's take an example: electrical transformers windings. A transformer winding is defined by the voltage it is supposed to have and the maximum current it can stands. A transformer have two or more windings so if we define a type WindingPower we will be able to store an array of windings in our transformer table::
+Composite types are particularly useful to store complex set of data. In fact, with Postgresql, defining a table automatically defines the corresponding type. Hydrating type instances with postgresql values are the work of your custom converters. Let's take an example: electrical transformers. Electrical transformers are composed by at least two wiring, an input one (named primary) and an output one (named secondary) but it can be more of them. A transformer winding is defined by the voltage it is supposed to have and the maximum current it can stands.   ::
 
   -- SQL
   CREATE TYPE winding_power AS (
@@ -200,7 +203,7 @@ Writing your own converters
 ---------------------------
 
 You can write your own converters for your custom postgresql types. All they have to do is to implement the ``Pomm\Converter\ConverterInterface``. This interface makes your converter to have two methods:
- * ``fromPg($data, $type)``: convert data from Postgesql by returning the according PHP structure. The returned value will be hydrated in your entities.
+ * ``fromPg($data, $type)``: converts string data from Postgesql to a PHP representation. The returned value will be hydrated in your entities.
  * ``toPg($data, $type)``: returns a string with the Postgresql representation of a PHP structure. This string will be used in the SQL queries generated by the Map files to save or update entities.
 
 Here is the converter for the ``WindingPower`` type mentioned above::
@@ -214,19 +217,12 @@ Here is the converter for the ``WindingPower`` type mentioned above::
    
   class WindingPower implements ConverterInterface
   {
-      protected $class_name;
-
-      public function __contruct($class_name = 'Model\\Pomm\\Type\\WindingPowerType')
-      {
-          $this->class_name = $class_name;
-      }
-
       public function fromPg($data, $type = null)
       {
           $data = trim($data, "()");
           $values = preg_split('/,/', $data);
    
-          return new $this->class_name($values[0], $values[1]);
+          return new WindingPowerType($values[0], $values[1]);
       }
    
       public function toPg($data, $type = null)
@@ -235,7 +231,7 @@ Here is the converter for the ``WindingPower`` type mentioned above::
       }
   }
 
-Of course you can hardcode the class to be returned by the converter but it prevents others from extending your type.
+It is advised not to hard-code the name of the class type so other developers may extend it and use theirs.
 
 Entity converter
 ----------------
@@ -244,21 +240,8 @@ In Postgresql, creating a table means creating a new type with the table's field
 
 ::
 
-  class MyDatabase extends Pomm\Connection\Database
-  {
-    protected function initialize()
-    {
-      parent::initialize();
-
-      $this->registerConverter('MyEntity', 
-        new Pomm\Converter\PgEntity(
-          $this, 
-         'Database\Schema\MyEntity'
-        ), 
-        array('my_entity')
-      );
-    }
-  }
+    $database
+      ->registerConverter('MyEntity', new \Pomm\Converter\PgEntity($my_entity_map), array('my_schema.my_entity));
 
 ********
 Entities
@@ -270,7 +253,7 @@ Overview
 What is an Entity class ?
 -------------------------
 
-Entities are what programmers use in the end of the process. They are an OO implementation of the data retrieved from the database. Most of the time, these PHP classes are automatically generated by the instrospection tool (see `PHP tools`_) but you can write you own classes by hand. They just have to extends ``Pomm\Object\BaseObject`` class to know about status (see `Life cycle`_). Important things to know about entities are **they are schemaless** and **they are data source agnostic**. 
+Entities are what programmers use in the end of the process. They are an object oriented implementation of the data retrieved from the database. Most of the time, these PHP classes are automatically generated by the introspection tool (see `PHP tools`_) but you can write you own classes by hand. They just have to extends ``Pomm\Object\BaseObject`` class to know about status (see `Life cycle`_). Important things to know about entities are **they are schema less** and **they are data source agnostic**. 
 
 By default, entities lie in the same directory than their map classes and de facto share the same namespace but this is only convention.
 
@@ -293,8 +276,8 @@ Data source agnostic
 
 Entities do not know anything about database in general. This means they do not know how to save, retrieve or update themselves (see `Map classes`_ for that). You can use ``BaseObject`` children to store data of your web services, NoSQL database etc. They use the ``hydrate()`` method to get data and accessors to read / write data from them (see `Living with entities`_ below).
 
-Schemaless entities
--------------------
+Schema less entities
+--------------------
 
 Entities do not know anything about the structure of the tables, views etc. They are just flexible typed containers for data. They use PHP magic methods to simulate getters and setters on data they own (see `Living with entities`_ below). This is very powerful because you can access entities like they were arrays and benefit from method overloads.
 
@@ -355,7 +338,7 @@ Note that ``get()`` can take an array with multiple attributes::
     $entity = new Database\Schema\MyEntity(array('pika' => 'chu'));
     $entity->getPika();      // chu
 
-They are called virtual because they do not exist by default but ``BaseObject`` implements the ``__call()`` method to trap accessor calls using the ``get()`` and ``set()`` generic methods. Of course all these can be overloaded::
+They are called virtual because they do not exist by default but ``BaseObject`` implements the ``__call()`` method to trap accessors calls using the ``get()`` and ``set()`` generic methods. Of course all these can be overloaded::
 
   // in the Entity class
   public function getPika()
@@ -394,14 +377,14 @@ This also applies to ``set()`` and ``clear()`` methods.
 Extending entities
 ------------------
 
-Of course you can extend your entities providing new accessors. If by example you have an entity with a weight in grams and you would like to have an accessor that returns it in ounces::
+Of course you can extend your entities providing new accessors. If by example you have an entity with a weight in grams and you would like to have a getter that returns it in ounces::
 
   public function getWeightInOunce()
   {
     return round($this->getWeight() * 0.0352739619, 2);
   }
 
-In your templates, you can directly benefit from this accessor while using the entity as an array::
+In your templates, you can directly benefit from this getter while using the entity as an array::
 
   // in PHP
   <?php echo $thing['weight_in_ounce'] ?>
@@ -645,20 +628,39 @@ The first time you generate the base map classes, it will also generate the map 
 
 This is the place you are going to create your own finder methods. As it extends ``BaseObjectMap`` via ``BaseStudentMap`` it already has some useful finders:
 
- * ``findAll()`` return all entities
+ * ``findAll(...)`` return all entities
  * ``findByPK(...)`` return a single entity
  * ``findWhere(...)`` perform a 
    ``SELECT ... FROM my.table WHERE ...``
 
 Finders return either a ``Collection`` instance virtually containing all model instances returned by the query (see `Collections`_) or just a related model entity instance (like ``findByPK``).
 
+findAll
+-------
+
+``findAll`` is the simplest query you can make on a database set, it returns all the tuples of the set. This method takes a query suffix as optional argument. This is useful for query modifiers like ``LIMIT ... OFFSET`` or ``ORDER BY``.
+
+::
+
+  $map->findAll('ORDER BY created_at DESC LIMIT 5');
+
+  // corresponding query
+  SELECT
+    "field1" AS "field1",
+    ...
+  FROM
+    table_name
+  ORDER BY created_at DESC LIMIT 5
+
+**note** If you are just interested by the suffix to paginate your queries, have a look at `Pagers_`.
+
 findWhere
 ---------
 
-The simplest way to create a finder with Pomm is to use the ``findWhere()`` method.
+The simplest way to create a query with Pomm is to use the ``findWhere()`` method.
 
 findWhere($where, $values, $suffix)
-  return a set of entities based on the given where clause. This clause can be a string or a ``Where`` instance.
+  returns a set of entities based on the given where clause. This clause can be a string or a ``Where`` instance.
 
 It is possible to use it directly because we are in a Map class hence Pomm knows what table and fields to use in the query.
 
@@ -707,7 +709,7 @@ Of course, this is not very useful, because the date is very likely to be a para
         );
   }
 
-All queries are prepared, this might increase the performance but it certainly increases the security. Passing the argument using the question mark makes it automatically to be escaped by the database and ovoid SQL-injection attacks. If a suffix is passed, it is appended to the query **as is**. The suffix is intended to allow developers to specify sorting a subset parameters to the query. As the query is prepared, a multiple query injection type attack is not directly possible but be careful if you pass values sent by the customer.
+All queries are prepared, this might increase the performance but it certainly increases the security. Passing the argument using the question mark makes it automatically to be escaped by the database and ovoid SQL-injection attacks. If a suffix is passed, it is appended to the query **as is**. The suffix is intended to allow developers specifying the sorting order of a subset. As the query is prepared, a multiple query injection type attack is not directly possible but be careful if you pass directly values sent by untrusted source.
 
 AND OR: The Where class
 -----------------------
@@ -748,33 +750,106 @@ The ``Where`` instances can be combined together with respect of the logical pre
 
     echo $where1; // (pika = ? OR age < ?) AND other_id IN (?,?,?,?,?,?)
 
-Custom queries
-==============
-
-fields methods
+Fields methods
 --------------
 
-Although it is possible to write whole plain queries by hand in the finders, this may induce coupling between your classes and the database structure. To reduce coupling effects, the map class proposes the following methods: 
+A very useful property of SQL sets is that they are extendibles. You can add a new field or remove an existing one in a SELECT very easily. All the generic finders described above use the following methods to know what fields to retrieve from queries:
 
-* ``getSelectFields($alias)`` return an array with the field names eventually in the form of ``alias.field_name``.
-* ``getGroupByFields($alias)`` same as above.
-* ``getFields`` used for both methods above.
-* ``getTableName($alias)`` return the table name (property object_name see the `Structure`_ chapter) 
+* ``getFields``
+* ``getSelectFields($alias)``
+* ``getGroupByFields($alias)``
 
-Overloading one of these methods will modify the behavior of all built-in finders and those which use them. 
+**getFields($table_alias)** is the parent of all the fields getters. It returns an array of the form ``field_alias => $table_alias.$field_name``. Table alias is optional and can be omitted. All other fields getters use ``getFields`` internally and you would use it when to do your own one.
+
+**getSelectFields($alias)** is used by all the finders by also by the update, delete and insert methods in their ``RETURNING`` clause. Overloading this one will change their behavior also.
+
+**getGroupByFields($alias)** is to be used in ``GROUP BY`` clauses. Note that Postgresql > 9.1 does not enforce grouping all the fields present in the select as soon as you group by primary key. So this method is to be used only when using Postgres 9.0 or lower versions.
+
+The following example show how to modify the fields for a table containing user informations::
+
+    public function getSelectFields($alias = null)
+    {
+        $fields = parent::getSelectFields($alias);
+        $alias = is_null($alias) ? $alias."." : '';
+
+        // We do never retrieve password informations
+        unset($fields['password'];
+
+        // Add gravatar id in the select
+        $fields['gravatar'] = sprintf("md5(%s.email_address)", $alias);
+
+        return $fields;
+    }
+
+    // elsewhere in the code
+    $employee = $employee_map->findByPk(array('email' => 'pika.chu@gmail.com'));
+    $employee->has('password'); // false
+    $employee->get('gravatar'); // 6c3e76d8b31679442f089cd3e7edb48a
+
+Note the example above show the use of a Postgresql's function to calculate the gravatar field. It is obviously possible to use all Postgresql operators and functions in the fields, which makes this feature a very powerful ally.
+
+Building custom queries
+-----------------------
+
+Even if generic finders may fulfill 90% of developers needs, it is possible to define your own finders using SQL. The generic structures of the SQL with Pomm follow the principle described below::
+
+    SELECT
+      %s
+    FROM
+      %s
+    WHERE
+      %s
+
+ * The first string is provided by one fields getter method (see `Fields methods`_ above).
+ * The second string is the set's source, most of the time a table name. This is provided by the ``getTableName($alias)`` method.
+ * The last string is the where clause. If a ``Where`` instance is provided it is as easy as casting it to String.
+
+Fields formatters
+-----------------
+
+The problem with the fields getters is that they return an array. This array has to be processed to get a string of fields usable in a SQL query. This is the role of the fields formatters methods:
+
+ * formatFields('method_name', 'table_alias') returns a string with a comma separated list of fields.
+ * formatFieldsWithAlias('method_name', 'table_alias') same as above but with fields aliases.
+
+These methods call the fields getter given as *method_name* and return the formatted list of fields::
+
+    $where = new \Pomm\Query\Where::create("age < ?", array(18))
+        ->andWhere('main_teacher_id = ?', array(1));
+
+    $sql = sprintf("SELECT %s FROM %s WHERE %s", 
+        $this->formatFieldsWithAlias('getSelectFields', 'my_table'),
+        $this->getTableName('my_table'),
+        (string) $where
+        )
+
+    return $this->query->($sql, $where->getValues());
+
+    // This will perform
+    SELECT
+      "my_table.field1" AS "field1",
+      ...
+    FROM
+      a_table my_table
+    WHERE
+      age < ? AND main_teacher_id = ?
+
+The example above is roughly what is coded in ``findWhere``.In real life, it is very likely one needs to join several database tables and their fields. Pomm makes easy to get other map files from within the on you are coding your finder to use their methods.
 
 ::
 
   // MyDatabase\Blog\PostMap Class
   public function getBlogPostsWithCommentCount(Pomm\Query\Where $where)
   {
+    $comment_map = $this->connection->getMapFor('\MyDatabase\Blog\Comment');
+
     $sql = <<<_
     SELECT
       %s,
       COUNT(c.id) as "comment_count"
     FROM
-      %s
-        LEFT JOIN %s ON
+      %s p
+        LEFT JOIN %s c ON
             p.id = c.p_id
     WHERE
         %s
@@ -782,12 +857,13 @@ Overloading one of these methods will modify the behavior of all built-in finder
         %s
     _;
 
-    $select_fields = join(', ', $this->getSelectFields('p'));
-    $local_table = $this->getTableName('p');
-    $remote_table = $this->connection->getMapFor('MyDatabase\Blog\Comment')->getTableName('c');
-    $group_fields = join(', ', $this->getGroupByFields('p'));
-
-    $sql = sprintf($sql, $select_fields, $local_table, $remote_table, $where, $group_fields);
+    $sql = sprintf($sql,
+        $this->formatFieldsWithAlias('getSelectFields', 'p'),
+        $this->getTableName(),
+        $comment_map->getTableName(),
+        (string) $where,
+        $this->formatFields('getGroupByFields', 'p')
+        );
 
     return $this->query($sql, $where->getValues());
   }
@@ -796,23 +872,18 @@ The ``query()`` method is available for your custom queries. It takes 2 paramete
 
 Whatever you are retrieving, Pomm will hydrate objects according to what is in structure definition of your map class. **Entities do not know about their structure** they just contain data and methods. The entity instances returned here will have this extra field "comment_count" exactly as it would be a normal field. Of course if you update this entity in the database, this field will be ignored. 
 
-Sometimes, you want to change the fields list of an entity, by example showing the age of any student. This can be done simply by overloading the ``getSelectFields()`` method in your map class::
-
-    public function getSelectFields($alias = null)
-    {
-        $fields = parent::getSelectFields($alias);
-        $fields[] = sprintf('age(%sbirthday) AS age',
-            is_null($alias) ? '' : $alias.'.');
-
-        return $fields;
-    }
-
-But you can also choose not to retrieve some columns by filtering the fields (like columns containing passwords by example). Be aware that ``getSelectFields()`` changes is used in the ``SELECT`` part but does not change the ``GROUP BY``. If your queries need both to be updated in the same time, overload the ``getFields()`` method.
-
 Virtual fields
 --------------
 
-As soon as tables have their own data type, they can be considered as plain objects and fetched as is::
+Adding new fields in the SELECT trough the fields getter methods do not make them mapped to any known type hence not converted with the converter system. It is possible to assign these now "virtual fields" a converter. 
+
+::
+
+    // Map a field added in getSelectFields to then Interval converter.
+    $this->addVirtualField('created_since', 'Interval');
+
+
+This feature is interesting since SQL queries can fetch objects directly::
 
     SELECT author FROM author;
     |      author       |
@@ -822,7 +893,7 @@ As soon as tables have their own data type, they can be considered as plain obje
     | "(2,'Edgar')"     |
     +-------------------+
 
-Pomm takes advantage of this feature using *virtual fields*. You can add fields to your select queries and tie them with a registered converter. If this converter is an entity converter the Pomm model instance will be fetched directly from the query. The example below creates a relationship between the author and the post tables getting all the posts from one author in an array of Post instances::
+Using an entity converter will make an entity instance fetched directly from the database. The example below creates a relationship between the author and the post tables getting all the posts from one author in an array of Post instances::
 
     // YourDb\SchemaName\AuthorMap
 
@@ -861,10 +932,10 @@ In this example we assume the ``schema_name.post`` type has already been associa
 Collections
 ===========
 
-fetching results
+Fetching results
 ----------------
 
-The ``query()`` method return a ``Collection`` instance that holds the PDOStatement with the results. The ``Collection`` class implements the ``Coutable`` and ``Iterator`` interfaces so you can foreach on a Collection to retrieve the results:
+The ``query()`` method return a ``Collection`` instance that holds the PDOStatement with the results. The ``Collection`` class implements the ``Countable`` and ``Iterator`` interfaces so you can foreach on a Collection to retrieve the results:
 
 ::
 
