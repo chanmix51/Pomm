@@ -28,8 +28,12 @@ class CreateBaseMapTool extends CreateFileTool
      * * prefix_dir       where to generate the dirs
      *
      * other options:
-     * * parent_namespace   override default namespace for parent
-     * * namespace          the namespace format (default \%dbname%\%schema)
+     * * parent_namespace   override default namespace for parent.
+     * * namespace          the namespace format (default \%dbname%\%schema).
+     * * class_name         the corresponding entity class name
+     *                      (default: table's camel cased name).
+     * * extends            The class the BaseMap should extend
+     *                      (default: \Pomm\Object\BaseObjectMap)
      *
      * @see Pomm\Tools\BaseTool
      **/

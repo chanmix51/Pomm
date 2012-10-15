@@ -24,9 +24,18 @@ class ScanSchemaTool extends CreateFileTool
      * configure
      *
      * mandatory options :
-     * * dir        the directory base classes will be generated in
+     * * prefix_dir the directory base classes will be generated in
      * * database   a Database instance
      *
+     * other options
+     * * parent_namespace   override default namespace for parent
+     * * namespace          the namespace format (default \%dbname%\%schema)
+     * * class_name         the corresponding entity class name
+     *                      (default: table's camel cased name).
+     * * extends            The class the BaseMap should extend
+     *                      (default: \Pomm\Object\BaseObjectMap)
+     * * exclude            An array of tables/views to skip.
+     * 
      * @see Pomm\Tools\BaseTool
      **/
     protected function configure()
