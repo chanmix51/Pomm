@@ -1,41 +1,41 @@
 === 1.1.0-RC1
 
- *  SimpleCollection, simple iterator on results.
- *  Chain calls Collection::registerFilter() methods.
- *  BaseObject::extract() now dumps embeded entities.
- *  PgEntity now uses identity mapper.
- *  Complete HStore support.
- *  formatFields() replaces joinSelectFieldXXX().
- *  Connection to store map instances.
- *  getRemoteSelectFields update.
- *  Consistent TsRange type.
- *  Number range converter.
- *  UpdateByPk() method.
- *  Exception when getting unexistent attribute.
- *  Fields from db with NULL values are no more ignored.
- *  Timestamp range type support.
- *  DateTime instance in Where
- *  Optionnal exclude some tables from schema scan.
- *  Json converter.
- *  Method BaseObjectMap::createAndSaveObject()
- *  Method Collection::extract()
- *  Fields indexed by alias name
- *  Clear method for entity.
- *  Converter and type for timestamp range Pg type
- *  Output stack for tools
- *  findAll now accepts suffix
- *  Namespace of generated file accepts placeholders.
- *  Finished converter tests.
- *  LTree tests
- *  HStore tests
- *  Segment tests
- *  tests for point and circle.
- *  Tests for point and bytea
- *  Tests for Boolean.
- *  Added converter tests for int & strings.
- *  test for integers
- *  executeAnonymousQuery now in Connection
- *  Deleted old tests, added Where.
+ * SimpleCollection, simple iterator on results.
+ * Chain calls Collection::registerFilter() methods.
+ * BaseObject::extract() now dumps embeded entities.
+ * PgEntity now uses identity mapper.
+ * Complete HStore support.
+ * formatFields() replaces joinSelectFieldXXX().
+ * Connection to store map instances.
+ * getRemoteSelectFields update.
+ * Consistent TsRange type.
+ * Number range converter.
+ * UpdateByPk() method.
+ * Exception when getting unexistent attribute.
+ * Fields from db with NULL values are no more ignored.
+ * Timestamp range type support.
+ * DateTime instance in Where
+ * Optionnal exclude some tables from schema scan.
+ * Json converter.
+ * Method BaseObjectMap::createAndSaveObject()
+ * Method Collection::extract()
+ * Fields indexed by alias name
+ * Clear method for entity.
+ * Converter and type for timestamp range Pg type
+ * Output stack for tools
+ * findAll now accepts suffix
+ * Namespace of generated file accepts placeholders.
+ * Finished converter tests.
+ * LTree tests
+ * HStore tests
+ * Segment tests
+ * tests for point and circle.
+ * Tests for point and bytea
+ * Tests for Boolean.
+ * Added converter tests for int & strings.
+ * test for integers
+ * executeAnonymousQuery now in Connection
+ * Deleted old tests, added Where.
  * PgEntity constructor now takes Map instance as argument (#30).
  * Anonymous query into Connection (#29).
  * Fixed converter / mapper bugs as in 1.0 branch.
