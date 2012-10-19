@@ -1,3 +1,10 @@
+=== 1.0.6
+ * PgEntity now uses identity mapper.
+ * Bad escaping in Entity converter.
+ * Complete HStore support.
+ * Better annotations for NetBean autocompletion. (see #56).
+ * Support non alpha in Db name. (close #50)
+ * Nested object arrays slashes escaping bug.
 === 1.0.5
  *  Bug in parent fields detection in map generation.
  *  Where values are type hinted as Array.
