@@ -909,7 +909,7 @@ li dd ul {
 <blockquote>
 <ul class="simple">
 <li>Database Inspector to build automatically your PHP model files (support inheritance).</li>
-<li>Namespaces to ovoid collision between objects located in different Pg schemas.</li>
+<li>Namespaces to avoid collision between objects located in different Pg schemas.</li>
 <li>PHP &lt;=&gt; Postgres type converter that support HStore, geometric types, objects, ranges etc.</li>
 <li>Lazy fetching for results.</li>
 <li>Pre and post hydration filters trough PHP callables.</li>
@@ -1557,7 +1557,7 @@ $students = $this-&gt;findWhere("birthdate &gt; '1980-01-01' AND first_name ILIK
       );
 }
 </pre>
-<p>All queries are prepared, this might increase the performance but it certainly increases the security. Passing the argument using the question mark makes it automatically to be escaped by the database and ovoid SQL-injection attacks. If a suffix is passed, it is appended to the query <strong>as is</strong>. The suffix is intended to allow developers specifying the sorting order of a subset. As the query is prepared, a multiple query injection type attack is not directly possible but be careful if you pass directly values sent by untrusted source.</p>
+<p>All queries are prepared, this might increase the performance but it certainly increases the security. Passing the argument using the question mark makes it automatically to be escaped by the database and avoid SQL-injection attacks. If a suffix is passed, it is appended to the query <strong>as is</strong>. The suffix is intended to allow developers specifying the sorting order of a subset. As the query is prepared, a multiple query injection type attack is not directly possible but be careful if you pass directly values sent by untrusted source.</p>
 </div>
 <div class="section" id="and-or-the-where-class">
 <h3><a class="toc-backref" href="#id41">AND OR: The Where class</a></h3>
