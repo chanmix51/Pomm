@@ -70,7 +70,7 @@
  * Model generation with new converter system.
  * Quote escaping in array and entity converters.
  * ArrayConverter.
- * Use ROW to ovoid litteral syntax.
+ * Use ROW to avoid litteral syntax.
  * New converter system.
  * Generic accessors made final.
  * Update documentation: virtual fields.

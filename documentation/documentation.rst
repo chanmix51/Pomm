@@ -11,7 +11,7 @@ Overview
 Pomm is a fast, lightweight, efficient model manager for Postgresql written in PHP. It can be seen as an enhanced object hydrator above PDO with the following features:
 
  * Database Inspector to build automatically your PHP model files (support inheritance).
- * Namespaces to ovoid collision between objects located in different Pg schemas.
+ * Namespaces to avoid collision between objects located in different Pg schemas.
  * PHP <=> Postgres type converter that support HStore, geometric types, objects, ranges etc.
  * Lazy fetching for results.
  * Pre and post hydration filters trough PHP callables.
@@ -709,7 +709,7 @@ Of course, this is not very useful, because the date is very likely to be a para
         );
   }
 
-All queries are prepared, this might increase the performance but it certainly increases the security. Passing the argument using the question mark makes it automatically to be escaped by the database and ovoid SQL-injection attacks. If a suffix is passed, it is appended to the query **as is**. The suffix is intended to allow developers specifying the sorting order of a subset. As the query is prepared, a multiple query injection type attack is not directly possible but be careful if you pass directly values sent by untrusted source.
+All queries are prepared, this might increase the performance but it certainly increases the security. Passing the argument using the question mark makes it automatically to be escaped by the database and avoid SQL-injection attacks. If a suffix is passed, it is appended to the query **as is**. The suffix is intended to allow developers specifying the sorting order of a subset. As the query is prepared, a multiple query injection type attack is not directly possible but be careful if you pass directly values sent by untrusted source.
 
 AND OR: The Where class
 -----------------------
