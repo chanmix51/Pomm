@@ -9,49 +9,24 @@ class IdentityMapperSmart extends IdentityMapperStrict
     /**
      * @see Pomm\Identity\IdentityMapperInterface.
      **/
-    public function getModelInstance(BaseObject $object, Array $pk_fields)
+    public function getInstance(BaseObject $object, Array $pk_fields)
     {
         if (count($pk_fields) == 0)
         {
             return $object;
         }
 
-        $crc = $this->getSignature(get_class($object), $object->get($pk_fields));
+        $index = $this->getSignature($object, $object->get($pk_fields));
 
-        if (array_key_exists($crc, $this->mapper))
+        if (array_key_exists($index, $this->mapper))
         {
-            if (!$this->mapper[$crc]->_getStatus() & BaseObject::EXIST)
-            {
-                $this->mapper[$crc] = $object;
-            }
-            else
-            {
-                $this->mapper[$crc]->hydrate(array_merge($object->getFields(), $this->mapper[$crc]->getFields()));
-            }
+            $this->mapper[$index]->hydrate(array_merge($object->getFields(), $this->mapper[$index]->getFields()));
         }
         else
         {
-            $this->mapper[$crc] = $object;
+            $this->mapper[$index] = $object;
         }
 
-        return $this->mapper[$crc];
-    }
-
-    /**
-     * @see Pomm\Identity\IdentityMapperInterface.
-     **/
-    public function checkModelInstance($class_name, Array $pk_fields)
-    {
-        if (count($pk_fields) == 0)
-        {
-            return $object;
-        }
-
-        $crc = $this->getSignature($class_name, $pk_fields);
-
-        return array_key_exists($crc, $this->mapper) && ($this->mapper[$crc]->_getStatus() & BaseObject::EXIST)
-            ? $this->mapper[$crc]
-            : false
-            ;
+        return $this->mapper[$index];
     }
 }

@@ -201,7 +201,8 @@ abstract class BaseObjectMap
     /**
      * createObjectFromPg
      *
-     * create an object with converted values.
+     * create an object with converted values and check it against identity mapper 
+     * if any.
      *
      * @param Array $values  Values to be converted..
      * @return \Pomm\Object\BaseObject $object
@@ -212,9 +213,12 @@ abstract class BaseObjectMap
         $object = $this->createObject($values);
         $object->_setStatus(BaseObject::EXIST);
 
-        $identity_map = $this->connection->getIdentityMapper();
+        if ($identity_map = $this->connection->getIdentityMapper())
+        {
+            $object = $identity_map->getInstance($object, $this->getPrimaryKey());
+        }
 
-        return $identity_map ? $identity_map->getModelInstance($object, $this->getPrimaryKey()) : $object;
+        return $object;
     }
 
     /**
@@ -365,12 +369,6 @@ abstract class BaseObjectMap
             throw new Exception(sprintf('Given values "%s" do not match PK definition "%s" using class "%s".', print_r($values, true), print_r($this->getPrimaryKey(), true), get_class($this)));
         }
 
-        if ($identity_mapper = $this->connection->getIdentityMapper() and
-            ($object = $identity_mapper->checkModelInstance($this->object_class, $values)))
-        {
-            return $object;
-        }
-
         $result = $this->findWhere($this->createSqlAndFrom($values), array_values($values));
 
         return count($result) == 1 ? $result->current() : null;
@@ -518,6 +516,11 @@ abstract class BaseObjectMap
         if ($collection->count() != 0)
         {
             $object = $collection->current();
+
+            if ($identity_map = $this->connection->getIdentityMapper())
+            {
+                $identity_map->flush($object);
+            }
         }
 
         $object->_setStatus(BaseObject::NONE);

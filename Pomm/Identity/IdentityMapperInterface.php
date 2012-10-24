@@ -5,37 +5,32 @@ namespace Pomm\Identity;
 interface IdentityMapperInterface
 {
     /**
-     * getModelInstance
+     * getInstance
      *
      * Sets the given model instance to de data mapper if not
      * set already. Return the set instance.
      *
-     * @param Pomm\Object\BaseObject    $object     Entity instance.
+     * @param \Pomm\Object\BaseObject    $object     Entity instance.
      * @param Array                     $pk_fields  Unique identitfier for that entity.
-     * @return Pomm\Object\BaseObject
+     * @return \Pomm\Object\BaseObject
      **/
-    public function getModelInstance(\Pomm\Object\BaseObject $object, Array $pk_fields);
+    public function getInstance(\Pomm\Object\BaseObject $object, Array $pk_fields);
 
 
     /**
-     * checkModelInstance
+     * clear
      *
-     * Check if an instance is present in the mapper and returns it if yes
-     * false if not.
+     * Remove the instance from the IM if it exists.
      *
-     * @param String $class_name  Class name of the Model.
-     * @param Array  $primary_key Primary key.
-     * @return mixed
+     * @param \Pomm\Object\BaseObject    $object     Entity instance.
+     * @param Array                     $pk_fields  Unique identitfier for that entity.
      **/
-    public function checkModelInstance($class_name, Array $primary_key);
+    public function clear(\Pomm\Object\BaseObject $object, Array $pk_fields);
 
     /**
-     * discardInstance
+     * flush
      *
-     * remove an existing model instance.
-     *
-     * @param String $class_name  Class name of the Model.
-     * @param Array  $primary_key Primary key.
+     * Flush the identity mapper.
      **/
-    public function discardInstance($class_name, Array $primary_key);
+    public function flush();
 }
