@@ -410,7 +410,7 @@ abstract class BaseObjectMap
     {
         $sql = sprintf('DELETE FROM %s WHERE %s RETURNING %s', $this->object_name, $this->createSqlAndFrom($pk), $this->formatFieldsWithAlias('getSelectFields'));
 
-        return $this->query($sql, array_values($pk));
+        return $this->query($sql, array_values($pk))->current();
     }
 
     /**
@@ -511,11 +511,11 @@ abstract class BaseObjectMap
      */
     public function deleteOne(BaseObject &$object)
     {
-        $collection = $this->deleteByPk($object->get($this->getPrimaryKey()));
+        $del_object = $this->deleteByPk($object->get($this->getPrimaryKey()));
 
-        if ($collection->count() != 0)
+        if ($del_object)
         {
-            $object = $collection->current();
+            $object = $del_object;
 
             if ($identity_map = $this->connection->getIdentityMapper())
             {
