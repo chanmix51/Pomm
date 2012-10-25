@@ -516,11 +516,6 @@ abstract class BaseObjectMap
         if ($del_object)
         {
             $object = $del_object;
-
-            if ($identity_map = $this->connection->getIdentityMapper())
-            {
-                $identity_map->flush($object);
-            }
         }
 
         $object->_setStatus(BaseObject::NONE);
