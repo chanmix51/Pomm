@@ -172,7 +172,7 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
     {
         $dt = new \DateTime();
 
-        $entity = static::$map->updateByPk($entity->get(static::$map->getPrimaryKey()), array('bool_data' => false, 'ts_data' => $dt));
+        $entity = static::$map->updateByPk($entity->get(static::$map->getPrimaryKey()), array('ts_data' => $dt, 'bool_data' => false));
 
         $this->assertTrue(!$entity->isModified(), "Object is not marked as modified.");
         $this->assertTrue(!$entity['bool_data'], "Bool data is false.");

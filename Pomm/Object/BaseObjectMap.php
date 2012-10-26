@@ -386,9 +386,11 @@ abstract class BaseObjectMap
     public function updateByPk(Array $pk, Array $values)
     {
         $where = $this->createSqlAndFrom($pk);
+        $converted_values = $this->convertToPg($values);
+
         $sql  = sprintf("UPDATE %s SET %s WHERE %s RETURNING %s",
             $this->getTableName(),
-            join(', ', array_map(function($key, $value) { return sprintf("\"%s\" = %s", $key, $value); }, array_keys($values), $this->convertToPg($values))),
+            join(', ', array_map(function($key, $value) { return sprintf("\"%s\" = %s", $key, $value); }, array_keys($converted_values), $converted_values)),
             (string) $where,
             $this->formatFieldsWithAlias('getSelectFields')
         );
