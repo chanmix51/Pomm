@@ -15,8 +15,7 @@ You can reach
 
 * `documentation <http://pomm.coolkeums.org/documentation/manual>`_
 * `code examples <http://pomm.coolkeums.org/documentation/examples>`_
-* `A gentle introduction to Pomm <http://www.coolkeums.org/en/article/a-gentle-introduction-to-pomm.html>`_
-* `Pomm: a concerto for PHP and Postgresql <http://www.coolkeums.org/en/article/pomm-a-concerto-for-php-and-postgresql.html>`_
+* `mailing list <https://groups.google.com/forum/#!forum/pommproject>`_
 
 What does Pomm propose ?
 ************************
