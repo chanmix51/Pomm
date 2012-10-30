@@ -1,3 +1,13 @@
+--- 1.1.0-RC2
+
+ * Bug in updateByPk with fields order
+ * Delete from db does not impact identity mapper.
+ * DeleteByPk to return BaseObject.
+ * Refactored identity mapper.
+ * fix avoid typo
+ * Documentation updated for 1.1.
+ * Updated inline documentation.
+
 === 1.1.0-RC1
 
  * SimpleCollection, simple iterator on results.

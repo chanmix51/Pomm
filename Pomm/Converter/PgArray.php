@@ -15,7 +15,7 @@ use Pomm\Exception\Exception;
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
 
-class pgArray implements ConverterInterface
+class PgArray implements ConverterInterface
 {
     protected $database;
 
