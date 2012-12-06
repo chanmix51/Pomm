@@ -56,7 +56,7 @@ class ScanSchemaTool extends CreateFileTool
             throw new \InvalidArgumentException(sprintf('The database must be a "Pomm\Connection\Database" instance, "%s" given.', get_class($this->options['database'])));
         }
 
-        $inspector = new Inspector($this->options['database']->createConnection());
+        $inspector = new Inspector($this->options['database']->getConnection());
 
         $no_tables = $this->options->hasParameter('exclude') ?  array_flip($inspector->getTablesOids($this->options['schema'], $this->options['exclude'])) : array();
 

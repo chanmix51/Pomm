@@ -83,13 +83,13 @@ class Service
 
     /**
      * createConnection
-     * Shortcut to get a connection from a database
+     * Shortcut to get a connection from a database. 
      *
      * @param string the database name
      * @return Pomm\Connection\Connection
      **/
     public function createConnection($name = null)
     {
-        return $this->getDatabase($name)->createConnection();
+        return $this->getDatabase($name)->getConnection();
     }
 }

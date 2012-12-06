@@ -41,7 +41,7 @@ class CreateBaseMapTool extends CreateFileTool
     {
         parent::configure();
 
-        $this->inspector = new Inspector($this->options['database']->createConnection());
+        $this->inspector = new Inspector($this->options['database']->getConnection());
 
         if (!$this->options->hasParameter('oid'))
         {

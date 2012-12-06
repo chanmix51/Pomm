@@ -20,6 +20,7 @@ class Database
     protected $_handler;
     protected $converters = array();
     protected $handled_types = array();
+    protected $connection;
 
     /**
      * __construct
@@ -118,14 +119,34 @@ class Database
     /**
      * createConnection()
      *
-     * Opens a new connection to the database
+     * Opens a new connection to the database and stores it. It overrides any previous connection.
      * @access public
      * @param  \Pomm\Identity\IdentityMapperInterface $mapper An optional instance of a data mapper.
      * @return \Pomm\Connection\Connection
      **/
     public function createConnection(\Pomm\Identity\IdentityMapperInterface $mapper = null)
     {
-        return new Connection($this, $mapper);
+        $this->connection = new Connection($this, $mapper);
+
+        return $this->connection;
+    }
+
+    /**
+     * getConnection
+     *
+     * Returns the opened connection if any. If no connection is opened yet, it 
+     * creates a new one with default parameters.
+     * @access public
+     * @return \Pomm\Connection\Connection
+     **/
+    public function getConnection()
+    {
+        if (is_null($this->connection))
+        {
+            return $this->createConnection();
+        }
+
+        return $this->connection;
     }
 
     /**
