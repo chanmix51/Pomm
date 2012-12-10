@@ -25,6 +25,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($where->hasElement(), 'Where instance has no elements.');
         $this->assertEquals(array(), $where->getValues(), 'And no values.');
 
+        $where = Where::createWhereIn('(C, D)', array(array('pika', 1), array('chu', 2)));
+        $this->assertEquals('(C, D) IN ((?, ?), (?, ?))', (string) $where, "String where is '(C, D) IN ((?, ?), (?, ?))'.");
+        $this->assertEquals(array(array('pika', 1), array('chu', 2)), $where->getValues(), 'Where values are "[[pika, 1], [chu, 2]]".');
         return $where;
     }
 

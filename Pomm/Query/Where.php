@@ -48,13 +48,25 @@ class Where
      **/
     public static function createWhereIn($element, Array $values)
     {
-        $escaped_values = array();
-        for ($index = 1; $index <= count($values); $index++)
+        $escape = function ($values) use (&$escape)
         {
-            $escaped_values[] = '?';
-        }
+            $escaped_values = array();
+            foreach($values as $value)
+            {
+                if (is_array($value))
+                {
+                    $escaped_values[] = sprintf("(%s)", join(', ', $escape($value)));
+                }
+                else
+                {
+                    $escaped_values[] = '?';
+                }
+            }
 
-        return new self(sprintf("%s IN (%s)", $element, join(", ", $escaped_values)), $values);
+            return $escaped_values;
+        };
+
+        return new self(sprintf("%s IN (%s)", $element, join(", ", $escape($values))), $values);
     }
 
     /**
