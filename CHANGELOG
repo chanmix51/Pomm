@@ -1,4 +1,12 @@
---- 1.1.0-RC2
+--- 1.1.0
+
+ * Updated documentation.
+ * Removed unused Query and Insert classes.
+ * Bug in multiple column createWhereIn().
+ * Multiple column IN condition Bug (close #67)
+ * Database is now a Connection pool (closes #66).
+
+=== 1.1.0-RC2
 
  * Bug in updateByPk with fields order
  * Delete from db does not impact identity mapper.
