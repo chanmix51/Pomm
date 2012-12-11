@@ -704,12 +704,14 @@ Of course, this is not very useful, because the date is very likely to be a para
   */
 
     return $this->findWhere("birthdate > ? AND first_name ILIKE ?", 
-        array($date->format('Y-m-d'), '%an%'), 
+        array($date, '%an%'), 
         'ORDER BY birthdate DESC LIMIT 10'
         );
   }
 
 All queries are prepared, this might increase the performance but it certainly increases the security. Passing the argument using the question mark makes it automatically to be escaped by the database and avoid SQL-injection attacks. If a suffix is passed, it is appended to the query **as is**. The suffix is intended to allow developers specifying the sorting order of a subset. As the query is prepared, a multiple query injection type attack is not directly possible but be careful if you pass directly values sent by untrusted source.
+
+**Note** The DateTime PHP instances can be passed as is, they will be converted into string internally.
 
 AND OR: The Where class
 -----------------------
@@ -718,7 +720,7 @@ Sometimes, you do not know in advance what will be the clauses of your query bec
 
   public function getYoungerThan(DateTime $date, $needle)
   {
-    $where = new Pomm\Query\Where("birthdate > ?", array($date->format('Y-m-d')));
+    $where = new Pomm\Query\Where("birthdate > ?", array($date));
     $where->andWhere('first_name ILIKE ?', array(sprintf('%%%s%%', $needle)));
 
     return $this->findWhere($where, null, 'ORDER BY birthdate DESC LIMIT 10');
@@ -728,7 +730,7 @@ The ``Where`` class has two very handy methods: ``andWhere`` and ``orWhere`` whi
 
   public function getYoungerThan(DateTime $date, $needle)
   {
-    $where = Pomm\Query\Where::create("birthdate > ?", array($date->format('Y-m-d')))
+    $where = Pomm\Query\Where::create("birthdate > ?", array($date))
         ->andWhere('first_name ILIKE ?', array(sprintf('%%%s%%', $needle)))
 
     return $this->findWhere($where, null, 'ORDER BY birthdate DESC LIMIT 10');
@@ -736,9 +738,9 @@ The ``Where`` class has two very handy methods: ``andWhere`` and ``orWhere`` whi
 
 Because the ``WHERE something IN (...)`` clause needs to declare as many '?' as given parameters, it has its own constructor::
 
-    // SELECT all_fields FROM some_table WHERE station_id IN ( list of ids );
+    // WHERE (station_id, line_no) IN ((1, 1), (1, 3), ... );
     
-    $this->findWhere(Pomm\Query\Where::createIn("station_id", $array_of_ids))
+    $this->findWhere(Pomm\Query\Where::createWhereIn("(station_id, line_no)", array(array(1, 1), array(1, 3)))
 
 The ``Where`` instances can be combined together with respect of the logical precedence::
 
@@ -1107,26 +1109,29 @@ Overview
 Map classes provider
 --------------------
 
-As soon as you have a database instance, you can create new connections. This is done by using the ``createConnection()`` method. Connections are the way to
+As soon as you have a database instance, you can create new connections. This is done by using the ``getConnection()`` method. Connections are the way to
  * Retrieve map classes instances
  * Manage transactions
 
 The entities are stored in a particular database. This is why only connections to this base are able to give you associated map classes::
 
-  $map = $service->getDatabase()->createConnection()
+  $map = $database()
+    ->getConnection()
     ->getMapFor('College\School\Student'); 
   
+
+It is possible to force the creation of a new Connection using the `createConnection()` method call but the `getConnection()` is preferred since it creates automatically a new connection if none exist, it returns the current one otherwise.
 
 Identity mappers
 ----------------
 
-Connections are also the way to tell the map classes to use or not an ``IdentityMapper``. An identity mapper is an index kept by the connection and shared amongst the map instances. This index ensures that if an object is retrieved twice from the database, the same ``Object`` instance will be returned. This is a very powerful (and dangerous) feature. There are two ways to declare an identity mapper to your connections:
+Connections are also the way to tell the map classes to use or not an ``IdentityMapper``. An identity mapper is an index kept by the connection and shared amongst the map instances. This index ensures that when an object is retrieved twice from the database, the same ``Object`` instance will be returned. This is a very powerful (and dangerous) feature. There are two ways to declare an identity mapper to your connections:
  * in the ``Database`` parameters. All the connections created for this database will use the given ``IdentityMapper`` class.
  * when instanciating the connection through the ``createConnection()`` call. This enforces the parameter given to the ``Database`` class if any. 
 
  ::
 
-  $map = $service->getDatabase()
+  $map = $database()
     ->createConnection(new \Pomm\Identity\IdentityMapperSmart())
     ->getMapFor('College\School\Student');
 

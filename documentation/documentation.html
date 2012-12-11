@@ -1,6 +1,4 @@
-<!--?xml version="1.0" encoding="utf-8" --!>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+<!--?xml version="1.0" encoding="utf-8" ?--><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="generator" content="Docutils 0.7: http://docutils.sourceforge.net/">
 <title>Pomm Documentation</title>
@@ -1552,19 +1550,20 @@ $students = $this-&gt;findWhere("birthdate &gt; '1980-01-01' AND first_name ILIK
 */
 
   return $this-&gt;findWhere("birthdate &gt; ? AND first_name ILIKE ?",
-      array($date-&gt;format('Y-m-d'), '%an%'),
+      array($date, '%an%'),
       'ORDER BY birthdate DESC LIMIT 10'
       );
 }
 </pre>
 <p>All queries are prepared, this might increase the performance but it certainly increases the security. Passing the argument using the question mark makes it automatically to be escaped by the database and avoid SQL-injection attacks. If a suffix is passed, it is appended to the query <strong>as is</strong>. The suffix is intended to allow developers specifying the sorting order of a subset. As the query is prepared, a multiple query injection type attack is not directly possible but be careful if you pass directly values sent by untrusted source.</p>
+<p><strong>Note</strong> The DateTime PHP instances can be passed as is, they will be converted into string internally.</p>
 </div>
 <div class="section" id="and-or-the-where-class">
 <h3><a class="toc-backref" href="#id41">AND OR: The Where class</a></h3>
 <p>Sometimes, you do not know in advance what will be the clauses of your query because it depends on variable factors. You can use the <tt class="docutils literal">Where</tt> class to chain logical statements:</p>
 <pre class="literal-block">public function getYoungerThan(DateTime $date, $needle)
 {
-  $where = new Pomm\Query\Where("birthdate &gt; ?", array($date-&gt;format('Y-m-d')));
+  $where = new Pomm\Query\Where("birthdate &gt; ?", array($date));
   $where-&gt;andWhere('first_name ILIKE ?', array(sprintf('%%%s%%', $needle)));
 
   return $this-&gt;findWhere($where, null, 'ORDER BY birthdate DESC LIMIT 10');
@@ -1573,16 +1572,16 @@ $students = $this-&gt;findWhere("birthdate &gt; '1980-01-01' AND first_name ILIK
 <p>The <tt class="docutils literal">Where</tt> class has two very handy methods: <tt class="docutils literal">andWhere</tt> and <tt class="docutils literal">orWhere</tt> which can take string or another <tt class="docutils literal">Where</tt> instance as argument. All methods return a <tt class="docutils literal">Where</tt> instance so it is possible to chain the calls. The example above can be rewritten this way:</p>
 <pre class="literal-block">public function getYoungerThan(DateTime $date, $needle)
 {
-  $where = Pomm\Query\Where::create("birthdate &gt; ?", array($date-&gt;format('Y-m-d')))
+  $where = Pomm\Query\Where::create("birthdate &gt; ?", array($date))
       -&gt;andWhere('first_name ILIKE ?', array(sprintf('%%%s%%', $needle)))
 
   return $this-&gt;findWhere($where, null, 'ORDER BY birthdate DESC LIMIT 10');
 }
 </pre>
 <p>Because the <tt class="docutils literal">WHERE something IN <span class="pre">(...)</span></tt> clause needs to declare as many '?' as given parameters, it has its own constructor:</p>
-<pre class="literal-block">// SELECT all_fields FROM some_table WHERE station_id IN ( list of ids );
+<pre class="literal-block">// WHERE (station_id, line_no) IN ((1, 1), (1, 3), ... );
 
-$this-&gt;findWhere(Pomm\Query\Where::createIn("station_id", $array_of_ids))
+$this-&gt;findWhere(Pomm\Query\Where::createWhereIn("(station_id, line_no)", array(array(1, 1), array(1, 3)))
 </pre>
 <p>The <tt class="docutils literal">Where</tt> instances can be combined together with respect of the logical precedence:</p>
 <pre class="literal-block">$where1 = new Pomm\Query\Where('pika = ?', array('chu'));
@@ -1917,7 +1916,7 @@ Next
 <div class="section" id="map-classes-provider">
 <h3><a class="toc-backref" href="#id56">Map classes provider</a></h3>
 <dl class="docutils">
-<dt>As soon as you have a database instance, you can create new connections. This is done by using the <tt class="docutils literal">createConnection()</tt> method. Connections are the way to</dt>
+<dt>As soon as you have a database instance, you can create new connections. This is done by using the <tt class="docutils literal">getConnection()</tt> method. Connections are the way to</dt>
 <dd><ul class="first last simple">
 <li>Retrieve map classes instances</li>
 <li>Manage transactions</li>
@@ -1925,19 +1924,21 @@ Next
 </dd>
 </dl>
 <p>The entities are stored in a particular database. This is why only connections to this base are able to give you associated map classes:</p>
-<pre class="literal-block">$map = $service-&gt;getDatabase()-&gt;createConnection()
+<pre class="literal-block">$map = $database()
+  -&gt;getConnection()
   -&gt;getMapFor('College\School\Student');
 </pre>
+<p>It is possible to force the creation of a new Connection using the <cite>createConnection()</cite> method call but the <cite>getConnection()</cite> is preferred since it creates automatically a new connection if none exist, it returns the current one otherwise.</p>
 </div>
 <div class="section" id="identity-mappers">
 <h3><a class="toc-backref" href="#id57">Identity mappers</a></h3>
 <dl class="docutils">
-<dt>Connections are also the way to tell the map classes to use or not an <tt class="docutils literal">IdentityMapper</tt>. An identity mapper is an index kept by the connection and shared amongst the map instances. This index ensures that if an object is retrieved twice from the database, the same <tt class="docutils literal">Object</tt> instance will be returned. This is a very powerful (and dangerous) feature. There are two ways to declare an identity mapper to your connections:</dt>
+<dt>Connections are also the way to tell the map classes to use or not an <tt class="docutils literal">IdentityMapper</tt>. An identity mapper is an index kept by the connection and shared amongst the map instances. This index ensures that when an object is retrieved twice from the database, the same <tt class="docutils literal">Object</tt> instance will be returned. This is a very powerful (and dangerous) feature. There are two ways to declare an identity mapper to your connections:</dt>
 <dd><ul class="first simple">
 <li>in the <tt class="docutils literal">Database</tt> parameters. All the connections created for this database will use the given <tt class="docutils literal">IdentityMapper</tt> class.</li>
 <li>when instanciating the connection through the <tt class="docutils literal">createConnection()</tt> call. This enforces the parameter given to the <tt class="docutils literal">Database</tt> class if any.</li>
 </ul>
-<pre class="last literal-block">$map = $service-&gt;getDatabase()
+<pre class="last literal-block">$map = $database()
   -&gt;createConnection(new \Pomm\Identity\IdentityMapperSmart())
   -&gt;getMapFor('College\School\Student');
 
