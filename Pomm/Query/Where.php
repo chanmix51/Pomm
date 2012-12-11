@@ -49,24 +49,37 @@ class Where
     public static function createWhereIn($element, Array $values)
     {
         $escape = function ($values) use (&$escape)
-        {
-            $escaped_values = array();
-            foreach($values as $value)
             {
-                if (is_array($value))
+                $escaped_values = array();
+                foreach($values as $value)
                 {
-                    $escaped_values[] = sprintf("(%s)", join(', ', $escape($value)));
+                    if (is_array($value))
+                    {
+                        $escaped_values[] = sprintf("(%s)", join(', ', $escape($value)));
+                    }
+                    else
+                    {
+                        $escaped_values[] = '?';
+                    }
                 }
-                else
+
+                return $escaped_values;
+            };
+
+        $get_values = function($values)
+            {
+                $array = array();
+
+                foreach(new \RecursiveIteratorIterator(new \RecursiveArrayIterator($values)) as $value)
                 {
-                    $escaped_values[] = '?';
+                    $array[] = $value;
                 }
-            }
 
-            return $escaped_values;
-        };
+                return $array;
 
-        return new self(sprintf("%s IN (%s)", $element, join(", ", $escape($values))), $values);
+            };
+
+        return new self(sprintf("%s IN (%s)", $element, join(", ", $escape($values))), $get_values($values));
     }
 
     /**
