@@ -21,7 +21,8 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
             array('pgsql://user/db'),
             array('pgsql://user/some.db'),
             array('pgsql://user:&~"#\'{([-|`_\\^])+=}$*%!/:.;?,@host:12345/db'),
-            array('pgsql://some_user:azerty0/some_db')
+            array('pgsql://some_user:azerty0/some_db'),
+            array('pgsql://user:pass@ec2-34-143-188-54.compute-N.amazonawz.com:5432/db_name')
         );
     }
 
