@@ -46,7 +46,10 @@ class CollectionTest extends ASimpleCollectionTest
     public function testFilters(SimpleCollection $collection)
     {
         $collection = static::$map->findAll();
-        $collection->registerFilter(function ($vals) { return array('id' => $vals['id'] * 2); });
+        $collection
+            ->registerFilter(function ($vals) { return array('id' => $vals['id'] * 2); })
+            ->registerFilter(array($this, 'doNothing'))
+            ;
         $n = 1;
         foreach ($collection as $entity)
         {
@@ -76,6 +79,11 @@ class CollectionTest extends ASimpleCollectionTest
         $collection = parent::testExtract();
 
         $this->assertEquals(array('plop' => array(array('id' => 1), array('id' => 2), array('id' => 3), array('id' => 4))), $collection->extract('plop'), 'Extract is an array of extracts.');
+    }
+
+    public function doNothing($values)
+    {
+        return $values;
     }
 }
 
