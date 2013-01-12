@@ -104,10 +104,17 @@ class Collection implements \Iterator, \Countable
 
         foreach($this->filters as $index => $filter)
         {
-            $values = $filter($values);
-            if (!is_array($values))
+            if (is_callable($filter))
             {
-                throw new Exception(sprintf("Filters have to return an Array. Filter number %d returned a '%s'.", $index, gettype($values)));
+                $values = call_user_func($filter, $values);
+                if (!is_array($values))
+                {
+                    throw new Exception(sprintf("Filters have to return an Array. Filter number %d returned a '%s'.", $index, gettype($values)));
+                }
+            }
+            else
+            {
+                throw new Exception(sprintf("Collection filter index %d is not a callable ('%s' found instead).", $index, gettype($filter)));
             }
         }
 
