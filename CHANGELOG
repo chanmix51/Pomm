@@ -1,3 +1,8 @@
+=== 1.1.1
+
+ * Bug in 'CreateFromForeign' filter. (close #70)
+ * Host names can contain '-' in DSN.
+
 === 1.1.0
 
  * Updated documentation.
