@@ -12,10 +12,10 @@ use Pomm\FilterChain\FilterInterface;
 /**
  * Pomm\Connection\Connection
  * Manage a connection and related transactions
- * 
+ *
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -36,7 +36,7 @@ class Connection
 
     /**
      * __construct()
-     * 
+     *
      * Connection instance to the specified database.
      *
      * @access public
@@ -52,24 +52,20 @@ class Connection
         $this->parameter_holder = $database->getParameterHolder();
 
         $this->parameter_holder->setDefaultValue('isolation', self::ISOLATION_READ_COMMITTED);
-        $this->parameter_holder->mustBeOneOf('isolation', 
+        $this->parameter_holder->mustBeOneOf('isolation',
             array(self::ISOLATION_READ_COMMITTED, self::ISOLATION_SERIALIZABLE, self::ISOLATION_READ_REPEATABLE)
         );
 
         $this->isolation = $this->parameter_holder['isolation'];
         $this->parameter_holder->setDefaultValue('identity_mapper', false);
 
-        if (is_null($mapper))
-        {
-            if ($this->parameter_holder['identity_mapper'] !== false)
-            {
+        if (is_null($mapper)) {
+            if ($this->parameter_holder['identity_mapper'] !== false) {
                 $identity_class = $this->parameter_holder['identity_mapper'] === true ? 'Pomm\Identity\IdentityMapperSmart' : $this->parameter_holder['identity_mapper'];
 
                 $this->identity_mapper = new $identity_class();
             }
-        }
-        else
-        {
+        } else {
             $this->identity_mapper = $mapper;
         }
     }
@@ -82,7 +78,7 @@ class Connection
      **/
     protected function launch()
     {
-        $connect_string = sprintf('%s:dbname=%s', 
+        $connect_string = sprintf('%s:dbname=%s',
             $this->parameter_holder['adapter'],
             $this->parameter_holder['database']
         );
@@ -90,12 +86,9 @@ class Connection
         $connect_string .= $this->parameter_holder['host'] !== '' ? sprintf(';host=%s', $this->parameter_holder['host']) : '';
         $connect_string .= $this->parameter_holder['port'] !== '' ? sprintf(';port=%d', $this->parameter_holder['port']) : '';
 
-        try
-        {
+        try {
             $this->handler = new \PDO($connect_string, $this->parameter_holder['user'], $this->parameter_holder['pass'] != '' ? $this->parameter_holder['pass'] : null);
-        }
-        catch (\PDOException $e)
-        {
+        } catch (\PDOException $e) {
             throw new Exception(sprintf('Error connecting to the database with dsn «%s». Driver said "%s".', $connect_string, $e->getMessage()));
         }
 
@@ -115,17 +108,16 @@ class Connection
     }
 
     /**
-     * getPdo 
+     * getPdo
      *
      * Returns the PDO instance of the associated connection.
-     * 
+     *
      * @access public
      * @return PDO
      */
     public function getPdo()
     {
-        if (!isset($this->handler))
-        {
+        if (!isset($this->handler)) {
             $this->launch();
         }
 
@@ -133,10 +125,10 @@ class Connection
     }
 
     /**
-     * getMapFor 
+     * getMapFor
      *
      * Returns a Map instance of the given model name.
-     * 
+     *
      * @param  String $class The fully qualified class name of the associated entity.
      * @param  Bool   $force Force the creation of a new Map instance.
      * @access public
@@ -146,8 +138,7 @@ class Connection
     {
         $class_name = $class.'Map';
 
-        if ($force === true or !array_key_exists($class_name, $this->maps))
-        {
+        if ($force === true or !array_key_exists($class_name, $this->maps)) {
             $this->maps[$class] = new $class_name($this);
         }
 
@@ -176,8 +167,7 @@ class Connection
      **/
     public function begin()
     {
-        if ($this->in_transaction)
-        {
+        if ($this->in_transaction) {
             throw new Exception("Cannot begin a new transaction, we are already in a transaction.");
         }
 
@@ -195,8 +185,7 @@ class Connection
      **/
     public function commit()
     {
-        if (! $this->in_transaction)
-        {
+        if (! $this->in_transaction) {
             throw new Exception("COMMIT while not in a transaction");
         }
 
@@ -207,7 +196,7 @@ class Connection
 
     /**
      * rollback
-     * 
+     *
      * rollback a transaction. This can be the whole transaction
      * or if a savepoint name is specified only the queries since
      * this savepoint.
@@ -217,18 +206,14 @@ class Connection
      **/
     public function rollback($name = null)
     {
-        if (! $this->in_transaction)
-        {
+        if (! $this->in_transaction) {
             throw new Exception("ROLLBACK while not in a transaction");
         }
 
-        if (is_null($name))
-        {
+        if (is_null($name)) {
             $this->getPdo()->exec('ROLLBACK TRANSACTION');
             $this->in_transaction = false;
-        }
-        else
-        {
+        } else {
             $this->getPdo()->exec(sprintf("ROLLBACK TO SAVEPOINT %s", $name));
         }
 

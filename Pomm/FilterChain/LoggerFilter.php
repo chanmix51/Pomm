@@ -2,18 +2,17 @@
 
 namespace Pomm\FilterChain;
 
-use Pomm\Exception\Exception;
 use Pomm\FilterChain\FilterInterface;
 use Pomm\FilterChain\QueryFilterChain;
 use Pomm\Tools\Logger;
 
 /**
  * Pomm\FilterChain\LoggerFilter - The logger filter.
- * 
+ *
  * @package Pomm
  * @uses Pomm\FilterChain\FilterInterface
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */

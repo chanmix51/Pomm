@@ -16,13 +16,11 @@ class ScanSchemaToolTest extends \PHPUnit_Framework_TestCase
 
         static::$tmp_dir = isset($GLOBALS['tmp_dir']) ? $GLOBALS['tmp_dir'] : DIRECTORY_SEPARATOR.'tmp';
 
-        if (!is_dir(static::$tmp_dir)) 
-        {
+        if (!is_dir(static::$tmp_dir)) {
             throw new Exception(sprintf("Directory '%s' does not exist.", static::$tmp_dir));
         }
 
-        if (!is_writeable(static::$tmp_dir))
-        {
+        if (!is_writeable(static::$tmp_dir)) {
             throw new Exception(sprintf("Directory '%s' is not writeable.", static::$tmp_dir));
         }
         $database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
@@ -30,8 +28,7 @@ class ScanSchemaToolTest extends \PHPUnit_Framework_TestCase
         static::$connection = $database->createConnection();
         static::$connection->begin();
 
-        try
-        {
+        try {
             $sql = 'CREATE SCHEMA pomm_test';
             static::$connection->executeAnonymousQuery($sql);
 
@@ -45,9 +42,7 @@ class ScanSchemaToolTest extends \PHPUnit_Framework_TestCase
             static::$connection->executeAnonymousQuery($sql);
 
             static::$connection->commit();
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             static::$connection->rollback();
 
             throw $e;

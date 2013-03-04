@@ -4,11 +4,11 @@ namespace Pomm\Converter;
 use Pomm\Converter\ConverterInterface;
 
 /**
- * Pomm\Converter\PgString - String converter 
- * 
+ * Pomm\Converter\PgString - String converter
+ *
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */

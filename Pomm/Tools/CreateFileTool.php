@@ -2,7 +2,6 @@
 namespace Pomm\Tools;
 
 use Pomm\Exception\ToolException;
-use Pomm\Tools\ParameterHolder;
 use Pomm\External\sfInflector;
 
 /**
@@ -82,7 +81,7 @@ abstract class CreateFileTool extends BaseTool
     }
 
     /**
-     * saveFile 
+     * saveFile
      *
      * Save the file.
      *
@@ -91,8 +90,7 @@ abstract class CreateFileTool extends BaseTool
      **/
     protected function saveFile($path, $content)
     {
-        if (!$this->createDirIfNotExist(dirname($path)))
-        {
+        if (!$this->createDirIfNotExist(dirname($path))) {
             throw new ToolException(sprintf("Could not create directories for file '%s'.", $path));
         }
 
@@ -108,8 +106,7 @@ abstract class CreateFileTool extends BaseTool
      **/
     protected function createDirIfNotExist($dir)
     {
-        if (!file_exists($dir)) 
-        {
+        if (!file_exists($dir)) {
             $this->output_stack->add(sprintf("Create directory '%s'.", $dir));
 
             return @mkdir($dir, 0755, true);
@@ -118,4 +115,3 @@ abstract class CreateFileTool extends BaseTool
         return true;
     }
 }
-

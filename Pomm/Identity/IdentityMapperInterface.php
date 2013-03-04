@@ -16,7 +16,6 @@ interface IdentityMapperInterface
      **/
     public function getInstance(\Pomm\Object\BaseObject $object, Array $pk_fields);
 
-
     /**
      * clear
      *

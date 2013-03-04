@@ -20,8 +20,7 @@ class IdentityMapperStrict implements IdentityMapperInterface
     {
         $class_name = get_class($object);
 
-        if (count($primary_key) == 0)
-        {
+        if (count($primary_key) == 0) {
             throw new Exception(sprintf("Primary Key can not be empty when generating instance signature (class '%s').", $class_name));
         }
 
@@ -33,15 +32,13 @@ class IdentityMapperStrict implements IdentityMapperInterface
      **/
     public function getInstance(\Pomm\Object\BaseObject $object, Array $pk_fields)
     {
-        if (count($pk_fields) == 0)
-        {
+        if (count($pk_fields) == 0) {
             return $object;
         }
 
         $index = $this->getSignature($object, $object->get($pk_fields));
 
-        if (!array_key_exists($index, $this->mapper))
-        {
+        if (!array_key_exists($index, $this->mapper)) {
             $this->mapper[$index] = $object;
         }
 
@@ -53,8 +50,7 @@ class IdentityMapperStrict implements IdentityMapperInterface
      **/
     public function clear(\Pomm\Object\BaseObject $object, Array $pk_fields)
     {
-        if (count($pk_fields) != 0)
-        {
+        if (count($pk_fields) != 0) {
             $index = $this->getSignature($object, $object->get($pk_fields));
             unset($this->mapper[$index]);
         }

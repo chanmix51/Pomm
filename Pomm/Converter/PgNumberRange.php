@@ -8,10 +8,10 @@ use Pomm\Exception\Exception;
 
 /**
  * Pomm\Converter\PgNumberRange - Number range converter
- * 
+ *
  * @package Pomm
  * @version $id$
- * @copyright 2012 Grégoire HUBERT 
+ * @copyright 2012 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -34,8 +34,7 @@ class PgNumberRange implements ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {
-        if (!preg_match('/([\[\(])(-?[0-9\.]+),-?([0-9\.]+)([\]\)])/', $data, $matchs))
-        {
+        if (!preg_match('/([\[\(])(-?[0-9\.]+),-?([0-9\.]+)([\]\)])/', $data, $matchs)) {
             throw new Exception(sprintf("Bad number range representation '%s' (asked type '%s').", $data, $type));
         }
 
@@ -47,12 +46,10 @@ class PgNumberRange implements ConverterInterface
      **/
     public function toPg($data, $type = null)
     {
-        if (! $data instanceof \Pomm\Type\NumberRange )
-        {
+        if (! $data instanceof \Pomm\Type\NumberRange) {
             throw new Exception(sprintf("PgNumberRange converter expects 'NumberRange' data to convert. '%s' given.", gettype($data)));
         }
 
         return sprintf("%s '%s%s, %s%s'", $type, $data->start_included ? '[' : '(', $data->start + 0, $data->end + 0, $data->end_included ? ']' : ')');
     }
 }
-

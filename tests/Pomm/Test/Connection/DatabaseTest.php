@@ -3,9 +3,6 @@
 namespace Pomm\Test\Connection;
 
 use Pomm\Connection\Database;
-use Pomm\Exception\Exception;
-use Pomm\Converter;
-use Pomm\Type;
 
 class DatabaseTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,4 +32,3 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Pomm\Connection\Database', $database, "Database is an instance.");
     }
 }
-

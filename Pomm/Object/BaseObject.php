@@ -21,7 +21,6 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     const EXIST    = 1;
     const MODIFIED = 2;
 
-
     protected $fields = array();
     protected $status = self::NONE;
 
@@ -34,8 +33,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      **/
     public function __construct(Array $values = null)
     {
-        if (!is_null($values))
-        {
+        if (!is_null($values)) {
             $this->hydrate($values);
         }
     }
@@ -49,21 +47,15 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      * @param String $default  Default value if var does not exist.
      * @return mixed
      */
-    public final function get($var)
+    final public function get($var)
     {
-        if (is_scalar($var))
-        {
-            if ($this->has($var)) 
-            {
+        if (is_scalar($var)) {
+            if ($this->has($var)) {
                 return $this->fields[$var];
-            }
-            else
-            {
+            } else {
                 throw new Exception(sprintf("No such key '%s'.", $var));
             }
-        }
-        elseif (is_array($var))
-        {
+        } elseif (is_array($var)) {
             return array_intersect_key($this->fields, array_flip($var));
         }
     }
@@ -74,12 +66,12 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      * Returns true if the given key exists.
      *
      * @final
-     * @param string $var 
+     * @param string $var
      * @return boolean
      */
-    public final function has($var)
+    final public function has($var)
     {
-        return array_key_exists($var, $this->fields) 
+        return array_key_exists($var, $this->fields)
             || method_exists($this, sprintf("get%s", sfInflector::camelize($var)));
     }
 
@@ -97,8 +89,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
         list($operation, $attribute) = preg_split('/(?=[A-Z])/', $method, 2);
         $attribute = sfInflector::underscore($attribute);
 
-        switch($operation)
-        {
+        switch ($operation) {
         case 'set':
             return $this->set($attribute, $arguments[0]);
         case 'get':
@@ -121,7 +112,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      *
      * @param Array $values
      */
-    public final function hydrate(Array $values)
+    final public function hydrate(Array $values)
     {
         $this->fields = array_merge($this->fields, $values);
     }
@@ -136,8 +127,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     public function convert(Array $values)
     {
         $tmp = array();
-        foreach ($values as $key => $values)
-        {
+        foreach ($values as $key => $values) {
             $tmp[strtolower($key)] = $values;
         }
 
@@ -174,27 +164,23 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      *
      * Returns the fields flatten as arrays.
      *
-     * The complex stuff in here is when there is an array, since all elements 
-     * in arrays are the same type, we check only its first value to know if we need 
+     * The complex stuff in here is when there is an array, since all elements
+     * in arrays are the same type, we check only its first value to know if we need
      * to traverse it or not.
      *
      * @return Array
      */
     public function extract()
     {
-        $array_recurse = function($val) use (&$array_recurse)
-        {
-            if (is_scalar($val)) 
+        $array_recurse = function($val) use (&$array_recurse) {
+            if (is_scalar($val))
                 return $val;
-            if (is_array($val)) 
-            {
-                if (is_array(current($val)) || (is_object(current($val)) && current($val) instanceof \Pomm\Object\BaseObject))
-                {
+            if (is_array($val)) {
+                if (is_array(current($val)) || (is_object(current($val)) && current($val) instanceof \Pomm\Object\BaseObject)) {
                     return array_map($array_recurse, $val);
-                }
-                else return $val;
+                } else return $val;
             }
-            if (is_object($val) && $val instanceof \Pomm\Object\BaseObject) 
+            if (is_object($val) && $val instanceof \Pomm\Object\BaseObject)
                 return $val->extract();
             return $val;
         };
@@ -252,7 +238,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      * @param String $var       Attribute name.
      * @param Mixed  $value     Attribute value.
      */
-    public final function set($var, $value)
+    final public function set($var, $value)
     {
         $this->fields[$var] = $value;
         $this->status = $this->status | self::MODIFIED;
@@ -269,12 +255,9 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      */
     public function add($var, $value)
     {
-        if ($this->has($var) && is_array($this->fields[$var]))
-        {
+        if ($this->has($var) && is_array($this->fields[$var])) {
             $this->fields[$var][] = $value;
-        }
-        else
-        {
+        } else {
             $this->fields[$var] = array($value);
         }
     }
@@ -287,10 +270,9 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      * @final
      * @param String $offset   Attribute name.
      **/
-    public final function clear($offset)
+    final public function clear($offset)
     {
-        if ($this->has($offset))
-        {
+        if ($this->has($offset)) {
             unset($this->fields[$offset]);
             $this->status = $this->status | self::MODIFIED;
         }

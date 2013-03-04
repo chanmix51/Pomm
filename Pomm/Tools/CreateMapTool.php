@@ -4,7 +4,6 @@ namespace Pomm\Tools;
 
 use Pomm\Pomm;
 use Pomm\Exception\Exception;
-use Pomm\External\sfInflector;
 
 /**
  * Pomm\Tools\CreateMapTool - Create a Map class
@@ -57,7 +56,7 @@ class CreateMapTool extends CreateFileTool
      * generateMapFile
      *
      * Generates the empty map file.
-     * 
+     *
      * @access protected
      **/
     protected function generateMapFile()
@@ -73,7 +72,6 @@ namespace $namespace;
 use $namespace\\Base\\${class}Map as Base${class}Map;
 use $namespace\\${class};
 use \\Pomm\\Exception\\Exception;
-use \\Pomm\\Query\\Where;
 
 class ${class}Map extends Base${class}Map
 {

@@ -32,8 +32,9 @@ class BaseObjectTest extends \PHPUnit_Framework_TestCase
     public function getEntities()
     {
         $data = array('first' => 1, 'second' => 2, 'third' => 'plop', 'fourth' => array('one', 'two', 'three'), 'fifth' => '2012-06-18 14:42:07.123456');
+
         return array(
-            array(new Entity(), array()), 
+            array(new Entity(), array()),
             array(new Entity($data), $data)
         );
     }

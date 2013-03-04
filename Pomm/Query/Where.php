@@ -2,15 +2,15 @@
 namespace Pomm\Query;
 
 /**
- * Where 
- * 
- * This class represents a WHERE clause of a SQL statement. It deals with AND & 
- * OR operator you can add using handy methods. This allows you to build 
+ * Where
+ *
+ * This class represents a WHERE clause of a SQL statement. It deals with AND &
+ * OR operator you can add using handy methods. This allows you to build
  * queries dynamically.
  *
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  **/
@@ -22,10 +22,10 @@ class Where
     public $operator;
 
     /**
-     * create 
+     * create
      *
      * A constructor you can chain from.
-     * 
+     *
      * @static
      * @param String $element Optional logical element.
      * @param Array  $values  Optional elements' values.
@@ -48,17 +48,12 @@ class Where
      **/
     public static function createWhereIn($element, Array $values)
     {
-        $escape = function ($values) use (&$escape)
-            {
+        $escape = function ($values) use (&$escape) {
                 $escaped_values = array();
-                foreach($values as $value)
-                {
-                    if (is_array($value))
-                    {
+                foreach ($values as $value) {
+                    if (is_array($value)) {
                         $escaped_values[] = sprintf("(%s)", join(', ', $escape($value)));
-                    }
-                    else
-                    {
+                    } else {
                         $escaped_values[] = '?';
                     }
                 }
@@ -66,12 +61,10 @@ class Where
                 return $escaped_values;
             };
 
-        $get_values = function($values)
-            {
+        $get_values = function($values) {
                 $array = array();
 
-                foreach(new \RecursiveIteratorIterator(new \RecursiveArrayIterator($values)) as $value)
-                {
+                foreach (new \RecursiveIteratorIterator(new \RecursiveArrayIterator($values)) as $value) {
                     $array[] = $value;
                 }
 
@@ -83,15 +76,14 @@ class Where
     }
 
     /**
-     * __construct 
-     * 
+     * __construct
+     *
      * @param String $element  (optional)
      * @param Array  $values   (optional)
      **/
     public function __construct($element = null, Array $values = array())
     {
-        if (!is_null($element))
-        {
+        if (!is_null($element)) {
             $this->element = $element;
             $this->values = $values;
 
@@ -99,12 +91,12 @@ class Where
     }
 
     /**
-     * setOperator 
-     * 
+     * setOperator
+     *
      * is it an AND or an OR ?
      * or something else (XOR maybe).
      *
-     * @param String $operator 
+     * @param String $operator
      * @return Pomm\Query\Where
      **/
     public function setOperator($operator)
@@ -115,8 +107,8 @@ class Where
     }
 
     /**
-     * isEmpty 
-     * 
+     * isEmpty
+     *
      * is it a fresh brand new object ?
      *
      * @return Boolean
@@ -127,11 +119,11 @@ class Where
     }
 
     /**
-     * transmute 
+     * transmute
      *
      * Absorbing another Where instance.
-     * 
-     * @param Pomm\Query\Where $where 
+     *
+     * @param Pomm\Query\Where $where
      **/
     public function transmute(Where $where)
     {
@@ -142,44 +134,36 @@ class Where
     }
 
     /**
-     * addWhere 
+     * addWhere
      *
      * You can add a new WHERE clause with your own operator.
-     * 
-     * @param Mixed  $element 
-     * @param Array  $values 
-     * @param String $operator 
+     *
+     * @param Mixed  $element
+     * @param Array  $values
+     * @param String $operator
      * @return Pomm\Query\Where
      **/
     public function addWhere($element, Array $values, $operator)
     {
-        if (!$element instanceof Where)
-        {
+        if (!$element instanceof Where) {
             $element = new self($element, $values);
         }
 
         if ($element->isEmpty()) return $this;
-        if ($this->isEmpty())
-        {
+        if ($this->isEmpty()) {
             $this->transmute($element);
 
             return $this;
         }
 
-        if ($this->hasElement())
-        {
+        if ($this->hasElement()) {
             $this->stack = array(new self($this->getElement(), $this->values), $element);
             $this->element = NULL;
             $this->values = array();
-        }
-        else
-        {
-            if ($this->operator == $operator)
-            {
+        } else {
+            if ($this->operator == $operator) {
                 $this->stack[] = $element;
-            }
-            else
-            {
+            } else {
                 $this->stack = array(self::create()->setStack($this->stack)->setOperator($this->operator), $element);
             }
         }
@@ -190,12 +174,12 @@ class Where
     }
 
     /**
-     * andWhere 
-     * 
+     * andWhere
+     *
      * Or use a ready to use AND where clause.
      *
-     * @param Mixed $element 
-     * @param Array $values 
+     * @param Mixed $element
+     * @param Array $values
      * @return Pomm\Query\Where
      **/
     public function andWhere($element, Array $values = array())
@@ -204,10 +188,10 @@ class Where
     }
 
     /**
-     * orWhere 
-     * 
-     * @param Mixed $element 
-     * @param Array $values 
+     * orWhere
+     *
+     * @param Mixed $element
+     * @param Array $values
      * @return Pomm\Query\Where
      **/
     public function orWhere($element, Array $values = array())
@@ -216,9 +200,9 @@ class Where
     }
 
     /**
-     * setStack 
-     * 
-     * @param Array $stack 
+     * setStack
+     *
+     * @param Array $stack
      * @return Pomm\Query\Where
      **/
     public function setStack(Array $stack)
@@ -229,27 +213,24 @@ class Where
     }
 
     /**
-     * __toString 
-     * 
+     * __toString
+     *
      * where your SQL statement is built.
      *
      * @return String
      **/
     public function __toString()
     {
-        if ($this->isEmpty())
-        {
+        if ($this->isEmpty()) {
             return 'true';
-        }
-        else
-        {
+        } else {
             return $this->parse();
         }
     }
 
     /**
-     * hasElement 
-     * 
+     * hasElement
+     *
      * @return Boolean
      **/
     public function hasElement()
@@ -258,8 +239,8 @@ class Where
     }
 
     /**
-     * getElement 
-     * 
+     * getElement
+     *
      * @return String
      **/
     public function getElement()
@@ -268,21 +249,19 @@ class Where
     }
 
     /**
-     * parse 
-     * 
+     * parse
+     *
      * @access protected
      * @return String
      **/
     protected function parse()
     {
-        if ($this->hasElement())
-        {
+        if ($this->hasElement()) {
             return $this->getElement();
         }
 
         $stack = array();
-        foreach ($this->stack as $offset => $where)
-        {
+        foreach ($this->stack as $offset => $where) {
             $stack[$offset] = $where->parse();
         }
 
@@ -290,7 +269,7 @@ class Where
     }
 
     /**
-     * getValues 
+     * getValues
      *
      * Get all the values back for the prepated statement.
      *
@@ -298,18 +277,15 @@ class Where
      **/
     public function getValues()
     {
-        if ($this->isEmpty())
-        {
+        if ($this->isEmpty()) {
             return array();
         }
-        if ($this->hasElement())
-        {
+        if ($this->hasElement()) {
             return $this->values;
         }
 
         $values = array();
-        foreach($this->stack as $offset => $where)
-        {
+        foreach ($this->stack as $offset => $where) {
             $values = array_merge($values, $where->getValues());
         }
 

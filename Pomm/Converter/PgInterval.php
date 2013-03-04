@@ -7,10 +7,10 @@ use Pomm\Exception\Exception;
 
 /**
  * Pomm\Converter\PgInterval - Date interval converter
- * 
+ *
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -21,8 +21,7 @@ class PgInterval implements ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {
-        if (!preg_match("/(?:([0-9]+) years ?)?(?:([0-9]+) mons ?)?(?:([0-9]+) days ?)?(?:([0-9]{1,2}):([0-9]{1,2}):([0-9]+))?/", $data, $matchs))
-        {
+        if (!preg_match("/(?:([0-9]+) years ?)?(?:([0-9]+) mons ?)?(?:([0-9]+) days ?)?(?:([0-9]{1,2}):([0-9]{1,2}):([0-9]+))?/", $data, $matchs)) {
             throw new Exception(sprintf("Data '%s' is not a pg interval representation.", $data));
         }
 
@@ -42,8 +41,7 @@ class PgInterval implements ConverterInterface
      **/
     public function toPg($data, $type = null)
     {
-        if (!$data instanceof \DateInterval)
-        {
+        if (!$data instanceof \DateInterval) {
             $data = \DateInterval::createFromDateString($data);
         }
 

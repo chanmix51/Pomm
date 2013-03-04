@@ -24,8 +24,7 @@ class IdentityMapTest extends \PHPUnit_Framework_TestCase
         $connection = static::$database->createConnection();
 
         $connection->begin();
-        try
-        {
+        try {
             $sql = 'CREATE SCHEMA pomm_test';
             $connection->executeAnonymousQuery($sql);
 
@@ -33,9 +32,7 @@ class IdentityMapTest extends \PHPUnit_Framework_TestCase
             $map->createTable();
 
             $connection->commit();
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             $connection->rollback();
 
             throw $e;
@@ -119,7 +116,6 @@ class IdentityMapTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-
 class EntityMap extends BaseObjectMap
 {
     protected function initialize()
@@ -148,7 +144,7 @@ class EntityMap extends BaseObjectMap
         $sql = sprintf('ALTER SEQUENCE %s_id_seq RESTART', $this->getTableName());
         $this->connection->executeAnonymousQuery($sql);
     }
-} 
+}
 
 class Entity extends BaseObject
 {

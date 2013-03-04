@@ -5,11 +5,11 @@ namespace Pomm\Object;
 use \Pomm\Exception\Exception;
 
 /**
- * Collection 
- * 
+ * Collection
+ *
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -76,28 +76,22 @@ class Collection extends SimpleCollection
 
     public function get($index)
     {
-        if (isset($this->fetched[$index]))
-        {
+        if (isset($this->fetched[$index])) {
             return $this->fetched[$index];
         }
 
         $values = $this->stmt->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_ABS, $index);
 
-        if ($values === false) 
+        if ($values === false)
             return false;
 
-        foreach($this->filters as $index => $filter)
-        {
-            if (is_callable($filter))
-            {
+        foreach ($this->filters as $index => $filter) {
+            if (is_callable($filter)) {
                 $values = call_user_func($filter, $values);
-                if (!is_array($values))
-                {
+                if (!is_array($values)) {
                     throw new Exception(sprintf("Filters have to return an Array. Filter number %d returned a '%s'.", $index, gettype($values)));
                 }
-            }
-            else
-            {
+            } else {
                 throw new Exception(sprintf("Collection filter index %d is not a callable ('%s' found instead).", $index, gettype($filter)));
             }
         }
@@ -109,11 +103,11 @@ class Collection extends SimpleCollection
     }
 
     /**
-     * rewind 
-     * 
+     * rewind
+     *
      * @see \Iterator
      */
-    public function rewind() 
+    public function rewind()
     {
         $this->position = 0;
     }

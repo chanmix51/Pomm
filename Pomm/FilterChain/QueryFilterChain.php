@@ -39,8 +39,7 @@ class QueryFilterChain
 
     public function executeNext()
     {
-        if ($this->pointer >= count($this->filters))
-        {
+        if ($this->pointer >= count($this->filters)) {
             throw new Exception(sprintf("Filter chain went over the last filter (position '%d').", $this->pointer));
         }
 

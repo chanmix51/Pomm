@@ -7,10 +7,10 @@ use \Pomm\Object\BaseObjectMap;
 
 /**
  * Pomm\Converter\PgEntity - Entity converter
- * 
+ *
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -35,24 +35,20 @@ class PgEntity implements ConverterInterface
     {
         $class_name = $this->map->getObjectClass();
 
-        if (!is_object($data))
-        {
+        if (!is_object($data)) {
             throw new Exception(sprintf("'%s' converter toPG() method expects argument to be a '%s' instance ('%s given).", get_class($this), $class_name, gettype($data)));
         }
 
-        if (! $data instanceof $class_name)
-        {
+        if (! $data instanceof $class_name) {
             throw new Exception(sprintf("'%s' converter toPG() method expects argument to be a '%s' instance ('%s given).", get_class($this), $class_name, get_class($data)));
         }
 
-        if (! $data instanceof \Pomm\Object\BaseObject)
-        {
+        if (! $data instanceof \Pomm\Object\BaseObject) {
             throw new Exception(sprintf("'%s' converter needs '%s' to be children of Pomm\\Object\\BaseObject.", get_class($this), get_class($data)));
         }
 
         $fields = array();
-        foreach ($this->map->getFieldDefinitions() as $field_name => $field_type)
-        {
+        foreach ($this->map->getFieldDefinitions() as $field_name => $field_type) {
             $fields[$field_name] = $data->has($field_name) ? $data[$field_name] : null;
         }
 
@@ -68,13 +64,11 @@ class PgEntity implements ConverterInterface
         $elts = str_getcsv(trim($data, '()'));
 
         $fields = array();
-        foreach ($this->map->getFieldDefinitions() as $field_name => $pg_type)
-        {
+        foreach ($this->map->getFieldDefinitions() as $field_name => $pg_type) {
             $fields[$field_name] = stripcslashes(array_shift($elts));
         }
 
-        if (count($elts) > 0)
-        {
+        if (count($elts) > 0) {
             $fields['_extra'] = $elts;
         }
 

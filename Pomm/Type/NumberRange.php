@@ -4,10 +4,10 @@ namespace Pomm\Type;
 
 /**
  * Pomm\Type\NumberRange - Number range type.
- * 
+ *
  * @package Pomm
  * @version $id$
- * @copyright 2012 Grégoire HUBERT 
+ * @copyright 2012 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -27,5 +27,3 @@ class NumberRange
         $this->end_included = (bool) $end_included;
     }
 }
-
-

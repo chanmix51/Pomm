@@ -5,10 +5,10 @@ use Pomm\Converter\ConverterInterface;
 
 /**
  * Pomm\Converter\PgTimestamp - Date and timestamp converter
- * 
+ *
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -27,8 +27,7 @@ class PgTimestamp implements ConverterInterface
      **/
     public function toPg($data, $type = null)
     {
-        if (!$data instanceof \DateTime)
-        {
+        if (!$data instanceof \DateTime) {
             $data = new \DateTime($data);
         }
 

@@ -9,11 +9,11 @@ use Pomm\FilterChain\QueryFilterChain;
 
 /**
  * Pomm\FilterChain\PDOQueryFilter - The query filter.
- * 
+ *
  * @package Pomm
  * @uses Pomm\FilterChain\FilterInterface
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -33,10 +33,10 @@ class PDOQueryFilter implements FilterInterface
     }
 
     /**
-     * prepareStatement 
+     * prepareStatement
      *
      * Prepare a SQL statement.
-     * 
+     *
      * @access protected
      * @return \PDOStatement
      */
@@ -46,42 +46,32 @@ class PDOQueryFilter implements FilterInterface
     }
 
     /**
-     * bindParams 
+     * bindParams
      *
      * Bind parameters to a prepared statement.
-     * 
-     * @param PDOStatement $stmt 
+     *
+     * @param PDOStatement $stmt
      * @access protected
      * @return \PDOStatement
      */
     protected function bindParams($stmt)
     {
-        foreach ($this->filter_chain->getValues() as $pos => $value)
-        {
-            if (is_integer($value))
-            {
+        foreach ($this->filter_chain->getValues() as $pos => $value) {
+            if (is_integer($value)) {
                 $type = \PDO::PARAM_INT;
-            }
-            elseif (is_bool($value))
-            {
+            } elseif (is_bool($value)) {
                 $type = \PDO::PARAM_BOOL;
-            }
-            else
-            {
-                if ($value instanceof \DateTime)
-                {
+            } else {
+                if ($value instanceof \DateTime) {
                     $value = $value->format('Y-m-d H:i:s.u');
                 }
 
                 $type = null;
             }
 
-            if (is_null($type))
-            {
+            if (is_null($type)) {
                 $stmt->bindValue($pos + 1, $value);
-            }
-            else
-            {
+            } else {
                 $stmt->bindValue($pos + 1, $value, $type);
             }
         }
@@ -90,10 +80,10 @@ class PDOQueryFilter implements FilterInterface
     }
 
     /**
-     * doQuery 
+     * doQuery
      *
      * Performs a query, returns the PDO Statment instance used.
-     * 
+     *
      * @access protected
      * @return \PDOStatement
      */
@@ -102,15 +92,11 @@ class PDOQueryFilter implements FilterInterface
         $sql = $this->filter_chain->getSql();
 
         $stmt = $this->bindParams($this->prepareStatement());
-        try
-        {
-            if (!$stmt->execute())
-            {
+        try {
+            if (!$stmt->execute()) {
                 throw new SqlException($stmt, $sql);
             }
-        }
-        catch(\PDOException $e)
-        {
+        } catch (\PDOException $e) {
             throw new Exception('PDOException while performing SQL query «%s». The driver said "%s".', $sql, $e->getMessage());
         }
 

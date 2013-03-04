@@ -7,8 +7,6 @@ use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
 use Pomm\Object\SimpleCollection;
 use Pomm\Exception\Exception;
-use Pomm\Query\Where;
-
 
 class ASimpleCollectionTest extends \PHPUnit_Framework_TestCase
 {
@@ -55,8 +53,7 @@ class ASimpleCollectionTest extends \PHPUnit_Framework_TestCase
     public function testResult(SimpleCollection $collection)
     {
         $n = 1;
-        foreach($collection as $entity) 
-        {
+        foreach ($collection as $entity) {
             $this->assertEquals($n++, $entity['id'], sprintf("We have id '%d'.", $n - 1));
         }
 
