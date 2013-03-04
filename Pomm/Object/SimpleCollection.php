@@ -5,23 +5,23 @@ namespace Pomm\Object;
 use \Pomm\Exception\Exception;
 
 /**
- * SimpleCollection 
- * 
+ * SimpleCollection
+ *
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class SimpleCollection implements \Iterator, \Countable 
+class SimpleCollection implements \Iterator, \Countable
 {
     protected $stmt;
     protected $object_map;
     protected $position = 0;
 
     /**
-     * __construct 
-     * 
+     * __construct
+     *
      * @param \PDOStatement              $stmt
      * @param \Pomm\Object\BaseObjectMap $object_map
      */
@@ -55,7 +55,7 @@ class SimpleCollection implements \Iterator, \Countable
     {
         $values = $this->stmt->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_ABS, $index);
 
-        if ($values === false) 
+        if ($values === false)
             return false;
 
         return $this->object_map->createObjectFromPg($values);
@@ -75,8 +75,8 @@ class SimpleCollection implements \Iterator, \Countable
     }
 
     /**
-     * count 
-     * 
+     * count
+     *
      * @see \Countable
      * @return Integer
      */
@@ -86,61 +86,60 @@ class SimpleCollection implements \Iterator, \Countable
     }
 
     /**
-     * rewind 
-     * 
+     * rewind
+     *
      * @see \Iterator
      */
-    public function rewind() 
+    public function rewind()
     {
-        if ($this->position !== 0)
-        {
+        if ($this->position !== 0) {
             throw new Exception(sprintf("Can not rewind a cursor. Use the \\Pomm\\Object\\Collection instead."));
         }
     }
 
     /**
-     * current 
-     * 
+     * current
+     *
      * @see \Iterator
      */
-    public function current() 
+    public function current()
     {
         return $this->get($this->position);
     }
 
     /**
-     * key 
-     * 
+     * key
+     *
      * @see \Iterator
      */
-    public function key() 
+    public function key()
     {
         return $this->position;
     }
 
     /**
-     * next 
-     * 
+     * next
+     *
      * @see \Iterator
      */
-    public function next() 
+    public function next()
     {
         ++$this->position;
     }
 
     /**
-     * valid 
-     * 
+     * valid
+     *
      * @see \Iterator
      * @return Boolean
      */
-    public function valid() 
+    public function valid()
     {
         return $this->has($this->position);
     }
 
     /**
-     * isFirst 
+     * isFirst
      * Is the iterator on the first element ?
      *
      * @return Boolean
@@ -151,10 +150,10 @@ class SimpleCollection implements \Iterator, \Countable
     }
 
     /**
-     * isLast 
+     * isLast
      *
      * Is the iterator on the last element ?
-     * 
+     *
      * @return Boolean
      */
     public function isLast()
@@ -163,10 +162,10 @@ class SimpleCollection implements \Iterator, \Countable
     }
 
     /**
-     * isEmpty 
+     * isEmpty
      *
      * Is the collection empty (no element) ?
-     * 
+     *
      * @return Boolean
      */
     public function isEmpty()
@@ -175,10 +174,10 @@ class SimpleCollection implements \Iterator, \Countable
     }
 
     /**
-     * isEven 
+     * isEven
      *
      * Is the iterator on an even position ?
-     * 
+     *
      * @return Boolean
      */
     public function isEven()
@@ -187,10 +186,10 @@ class SimpleCollection implements \Iterator, \Countable
     }
 
     /**
-     * isOdd 
+     * isOdd
      *
      * Is the iterator on an odd position ?
-     * 
+     *
      * @return Boolean
      */
     public function isOdd()
@@ -199,12 +198,12 @@ class SimpleCollection implements \Iterator, \Countable
     }
 
     /**
-     * getOddEven 
+     * getOddEven
      *
      * Return 'odd' or 'even' depending on the element index position.
-     * Useful to style list elements when printing lists to do 
+     * Useful to style list elements when printing lists to do
      * <li class="line_<?php $list->getOddEven() ?>">.
-     * 
+     *
      * @return String
      */
     public function getOddEven()
@@ -215,8 +214,8 @@ class SimpleCollection implements \Iterator, \Countable
     /**
      * extract
      *
-     * Return an array of results. Useful if you want to serialize a result or 
-     * export it as a JSON format. Filters are still executed on all the 
+     * Return an array of results. Useful if you want to serialize a result or
+     * export it as a JSON format. Filters are still executed on all the
      * fetched results.
      *
      * @param String $name The name of the resultset (Defaults to entity FQCN)
@@ -227,8 +226,7 @@ class SimpleCollection implements \Iterator, \Countable
         $name = is_null($name) ? $this->object_map->getObjectClass() : $name;
         $results = array();
 
-        foreach ($this as $result)
-        {
+        foreach ($this as $result) {
             $results[] = $result->extract();
         }
 

@@ -3,12 +3,12 @@ namespace Pomm\Exception;
 
 /**
  * Pomm\SqlException - errors from the rdbms with the PDOStatement object
- * 
+ *
  * @link http://www.postgresql.org/docs/8.4/static/errcodes-appendix.html
  * @package Pomm
  * @uses Pomm\Exception
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -18,10 +18,10 @@ class SqlException extends Exception
   protected $error_state;
 
   /**
-   * __construct 
-   * 
-   * @param PDOStatement $stmt 
-   * @param Mixed        $sql 
+   * __construct
+   *
+   * @param PDOStatement $stmt
+   * @param Mixed        $sql
    */
   public function __construct(\PDOStatement $stmt, $sql)
   {
@@ -30,7 +30,7 @@ class SqlException extends Exception
   }
 
   /**
-   * getSQLErrorState 
+   * getSQLErrorState
    *
    * Returns the SQLSTATE of the last SQL error.
    *
@@ -43,7 +43,7 @@ class SqlException extends Exception
   }
 
   /**
-   * getSQLExtendedErrorStatus 
+   * getSQLExtendedErrorStatus
    *
    * Returns the internal driver error code.
    *
@@ -55,8 +55,8 @@ class SqlException extends Exception
   }
 
   /**
-   * getSQLErrorMessage 
-   * 
+   * getSQLErrorMessage
+   *
    * @return String
    */
   public function getSQLErrorMessage()

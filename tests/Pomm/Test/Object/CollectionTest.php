@@ -3,12 +3,8 @@
 namespace Pomm\Test\Object;
 
 use Pomm\Connection\Database;
-use Pomm\Object\BaseObject;
-use Pomm\Object\BaseObjectMap;
 use Pomm\Object\SimpleCollection;
 use Pomm\Object\Collection;
-use Pomm\Exception\Exception;
-use Pomm\Query\Where;
 
 class CollectionTest extends ASimpleCollectionTest
 {
@@ -51,8 +47,7 @@ class CollectionTest extends ASimpleCollectionTest
             ->registerFilter(array($this, 'doNothing'))
             ;
         $n = 1;
-        foreach ($collection as $entity)
-        {
+        foreach ($collection as $entity) {
             $this->assertEquals(2 * $n++, $entity->get('id'), "Filter multiply everthing by 2.");
         }
     }
@@ -64,12 +59,10 @@ class CollectionTest extends ASimpleCollectionTest
     {
         $collection = static::$map->findAll();
 
-        foreach ($collection as $result)
-        {
+        foreach ($collection as $result) {
         }
 
-        foreach ($collection as $index => $result)
-        {
+        foreach ($collection as $index => $result) {
             $this->assertTrue( $index + 1 == $result['id'], "Index follows status.");
         }
     }

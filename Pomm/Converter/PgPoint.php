@@ -8,10 +8,10 @@ use Pomm\Exception\Exception;
 
 /**
  * Pomm\Converter\PgPoint - Geometric Point converter
- * 
+ *
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -34,8 +34,7 @@ class PgPoint implements ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {
-        if (!preg_match('/([0-9e\-+\.]+,[0-9e\-+\.]+)/', $data))
-        {
+        if (!preg_match('/([0-9e\-+\.]+,[0-9e\-+\.]+)/', $data)) {
             throw new Exception(sprintf("Bad point representation '%s' (asked type '%s').", $data, $type));
         }
 
@@ -49,14 +48,10 @@ class PgPoint implements ConverterInterface
      **/
     public function toPg($data, $type = null)
     {
-        if (! $data instanceof $this->class_name)
-        {
-            if (!is_object($data)) 
-            {
+        if (! $data instanceof $this->class_name) {
+            if (!is_object($data)) {
                 $type = gettype($data);
-            }
-            else 
-            {
+            } else {
                 $type = get_class($data);
             }
 

@@ -5,11 +5,11 @@ namespace Pomm\Tools;
 use Pomm\Exception\Exception;
 
 /**
- * Pomm\Tools\ParameterHolder 
+ * Pomm\Tools\ParameterHolder
  *
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -19,7 +19,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
 
     /**
      * __construct()
-     * 
+     *
      * @param Array $parameters (optional)
      **/
     public function __construct(Array $parameters = array())
@@ -35,7 +35,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
      * @param String $name
      * @param String $value
      * */
-    public function setParameter($name, $value) 
+    public function setParameter($name, $value)
     {
         $this->parameters[$name] = $value;
     }
@@ -88,8 +88,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
      **/
     public function mustHave($name)
     {
-        if (!$this->hasParameter($name))
-        {
+        if (!$this->hasParameter($name)) {
             throw new Exception(sprintf('The parameters "%s" is mandatory.', $name));
         }
     }
@@ -104,8 +103,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
      **/
     public function setDefaultValue($name, $value)
     {
-        if (!$this->hasParameter($name))
-        {
+        if (!$this->hasParameter($name)) {
             $this->setParameter($name, $value);
         }
     }
@@ -113,7 +111,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
     /**
      * mustBeOneOf()
      *
-     * Check if the given parameter is one of the values passed as argument. If 
+     * Check if the given parameter is one of the values passed as argument. If
      * not, an exception is thrown.
      *
      * @param String $name the parameter's name
@@ -123,8 +121,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
 
     public function mustBeOneOf($name, Array $values)
     {
-        if (!in_array($this[$name], $values))
-        {
+        if (!in_array($this[$name], $values)) {
             throw new Exception(sprintf('The parameters "%s" must be one of [%s].', $name, implode(', ', $values)));
         }
 
@@ -134,7 +131,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
     /**
      * unsetParameter()
      *
-     * @param String $name 
+     * @param String $name
      **/
     public function unsetParameter($name)
     {
@@ -185,7 +182,6 @@ class ParameterHolder implements \ArrayAccess, \Iterator
     {
         return current($this->parameters);
     }
-
 
     /**
      * next()

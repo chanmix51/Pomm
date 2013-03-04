@@ -2,8 +2,6 @@
 
 namespace Pomm\External;
 
-use Pomm\External\Toolkit;
-
 /*
  * This file is part of the symfony package.
  * (c) 2004-2006 Fabien Potencier <fabien.potencier@symfony-project.com>
@@ -115,8 +113,7 @@ class sfInflector
    */
   public static function humanize($lower_case_and_underscored_word)
   {
-    if (substr($lower_case_and_underscored_word, -3) === '_id')
-    {
+    if (substr($lower_case_and_underscored_word, -3) === '_id') {
       $lower_case_and_underscored_word = substr($lower_case_and_underscored_word, 0, -3);
     }
 

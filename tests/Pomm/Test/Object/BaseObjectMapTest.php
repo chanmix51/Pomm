@@ -17,17 +17,14 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
     {
         $database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
 
-        if (isset($GLOBALS['dev']) && $GLOBALS['dev'] == 'true') 
-        {
+        if (isset($GLOBALS['dev']) && $GLOBALS['dev'] == 'true') {
             static::$logger = new \Pomm\Tools\Logger();
 
             static::$map = $database
                 ->createConnection()
                 ->registerFilter(new \Pomm\FilterChain\LoggerFilter(static::$logger))
                 ->getMapFor('Pomm\Test\Object\BaseEntity');
-        } 
-        else 
-        {
+        } else {
             static::$map = $database
                 ->createConnection()
                 ->getMapFor('Pomm\Test\Object\BaseEntity');
@@ -77,7 +74,7 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @depends testSave 
+     * @depends testSave
      **/
     public function testSaveUpdate(BaseEntity $entity)
     {
@@ -128,13 +125,11 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
         $test_entity = static::$map->findWhere('ts_data > ?', array(new \DateTime("2000-01-01")))->current();
         $this->assertEquals(1, $test_entity['id'], "Can feed findWhere with a DateTime instance.");
 
-
         return $entity;
     }
 
-
     /**
-     * @depends testFindWhere 
+     * @depends testFindWhere
      **/
     public function testFindByPK(BaseEntity $entity)
     {
@@ -243,8 +238,7 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(5, $raw_res->count(), "5 results.");
 
         $this->assertEquals(5, $ordered_res->count(), "5 results.");
-        foreach ($ordered_res as $index => $result) 
-        {
+        foreach ($ordered_res as $index => $result) {
             $this->assertEquals( 5 - $index, $result['id'], "Names are the other way than ids.");
         }
 
@@ -322,4 +316,3 @@ class BaseEntityMap extends BaseObjectMap
 class BaseEntity extends BaseObject
 {
 }
-

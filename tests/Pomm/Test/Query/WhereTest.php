@@ -28,6 +28,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $where = Where::createWhereIn('(C, D)', array(array('pika', 1), array('chu', 2)));
         $this->assertEquals('(C, D) IN ((?, ?), (?, ?))', (string) $where, "String where is '(C, D) IN ((?, ?), (?, ?))'.");
         $this->assertEquals(array('pika', 1, 'chu', 2), $where->getValues(), 'Where values are "[pika, 1, chu, 2]".');
+
         return $where;
     }
 
@@ -74,4 +75,3 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->checkToString($where, '((A AND B AND C) OR D OR NOT E OR ((A OR B OR C) AND D AND NOT E))', array(1, 2, 3, 4, 5, 1, 2, 3, 4, 5));
     }
 }
-

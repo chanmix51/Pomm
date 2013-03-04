@@ -8,10 +8,10 @@ use Pomm\Exception\Exception;
 
 /**
  * Pomm\Converter\PgTsRange - Timestamp range converter
- * 
+ *
  * @package Pomm
  * @version $id$
- * @copyright 2012 Grégoire HUBERT 
+ * @copyright 2012 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -34,8 +34,7 @@ class PgTsRange implements ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {
-        if (!preg_match('/([\[\(])"([0-9 :-]+)","([0-9 :-]+)"([\]\)])/', $data, $matchs))
-        {
+        if (!preg_match('/([\[\(])"([0-9 :-]+)","([0-9 :-]+)"([\]\)])/', $data, $matchs)) {
             throw new Exception(sprintf("Bad timestamp range representation '%s' (asked type '%s').", $data, $type));
         }
 
@@ -47,8 +46,7 @@ class PgTsRange implements ConverterInterface
      **/
     public function toPg($data, $type = null)
     {
-        if (! $data instanceof \Pomm\Type\TsRange )
-        {
+        if (! $data instanceof \Pomm\Type\TsRange) {
             throw new Exception(sprintf("PgTsRange converter expects 'TsRange' data to convert. '%s' given.", gettype($data)));
         }
 

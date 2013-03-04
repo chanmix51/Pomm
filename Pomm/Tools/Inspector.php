@@ -43,8 +43,7 @@ class Inspector
         $sql = sprintf("SELECT c.oid FROM pg_catalog.pg_class c LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = '%s' AND c.relname ~ '^(%s)$';", $schema, $table);
         $oid = $this->connection->getPdo()->query($sql)->fetchColumn();
 
-        if ($oid === FALSE)
-        {
+        if ($oid === FALSE) {
             throw new Exception(sprintf("Could not find table or view '%s' in postgres schema '%s'.", $table, $schema));
         }
 
@@ -63,16 +62,16 @@ class Inspector
     public function getTablesOids($schema, Array $names)
     {
         $sql = <<<SQL
-SELECT 
-  c.relname AS table_name, 
-  c.oid 
-FROM 
+SELECT
+  c.relname AS table_name,
+  c.oid
+FROM
   pg_catalog.pg_class c
-    LEFT JOIN pg_catalog.pg_namespace n ON 
-      n.oid = c.relnamespace 
-WHERE 
-    n.nspname = '%s' 
-  AND 
+    LEFT JOIN pg_catalog.pg_namespace n ON
+      n.oid = c.relnamespace
+WHERE
+    n.nspname = '%s'
+  AND
     c.relname ~ ANY(ARRAY[%s]::varchar[])
 SQL;
 
@@ -82,14 +81,12 @@ SQL;
             join(', ', array_map(function($val) { return sprintf("'^(%s)$'", $val); }, $names))
         ));
 
-        if ($pdo === false)
-        {
+        if ($pdo === false) {
             throw new ToolException(sprintf("Could not query the database."));
         }
 
         $tables = array();
-        foreach($pdo->fetchAll(\PDO::FETCH_ASSOC) AS $row)
-        {
+        foreach ($pdo->fetchAll(\PDO::FETCH_ASSOC) AS $row) {
             $tables[$row['table_name']] = $row['oid'];
         }
 
@@ -97,7 +94,7 @@ SQL;
     }
 
     /**
-     * getTableInformation 
+     * getTableInformation
      *
      * Returns the object name, type and schema associated to an oid.
      *
@@ -111,8 +108,7 @@ SQL;
 
         $information = $pdo->fetch(\PDO::FETCH_ASSOC);
 
-        if ($information === FALSE)
-        {
+        if ($information === FALSE) {
             throw new Exception(sprintf("Could not find any objects in table pg_class for oid='%d'.", $oid));
         }
 
@@ -149,45 +145,44 @@ SQL;
     public function getTableFieldsInformation($oid)
     {
         $sql = <<<SQL
-SELECT 
+SELECT
   a.attname,
   t.typname AS type,
   n.nspname AS type_namespace,
   (
-    SELECT 
-      substring(pg_catalog.pg_get_expr(d.adbin, d.adrelid) for 128) 
-    FROM 
-      pg_catalog.pg_attrdef d 
-    WHERE 
-        d.adrelid = a.attrelid 
-      AND 
-        d.adnum = a.attnum 
-      AND 
+    SELECT
+      substring(pg_catalog.pg_get_expr(d.adbin, d.adrelid) for 128)
+    FROM
+      pg_catalog.pg_attrdef d
+    WHERE
+        d.adrelid = a.attrelid
+      AND
+        d.adnum = a.attnum
+      AND
         a.atthasdef
   ) as defaultval,
   a.attnotnull as notnull,
-  a.attnum as index 
-FROM 
-  pg_catalog.pg_attribute a 
+  a.attnum as index
+FROM
+  pg_catalog.pg_attribute a
     JOIN pg_catalog.pg_type t ON
         a.atttypid = t.oid
     JOIN pg_namespace n ON
         t.typnamespace = n.oid
-WHERE 
+WHERE
     a.attrelid = %d
-  AND 
-    a.attnum > 0 
-  AND 
-    NOT a.attisdropped 
-ORDER BY 
+  AND
+    a.attnum > 0
+  AND
+    NOT a.attisdropped
+ORDER BY
   a.attnum
 SQL;
         $sql = sprintf($sql, $oid);
 
         $pdo = $this->connection->getPdo()->query($sql);
         $attributes = array();
-        while ($class = $pdo->fetch(\PDO::FETCH_LAZY))
-        {
+        while ($class = $pdo->fetch(\PDO::FETCH_LAZY)) {
             $attributes[] = array('attname' => $class->attname, 'format_type' => $class->type_namespace == 'pg_catalog' ? $class->type : sprintf("%s.%s", $class->type_namespace, $class->type));
         }
 
@@ -197,7 +192,7 @@ SQL;
     /**
      * getTableParent
      *
-     * Return the oid of the parent table if any, FALSE is returned if there 
+     * Return the oid of the parent table if any, FALSE is returned if there
      * are no parent or if there are several parents.
      *
      * @param Integer $oid
@@ -208,14 +203,12 @@ SQL;
         $sql = sprintf("SELECT pa.inhparent FROM pg_catalog.pg_inherits pa WHERE pa.inhrelid = %d", $oid);
         $pdo = $this->connection->getPdo()->query($sql);
 
-        if ($pdo->rowCount() <> 1)
-        {
+        if ($pdo->rowCount() <> 1) {
             return FALSE;
         }
 
         return $pdo->fetchColumn();
     }
-
 
     /**
      * getTablesInSchema
@@ -231,8 +224,7 @@ SQL;
 
         $tables = array();
         $pdo = $this->connection->getPdo()->query($sql);
-        while ($oid = $pdo->fetchColumn())
-        {
+        while ($oid = $pdo->fetchColumn()) {
             $tables[] = $oid;
         }
 
@@ -255,8 +247,7 @@ SQL;
         $pdo = $this->connection->getPdo()->query($sql);
         $sources = array();
 
-        while ($source = $pdo->fetchColumn())
-        {
+        while ($source = $pdo->fetchColumn()) {
             $sources[] = $source;
         }
 

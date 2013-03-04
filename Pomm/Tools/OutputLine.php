@@ -1,9 +1,7 @@
 <?php
 namespace Pomm\Tools;
 
-use Pomm\Exception\ToolException;
-
-class OutputLine 
+class OutputLine
 {
     const LEVEL_DEBUG    = 1;
     const LEVEL_INFO     = 2;
@@ -54,8 +52,7 @@ class OutputLine
      **/
     public function getFormattedLevel()
     {
-        switch($this->level)
-        {
+        switch ($this->level) {
         case 1: return "DEBUG";
         case 2: return "INFO";
         case 4: return "WARNING";
@@ -64,4 +61,3 @@ class OutputLine
         }
     }
 }
-

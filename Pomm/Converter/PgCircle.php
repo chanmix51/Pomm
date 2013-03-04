@@ -8,10 +8,10 @@ use Pomm\Exception\Exception;
 
 /**
  * Pomm\Converter\PgCircle - Geometric Circle converter
- * 
+ *
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -41,11 +41,9 @@ class PgCircle implements ConverterInterface
 
         $elts = preg_split('/[,\s]*(\([^\)]+\))[,\s]*|[,\s]+/', $data, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
-        if (count($elts) !== 2)
-        {
+        if (count($elts) !== 2) {
             throw new Exception(sprintf("Cannot parse circle data '%s'.", $data));
         }
-
 
         return new Circle($this->point_converter->fromPg($elts[0]), $elts[1]);
     }
@@ -55,14 +53,10 @@ class PgCircle implements ConverterInterface
      **/
     public function toPg($data, $type = null)
     {
-        if (! $data instanceof $this->class_name)
-        {
-            if (!is_object($data)) 
-            {
+        if (! $data instanceof $this->class_name) {
+            if (!is_object($data)) {
                 $type = gettype($data);
-            }
-            else 
-            {
+            } else {
                 $type = get_class($data);
             }
 

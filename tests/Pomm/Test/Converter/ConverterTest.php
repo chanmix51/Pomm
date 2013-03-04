@@ -22,16 +22,14 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
 
         static::$connection = $database->createConnection();
 
-        if (isset($GLOBALS['dev']) && $GLOBALS['dev'] == 'true') 
-        {
+        if (isset($GLOBALS['dev']) && $GLOBALS['dev'] == 'true') {
             static::$logger = new \Pomm\Tools\Logger();
 
             static::$connection->registerFilter(new \Pomm\FilterChain\LoggerFilter(static::$logger));
-        } 
+        }
 
         static::$connection->begin();
-        try
-        {
+        try {
             $sql = 'CREATE SCHEMA pomm_test';
             static::$connection->executeAnonymousQuery($sql);
 
@@ -41,9 +39,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
             static::$super_cv_map = static::$connection->getMapFor('Pomm\Test\Converter\SuperConverterEntity');
             static::$super_cv_map->createTable(static::$cv_map);
             static::$connection->commit();
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             static::$connection->rollback();
 
             throw $e;
@@ -106,18 +102,14 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $entity['some_text'], "Empty strings are ok.");
         $this->assertEquals(array(null, '123', null, '', null, 'abc'), $entity['arr_varchar'], "Char arrays can contain nulls and emtpy strings.");
 
-        if (static::$cv_map->alterJson() !== false)
-        {
+        if (static::$cv_map->alterJson() !== false) {
             $entity['some_json'] = json_encode(array('plop' => array('pika' => 'chu', 'lot of' => array(1, 2, 3, 4, 5))));
             static::$cv_map->updateOne($entity, array('some_json'));
 
             $this->assertEquals('{"plop":{"pika":"chu","lot of":[1,2,3,4,5]}}', $entity['some_json'], "Json type is kept unchanged.");
-        }
-        else
-        {
+        } else {
             $this->markTestSkipped("Json type is supported since postgresql 9.2. Test skipped.");
         }
-
 
         return $entity;
     }
@@ -195,10 +187,10 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
      * pg bytea escaping with PHP :
      * https://bugs.php.net/bug.php?id=59831&thanks=6
      *
-     * I don't know why PHP seems to strip some chars from bytea when fetching 
+     * I don't know why PHP seems to strip some chars from bytea when fetching
      * results on some large objects wich makes fail tests (See issue #31).
      *
-     * Arrays of bytea is not supported as PHP returns this field as string and 
+     * Arrays of bytea is not supported as PHP returns this field as string and
      * it (or myself) was not able to convert strings to binary (See issue #32).
      *
      * @depends testInteger
@@ -219,7 +211,6 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($length, strlen($entity['some_bin']), "Binary strings have same length.");
         $this->assertEquals($hash, $this->checksumBinary($entity['some_bin']), "Small 'some_bin' is preserved.");
 
-
         return $entity;
     }
 
@@ -231,7 +222,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         static::$cv_map->alterPoint();
         $entity = static::$cv_map->findAll()->current();
         $values = array(
-            'some_point' => new Type\Point(47.21262, -1.55516), 
+            'some_point' => new Type\Point(47.21262, -1.55516),
             'arr_point' => array(new Type\Point(6.431264, 3.424915), new Type\Point(-33.969043, 151.187225))
         );
 
@@ -334,10 +325,9 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
     /**
      * @depends testInteger
      **/
-    function testHStore()
+    public function testHStore()
     {
-        if (static::$cv_map->alterHStore() === false)
-        {
+        if (static::$cv_map->alterHStore() === false) {
             $this->markTestSkipped("HStore extension could not be found in Postgres, tests skipped.");
 
             return;
@@ -357,8 +347,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
      **/
     public function testLTree()
     {
-        if (static::$cv_map->alterLTree() === false)
-        {
+        if (static::$cv_map->alterLTree() === false) {
             $this->markTestSkipped("Ltree extension could not be found in Postgres, tests skipped.");
 
             return;
@@ -401,8 +390,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
      **/
     public function testTsRange()
     {
-        if (static::$cv_map->alterTsRange() === false)
-        {
+        if (static::$cv_map->alterTsRange() === false) {
             $this->markTestSkipped("tsrange type could not be found, maybe Postgres version < 9.2. Tests skipped.");
 
             return;
@@ -433,8 +421,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
      **/
     public function testNumberRangeConverter()
     {
-        if (static::$cv_map->alterNumberRange() === false)
-        {
+        if (static::$cv_map->alterNumberRange() === false) {
             $this->markTestSkipped("Range types could not be found, maybe Postgres version < 9.2. Tests skipped.");
 
             return;
@@ -454,8 +441,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new Type\NumberRange(29.76607095, 30.44125206, false, false), $entity['some_numrange'], "Numrange is ok.");
         $this->assertTrue(is_array($entity['arr_numrange']), "'arr_numrange' is an array.");
 
-        for($x = 1; $x <= count($entity['arr_numrange']); $x++)
-        {
+        for ($x = 1; $x <= count($entity['arr_numrange']); $x++) {
             $range = $entity['arr_numrange'][$x - 1];
             $this->assertInstanceOf('\Pomm\Type\NumberRange', $range, "Instance 'NumberRange'.");
             $this->assertEquals((float) $x * 1.1, $range->start, "Range start is ok.");
@@ -508,8 +494,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Pomm\Test\Converter\TsEntity', $ts_extended_entity['p1'], "'p1' is a \\DateTime instance.");
         $this->assertEquals('2000-02-29', $ts_extended_entity['p1']['p1']->format('Y-m-d'), 'Timestamp is preserved.');
 
-        foreach (array('1999-12-31 23:59:59.999999', '2005-01-29 23:01:58.000000') AS $key => $ts)
-        {
+        foreach (array('1999-12-31 23:59:59.999999', '2005-01-29 23:01:58.000000') AS $key => $ts) {
             $this->assertEquals($ts, $ts_extended_entity['p2'][$key]['p1']->format('Y-m-d H:i:s.u'), 'Timestamp array is preserved.');
         }
 
@@ -550,19 +535,15 @@ class ConverterEntityMap extends BaseObjectMap
     protected function alterTable(Array $fields)
     {
         $this->connection->begin();
-        try
-        {
-            foreach($fields as $field => $type)
-            {
+        try {
+            foreach ($fields as $field => $type) {
                 $sql = sprintf("ALTER TABLE %s ADD COLUMN %s %s", $this->getTableName(), $field, $type);
                 $this->connection->executeAnonymousQuery($sql);
                 $this->addField($field, strtok($type, '('));
             }
 
             $this->connection->commit();
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             $this->connection->rollback();
 
             throw $e;
@@ -624,8 +605,7 @@ class ConverterEntityMap extends BaseObjectMap
 
     public function alterHStore()
     {
-        if ($schema = $this->checkType('hstore') === false)
-        {
+        if ($schema = $this->checkType('hstore') === false) {
             return false;
         }
 
@@ -637,8 +617,7 @@ class ConverterEntityMap extends BaseObjectMap
 
     public function alterLTree()
     {
-        if ($schema = $this->checkType('ltree') === false)
-        {
+        if ($schema = $this->checkType('ltree') === false) {
             return false;
         }
 
@@ -650,8 +629,7 @@ class ConverterEntityMap extends BaseObjectMap
 
     public function alterTsRange()
     {
-        if ($schema = $this->checkType('tsrange') === false)
-        {
+        if ($schema = $this->checkType('tsrange') === false) {
             return false;
         }
 
@@ -663,8 +641,7 @@ class ConverterEntityMap extends BaseObjectMap
 
     public function alterJson()
     {
-        if ($schema = $this->checkType('json') === false)
-        {
+        if ($schema = $this->checkType('json') === false) {
             return false;
         }
 
@@ -673,8 +650,7 @@ class ConverterEntityMap extends BaseObjectMap
 
     public function alterNumberRange()
     {
-        if ($schema = $this->checkType('numrange') === false)
-        {
+        if ($schema = $this->checkType('numrange') === false) {
             return false;
         }
 
@@ -745,7 +721,7 @@ class TsExtendedEntityMap extends BaseObjectMap
     {
         $this->object_class = '\Pomm\Test\Converter\TsExtendedEntity';
         $this->object_name  = <<<SQL
-( VALUES 
+( VALUES
   ( ROW('2000-02-29'::timestamp)::pomm_test.ts_entity, ARRAY[ROW('1999-12-31 23:59:59.999999'::timestamp)::pomm_test.ts_entity, ROW('2005-01-29 23:01:58'::timestamp)::pomm_test.ts_entity]::pomm_test.ts_entity[] ),
   ( ROW('2004-02-29'::timestamp)::pomm_test.ts_entity, ARRAY[ROW('1989-12-31 23:59:59.999999'::timestamp)::pomm_test.ts_entity, ROW('2005-01-29 23:01:58'::timestamp)::pomm_test.ts_entity]::pomm_test.ts_entity[] )
 ) ts_extended_entity (p1, p2)
@@ -779,7 +755,7 @@ class TsOverExtendedEntityMap extends BaseObjectMap
     {
         $this->object_class = '\Pomm\Test\Converter\TsOverExtendedEntity';
         $this->object_name  = <<<SQL
-( VALUES 
+( VALUES
   ( ROW(ROW('2000-02-29'::timestamp)::pomm_test.ts_entity, ARRAY[ROW('1999-12-31 23:59:59.999999'::timestamp)::pomm_test.ts_entity, ROW('2005-01-29 23:01:58'::timestamp)::pomm_test.ts_entity]::pomm_test.ts_entity[] )::pomm_test.ts_extended_entity, ARRAY[ROW(ROW('2004-02-29'::timestamp)::pomm_test.ts_entity, ARRAY[ROW('1989-12-31 23:59:59.999999'::timestamp)::pomm_test.ts_entity, ROW('2005-01-29 23:01:58'::timestamp)::pomm_test.ts_entity]::pomm_test.ts_entity[])::pomm_test.ts_extended_entity]::pomm_test.ts_extended_entity[] )
 ) ts_over_extended_entity (p1, p2)
 SQL;
@@ -802,6 +778,6 @@ SQL;
     }
 }
 
-class TsOverExtendedEntity extends BaseObject 
+class TsOverExtendedEntity extends BaseObject
 {
 }

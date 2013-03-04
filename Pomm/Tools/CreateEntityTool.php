@@ -4,10 +4,9 @@ namespace Pomm\Tools;
 
 use Pomm\Pomm;
 use Pomm\Exception\Exception;
-use Pomm\External\sfInflector;
 
 /**
- * Pomm\Tools\CreateEntityTool 
+ * Pomm\Tools\CreateEntityTool
  *
  * Create an Entity class from the database schema.
  *
@@ -25,7 +24,7 @@ class CreateEntityTool extends CreateFileTool
      *
      * mandatory options :
      * * class      the class name to generate
-     * * database   the database 
+     * * database   the database
      *
      * optional options :
      * * namespace
