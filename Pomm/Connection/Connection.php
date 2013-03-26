@@ -144,9 +144,10 @@ class Connection
      */
     public function getMapFor($class, $force = false)
     {
+        $class = trim($class, '\\');
         $class_name = $class.'Map';
 
-        if ($force === true or !array_key_exists($class_name, $this->maps))
+        if ($force === true or !array_key_exists($class, $this->maps))
         {
             $this->maps[$class] = new $class_name($this);
         }
