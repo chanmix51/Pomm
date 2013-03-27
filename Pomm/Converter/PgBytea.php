@@ -52,7 +52,22 @@ class PgBytea implements ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {
-        return stripcslashes(@stream_get_contents($data));
+        if (is_resource($data))
+        {
+            return stripcslashes(@stream_get_contents($data));
+        }
+        else if (substr($data,0,2) === '\\x')
+        {
+            return stripcslashes(pack('H*',substr($data,2)));
+        }
+        else if (function_exists('pg_unescape_bytea'))
+        {
+            return pg_unescape_bytea($data);
+        }
+        else
+        {
+            return stripcslashes($data);
+        }
     }
 }
 
