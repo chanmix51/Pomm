@@ -100,7 +100,7 @@ class Connection
         }
 
         // required for pg8.4 -> pg9.1 compatibility
-        $this->handler->exec('SET standard_conforming_strings TO off');
+        $this->handler->exec('SET standard_conforming_strings TO off; SET bytea_output TO escape');
     }
 
     /*

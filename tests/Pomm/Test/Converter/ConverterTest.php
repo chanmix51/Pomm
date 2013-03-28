@@ -211,13 +211,16 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $hash = $this->checksumBinary($binary);
         $length = strlen($binary);
 
-        $values = array('some_bin' => $binary);
+        $values = array('some_bin' => $binary, 'arr_bin' => array($binary, $binary));
         $entity->hydrate($values);
 
         static::$cv_map->saveOne($entity);
 
         $this->assertEquals($length, strlen($entity['some_bin']), "Binary strings have same length.");
         $this->assertEquals($hash, $this->checksumBinary($entity['some_bin']), "Small 'some_bin' is preserved.");
+
+        $this->assertEquals(2, count($entity['arr_bin']), "The array has 2 elements.");
+        $this->assertEquals($binary, $entity['arr_bin'][0], "The values in the array are preserved.");
 
 
         return $entity;
@@ -595,7 +598,7 @@ class ConverterEntityMap extends BaseObjectMap
 
     public function alterBinary()
     {
-        $this->alterTable(array('some_bin' => 'bytea'));
+        $this->alterTable(array('some_bin' => 'bytea', 'arr_bin' => 'bytea[]'));
     }
 
     public function alterPoint()

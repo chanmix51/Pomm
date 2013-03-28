@@ -32,6 +32,14 @@ class PgBytea implements ConverterInterface
         return $data;
     }
 
+    protected function unescByteA($data)
+    {
+        $search = array('\\000', '\\\'', '\\033', '\\015', '\\'); 
+        $replace = array(chr(0), chr(39), chr(27), chr(13), chr(92)); 
+        $data = str_replace($search, $replace, $data); 
+
+        return $data;
+    }
     /**
      * @see Pomm\Converter\ConverterInterface
      **/
@@ -52,7 +60,12 @@ class PgBytea implements ConverterInterface
      **/
     public function fromPg($data, $type = null)
     {
-        return stripcslashes(@stream_get_contents($data));
+        if (is_resource($data))
+        {
+            return stripcslashes(@stream_get_contents($data));
+        }
+
+        return $this->unescByteA(stripcslashes($data));
     }
 }
 
