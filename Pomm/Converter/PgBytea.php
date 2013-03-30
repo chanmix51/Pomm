@@ -34,9 +34,11 @@ class PgBytea implements ConverterInterface
 
     protected function unescByteA($data)
     {
-        $search = array('\\000', '\\\'', '\\033', '\\015', '\\'); 
-        $replace = array(chr(0), chr(39), chr(27), chr(13), chr(92)); 
+        $search = array('\\000', '\\\'', '\\'); 
+        $replace = array(chr(0), chr(39), chr(92)); 
         $data = str_replace($search, $replace, $data); 
+
+        $data = preg_replace_callback('/\\\\([0-9]{3})/', function($byte) { return chr((int) base_convert((int) $byte[1], 8, 10)); }, $data);
 
         return $data;
     }
