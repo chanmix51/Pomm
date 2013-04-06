@@ -27,4 +27,3 @@ class TsRange
         $this->end_included = (bool) $end_included;
     }
 }
-

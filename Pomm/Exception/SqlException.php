@@ -1,4 +1,5 @@
 <?php
+
 namespace Pomm\Exception;
 
 /**
@@ -20,8 +21,8 @@ class SqlException extends Exception
   /**
    * __construct 
    * 
-   * @param PDOStatement $stmt 
-   * @param Mixed        $sql 
+   * @param PDOStatement $stmt
+   * @param Mixed        $sql
    */
   public function __construct(\PDOStatement $stmt, $sql)
   {

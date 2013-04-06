@@ -21,7 +21,7 @@ class Logger
      * Add a new log line to the logger.
      *
      * @param String $status
-     **/
+     */
     public function add($status)
     {
         $this->logs[] = $status;
@@ -33,7 +33,7 @@ class Logger
      * Get all stored log lines.
      *
      * @return Array
-     **/
+     */
     public function getLogs()
     {
         return $this->logs;

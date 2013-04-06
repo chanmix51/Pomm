@@ -22,8 +22,8 @@ interface FilterInterface
      *
      * Run the filter.
      *
-     * @param Pomm\FilterChain\QueryFilterChain $query_filter_chain 
+     * @param Pomm\FilterChain\QueryFilterChain $query_filter_chain
      * @return \PDOStatement 
-     **/
+     */
     public function execute(QueryFilterChain $query_filter_chain);
 }

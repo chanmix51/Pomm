@@ -72,7 +72,7 @@ abstract class BaseObjectMap
      * 
      * Get the associated table signature (schema.name).
      * 
-     * @param  String $alias Optionnal alias (default null).
+     * @param  String $alias Optional alias (default null).
      * @return String
      */
     public function getTableName($alias = null)
@@ -88,7 +88,7 @@ abstract class BaseObjectMap
      * Returns object_class definition.
      *
      * @return String
-     **/
+     */
     public function getObjectClass()
     {
         return $this->object_class;
@@ -154,7 +154,7 @@ abstract class BaseObjectMap
     /**
      * addVirtualField 
      *
-     * Add a new virtial field definition.
+     * Add a new virtual field definition.
      *
      * @access protected
      * @param string $name 
@@ -174,7 +174,7 @@ abstract class BaseObjectMap
      *
      * @param Array $values
      * @return \Pomm\Object\BaseObject
-     **/
+     */
     public function createAndSaveObject(Array $values)
     {
         $object = $this->createObject($values);
@@ -206,7 +206,7 @@ abstract class BaseObjectMap
      *
      * @param Array $values  Values to be converted..
      * @return \Pomm\Object\BaseObject $object
-     **/
+     */
     public function createObjectFromPg(Array $values)
     {
         $values = $this->convertFromPg($values);
@@ -229,7 +229,7 @@ abstract class BaseObjectMap
      * @param String  $sql    SQL statement.
      * @param Array  $values Optional parameters for the prepared query.
      * @return \PDOStatement
-     **/
+     */
     public function doQuery($sql, $values = array())
     {
         return $this->connection->executeFilterChain($this, $sql, $values);
@@ -260,7 +260,7 @@ abstract class BaseObjectMap
      * @param Integer $items_per_page
      * @param Integer $page      page index.
      * @return \Pomm\Object\Pager
-     **/
+     */
     public function paginateQuery($sql, $sql_count, $values, $items_per_page, $page = 1)
     {
         if ($page < 1)
@@ -285,7 +285,9 @@ abstract class BaseObjectMap
      * findAll 
      *
      * The simplest query on a table.
-     * 
+     *
+     * @param string $suffix
+     *
      * @return \Pomm\Object\Collection
      */
     public function findAll($suffix = '')
@@ -331,7 +333,7 @@ abstract class BaseObjectMap
      * @param Integer  $items_per_page
      * @param Integer  $page     Page index.
      * @return \Pomm\Object\Pager
-     **/
+     */
     public function paginateFindWhere($where, $values, $suffix, $items_per_page, $page = 1)
     {
         if (is_object($where))
@@ -346,7 +348,7 @@ abstract class BaseObjectMap
             }
         }
 
-        $sql_count = sprintf("SELECT count(*) FROM %s WHERE %s", 
+        $sql_count = sprintf("SELECT count(*) FROM %s WHERE %s",
             $this->getTableName(),
             (string) $where
         );
@@ -357,7 +359,7 @@ abstract class BaseObjectMap
     /**
      * findByPk 
      * 
-     * Retrieve the corresponing entity from the database if it exists.
+     * Retrieve the corresponding entity from the database if it exists.
      *
      * @param Array $values Key value of the PK.
      * @return \Pomm\Object\BaseObject
@@ -382,7 +384,7 @@ abstract class BaseObjectMap
      * @param Array $pk
      * @param Array $values Values to be updated
      * @return \Pomm\Object\BaseObject
-     **/
+     */
     public function updateByPk(Array $pk, Array $values)
     {
         $where = $this->createSqlAndFrom($pk);
@@ -459,7 +461,7 @@ abstract class BaseObjectMap
      * @param \Pomm\Object\BaseObject $object
      * @param Array                  $fields Only these fields will be updated.
      * @return \Pomm\Object\BaseObject 
-     **/
+     */
     public function updateOne(BaseObject &$object, Array $fields)
     {
         $this->checkObject($object, sprintf('"%s" class does not know how to update "%s" objects.', get_class($this), get_class($object)));
@@ -487,9 +489,9 @@ abstract class BaseObjectMap
         }
 
 
-        $sql = sprintf("UPDATE %s SET %s WHERE %s RETURNING %s;", 
-            $this->object_name, 
-            join(', ', $updates), 
+        $sql = sprintf("UPDATE %s SET %s WHERE %s RETURNING %s;",
+            $this->object_name,
+            join(', ', $updates),
             $this->createSqlAndFrom($object->get($this->getPrimaryKey())),
             $this->formatFieldsWithAlias('getSelectFields')
         );
@@ -532,7 +534,7 @@ abstract class BaseObjectMap
      * @see \Pomm\Object\BaseObjectMap::getField()
      * @param String $alias Optional table alias prefix.
      * @return Array fields to be grouped.
-     **/
+     */
     public function getGroupByFields($alias = null)
     {
         return $this->getFields($alias);
@@ -547,7 +549,7 @@ abstract class BaseObjectMap
      * @see \Pomm\Object\BaseObjectMap::getField()
      * @param String $alias the table alias in the query.
      * @return Array
-     **/
+     */
     public function getSelectFields($alias = null)
     {
         return $this->getFields($alias);
@@ -560,7 +562,7 @@ abstract class BaseObjectMap
      *
      * @param String $alias the table alias in the query
      * @return Array
-     **/
+     */
     public function getFields($alias = null)
     {
         $fields = array();
@@ -580,9 +582,9 @@ abstract class BaseObjectMap
      * This is used when queries need to format fields with column aliases.
      * 
      * @param String This current map's getFields() method name.
-     * @param String Optionnal table alias.
+     * @param String Optional table alias.
      * @return String
-     **/
+     */
     public function formatFieldsWithAlias($field_method, $table_alias = null)
     {
         if (!method_exists($this, $field_method))
@@ -601,9 +603,9 @@ abstract class BaseObjectMap
      * This is used when queries need formatted fields with no column alias.
      *
      * @param String This current map's getFields() method name.
-     * @param String Optionnal table alias.
+     * @param String Optional table alias.
      * @return String
-     **/
+     */
     public function formatFields($field_method, $table_alias = null)
     {
         if (!method_exists($this, $field_method))
@@ -622,7 +624,7 @@ abstract class BaseObjectMap
      *
      * @param String $alias Optional alias prefix.
      * @return Array $fields
-     **/
+     */
     public function getRemoteSelectFields($alias = null)
     {
         $fields = array();
@@ -638,13 +640,13 @@ abstract class BaseObjectMap
      * createFromForeign
      *
      * This method is intended to be used as a Collection filter.
-     * Hydrate an object from the values with keys formated like table{field}
+     * Hydrate an object from the values with keys formatted like table{field}
      * and set it in the values with the table name as key. All the values used 
      * to hydrate the object are removed from the array.
      *
-     * @param Array $@old_values
+     * @param Array $old_values
      * @return Array 
-     **/
+     */
     public function createFromForeign(Array $old_values)
     {
         $values = array();
@@ -846,7 +848,7 @@ abstract class BaseObjectMap
      * @param Mixed  $where   Can be a String or \Pomm\Query\Where instance.
      * @param String $suffix  ORDER BY, LIMIT etc.
      * @return String   The SQL query.
-     **/
+     */
     protected function generateSqlForWhere($where, $suffix = null)
     {
         $sql = sprintf('SELECT %s FROM %s WHERE %s', $this->formatFieldsWithAlias('getSelectFields'), $this->object_name, $where); 

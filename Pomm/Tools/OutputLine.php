@@ -3,7 +3,7 @@ namespace Pomm\Tools;
 
 use Pomm\Exception\ToolException;
 
-class OutputLine 
+class OutputLine
 {
     const LEVEL_DEBUG    = 1;
     const LEVEL_INFO     = 2;
@@ -19,7 +19,7 @@ class OutputLine
     /**
      * __construct
      *
-     **/
+     */
     public function __construct($message, $level)
     {
         $this->message = $message;
@@ -31,7 +31,7 @@ class OutputLine
      * getLevel
      *
      * @return Integer Current line's severity level.
-     **/
+     */
     public function getLevel()
     {
         return $this->level;
@@ -41,7 +41,7 @@ class OutputLine
      * __toString
      *
      * @return String
-     **/
+     */
     public function __toString()
     {
         return sprintf("%s | %-10s | %s", $this->timestamp->format("Y-m-d H:i:s.u"), $this->getFormattedLevel(), $this->message);
@@ -51,7 +51,7 @@ class OutputLine
      * getFormattedLevel
      *
      * @return String
-     **/
+     */
     public function getFormattedLevel()
     {
         switch($this->level)
@@ -64,4 +64,3 @@ class OutputLine
         }
     }
 }
-

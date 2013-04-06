@@ -23,7 +23,7 @@ class PgPoint implements ConverterInterface
      * __construct()
      *
      * @param String            $class_name      Optional fully qualified Point type class name.
-     **/
+     */
     public function __construct($class_name = 'Pomm\Type\Point')
     {
         $this->class_name = $class_name;
@@ -31,7 +31,7 @@ class PgPoint implements ConverterInterface
 
     /**
      * @see Pomm\Converter\ConverterInterface
-     **/
+     */
     public function fromPg($data, $type = null)
     {
         if (!preg_match('/([0-9e\-+\.]+,[0-9e\-+\.]+)/', $data))
@@ -46,16 +46,16 @@ class PgPoint implements ConverterInterface
 
     /**
      * @see Pomm\Converter\ConverterInterface
-     **/
+     */
     public function toPg($data, $type = null)
     {
         if (! $data instanceof $this->class_name)
         {
-            if (!is_object($data)) 
+            if (!is_object($data))
             {
                 $type = gettype($data);
             }
-            else 
+            else
             {
                 $type = get_class($data);
             }

@@ -24,7 +24,7 @@ class PDOQueryFilter implements FilterInterface
 
     /**
      * @see Pomm\FilterChain\FilterInterface
-     **/
+     */
     public function execute(QueryFilterChain $query_filter_chain)
     {
         $this->filter_chain = $query_filter_chain;
@@ -92,7 +92,7 @@ class PDOQueryFilter implements FilterInterface
     /**
      * doQuery 
      *
-     * Performs a query, returns the PDO Statment instance used.
+     * Performs a query, returns the PDO Statement instance used.
      * 
      * @access protected
      * @return \PDOStatement

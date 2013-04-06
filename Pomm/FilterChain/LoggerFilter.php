@@ -25,7 +25,7 @@ class LoggerFilter implements FilterInterface
      * __construct
      *
      * @param Pomm\Tools\Logger $logger
-     **/
+     */
     public function __construct(Logger $logger)
     {
         $this->logger = $logger;
@@ -33,7 +33,7 @@ class LoggerFilter implements FilterInterface
 
     /**
      * @see Pomm\FilterChain\FilterInterface
-     **/
+     */
     public function execute(QueryFilterChain $query_filter_chain)
     {
         $time_start = microtime(true);

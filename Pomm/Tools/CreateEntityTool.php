@@ -31,7 +31,7 @@ class CreateEntityTool extends CreateFileTool
      * * namespace
      * * schema (default public)
      * @see Pomm\Tools\BaseTool
-     **/
+     */
 
     protected function configure()
     {
@@ -42,7 +42,7 @@ class CreateEntityTool extends CreateFileTool
     /**
      * execute()
      * @see BaseTool
-     **/
+     */
     public function execute()
     {
         $content = $this->generateMapFile();
@@ -57,7 +57,7 @@ class CreateEntityTool extends CreateFileTool
      * Generates the empty map file.
      *
      * @access protected
-     **/
+     */
     protected function generateMapFile()
     {
         $namespace = $this->getNamespace();

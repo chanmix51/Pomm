@@ -37,7 +37,7 @@ class ScanSchemaTool extends CreateFileTool
      * * exclude            An array of tables/views to skip.
      * 
      * @see Pomm\Tools\BaseTool
-     **/
+     */
     protected function configure()
     {
         parent::configure();
@@ -48,7 +48,7 @@ class ScanSchemaTool extends CreateFileTool
      * execute()
      *
      * @see Pomm\Tools\BaseTool
-     **/
+     */
     public function execute()
     {
         if (!($this->options['database'] instanceof Database))

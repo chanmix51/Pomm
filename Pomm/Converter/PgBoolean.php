@@ -18,7 +18,7 @@ class PgBoolean implements ConverterInterface
 {
     /**
      * @see Pomm\Converter\ConverterInterface
-     **/
+     */
     public function fromPg($data, $type = null)
     {
         return ($data == 't');
@@ -26,7 +26,7 @@ class PgBoolean implements ConverterInterface
 
     /**
      * @see Pomm\Converter\ConverterInterface
-     **/
+     */
     public function toPg($data, $type = null)
     {
         return $data ? "true" : "false";
