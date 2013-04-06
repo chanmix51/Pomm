@@ -23,7 +23,7 @@ class PgTsRange implements ConverterInterface
      * __construct()
      *
      * @param String            $class_name      Optional fully qualified TsRange type class name.
-     **/
+     */
     public function __construct($class_name = 'Pomm\Type\TsRange')
     {
         $this->class_name = $class_name;
@@ -31,7 +31,7 @@ class PgTsRange implements ConverterInterface
 
     /**
      * @see Pomm\Converter\ConverterInterface
-     **/
+     */
     public function fromPg($data, $type = null)
     {
         if (!preg_match('/([\[\(])"([0-9 :-]+)","([0-9 :-]+)"([\]\)])/', $data, $matchs))
@@ -44,7 +44,7 @@ class PgTsRange implements ConverterInterface
 
     /**
      * @see Pomm\Converter\ConverterInterface
-     **/
+     */
     public function toPg($data, $type = null)
     {
         if (! $data instanceof \Pomm\Type\TsRange )

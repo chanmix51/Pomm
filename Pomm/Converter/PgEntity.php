@@ -22,7 +22,7 @@ class PgEntity implements ConverterInterface
      * constructor
      *
      * @param Pomm\Object\BaseObjectMap  $map
-     **/
+     */
     public function __construct(BaseObjectMap $map)
     {
         $this->map = $map;
@@ -30,7 +30,7 @@ class PgEntity implements ConverterInterface
 
     /**
      * @see Pomm\Converter\ConverterInterface
-     **/
+     */
     public function toPg($data, $type = null)
     {
         $class_name = $this->map->getObjectClass();
@@ -62,7 +62,7 @@ class PgEntity implements ConverterInterface
 
     /**
      * @see Pomm\Converter\ConverterInterface
-     **/
+     */
     public function fromPg($data, $type = null)
     {
         $elts = str_getcsv(trim($data, '()'));

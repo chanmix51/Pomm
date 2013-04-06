@@ -25,7 +25,7 @@ class Collection extends SimpleCollection
      *
      * @param Callable $callable May be anonymous function.
      * @return \Pomm\Object\Collection
-     **/
+     */
 
     public function registerFilter($callable)
     {
@@ -41,7 +41,7 @@ class Collection extends SimpleCollection
      *
      * @param Callable the callable to unregister.
      * @return \Pomm\Object\Collection
-     **/
+     */
     public function unregisterFilter($callable)
     {
         $this->filters = array_map(function($value) use ($callable) {
@@ -57,7 +57,7 @@ class Collection extends SimpleCollection
      * Remove all filters.
      *
      * @return \Pomm\Object\Collection
-     **/
+     */
     public function resetFilters()
     {
         $this->filters = array();
@@ -72,7 +72,7 @@ class Collection extends SimpleCollection
      *
      * @param Integer $index
      * @return \Pomm\Object\BaseObject
-     **/
+     */
 
     public function get($index)
     {
@@ -83,7 +83,7 @@ class Collection extends SimpleCollection
 
         $values = $this->stmt->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_ABS, $index);
 
-        if ($values === false) 
+        if ($values === false)
             return false;
 
         foreach($this->filters as $index => $filter)
@@ -113,7 +113,7 @@ class Collection extends SimpleCollection
      * 
      * @see \Iterator
      */
-    public function rewind() 
+    public function rewind()
     {
         $this->position = 0;
     }

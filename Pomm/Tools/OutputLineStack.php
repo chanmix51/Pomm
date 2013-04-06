@@ -13,7 +13,7 @@ class OutputLineStack implements \Iterator, \Countable
      * __construct
      *
      * @param Integer $level 
-     **/
+     */
     public function __construct($level = OutputLine::LEVEL_ALL)
     {
         $this->setLevel($level);
@@ -27,7 +27,7 @@ class OutputLineStack implements \Iterator, \Countable
      *
      * @param String  $message
      * @param Integer $level ( default OutputLine::LEVEL_DEBUG )
-     **/
+     */
     public function add($message, $level = OutputLine::LEVEL_DEBUG)
     {
         $this->addOutputLine(new OutputLine($message, $level));
@@ -39,7 +39,7 @@ class OutputLineStack implements \Iterator, \Countable
      * Add a OutputLine instance in the stack.
      *
      * @param OutputLine $line
-     **/
+     */
     public function addOutputLine(OutputLine $line)
     {
         if ( $line->getLevel() & $this->level )
@@ -55,7 +55,7 @@ class OutputLineStack implements \Iterator, \Countable
      * This changes the way the output lines are stored AND retrieved.
      *
      * @param Integer $level
-     **/
+     */
     public function setLevel($level)
     {
         $this->level = $level;
@@ -65,7 +65,7 @@ class OutputLineStack implements \Iterator, \Countable
      * getLevel
      *
      * @return Integer The stack's current severity level.
-     **/
+     */
     public function getLevel()
     {
         return $this->level;
@@ -75,7 +75,7 @@ class OutputLineStack implements \Iterator, \Countable
      * rewind
      *
      * @see \Iterator
-     **/
+     */
     public function rewind()
     {
         $this->iterator = null;
@@ -85,7 +85,7 @@ class OutputLineStack implements \Iterator, \Countable
      * current
      *
      * @see \Iterator
-     **/
+     */
     public function current()
     {
         if (is_null($this->iterator))
@@ -100,7 +100,7 @@ class OutputLineStack implements \Iterator, \Countable
      * key
      *
      * @see \Iterator
-     **/
+     */
     public function key()
     {
         return $this->iterator;
@@ -110,7 +110,7 @@ class OutputLineStack implements \Iterator, \Countable
      * next
      *
      * @see \Iterator
-     **/
+     */
     public function next()
     {
         if (!is_null($this->iterator))
@@ -132,7 +132,7 @@ class OutputLineStack implements \Iterator, \Countable
      * valid
      *
      * @see \Iterator
-     **/
+     */
     public function valid()
     {
         if (is_null($this->iterator))
@@ -147,7 +147,7 @@ class OutputLineStack implements \Iterator, \Countable
      * count
      *
      * @see \Countable
-     **/
+     */
     public function count()
     {
         return count($this->stack);
@@ -159,7 +159,7 @@ class OutputLineStack implements \Iterator, \Countable
      * Merges the stack from another OutputLineStack.
      *
      * @param OutputLineStack $stack
-     **/
+     */
     public function mergeStack(OutputLineStack $stack)
     {
         $this->stack = array_merge($this->stack, $stack->getStack());
@@ -169,7 +169,7 @@ class OutputLineStack implements \Iterator, \Countable
      * getStack
      *
      * @return OutputLineStack 
-     **/
+     */
     public function getStack()
     {
         return $this->stack;

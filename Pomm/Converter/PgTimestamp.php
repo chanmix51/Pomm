@@ -16,7 +16,7 @@ class PgTimestamp implements ConverterInterface
 {
     /**
      * @see Pomm\Converter\ConverterInterface
-     **/
+     */
     public function fromPg($data, $type = null)
     {
         return new \DateTime($data);
@@ -24,7 +24,7 @@ class PgTimestamp implements ConverterInterface
 
     /**
      * @see Pomm\Converter\ConverterInterface
-     **/
+     */
     public function toPg($data, $type = null)
     {
         if (!$data instanceof \DateTime)

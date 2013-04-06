@@ -27,5 +27,3 @@ class NumberRange
         $this->end_included = (bool) $end_included;
     }
 }
-
-

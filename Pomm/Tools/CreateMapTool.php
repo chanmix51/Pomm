@@ -32,7 +32,7 @@ class CreateMapTool extends CreateFileTool
      * * schema (default public)
      *
      * @see BaseTool
-     **/
+     */
 
     protected function configure()
     {
@@ -44,7 +44,7 @@ class CreateMapTool extends CreateFileTool
      * execute()
      *
      * @see BaseTool
-     **/
+     */
     public function execute()
     {
         $content = $this->generateMapFile();
@@ -59,7 +59,7 @@ class CreateMapTool extends CreateFileTool
      * Generates the empty map file.
      *
      * @access protected
-     **/
+     */
     protected function generateMapFile()
     {
         $namespace = $this->getNamespace();

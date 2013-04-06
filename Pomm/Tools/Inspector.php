@@ -23,7 +23,7 @@ class Inspector
      * __construct
      *
      * @param Pomm\Connection\Connection $connection
-     **/
+     */
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
@@ -37,7 +37,7 @@ class Inspector
      * @param String $schema
      * @param String $table
      * @return Integer
-     **/
+     */
     public function getTableOid($schema, $table)
     {
         $sql = sprintf("SELECT c.oid FROM pg_catalog.pg_class c LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = '%s' AND c.relname ~ '^(%s)$';", $schema, $table);
@@ -59,7 +59,7 @@ class Inspector
      * @param String schema name
      * @param Array  tables name
      * @return Array associative array with name => oid
-     **/
+     */
     public function getTablesOids($schema, Array $names)
     {
         $sql = <<<SQL
@@ -88,7 +88,7 @@ SQL;
         }
 
         $tables = array();
-        foreach($pdo->fetchAll(\PDO::FETCH_ASSOC) AS $row)
+        foreach($pdo->fetchAll(\PDO::FETCH_ASSOC) as $row)
         {
             $tables[$row['table_name']] = $row['oid'];
         }
@@ -103,7 +103,7 @@ SQL;
      *
      * @param Integer $oid
      * @return Array Informations [table_oid, schema_oid, schema, name]
-     **/
+     */
     public function getTableInformation($oid)
     {
         $sql = sprintf("SELECT c.oid AS table_oid, n.oid AS schema_oid, n.nspname AS \"schema\", c.relname AS \"table\" FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.oid = %d;", $oid);
@@ -124,9 +124,9 @@ SQL;
      *
      * Returns an array with the fields composing a primary key.
      *
-     * @param Intger $oid
+     * @param Integer $oid
      * @return Array
-     **/
+     */
     public function getTablePrimaryKey($oid)
     {
         $sql = sprintf("SELECT regexp_matches(pg_catalog.pg_get_indexdef(i.indexrelid, 0, true), e'\\\\((.*)\\\\)', 'gi') AS pkey FROM pg_catalog.pg_class c, pg_catalog.pg_class c2, pg_catalog.pg_index i WHERE c.oid = '%d' AND c.oid = i.indrelid AND i.indexrelid = c2.oid ORDER BY i.indisprimary DESC, i.indisunique DESC, c2.relname", $oid);
@@ -145,7 +145,7 @@ SQL;
      *
      * @param Integer $oid
      * @return Array Key is the column name, value is the type.
-     **/
+     */
     public function getTableFieldsInformation($oid)
     {
         $sql = <<<SQL
@@ -202,7 +202,7 @@ SQL;
      *
      * @param Integer $oid
      * @return Integer $oid
-     **/
+     */
     public function getTableParents($oid)
     {
         $sql = sprintf("SELECT pa.inhparent FROM pg_catalog.pg_inherits pa WHERE pa.inhrelid = %d", $oid);
@@ -220,11 +220,12 @@ SQL;
     /**
      * getTablesInSchema
      *
-     * Return the list of the tables within the schem.
+     * Return the list of the tables within the schema.
      *
      * @param String $schema
+     * @param Array $relkind
      * @return Array Tables OID
-     **/
+     */
     public function getTablesInSchema($schema, Array $relkind = array('r', 'v'))
     {
         $sql = sprintf("SELECT c.oid FROM pg_catalog.pg_class c LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind IN (%s) AND n.nspname = '%s'", sprintf("'%s'", join("', '", $relkind)), $schema);
@@ -247,7 +248,7 @@ SQL;
      * @param String $schema
      * @param String $name  Stored procedure's name.
      * @return Array Source codes.
-     **/
+     */
     public function getStoredProcedureSource($schema, $name)
     {
         $sql = sprintf("SELECT pg_catalog.pg_proc.prosrc FROM pg_catalog.pg_proc JOIN pg_catalog.pg_namespace ON pg_catalog.pg_proc.pronamespace = pg_catalog.pg_namespace.oid WHERE proname = '%s' AND pg_catalog.pg_namespace.nspname = '%s'", $name, $schema);

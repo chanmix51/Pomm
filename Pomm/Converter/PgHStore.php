@@ -17,7 +17,7 @@ class PgHStore implements ConverterInterface
 {
     /**
      * @see \Pomm\Converter\ConverterInterface
-     **/
+     */
     public function fromPg($data, $type = null)
     {
         if ($data === 'NULL') return null;
@@ -34,7 +34,7 @@ class PgHStore implements ConverterInterface
 
     /**
      * @see \Pomm\Converter\ConverterInterface
-     **/
+     */
     public function toPg($data, $type = null)
     {
         if (!is_array($data))

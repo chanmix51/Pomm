@@ -16,7 +16,7 @@ class PgString implements ConverterInterface
 {
     /**
      * @see Pomm\Converter\ConverterInterface
-     **/
+     */
     public function toPg($data, $type = null)
     {
         $data = str_replace("'", "''", $data);
@@ -29,7 +29,7 @@ class PgString implements ConverterInterface
 
     /**
      * @see Pomm\Converter\ConverterInterface
-     **/
+     */
     public function fromPg($data, $type = null)
     {
         return str_replace('\\"', '"', $data);

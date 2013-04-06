@@ -16,7 +16,7 @@ class PgLTree implements ConverterInterface
 {
     /**
      * @see Pomm\Converter\ConverterInterface
-     **/
+     */
     public function fromPg($data, $type = null)
     {
         return strlen($data) > 0 ? preg_split('/\./', $data) : array();
@@ -24,7 +24,7 @@ class PgLTree implements ConverterInterface
 
     /**
      * @see Pomm\Converter\ConverterInterface
-     **/
+     */
     public function toPg($data, $type = null)
     {
         return sprintf("'%s'::ltree", join('.', $data));

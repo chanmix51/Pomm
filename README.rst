@@ -25,7 +25,7 @@ What does Pomm propose ?
 * SQL queries, virtual fields, finders and pagers
 * Collection, filters and query filters
 * A Where clause builder
-* Security and debuging tools
+* Security and debugging tools
 
 Database introspection and model generation
 *******************************************
@@ -33,7 +33,7 @@ Once you have designed your database using your favorite tool, Pomm can generate
 
 Lazy hydration and on the fly type conversion
 *********************************************
-`Queries <http://pomm.coolkeums.org/documentation/manual#custom-queries>`_ return `collections <http://pomm.coolkeums.org/documentation/manual#collections>`_ which are scrollable iterators on results. Fetched objects are hydrated on demand for minimal memory consumption and data are `converted <http://pomm.coolkeums.org/documentation/manual#database-and-converters>`_ from/to Postgresql. Boolean in Pg are boolean in PHP, `arrays <http://www.postgresql.org/docs/8.4/static/arrays.html>`_ in Pg are arrays in PHP, `geometric types <http://www.postgresql.org/docs/8.4/static/datatype-geometric.html>`_ are converted into geometric PHP objects. Of course this is extendible and custom database types can be converted into custom PHP classes. Almost all standard and geometric types are supported plus `range <http://www.postgresql.org/docs/9.2/static/rangetypes.html>`_, `HStore <http://www.postgresql.org/docs/8.4/static/hstore.html>`_ and `ltree <http://www.postgresql.org/docs/8.4/static/ltree.html>`_ extensions.
+`Queries <http://pomm.coolkeums.org/documentation/manual#custom-queries>`_ return `collections <http://pomm.coolkeums.org/documentation/manual#collections>`_ which are scrollable iterators on results. Fetched objects are hydrated on demand for minimal memory consumption and data are `converted <http://pomm.coolkeums.org/documentation/manual#database-and-converters>`_ from/to Postgresql. Boolean in Pg are boolean in PHP, `arrays <http://www.postgresql.org/docs/8.4/static/arrays.html>`_ in Pg are arrays in PHP, `geometric types <http://www.postgresql.org/docs/8.4/static/datatype-geometric.html>`_ are converted into geometric PHP objects. Of course this is extensible and custom database types can be converted into custom PHP classes. Almost all standard and geometric types are supported plus `range <http://www.postgresql.org/docs/9.2/static/rangetypes.html>`_, `HStore <http://www.postgresql.org/docs/8.4/static/hstore.html>`_ and `ltree <http://www.postgresql.org/docs/8.4/static/ltree.html>`_ extensions.
 
 SQL queries, virtual fields, finders and pagers
 ***********************************************
@@ -49,8 +49,8 @@ A Where clause builder
 **********************
 Sometimes, you want to create a ``WHERE`` clause dynamically. Pomm proposes a Where class to let you ``AND`` and/or ``OR`` your conditions passing the values as argument each time for escaping. There is even a ``WhereIn`` method with an array of values as parameter.
 
-Security and debuging tools
-***************************
+Security and debugging tools
+****************************
 All queries are prepared, the values you give as argument are automatically escaped by the server. Furthermore, the converter system ensures there is no type enforcing.
 
 To be sure everything is fine, you can register the ``LoggerFilter`` to your connection so you will keep track of every query with statistics like the time it took, the number of results returned etc.

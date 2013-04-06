@@ -27,7 +27,7 @@ class Database
      *
      * Parameters that can be sent :
      * dsn : an url like psql://user:pass@host:port/dbname
-     * name : the connection name for this database (optionnal)
+     * name : the connection name for this database (optional)
      * persistant : a boolean to use persistant connections or not (default true)
      * isolation : transaction isolation level (default READ COMMITED)
      *
@@ -56,7 +56,7 @@ class Database
 
         if (!preg_match('#([a-z]+)://([^:@]+)(?::([^@]+))?(?:@([\w\.-]+|!/.+[^/]!)(?::(\w+))?)?/(.+)#', $dsn, $matchs))
         {
-            throw new PommException(sprintf('Cound not parse DSN "%s".', $dsn));
+            throw new PommException(sprintf('Could not parse DSN "%s".', $dsn));
         }
 
 
@@ -123,7 +123,7 @@ class Database
      * @access public
      * @param  \Pomm\Identity\IdentityMapperInterface $mapper An optional instance of a data mapper.
      * @return \Pomm\Connection\Connection
-     **/
+     */
     public function createConnection(\Pomm\Identity\IdentityMapperInterface $mapper = null)
     {
         $this->connection = new Connection($this, $mapper);
@@ -138,7 +138,7 @@ class Database
      * creates a new one with default parameters.
      * @access public
      * @return \Pomm\Connection\Connection
-     **/
+     */
     public function getConnection()
     {
         if (is_null($this->connection))
@@ -158,7 +158,7 @@ class Database
      * @param  \Pomm\Converter\ConverterInterface $converter A converter instance.
      * @param  Array              $pg_types  An array of the mapped postgresql's types.
      * @return \Pomm\Connection\Database
-     **/
+     */
     public function registerConverter($name, Converter\ConverterInterface $converter, Array $pg_types)
     {
         $this->converters[$name] = $converter;
@@ -177,9 +177,9 @@ class Database
      * Returns a converter from its designation.
      *
      * @access public
-     * @param  string $name       Converter desgination.
+     * @param  string $name       Converter designation.
      * @return \Pomm\Converter\ConverterInterface Converter instance.
-     **/
+     */
     public function getConverterFor($name)
     {
         return $this->converters[$name];
@@ -194,7 +194,7 @@ class Database
      * @param  String $pg_type Type name.
      * @return String Converter instance.
      * @throw  \Pomm\Exception\Exception if not found.
-     **/
+     */
     public function getConverterForType($pg_type)
     {
         if (isset($this->handled_types[$pg_type]))
@@ -220,11 +220,11 @@ class Database
      * Associate an existing converter with a Pg type.
      * This is useful for DOMAINs.
      *
-     * @acces public
+     * @access public
      * @param String $type           Type name
      * @param String $converter_name Converter designation.
      * @return \Pomm\Connection\Database
-     **/
+     */
     public function registerTypeForConverter($type, $converter_name)
     {
         $this->handled_types[$type] = $converter_name;
@@ -237,9 +237,9 @@ class Database
      *
      * Returns the parameter holder
      *
-     * @acces public
+     * @access public
      * @return ParameterHolder
-     **/
+     */
     public function getParameterHolder()
     {
         return $this->parameter_holder;
@@ -251,7 +251,7 @@ class Database
      * Register the converters for postgresql's built-in types
      *
      * @access protected
-     **/
+     */
 
     protected function registerBaseConverters()
     {
@@ -274,7 +274,7 @@ class Database
      *
      * @access public
      * @return String
-     **/
+     */
     public function getName()
     {
         return $this->parameter_holder->hasParameter('name') ? $this->parameter_holder['name'] : $this->parameter_holder['database'];
@@ -287,7 +287,7 @@ class Database
      *
      * @access public
      * @param String $name Database name
-     **/
+     */
     public function setName($name)
     {
         $this->parameter_holder->setParameter('name', $name);

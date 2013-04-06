@@ -24,9 +24,9 @@ abstract class BaseTool
      * __construct
      *
      * @final
-     * @param Array $options (optionnal)
-     **/
-    public final function __construct(Array $options = array())
+     * @param Array $options (optional)
+     */
+    final public function __construct(Array $options = array())
     {
         $this->options = new ParameterHolder($options);
         $this->output_stack = new OutputLineStack($this->options->hasParameter('output_level') ? $this->options->get('output_level') : OutputLine::LEVEL_ALL);
@@ -42,7 +42,7 @@ abstract class BaseTool
      *
      * @abstract
      * @access protected
-     **/
+     */
     protected abstract function configure();
 
     /**
@@ -52,14 +52,14 @@ abstract class BaseTool
      *
      * @abstract
      * @access protected
-     **/
-    protected abstract function execute();
+     */
+     abstract protected function execute();
 
     /**
      * getOutputStack
      *
      * @return OutputLineStack
-     **/
+     */
     public function getOutputStack()
     {
         return $this->output_stack;

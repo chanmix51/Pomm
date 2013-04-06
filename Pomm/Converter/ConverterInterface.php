@@ -22,8 +22,8 @@ interface ConverterInterface
      *
      * @param $data String  Input string from Pg row result.
      * @param $type String  Optional type.
-     * @return Mixed PHP respresentation of the data.
-     **/
+     * @return Mixed PHP representation of the data.
+     */
     public function fromPg($data, $type = null);
 
     /**
@@ -34,6 +34,6 @@ interface ConverterInterface
      * @param $data Mixed   PHP representation.
      * @param $type String  Optional type.
      * @return String Pg converted string for input.
-     **/
+     */
     public function toPg($data, $type = null);
 }

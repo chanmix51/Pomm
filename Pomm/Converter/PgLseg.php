@@ -25,7 +25,7 @@ class PgLseg implements ConverterInterface
      *
      * @param String            $class_name      Optional fully qualified Segment type class name.
      * @param Pomm\Type\PgPoint $point_converter Point converter to be used.
-     **/
+     */
     public function __construct($class_name = 'Pomm\Type\Segment', PgPoint $point_converter = null)
     {
         $this->class_name = $class_name;
@@ -34,7 +34,7 @@ class PgLseg implements ConverterInterface
 
     /**
      * @see Pomm\Converter\ConverterInterface
-     **/
+     */
     public function fromPg($data, $type = null)
     {
         $data = trim($data, "[]");
@@ -50,16 +50,16 @@ class PgLseg implements ConverterInterface
 
     /**
      * @see Pomm\Converter\ConverterInterface
-     **/
+     */
     public function toPg($data, $type = null)
     {
         if (! $data instanceof $this->class_name)
         {
-            if (!is_object($data)) 
+            if (!is_object($data))
             {
                 $type = gettype($data);
             }
-            else 
+            else
             {
                 $type = get_class($data);
             }
@@ -67,7 +67,7 @@ class PgLseg implements ConverterInterface
             throw new Exception(sprintf("Converter PgLseg needs data to be an instance of '%s' ('%s' given).", $this->class_name, $type));
         }
 
-        return sprintf("lseg(%s, %s)", 
+        return sprintf("lseg(%s, %s)",
             $this->point_converter->toPg($data->point_a),
             $this->point_converter->toPg($data->point_b)
         );

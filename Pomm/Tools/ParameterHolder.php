@@ -21,7 +21,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
      * __construct()
      * 
      * @param Array $parameters (optional)
-     **/
+     */
     public function __construct(Array $parameters = array())
     {
         $this->parameters = $parameters;
@@ -35,7 +35,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
      * @param String $name
      * @param String $value
      * */
-    public function setParameter($name, $value) 
+    public function setParameter($name, $value)
     {
         $this->parameters[$name] = $value;
     }
@@ -60,9 +60,9 @@ class ParameterHolder implements \ArrayAccess, \Iterator
      *
      * @access public
      * @param String $name
-     * @param String $default Optionnal default value if name not set.
+     * @param String $default Optional default value if name not set.
      * @return String Parameter's value or default.
-     **/
+     */
     public function getParameter($name, $default = null)
     {
         return $this->hasParameter($name) ? $this->parameters[$name] : $default;
@@ -72,8 +72,8 @@ class ParameterHolder implements \ArrayAccess, \Iterator
      * getParameters()
      *
      * Return the parameters as array
-     * @return Array the parameterrs
-     **/
+     * @return Array the parameters
+     */
     public function getParameters()
     {
         return $this->parameters;
@@ -85,7 +85,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
      * Throw an exception if a param is not set
      * @access public
      * @param String $name the parameter's name
-     **/
+     */
     public function mustHave($name)
     {
         if (!$this->hasParameter($name))
@@ -101,7 +101,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
      * @access public
      * @param String $name the parameter's name
      * @param mixed $value the default value
-     **/
+     */
     public function setDefaultValue($name, $value)
     {
         if (!$this->hasParameter($name))
@@ -117,9 +117,9 @@ class ParameterHolder implements \ArrayAccess, \Iterator
      * not, an exception is thrown.
      *
      * @param String $name the parameter's name
-     * @param Array $value;
+     * @param Array $values
      * @return Boolean (true)
-     **/
+     */
 
     public function mustBeOneOf($name, Array $values)
     {
@@ -135,7 +135,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
      * unsetParameter()
      *
      * @param String $name 
-     **/
+     */
     public function unsetParameter($name)
     {
         unset($this->parameter[$name]);
@@ -144,7 +144,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
     /**
      * offsetExists()
      * @see ArrayAccess
-     **/
+     */
     public function offsetExists($name)
     {
         return $this->hasParameter($name);
@@ -153,7 +153,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
     /**
      * offsetGet()
      * @see ArrayAccess
-     **/
+     */
     public function offsetGet($name)
     {
         return $this->getParameter($name);
@@ -162,7 +162,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
     /**
      * offsetSet()
      * @see ArrayAccess
-     **/
+     */
     public function offsetSet($name, $value)
     {
         $this->setParameter($name, $value);
@@ -171,7 +171,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
     /**
      * offsetUnset()
      * @see ArrayAccess
-     **/
+     */
     public function offsetUnset($name)
     {
         $this->unsetParameter($name);
@@ -180,7 +180,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
     /**
      * current()
      * @see Iterator
-     **/
+     */
     public function current()
     {
         return current($this->parameters);
@@ -190,7 +190,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
     /**
      * next()
      * @see Iterator
-     **/
+     */
     public function next()
     {
         return next($this->parameters);
@@ -199,7 +199,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
     /**
      * key()
      * @see Iterator
-     **/
+     */
     public function key()
     {
         return key($this->parameters);
@@ -208,7 +208,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
     /**
      * valid()
      * @see Iterator
-     **/
+     */
     public function valid()
     {
         return valid($this->parameters);
@@ -217,7 +217,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
     /**
      * rewind()
      * @see Iterator
-     **/
+     */
     public function rewind()
     {
         rewind($this->parameters);

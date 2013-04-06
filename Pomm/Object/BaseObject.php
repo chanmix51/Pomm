@@ -28,10 +28,10 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     /**
      * __construct
      *
-     * Instanciate the entity and hydrate it with the given values.
+     * Instantiate the entity and hydrate it with the given values.
      *
      * @param Array $values Optional starting values.
-     **/
+     */
     public function __construct(Array $values = null)
     {
         if (!is_null($values))
@@ -46,14 +46,13 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      *
      * @final
      * @param String $var      Key you want to retrieve value from.
-     * @param String $default  Default value if var does not exist.
      * @return mixed
      */
     public final function get($var)
     {
         if (is_scalar($var))
         {
-            if ($this->has($var)) 
+            if ($this->has($var))
             {
                 return $this->fields[$var];
             }
@@ -79,7 +78,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      */
     public final function has($var)
     {
-        return array_key_exists($var, $this->fields) 
+        return array_key_exists($var, $this->fields)
             || method_exists($this, sprintf("get%s", sfInflector::camelize($var)));
     }
 
@@ -136,9 +135,9 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     public function convert(Array $values)
     {
         $tmp = array();
-        foreach ($values as $key => $values)
+        foreach ($values as $key => $value)
         {
-            $tmp[strtolower($key)] = $values;
+            $tmp[strtolower($key)] = $value;
         }
 
         $this->hydrate($tmp);
@@ -184,9 +183,9 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     {
         $array_recurse = function($val) use (&$array_recurse)
         {
-            if (is_scalar($val)) 
+            if (is_scalar($val))
                 return $val;
-            if (is_array($val)) 
+            if (is_array($val))
             {
                 if (is_array(current($val)) || (is_object(current($val)) && current($val) instanceof \Pomm\Object\BaseObject))
                 {
@@ -194,7 +193,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
                 }
                 else return $val;
             }
-            if (is_object($val) && $val instanceof \Pomm\Object\BaseObject) 
+            if (is_object($val) && $val instanceof \Pomm\Object\BaseObject)
                 return $val->extract();
             return $val;
         };
@@ -208,7 +207,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      * Return the fields array.
      *
      * @return Array
-     **/
+     */
     public function getFields()
     {
         return $this->fields;
@@ -286,7 +285,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      *
      * @final
      * @param String $offset   Attribute name.
-     **/
+     */
     public final function clear($offset)
     {
         if ($this->has($offset))
@@ -323,7 +322,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     /**
      * offsetExists
      * @see ArrayAccess
-     **/
+     */
     public function offsetExists($offset)
     {
         $method_name = "has".sfInflector::camelize($offset);
@@ -334,7 +333,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     /**
      * offsetSet
      * @see ArrayAccess
-     **/
+     */
     public function offsetSet($offset, $value)
     {
         $this->__set($offset, $value);
@@ -343,7 +342,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     /**
      * offsetGet
      * @see ArrayAccess
-     **/
+     */
     public function offsetGet($offset)
     {
         return $this->__get($offset);
@@ -352,7 +351,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     /**
      * offsetUnset
      * @see ArrayAccess
-     **/
+     */
     public function offsetUnset($offset)
     {
         $this->clear($offset);
@@ -361,7 +360,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     /**
      * getIterator
      * @see IteratorAggregate
-     **/
+     */
     public function getIterator()
     {
         return new \ArrayIterator($this->fields);
