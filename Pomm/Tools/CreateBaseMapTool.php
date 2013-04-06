@@ -36,7 +36,7 @@ class CreateBaseMapTool extends CreateFileTool
      *                      (default: \Pomm\Object\BaseObjectMap)
      *
      * @see Pomm\Tools\BaseTool
-     **/
+     */
     protected function configure()
     {
         parent::configure();
@@ -64,7 +64,7 @@ class CreateBaseMapTool extends CreateFileTool
      * execute
      *
      * @see Pomm\Tools\BaseTool
-     **/
+     */
     public function execute()
     {
         if (!($this->options['database'] instanceof \Pomm\Connection\Database))
@@ -87,7 +87,7 @@ class CreateBaseMapTool extends CreateFileTool
      *
      * @protected
      * @return string the PHP code
-     **/
+     */
     protected function generateMapFile()
     {
         $std_namespace = $this->getNamespace();
@@ -158,9 +158,11 @@ EOD;
      * generateFieldsDefinition - Generate the Pomm field definition for a
      * column
      *
+     * @param array $attributes
+     *
      * @protected
-     * @return string definiion
-     **/
+     * @return string definition
+     */
     protected function generateFieldsDefinition($attributes)
     {
         $fields_definition = "";
@@ -187,7 +189,7 @@ EOD;
     /**
      * createEmptyFilesIfNotExist
      * Create empty map and entity class if they do not exist
-     **/
+     */
     protected function createEmptyFilesIfNotExist()
     {
        $file = sprintf("%s%s%s.php", $this->getDestinationPath(), DIRECTORY_SEPARATOR, $this->options['class_name']);

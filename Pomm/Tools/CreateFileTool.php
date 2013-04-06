@@ -29,7 +29,7 @@ abstract class CreateFileTool extends BaseTool
      * * namespace  "\%dbname%\%schema%" the namespace string format
      *
      * @see Pomm\Tools\BaseTool
-     **/
+     */
     protected function configure()
     {
         $this->options->mustHave('prefix_dir');
@@ -44,7 +44,7 @@ abstract class CreateFileTool extends BaseTool
      * Create the final directory.
      *
      * @return String
-     **/
+     */
     public function getDestinationPath()
     {
         return $this->options['prefix_dir'].DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $this->getNamespace());
@@ -56,7 +56,7 @@ abstract class CreateFileTool extends BaseTool
      * Get the namespace from given option namespace.
      *
      * @return String
-     **/
+     */
     protected function getNamespace()
     {
         return $this->parseNamespace($this->options['namespace']);
@@ -72,7 +72,7 @@ abstract class CreateFileTool extends BaseTool
      *
      * @param string string
      * @return string
-     **/
+     */
     protected function parseNamespace($string)
     {
         $string = str_replace('%dbname%', sfInflector::camelize($this->options['database']->getName()), $string);
@@ -88,7 +88,7 @@ abstract class CreateFileTool extends BaseTool
      *
      * @param String $path
      * @param String $content
-     **/
+     */
     protected function saveFile($path, $content)
     {
         if (!$this->createDirIfNotExist(dirname($path)))
@@ -105,10 +105,10 @@ abstract class CreateFileTool extends BaseTool
      * Create Entity model directory structure if it does no exist.
      *
      * @param String $dir
-     **/
+     */
     protected function createDirIfNotExist($dir)
     {
-        if (!file_exists($dir)) 
+        if (!file_exists($dir))
         {
             $this->output_stack->add(sprintf("Create directory '%s'.", $dir));
 
@@ -118,4 +118,3 @@ abstract class CreateFileTool extends BaseTool
         return true;
     }
 }
-

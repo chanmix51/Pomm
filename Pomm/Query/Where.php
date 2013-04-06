@@ -30,7 +30,7 @@ class Where
      * @param String $element Optional logical element.
      * @param Array  $values  Optional elements' values.
      * @return Pomm\Query\Where
-     **/
+     */
     public static function create($element = null, Array $values = array())
     {
         return new self($element, $values);
@@ -45,7 +45,7 @@ class Where
      * @param String $element
      * @param Array  $values
      * @return Pomm\Query\Where
-     **/
+     */
     public static function createWhereIn($element, Array $values)
     {
         $escape = function ($values) use (&$escape)
@@ -87,7 +87,7 @@ class Where
      * 
      * @param String $element  (optional)
      * @param Array  $values   (optional)
-     **/
+     */
     public function __construct($element = null, Array $values = array())
     {
         if (!is_null($element))
@@ -106,7 +106,7 @@ class Where
      *
      * @param String $operator 
      * @return Pomm\Query\Where
-     **/
+     */
     public function setOperator($operator)
     {
         $this->operator = $operator;
@@ -120,19 +120,19 @@ class Where
      * is it a fresh brand new object ?
      *
      * @return Boolean
-     **/
+     */
     public function isEmpty()
     {
         return (is_null($this->element) and count($this->stack) == 0);
     }
 
     /**
-     * transmute 
+     * transmute
      *
      * Absorbing another Where instance.
-     * 
-     * @param Pomm\Query\Where $where 
-     **/
+     *
+     * @param Pomm\Query\Where $where
+     */
     public function transmute(Where $where)
     {
         $this->stack = $where->stack;
@@ -150,7 +150,7 @@ class Where
      * @param Array  $values 
      * @param String $operator 
      * @return Pomm\Query\Where
-     **/
+     */
     public function addWhere($element, Array $values, $operator)
     {
         if (!$element instanceof Where)
@@ -197,7 +197,7 @@ class Where
      * @param Mixed $element 
      * @param Array $values 
      * @return Pomm\Query\Where
-     **/
+     */
     public function andWhere($element, Array $values = array())
     {
         return $this->addWhere($element, $values, 'AND');
@@ -209,7 +209,7 @@ class Where
      * @param Mixed $element 
      * @param Array $values 
      * @return Pomm\Query\Where
-     **/
+     */
     public function orWhere($element, Array $values = array())
     {
         return $this->addWhere($element, $values, 'OR');
@@ -220,7 +220,7 @@ class Where
      * 
      * @param Array $stack 
      * @return Pomm\Query\Where
-     **/
+     */
     public function setStack(Array $stack)
     {
         $this->stack = $stack;
@@ -234,7 +234,7 @@ class Where
      * where your SQL statement is built.
      *
      * @return String
-     **/
+     */
     public function __toString()
     {
         if ($this->isEmpty())
@@ -251,7 +251,7 @@ class Where
      * hasElement 
      * 
      * @return Boolean
-     **/
+     */
     public function hasElement()
     {
         return ! is_null($this->element);
@@ -261,7 +261,7 @@ class Where
      * getElement 
      * 
      * @return String
-     **/
+     */
     public function getElement()
     {
         return $this->element;
@@ -272,7 +272,7 @@ class Where
      * 
      * @access protected
      * @return String
-     **/
+     */
     protected function parse()
     {
         if ($this->hasElement())
@@ -292,10 +292,10 @@ class Where
     /**
      * getValues 
      *
-     * Get all the values back for the prepated statement.
+     * Get all the values back for the prepared statement.
      *
      * @return Array
-     **/
+     */
     public function getValues()
     {
         if ($this->isEmpty())

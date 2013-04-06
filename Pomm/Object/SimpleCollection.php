@@ -13,7 +13,7 @@ use \Pomm\Exception\Exception;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class SimpleCollection implements \Iterator, \Countable 
+class SimpleCollection implements \Iterator, \Countable
 {
     protected $stmt;
     protected $object_map;
@@ -36,7 +36,7 @@ class SimpleCollection implements \Iterator, \Countable
      * __destruct
      *
      * Closes the cursor when the collection is cleared.
-     **/
+     */
     public function __destruct()
     {
         $this->stmt->closeCursor();
@@ -49,13 +49,13 @@ class SimpleCollection implements \Iterator, \Countable
      *
      * @param Integer $index
      * @return \Pomm\Object\BaseObject
-     **/
+     */
 
     public function get($index)
     {
         $values = $this->stmt->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_ABS, $index);
 
-        if ($values === false) 
+        if ($values === false)
             return false;
 
         return $this->object_map->createObjectFromPg($values);
@@ -66,9 +66,9 @@ class SimpleCollection implements \Iterator, \Countable
      *
      * Return true if the given index exists false otherwise.
      *
-     * @param Intger $index
+     * @param Integer $index
      * @return Boolean
-     **/
+     */
     public function has($index)
     {
         return $index < $this->count();
@@ -90,7 +90,7 @@ class SimpleCollection implements \Iterator, \Countable
      * 
      * @see \Iterator
      */
-    public function rewind() 
+    public function rewind()
     {
         if ($this->position !== 0)
         {
@@ -103,7 +103,7 @@ class SimpleCollection implements \Iterator, \Countable
      * 
      * @see \Iterator
      */
-    public function current() 
+    public function current()
     {
         return $this->get($this->position);
     }
@@ -113,7 +113,7 @@ class SimpleCollection implements \Iterator, \Countable
      * 
      * @see \Iterator
      */
-    public function key() 
+    public function key()
     {
         return $this->position;
     }
@@ -123,7 +123,7 @@ class SimpleCollection implements \Iterator, \Countable
      * 
      * @see \Iterator
      */
-    public function next() 
+    public function next()
     {
         ++$this->position;
     }
@@ -134,7 +134,7 @@ class SimpleCollection implements \Iterator, \Countable
      * @see \Iterator
      * @return Boolean
      */
-    public function valid() 
+    public function valid()
     {
         return $this->has($this->position);
     }
@@ -221,7 +221,7 @@ class SimpleCollection implements \Iterator, \Countable
      *
      * @param String $name The name of the resultset (Defaults to entity FQCN)
      * @return Array
-     **/
+     */
     public function extract($name = null)
     {
         $name = is_null($name) ? $this->object_map->getObjectClass() : $name;

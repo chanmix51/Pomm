@@ -42,7 +42,7 @@ class Connection
      * @access public
      * @param Database                  $database   The Database instance.
      * @param IdentityMapperInterface   $mapper     The optional identity mapper instance.
-     **/
+     */
     public function __construct(Database $database, \Pomm\Identity\IdentityMapperInterface $mapper = null)
     {
         $this->database = $database;
@@ -52,7 +52,7 @@ class Connection
         $this->parameter_holder = $database->getParameterHolder();
 
         $this->parameter_holder->setDefaultValue('isolation', self::ISOLATION_READ_COMMITTED);
-        $this->parameter_holder->mustBeOneOf('isolation', 
+        $this->parameter_holder->mustBeOneOf('isolation',
             array(self::ISOLATION_READ_COMMITTED, self::ISOLATION_SERIALIZABLE, self::ISOLATION_READ_REPEATABLE)
         );
 
@@ -79,10 +79,10 @@ class Connection
      *
      * Open a connection on the database.
      * @access protected
-     **/
+     */
     protected function launch()
     {
-        $connect_string = sprintf('%s:dbname=%s', 
+        $connect_string = sprintf('%s:dbname=%s',
             $this->parameter_holder['adapter'],
             $this->parameter_holder['database']
         );
@@ -162,7 +162,7 @@ class Connection
      *
      * @access public
      * @return Database
-     **/
+     */
     public function getDatabase()
     {
         return $this->database;
@@ -174,7 +174,7 @@ class Connection
      * Start a new transaction.
      *
      * @return Pomm\Connection\Connection
-     **/
+     */
     public function begin()
     {
         if ($this->in_transaction)
@@ -193,7 +193,7 @@ class Connection
      * Commit a transaction in the database.
      *
      * @return Pomm\Connection\Connection
-     **/
+     */
     public function commit()
     {
         if (! $this->in_transaction)
@@ -213,9 +213,9 @@ class Connection
      * or if a savepoint name is specified only the queries since
      * this savepoint.
      *
-     * @param  String $name Optionnal name of the savepoint.
+     * @param  String $name Optional name of the savepoint.
      * @return Pomm\Connection\Connection
-     **/
+     */
     public function rollback($name = null)
     {
         if (! $this->in_transaction)
@@ -244,7 +244,7 @@ class Connection
      *
      * @param String $name Savepoint's name.
      * @return Pomm\Connection\Connection
-     **/
+     */
     public function setSavepoint($name)
     {
         $this->getPdo()->exec(sprintf("SAVEPOINT %s", $name));
@@ -259,7 +259,7 @@ class Connection
      *
      * @param String $name the savepoint's name
      * @return Pomm\Connection\Connection
-     **/
+     */
     public function releaseSavepoint($name)
     {
         $this->getPdo()->exec(sprintf("RELEASE SAVEPOINT %s", $name));
@@ -273,7 +273,7 @@ class Connection
      * Check if we are in transaction mode.
      *
      * @return boolean
-     **/
+     */
     public function isInTransaction()
     {
         return (bool) $this->in_transaction;
@@ -285,7 +285,7 @@ class Connection
      * Get connection's related identity mapper.
      *
      * @return IdentityMapperInterface
-     **/
+     */
     public function getIdentityMapper()
     {
         return $this->identity_mapper;
@@ -298,7 +298,7 @@ class Connection
      *
      * @param \Pomm\FilterChain\FilterInterface
      * @return \Pomm\Connection\Connection
-     **/
+     */
     public function registerFilter(FilterInterface $filter)
     {
         $this->query_filter_chain->registerFilter($filter);
@@ -315,7 +315,7 @@ class Connection
      * @param String        $sql     The SQL query.
      * @param Array         $values  Optional parameter for the prepared query.
      * @return PDOStatement
-     **/
+     */
     public function executeFilterChain(BaseObjectMap $map, $sql, Array $values = array())
     {
         return $this->query_filter_chain->execute($map, $sql, $values);

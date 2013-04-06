@@ -16,7 +16,7 @@ class PgNumber implements ConverterInterface
 {
     /**
      * @see Pomm\Converter\ConverterInterface
-     **/
+     */
     public function fromPg($data, $type = null)
     {
         return $data + 0;
@@ -24,7 +24,7 @@ class PgNumber implements ConverterInterface
 
     /**
      * @see Pomm\Converter\ConverterInterface
-     **/
+     */
     public function toPg($data, $type = null)
     {
         return $data + 0;

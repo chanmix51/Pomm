@@ -22,7 +22,7 @@ use Pomm\External\Toolkit;
 class sfInflector
 {
   /**
-   * Returns a camelized string from a lower case and underscored string by replaceing slash with
+   * Returns a camelized string from a lower case and underscored string by replacing slash with
    * double-colon and upper-casing each letter preceded by an underscore.
    *
    * @param  string $lower_case_and_underscored_word  String to camelize.
@@ -86,7 +86,7 @@ class sfInflector
    *
    * @param  string $class_name  Name of class to get database table name for.
    *
-   * @return string Name of the databse table for given class.
+   * @return string Name of the database table for given class.
    */
   public static function tableize($class_name)
   {

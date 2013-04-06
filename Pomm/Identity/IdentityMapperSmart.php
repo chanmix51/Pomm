@@ -8,7 +8,7 @@ class IdentityMapperSmart extends IdentityMapperStrict
 {
     /**
      * @see Pomm\Identity\IdentityMapperInterface.
-     **/
+     */
     public function getInstance(BaseObject $object, Array $pk_fields)
     {
         if (count($pk_fields) == 0)

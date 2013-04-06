@@ -12,10 +12,10 @@ class IdentityMapperStrict implements IdentityMapperInterface
      * Return a unique identifier for each instance.
      *
      * @access protected
-     * @param  String $class_name  Entity class name.
+     * @param  String $object      Entity class name.
      * @param  Array  $primary_key Primary key.
      * @return Integer
-     **/
+     */
     protected function getSignature($object, $primary_key)
     {
         $class_name = get_class($object);
@@ -30,7 +30,7 @@ class IdentityMapperStrict implements IdentityMapperInterface
 
     /**
      * @see Pomm\Identity\IdentityMapperInterface.
-     **/
+     */
     public function getInstance(\Pomm\Object\BaseObject $object, Array $pk_fields)
     {
         if (count($pk_fields) == 0)
@@ -50,7 +50,7 @@ class IdentityMapperStrict implements IdentityMapperInterface
 
     /**
      * @see \Pomm\Identity\IdentityMapperInterface
-     **/
+     */
     public function clear(\Pomm\Object\BaseObject $object, Array $pk_fields)
     {
         if (count($pk_fields) != 0)
@@ -62,7 +62,7 @@ class IdentityMapperStrict implements IdentityMapperInterface
 
     /**
      * @see \Pomm\Identity\IdentityMapperInterface
-     **/
+     */
     public function flush()
     {
         $this->mapper = array();
