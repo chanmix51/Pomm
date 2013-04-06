@@ -57,7 +57,7 @@ class CreateMapTool extends CreateFileTool
      * generateMapFile
      *
      * Generates the empty map file.
-     * 
+     *
      * @access protected
      **/
     protected function generateMapFile()
@@ -78,6 +78,7 @@ use \\Pomm\\Query\\Where;
 class ${class}Map extends Base${class}Map
 {
 }
+
 EOD;
 
         return $php;
