@@ -13,10 +13,9 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
+        static::$tmp_dir = isset($GLOBALS['tmp_dir']) ? $GLOBALS['tmp_dir'] : sys_get_temp_dir();
 
-        static::$tmp_dir = isset($GLOBALS['tmp_dir']) ? $GLOBALS['tmp_dir'] : DIRECTORY_SEPARATOR.'tmp';
-
-        if (!is_dir(static::$tmp_dir)) 
+        if (!is_dir(static::$tmp_dir))
         {
             throw new Exception(sprintf("Directory '%s' does not exist.", static::$tmp_dir));
         }
@@ -65,8 +64,10 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
         #exec(sprintf("rm -r %s", static::$tmp_dir.DIRECTORY_SEPARATOR."TestDb"));
     }
 
-    protected function checkFiles($table, $class, $md5sums, $other_options = array())
+    protected function checkFiles($table, $class, $filenames, $other_options = array())
     {
+        $fixture_dir = realpath(__DIR__.'/../../Fixture');
+
         $options = array(
             'table' => $table,
             'schema' => 'pomm_test',
@@ -79,10 +80,9 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
         $tool = new CreateBaseMapTool($options);
         $tool->execute();
 
-        foreach ($md5sums as $hash => $file)
-        {
-            $this->assertFileExists($file, sprintf("file '%s' does exist.", $file));
-            $this->assertEquals($hash, md5(file_get_contents($file)), sprintf("Content hash match for file '%s'.", $file));
+        foreach ($filenames as $filename) {
+            $f = str_replace(static::$tmp_dir, $fixture_dir, $filename);
+            $this->assertFileEquals($f, $filename);
         }
     }
 
@@ -95,9 +95,9 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
             'PommTest');
 
         $this->checkFiles('pika', 'Pika', array(
-            "af8594137516d9ff83d30d728fbf0404" => sprintf("%s%sBase%s%s", $path, DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, 'PikaMap.php'),
-            "801c71fac28e0ae40d22fb3f61c208d6" => sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'Pika.php'),
-            "80dd30f55c806c327785890e31002027" => sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'PikaMap.php'))
+            sprintf("%s%sBase%s%s", $path, DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, 'PikaMap.php'),
+            sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'Pika.php'),
+            sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'PikaMap.php'))
         );
     }
 
@@ -110,9 +110,9 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
             'PommTestProd');
 
         $this->checkFiles('chu', 'Chu', array(
-            "337fc982688065df8b131e631f9a7500" => sprintf("%s%sBase%s%s", $path, DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, 'ChuMap.php'),
-            "a077d9766440ebbd4502194cfec964ea" => sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'Chu.php'),
-            "fc7ad4f4ae80b9dd0cf6cb7a95d510f6" => sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'ChuMap.php')),
+            sprintf("%s%sBase%s%s", $path, DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, 'ChuMap.php'),
+            sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'Chu.php'),
+            sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'ChuMap.php')),
             array('namespace' => '%dbname%\%schema%Prod', 'parent_namespace' => '\%dbname%\%schema%')
         );
     }
