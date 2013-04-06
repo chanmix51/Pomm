@@ -66,8 +66,6 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
 
     protected function checkFiles($table, $class, $filenames, $other_options = array())
     {
-        $fixture_dir = realpath(__DIR__.'/../../Fixture');
-
         $options = array(
             'table' => $table,
             'schema' => 'pomm_test',
@@ -80,40 +78,38 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
         $tool = new CreateBaseMapTool($options);
         $tool->execute();
 
+        $fixture_dir = realpath(__DIR__.'/../../Fixture');
+
         foreach ($filenames as $filename) {
             $f = str_replace(static::$tmp_dir, $fixture_dir, $filename);
+            $f = str_replace('/', DIRECTORY_SEPARATOR, $f);
+            $filename = str_replace('/', DIRECTORY_SEPARATOR, $filename);
             $this->assertFileEquals($f, $filename);
         }
     }
 
     public function testGenerateBaseMap()
     {
-        $path = sprintf("%s%s%s%s%s", static::$tmp_dir,
-            DIRECTORY_SEPARATOR,
-            'TestDb',
-            DIRECTORY_SEPARATOR,
-            'PommTest');
+        $root_dir = static::$tmp_dir.'/TestDb/PommTest';
 
         $this->checkFiles('pika', 'Pika', array(
-            sprintf("%s%sBase%s%s", $path, DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, 'PikaMap.php'),
-            sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'Pika.php'),
-            sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'PikaMap.php'))
-        );
+            $root_dir.'/Base/PikaMap.php',
+            $root_dir.'/Pika.php',
+            $root_dir.'/PikaMap.php',
+        ));
     }
 
     public function testGenerateBaseMapInherits()
     {
-        $path = sprintf("%s%s%s%s%s", static::$tmp_dir,
-            DIRECTORY_SEPARATOR,
-            'TestDb',
-            DIRECTORY_SEPARATOR,
-            'PommTestProd');
+        $root_dir = static::$tmp_dir.'/TestDb/PommTestProd';
 
         $this->checkFiles('chu', 'Chu', array(
-            sprintf("%s%sBase%s%s", $path, DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, 'ChuMap.php'),
-            sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'Chu.php'),
-            sprintf("%s%s%s", $path, DIRECTORY_SEPARATOR, 'ChuMap.php')),
-            array('namespace' => '%dbname%\%schema%Prod', 'parent_namespace' => '\%dbname%\%schema%')
-        );
+            $root_dir.'/Base/ChuMap.php',
+            $root_dir.'/Chu.php',
+            $root_dir.'/ChuMap.php',
+        ), array(
+            'namespace' => '%dbname%\%schema%Prod',
+            'parent_namespace' => '\%dbname%\%schema%',
+        ));
     }
 }
