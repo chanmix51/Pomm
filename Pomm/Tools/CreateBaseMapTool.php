@@ -148,6 +148,7 @@ $fields_definition
         \$this->pk_fields = array($primary_key);
     }
 }
+
 EOD;
 
         return $php;
