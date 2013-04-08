@@ -263,8 +263,8 @@ By default, entities lie in the same directory than their map classes and de fac
 
     namespace Database\Schema;
 
-    use \Pomm\Object\BaseObject;
-    use \Pomm\Exception\Exception;
+    use Pomm\Object\BaseObject;
+    use Pomm\Exception\Exception;
 
     class MyEntity extends BaseObject
     {
@@ -291,7 +291,7 @@ Living with entities
 Creator
 -------
 
-There are several to create entities. Use the constructor or use the creator methods from its related map class (see `Map classes`_).
+There are several ways to create entities. Use the constructor or use the creator methods from its related map class (see `Map classes`_).
 
 ::
 
@@ -839,7 +839,7 @@ These methods call the fields getter given as *method_name* and return the forma
 Complex queries
 ---------------
 
-The example above is roughly what is coded in ``findWhere``.In real life, it is very likely one needs to join several database tables and their fields. Pomm makes easy to get other map files from within the on you are coding your finder to use their methods.
+The example above is roughly what is coded in ``findWhere``.In real life, it is very likely one needs to join several database tables and their fields. Pomm makes it easy to get other map files from within the one you are coding your finder to use their methods.
 
 ::
 
@@ -961,9 +961,8 @@ Sometimes, you want to access a particular result in a collection knowing the re
 
 ::
 
-  # Get the an object from the collection at a given index 
-  # or create a new one
-  if index does not exist 
+  # Get an object from the collection at a given index 
+  # or create a new one if index does not exist 
   $object = $collection->has($index) ?
     $collection->get($index) : 
     new Object();
