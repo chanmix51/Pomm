@@ -71,7 +71,7 @@ Using `composer <http://packagist.org/>`_ installer and autoloader is probably t
   "require": {
       "pomm/pomm": "master-dev"
     }
-  } 
+  }
 
 Invoking ``composer.phar`` will automagically download Pomm, install it in a ``vendor`` directory and set up the according autoloader. Check out `this tutorial <http://www.coolkeums.org/en/article/a-gentle-introduction-to-pomm.html>`_  for step by step explanation.
 
@@ -91,3 +91,14 @@ That's very easy with github:
 * Report bugs (very appreciated)
 * Fork and PR (very very appreciated)
 * Send vacuum tubes to the author (actual preferred are russians 6Φ12Π, 6Ж43Π, 6Ж38Π, 6C19Π)
+
+Running tests
+*************
+
+.. code-block:: sh
+
+    psql -c 'CREATE DATABASE pomm_test' -U postgres -h 127.0.0.1
+    psql -c 'CREATE EXTENSION hstore' -U postgres -h 127.0.0.1 pomm_test
+    psql -c 'CREATE EXTENSION ltree' -U postgres -h 127.0.0.1 pomm_test
+
+    phpunit --configuration tests/phpunit.travis.xml
