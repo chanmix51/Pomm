@@ -73,13 +73,12 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      * Returns true if the given key exists.
      *
      * @final
-     * @param string $var 
+     * @param string $var
      * @return boolean
      */
     public final function has($var)
     {
-        return array_key_exists($var, $this->fields)
-            || method_exists($this, sprintf("get%s", sfInflector::camelize($var)));
+        return array_key_exists($var, $this->fields);
     }
 
     /**
@@ -173,8 +172,8 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      *
      * Returns the fields flatten as arrays.
      *
-     * The complex stuff in here is when there is an array, since all elements 
-     * in arrays are the same type, we check only its first value to know if we need 
+     * The complex stuff in here is when there is an array, since all elements
+     * in arrays are the same type, we check only its first value to know if we need
      * to traverse it or not.
      *
      * @return Array

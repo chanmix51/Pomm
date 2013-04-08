@@ -33,7 +33,7 @@ class BaseObjectTest extends \PHPUnit_Framework_TestCase
     {
         $data = array('first' => 1, 'second' => 2, 'third' => 'plop', 'fourth' => array('one', 'two', 'three'), 'fifth' => '2012-06-18 14:42:07.123456');
         return array(
-            array(new Entity(), array()), 
+            array(new Entity(), array()),
             array(new Entity($data), $data)
         );
     }
@@ -104,6 +104,7 @@ class BaseObjectTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($entity->getPlop(), "'plop' is always true.");
         $this->assertTrue($entity->hasPlop(), "'plop' always exists.");
+        $this->assertFalse($entity->has('plop'), "'plop' is not in fields.");
         $this->assertTrue($entity->offsetExists('plop'), "'plop' exists as an array key.");
         $this->assertTrue(!$entity->has('pika'), "'pika' never exists.");
 
@@ -135,6 +136,11 @@ class BaseObjectTest extends \PHPUnit_Framework_TestCase
 class Entity extends BaseObject
 {
     public function getPlop()
+    {
+        return true;
+    }
+
+    public function hasPlop()
     {
         return true;
     }
