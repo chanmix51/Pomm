@@ -1,3 +1,12 @@
+=== 1.1.2
+
+ * tests are now using composer autoloading (#81 from adrienbrault/gitignore).
+ * FIX `has` method just relies on entity's container(#79 from jeremyFreeAgent/fix/hasMethod).
+ * Lot of typos fixed in the code and in the documentation.
+ * New fixtures for map classes generation tests (#75 from brikou/fixtures_usage).
+ * FIX getMapFor now returns the same map instance.
+ * Harder test for binary arrays converter (see #74).
+
 === 1.1.1
 
  * Bug in 'CreateFromForeign' filter. (close #70)
@@ -8,12 +17,12 @@
  * Updated documentation.
  * Removed unused Query and Insert classes.
  * Bug in multiple column createWhereIn().
- * Multiple column IN condition Bug (close #67)
+ * Multiple column IN condition Bug (close #67).
  * Database is now a Connection pool (closes #66).
 
 === 1.1.0-RC2
 
- * Bug in updateByPk with fields order
+ * Bug in updateByPk with fields order.
  * Delete from db does not impact identity mapper.
  * DeleteByPk to return BaseObject.
  * Refactored identity mapper.
@@ -37,27 +46,27 @@
  * Exception when getting unexistent attribute.
  * Fields from db with NULL values are no more ignored.
  * Timestamp range type support.
- * DateTime instance in Where
+ * DateTime instance in Where.
  * Optionnal exclude some tables from schema scan.
  * Json converter.
- * Method BaseObjectMap::createAndSaveObject()
- * Method Collection::extract()
- * Fields indexed by alias name
+ * Method BaseObjectMap::createAndSaveObject().
+ * Method Collection::extract().
+ * Fields indexed by alias name.
  * Clear method for entity.
- * Converter and type for timestamp range Pg type
- * Output stack for tools
- * findAll now accepts suffix
+ * Converter and type for timestamp range Pg type.
+ * Output stack for tools.
+ * findAll now accepts suffix.
  * Namespace of generated file accepts placeholders.
  * Finished converter tests.
- * LTree tests
- * HStore tests
- * Segment tests
+ * LTree tests.
+ * HStore tests.
+ * Segment tests.
  * tests for point and circle.
- * Tests for point and bytea
+ * Tests for point and bytea.
  * Tests for Boolean.
  * Added converter tests for int & strings.
- * test for integers
- * executeAnonymousQuery now in Connection
+ * test for integers.
+ * executeAnonymousQuery now in Connection.
  * Deleted old tests, added Where.
  * PgEntity constructor now takes Map instance as argument (#30).
  * Anonymous query into Connection (#29).
