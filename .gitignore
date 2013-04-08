@@ -1,3 +1,6 @@
 *.swp
 .ctags
 phpunit.xml
+vendor/
+composer.lock
+
