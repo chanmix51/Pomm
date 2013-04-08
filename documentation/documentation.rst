@@ -775,7 +775,7 @@ The following example show how to modify the fields for a table containing user 
         $alias = is_null($alias) ? $alias."." : '';
 
         // We do never retrieve password informations
-        unset($fields['password'];
+        unset($fields['password']);
 
         // Add gravatar id in the select
         $fields['gravatar'] = sprintf("md5(%s.email_address)", $alias);
