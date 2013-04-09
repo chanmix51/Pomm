@@ -20,8 +20,8 @@ class Circle
     /**
      * __construct
      *
-     * @param Pomm\Type\Point $center
-     * @param Integer         $radius
+     * @param Point   $center
+     * @param integer $radius
      */
     public function __construct(Point $center, $radius)
     {

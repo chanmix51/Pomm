@@ -13,6 +13,7 @@ class QueryFilterChain
     protected $pointer;
     protected $sql;
     protected $values;
+    protected $map;
     protected $connection;
 
     public function __construct(Connection $connection)

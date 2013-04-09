@@ -2,6 +2,8 @@
 
 namespace Pomm\Identity;
 
+use Pomm\Object\BaseObject;
+
 interface IdentityMapperInterface
 {
     /**
@@ -10,11 +12,11 @@ interface IdentityMapperInterface
      * Sets the given model instance to de data mapper if not
      * set already. Return the set instance.
      *
-     * @param \Pomm\Object\BaseObject    $object     Entity instance.
-     * @param Array                     $pk_fields  Unique identifier for that entity.
-     * @return \Pomm\Object\BaseObject
+     * @param BaseObject $object    Entity instance.
+     * @param array      $pk_fields Unique identifier for that entity.
+     * @return BaseObject
      */
-    public function getInstance(\Pomm\Object\BaseObject $object, Array $pk_fields);
+    public function getInstance(BaseObject $object, array $pk_fields);
 
 
     /**
@@ -22,10 +24,10 @@ interface IdentityMapperInterface
      *
      * Remove the instance from the IM if it exists.
      *
-     * @param \Pomm\Object\BaseObject    $object     Entity instance.
-     * @param Array                     $pk_fields  Unique identifier for that entity.
+     * @param BaseObject $object Entity instance.
+     * @param array $pk_fields  Unique identifier for that entity.
      */
-    public function clear(\Pomm\Object\BaseObject $object, Array $pk_fields);
+    public function clear(BaseObject $object, array $pk_fields);
 
     /**
      * flush
