@@ -2,7 +2,7 @@
 
  * tests are now using composer autoloading (#81 from adrienbrault/gitignore).
  * FIX `has` method just relies on entity's container(#79 from jeremyFreeAgent/fix/hasMethod).
- * Lot of typos fixed in the code and in the documentation.
+ * Lot of typos fixed in the code and in the documentation (#76 from pborreli/typos).
  * New fixtures for map classes generation tests (#75 from brikou/fixtures_usage).
  * FIX getMapFor now returns the same map instance.
  * Harder test for binary arrays converter (see #74).
