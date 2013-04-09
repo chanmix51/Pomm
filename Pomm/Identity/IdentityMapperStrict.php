@@ -2,6 +2,9 @@
 
 namespace Pomm\Identity;
 
+use Pomm\Exception\Exception;
+use Pomm\Object\BaseObject;
+
 class IdentityMapperStrict implements IdentityMapperInterface
 {
     protected $mapper = array();
@@ -29,9 +32,9 @@ class IdentityMapperStrict implements IdentityMapperInterface
     }
 
     /**
-     * @see Pomm\Identity\IdentityMapperInterface.
+     * {@inheritdoc}
      */
-    public function getInstance(\Pomm\Object\BaseObject $object, Array $pk_fields)
+    public function getInstance(BaseObject $object, array $pk_fields)
     {
         if (count($pk_fields) == 0)
         {
@@ -49,9 +52,9 @@ class IdentityMapperStrict implements IdentityMapperInterface
     }
 
     /**
-     * @see \Pomm\Identity\IdentityMapperInterface
+     * {@inheritdoc}
      */
-    public function clear(\Pomm\Object\BaseObject $object, Array $pk_fields)
+    public function clear(BaseObject $object, array $pk_fields)
     {
         if (count($pk_fields) != 0)
         {
@@ -61,7 +64,7 @@ class IdentityMapperStrict implements IdentityMapperInterface
     }
 
     /**
-     * @see \Pomm\Identity\IdentityMapperInterface
+     * {@inheritdoc}
      */
     public function flush()
     {

@@ -23,7 +23,7 @@ class PDOQueryFilter implements FilterInterface
     protected $filter_chain;
 
     /**
-     * @see Pomm\FilterChain\FilterInterface
+     * {@inheritdoc}
      */
     public function execute(QueryFilterChain $query_filter_chain)
     {
@@ -50,7 +50,7 @@ class PDOQueryFilter implements FilterInterface
      *
      * Bind parameters to a prepared statement.
      * 
-     * @param PDOStatement $stmt 
+     * @param \PDOStatement $stmt
      * @access protected
      * @return \PDOStatement
      */

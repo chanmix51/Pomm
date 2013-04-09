@@ -24,7 +24,7 @@ class Collection extends SimpleCollection
      * Register a callable as filter.
      *
      * @param Callable $callable May be anonymous function.
-     * @return \Pomm\Object\Collection
+     * @return Collection
      */
 
     public function registerFilter($callable)
@@ -40,7 +40,7 @@ class Collection extends SimpleCollection
      * Unregister a filter.
      *
      * @param Callable the callable to unregister.
-     * @return \Pomm\Object\Collection
+     * @return Collection
      */
     public function unregisterFilter($callable)
     {
@@ -56,7 +56,7 @@ class Collection extends SimpleCollection
      *
      * Remove all filters.
      *
-     * @return \Pomm\Object\Collection
+     * @return Collection
      */
     public function resetFilters()
     {

@@ -19,8 +19,8 @@ class Point
     /**
      * __construct
      *
-     * @param Float $x
-     * @param Float $y
+     * @param float $x
+     * @param float $y
      */
     public function __construct($x, $y)
     {

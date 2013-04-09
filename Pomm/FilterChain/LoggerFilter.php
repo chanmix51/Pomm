@@ -24,7 +24,7 @@ class LoggerFilter implements FilterInterface
     /**
      * __construct
      *
-     * @param Pomm\Tools\Logger $logger
+     * @param Logger $logger
      */
     public function __construct(Logger $logger)
     {
@@ -32,7 +32,7 @@ class LoggerFilter implements FilterInterface
     }
 
     /**
-     * @see Pomm\FilterChain\FilterInterface
+     * {@inheritdoc}
      */
     public function execute(QueryFilterChain $query_filter_chain)
     {

@@ -5,6 +5,7 @@ namespace Pomm\Connection;
 use Pomm\Exception\Exception;
 use Pomm\Connection\Database;
 use Pomm\FilterChain\QueryFilterChain;
+use Pomm\Identity\IdentityMapperInterface;
 use Pomm\Object\BaseObjectMap;
 use Pomm\FilterChain\PDOQueryFilter;
 use Pomm\FilterChain\FilterInterface;
@@ -43,7 +44,7 @@ class Connection
      * @param Database                  $database   The Database instance.
      * @param IdentityMapperInterface   $mapper     The optional identity mapper instance.
      */
-    public function __construct(Database $database, \Pomm\Identity\IdentityMapperInterface $mapper = null)
+    public function __construct(Database $database, IdentityMapperInterface $mapper = null)
     {
         $this->database = $database;
         $this->query_filter_chain = new QueryFilterChain($this);
@@ -120,7 +121,7 @@ class Connection
      * Returns the PDO instance of the associated connection.
      * 
      * @access public
-     * @return PDO
+     * @return \PDO
      */
     public function getPdo()
     {
@@ -140,7 +141,7 @@ class Connection
      * @param  String $class The fully qualified class name of the associated entity.
      * @param  Bool   $force Force the creation of a new Map instance.
      * @access public
-     * @return \Pomm\Object\BaseObjectMap
+     * @return BaseObjectMap
      */
     public function getMapFor($class, $force = false)
     {
@@ -214,7 +215,7 @@ class Connection
      * this savepoint.
      *
      * @param  String $name Optional name of the savepoint.
-     * @return Pomm\Connection\Connection
+     * @return Connection
      */
     public function rollback($name = null)
     {
@@ -243,7 +244,7 @@ class Connection
      * Set a new savepoint with the given name.
      *
      * @param String $name Savepoint's name.
-     * @return Pomm\Connection\Connection
+     * @return Connection
      */
     public function setSavepoint($name)
     {
@@ -258,7 +259,7 @@ class Connection
      * Forget the specified savepoint.
      *
      * @param String $name the savepoint's name
-     * @return Pomm\Connection\Connection
+     * @return Connection
      */
     public function releaseSavepoint($name)
     {
@@ -296,8 +297,8 @@ class Connection
      *
      * Register a new Filter in the QueryFilterChain.
      *
-     * @param \Pomm\FilterChain\FilterInterface
-     * @return \Pomm\Connection\Connection
+     * @param FilterInterface $filter
+     * @return Connection
      */
     public function registerFilter(FilterInterface $filter)
     {
@@ -314,7 +315,7 @@ class Connection
      * @param BaseObjectMap $map     Map instance that sends the query.
      * @param String        $sql     The SQL query.
      * @param Array         $values  Optional parameter for the prepared query.
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     public function executeFilterChain(BaseObjectMap $map, $sql, Array $values = array())
     {

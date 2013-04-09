@@ -20,9 +20,9 @@ interface ConverterInterface
      * Parse the output string from Postgresql and returns the converted value 
      * into an according PHP representation.
      *
-     * @param $data String  Input string from Pg row result.
-     * @param $type String  Optional type.
-     * @return Mixed PHP representation of the data.
+     * @param string $data Input string from Pg row result.
+     * @param string $type Optional type.
+     * @return mixed PHP representation of the data.
      */
     public function fromPg($data, $type = null);
 
@@ -31,9 +31,9 @@ interface ConverterInterface
      *
      * Convert a PHP representation into the according Pg formatted string.
      *
-     * @param $data Mixed   PHP representation.
-     * @param $type String  Optional type.
-     * @return String Pg converted string for input.
+     * @param mixed  $data  PHP representation.
+     * @param string $type  Optional type.
+     * @return string Pg converted string for input.
      */
     public function toPg($data, $type = null);
 }

@@ -186,13 +186,13 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
                 return $val;
             if (is_array($val))
             {
-                if (is_array(current($val)) || (is_object(current($val)) && current($val) instanceof \Pomm\Object\BaseObject))
+                if (is_array(current($val)) || (is_object(current($val)) && current($val) instanceof BaseObject))
                 {
                     return array_map($array_recurse, $val);
                 }
                 else return $val;
             }
-            if (is_object($val) && $val instanceof \Pomm\Object\BaseObject)
+            if (is_object($val) && $val instanceof BaseObject)
                 return $val->extract();
             return $val;
         };
@@ -319,8 +319,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * offsetExists
-     * @see ArrayAccess
+     * {@inheritdoc}
      */
     public function offsetExists($offset)
     {
@@ -330,8 +329,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * offsetSet
-     * @see ArrayAccess
+     * {@inheritdoc}
      */
     public function offsetSet($offset, $value)
     {
@@ -339,8 +337,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * offsetGet
-     * @see ArrayAccess
+     * {@inheritdoc}
      */
     public function offsetGet($offset)
     {
@@ -348,8 +345,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * offsetUnset
-     * @see ArrayAccess
+     * {@inheritdoc}
      */
     public function offsetUnset($offset)
     {
@@ -357,8 +353,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * getIterator
-     * @see IteratorAggregate
+     * {@inheritdoc}
      */
     public function getIterator()
     {

@@ -60,7 +60,7 @@ class Service
      *
      * @param mixed $name
      * @access public
-     * @return Pomm\Connection\Database
+     * @return Database
      */
     public function getDatabase($name = null)
     {
@@ -86,7 +86,7 @@ class Service
      * Shortcut to get a connection from a database. 
      *
      * @param string the database name
-     * @return Pomm\Connection\Connection
+     * @return \Pomm\Connection\Connection
      */
     public function createConnection($name = null)
     {

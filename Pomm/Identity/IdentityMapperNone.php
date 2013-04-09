@@ -2,26 +2,28 @@
 
 namespace Pomm\Identity;
 
+use Pomm\Object\BaseObject;
+
 class IdentityMapperNone implements IdentityMapperInterface
 {
     /**
-     * @see \Pomm\Identity\IdentityMapperInterface.
+     * {@inheritdoc}
      */
-    public function getInstance(\Pomm\Object\BaseObject $object, Array $pk_fields)
+    public function getInstance(BaseObject $object, array $pk_fields)
     {
         return $object;
     }
     /**
-     * @see \Pomm\Identity\IdentityMapperInterface.
+     * {@inheritdoc}
      */
     public function flush()
     {
     }
 
     /**
-     * @see \Pomm\Identity\IdentityMapperInterface.
+     * {@inheritdoc}
      */
-    public function clear(\Pomm\Object\BaseObject $object, Array $pk_fields)
+    public function clear(BaseObject $object, array $pk_fields)
     {
     }
 }
