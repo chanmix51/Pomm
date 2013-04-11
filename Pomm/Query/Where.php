@@ -29,7 +29,7 @@ class Where
      * @static
      * @param String $element Optional logical element.
      * @param Array  $values  Optional elements' values.
-     * @return Pomm\Query\Where
+     * @return Where
      */
     public static function create($element = null, Array $values = array())
     {
@@ -44,7 +44,7 @@ class Where
      * @static
      * @param String $element
      * @param Array  $values
-     * @return Pomm\Query\Where
+     * @return Where
      */
     public static function createWhereIn($element, Array $values)
     {
@@ -105,7 +105,7 @@ class Where
      * or something else (XOR maybe).
      *
      * @param String $operator 
-     * @return Pomm\Query\Where
+     * @return Where
      */
     public function setOperator($operator)
     {
@@ -131,7 +131,7 @@ class Where
      *
      * Absorbing another Where instance.
      *
-     * @param Pomm\Query\Where $where
+     * @param Where $where
      */
     public function transmute(Where $where)
     {
@@ -149,7 +149,7 @@ class Where
      * @param Mixed  $element 
      * @param Array  $values 
      * @param String $operator 
-     * @return Pomm\Query\Where
+     * @return Where
      */
     public function addWhere($element, Array $values, $operator)
     {
@@ -196,7 +196,7 @@ class Where
      *
      * @param Mixed $element 
      * @param Array $values 
-     * @return Pomm\Query\Where
+     * @return Where
      */
     public function andWhere($element, Array $values = array())
     {
@@ -208,7 +208,7 @@ class Where
      * 
      * @param Mixed $element 
      * @param Array $values 
-     * @return Pomm\Query\Where
+     * @return Where
      */
     public function orWhere($element, Array $values = array())
     {
@@ -219,7 +219,7 @@ class Where
      * setStack 
      * 
      * @param Array $stack 
-     * @return Pomm\Query\Where
+     * @return Where
      */
     public function setStack(Array $stack)
     {

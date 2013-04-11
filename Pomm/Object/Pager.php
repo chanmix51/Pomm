@@ -23,12 +23,12 @@ class Pager
     /**
      * __construct
      *
-     * @param \Pomm\Object\Collection $collection
+     * @param Collection $collection
      * @param Integer $count         Total number of results.
      * @param Integer $max_per_page
      * @param Integer $page          Page index.
      */
-    public function __construct(\Pomm\Object\Collection $collection, $count, $max_per_page, $page)
+    public function __construct(Collection $collection, $count, $max_per_page, $page)
     {
         $this->collection = $collection;
         $this->count = $count;
@@ -41,7 +41,7 @@ class Pager
      *
      * Return the Pager's collection.
      *
-     * @return \Pomm\Object\Collection
+     * @return Collection
      */
     public function getCollection()
     {

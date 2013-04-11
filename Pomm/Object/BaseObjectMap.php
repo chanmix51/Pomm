@@ -173,7 +173,7 @@ abstract class BaseObjectMap
      * the database.
      *
      * @param Array $values
-     * @return \Pomm\Object\BaseObject
+     * @return BaseObject
      */
     public function createAndSaveObject(Array $values)
     {
@@ -189,7 +189,7 @@ abstract class BaseObjectMap
      * Return a new instance of the corresponding model class.
      * 
      * @param Array $values     Optional starting values.
-     * @return \Pomm\Object\BaseObject
+     * @return BaseObject
      */
     public function createObject(Array $values = null)
     {
@@ -205,7 +205,7 @@ abstract class BaseObjectMap
      * if any.
      *
      * @param Array $values  Values to be converted..
-     * @return \Pomm\Object\BaseObject $object
+     * @return BaseObject $object
      */
     public function createObjectFromPg(Array $values)
     {
@@ -362,7 +362,7 @@ abstract class BaseObjectMap
      * Retrieve the corresponding entity from the database if it exists.
      *
      * @param Array $values Key value of the PK.
-     * @return \Pomm\Object\BaseObject
+     * @return BaseObject
      */
     public function findByPk(Array $values)
     {
@@ -383,7 +383,7 @@ abstract class BaseObjectMap
      *
      * @param Array $pk
      * @param Array $values Values to be updated
-     * @return \Pomm\Object\BaseObject
+     * @return BaseObject
      */
     public function updateByPk(Array $pk, Array $values)
     {
@@ -422,8 +422,8 @@ abstract class BaseObjectMap
      *
      * Use this to insert or update an object.
      *
-     * @param \Pomm\Object\BaseObject $object 
-     * @return \Pomm\Object\BaseObject Saved instance.
+     * @param BaseObject $object 
+     * @return BaseObject Saved instance.
      */
     public function saveOne(BaseObject &$object)
     {
@@ -458,9 +458,9 @@ abstract class BaseObjectMap
      * Because this can trigger other changes in the database, the object is 
      * reloaded and all other changes are discarded.
      *
-     * @param \Pomm\Object\BaseObject $object
+     * @param BaseObject $object
      * @param Array                  $fields Only these fields will be updated.
-     * @return \Pomm\Object\BaseObject 
+     * @return BaseObject 
      */
     public function updateOne(BaseObject &$object, Array $fields)
     {
@@ -510,8 +510,8 @@ abstract class BaseObjectMap
      *
      * Delete the record tied with the given entity.
      * 
-     * @param \Pomm\Object\BaseObject $object 
-     * @return \Pomm\Object\BaseObject 
+     * @param BaseObject $object 
+     * @return BaseObject 
      */
     public function deleteOne(BaseObject &$object)
     {
@@ -531,7 +531,7 @@ abstract class BaseObjectMap
      * When grouping by all fields, this returns the fields with 
      * the given alias (default null).
      *
-     * @see \Pomm\Object\BaseObjectMap::getField()
+     * @see BaseObjectMap::getField()
      * @param String $alias Optional table alias prefix.
      * @return Array fields to be grouped.
      */
@@ -546,7 +546,7 @@ abstract class BaseObjectMap
      * Get the list of fields to SELECT.
      * When selecting all fields, this is better than *.
      *
-     * @see \Pomm\Object\BaseObjectMap::getField()
+     * @see BaseObjectMap::getField()
      * @param String $alias the table alias in the query.
      * @return Array
      */
@@ -791,7 +791,7 @@ abstract class BaseObjectMap
      * exception.
      *
      * @access protected
-     * @param \Pomm\Object\BaseObject $object 
+     * @param BaseObject $object 
      * @param String                 $message  Will be set in the Exception.
      * @access protected
      */
@@ -867,7 +867,7 @@ abstract class BaseObjectMap
      * Format the converted values for UPDATE query.
      * 
      * @access protected
-     * @param  \Pomm\Object\BaseObject $object 
+     * @param  BaseObject $object 
      * @return String
      */
     protected function parseForUpdate($object)

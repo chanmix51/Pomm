@@ -23,9 +23,9 @@ class SimpleCollection implements \Iterator, \Countable
      * __construct 
      * 
      * @param \PDOStatement              $stmt
-     * @param \Pomm\Object\BaseObjectMap $object_map
+     * @param BaseObjectMap $object_map
      */
-    public function __construct(\PDOStatement $stmt, \Pomm\Object\BaseObjectMap $object_map)
+    public function __construct(\PDOStatement $stmt, BaseObjectMap $object_map)
     {
         $this->stmt = $stmt;
         $this->object_map = $object_map;
@@ -48,7 +48,7 @@ class SimpleCollection implements \Iterator, \Countable
      * Return a particular result.
      *
      * @param Integer $index
-     * @return \Pomm\Object\BaseObject
+     * @return BaseObject
      */
 
     public function get($index)

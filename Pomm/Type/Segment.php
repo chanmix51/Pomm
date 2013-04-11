@@ -20,8 +20,8 @@ class Segment
     /**
      * __construct
      *
-     * @param Pomm\Type\Point $point_a
-     * @param Pomm\Type\Point $point_b
+     * @param Point $point_a
+     * @param Point $point_b
      */
     public function __construct(Point $point_a, Point $point_b)
     {

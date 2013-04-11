@@ -7,7 +7,7 @@ use Pomm\Object\BaseObject;
 class IdentityMapperSmart extends IdentityMapperStrict
 {
     /**
-     * @see Pomm\Identity\IdentityMapperInterface.
+     * {@inheritdoc}
      */
     public function getInstance(BaseObject $object, Array $pk_fields)
     {
