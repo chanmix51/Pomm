@@ -94,12 +94,12 @@ The ``Database`` class brings access to mechanisms to create connections and als
 By default, the following converters are registered, this means you can use them without configuring anything:
  * ``Boolean``: convert postgresql booleans 't' and 'f' to/from PHP boolean values
  * ``Number``: convert postgresql 'smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial' types to numbers
- * ``String``: convert postgresql 'varchar', 'uuid', 'xml', 'json' (Pg 9.2), 'name' and 'text' into PHP string
+ * ``String``: convert postgresql 'varchar', 'char', 'bpchar', 'uuid', 'tsvector', 'xml', 'json' (Pg 9.2), 'name' and 'text' into PHP string
  * ``Timestamp``: convert postgresql 'timestamp', 'date', 'time' to PHP ``DateTime`` instance.
- * ``Interval``: convert postgresql's 'interval' type into PHP ``SplInterval`` instance. 
+ * ``Interval``: convert postgresql's 'interval' type into PHP ``DateInterval`` instance. 
  * ``Binary``: convert postgresql's 'bytea' type into PHP string (see bugs `here <https://github.com/chanmix51/Pomm/issues/31>_` and `here <https://github.com/chanmix51/Pomm/issues/32>_`).
  * ``Array``: convert postgresql arrays from/to PHP arrays.
- * ``TsRange``: convert postgresql timestamp range to ``\Pomm\Type\TsRange`` instance (Pg 9.2).
+ * ``TsRange``: convert postgresql 'tsrange', 'daterange' to ``\Pomm\Type\TsRange`` instance (Pg 9.2).
  * ``NumberRange``: convert postgresql 'int4range', 'int8range', 'numrange` into ``\Pomm\Type\NumberRange`` instance (Pg 9.2).
 
 Registering converters
@@ -922,12 +922,13 @@ Using an entity converter will make an entity instance fetched directly from the
           %s
         _;
 
-        $sql = sprintf($sql, 
-            join(', ', $this->getSelectFields('author')), 
-            $this->getTableName('author'), 
+        $sql = sprintf(
+            $sql,
+            $this->formatFieldsWithAlias('getSelectFields', 'author'),
+            $this->getTableName('author'),
             $remote_map->getTableName('post'),
             $this->getGroupByFields('author')
-            );
+        );
 
         $this->addVirtualField('posts', 'schema_name.post[]');
 
@@ -1016,16 +1017,17 @@ Collection filters can also be used to create pseudo-relations between entity cl
 
     public function getPostWithAuthor($slug)
     {
-        $author_map = $this->connection->getMapFor('\MyDb\MySchema\Post');
+        $author_map = $this->connection->getMapFor('\MyDb\MySchema\Author');
 
         $sql = "SELECT %s, %s FROM %s p JOIN %s a ON p.author_id = a.id WHERE p.slug = ?";
 
         $sql = sprintf(
+            $sql,
             $this->formatFieldsWithAlias('getSelectFields', 'p'),
             $author_map->formatFieldsWithAlias('getRemoteSelectFields', 'a'),
             $this->getTableName(),
             $author_map->getTableName()
-            );
+        );
 
         return $this->query($sql, array($slug))
             ->registerFilter(array($author_map, 'createFromForeign'))

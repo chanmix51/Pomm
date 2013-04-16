@@ -989,12 +989,12 @@ $service-&gt;setDatabase('db_two', new App\MyDb(array(
 <dd><ul class="first last simple">
 <li><tt class="docutils literal">Boolean</tt>: convert postgresql booleans 't' and 'f' to/from PHP boolean values</li>
 <li><tt class="docutils literal">Number</tt>: convert postgresql 'smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial' types to numbers</li>
-<li><tt class="docutils literal">String</tt>: convert postgresql 'varchar', 'uuid', 'xml', 'json' (Pg 9.2), 'name' and 'text' into PHP string</li>
+<li><tt class="docutils literal">String</tt>: convert postgresql 'varchar', 'char', 'bpchar', 'uuid', 'tsvector', 'xml', 'json' (Pg 9.2), 'name' and 'text' into PHP string</li>
 <li><tt class="docutils literal">Timestamp</tt>: convert postgresql 'timestamp', 'date', 'time' to PHP <tt class="docutils literal">DateTime</tt> instance.</li>
-<li><tt class="docutils literal">Interval</tt>: convert postgresql's 'interval' type into PHP <tt class="docutils literal">SplInterval</tt> instance.</li>
+<li><tt class="docutils literal">Interval</tt>: convert postgresql's 'interval' type into PHP <tt class="docutils literal">DateInterval</tt> instance.</li>
 <li><tt class="docutils literal">Binary</tt>: convert postgresql's 'bytea' type into PHP string (see bugs <cite>here &lt;https://github.com/chanmix51/Pomm/issues/31&gt;_</cite> and <cite>here &lt;https://github.com/chanmix51/Pomm/issues/32&gt;_</cite>).</li>
 <li><tt class="docutils literal">Array</tt>: convert postgresql arrays from/to PHP arrays.</li>
-<li><tt class="docutils literal">TsRange</tt>: convert postgresql timestamp range to <tt class="docutils literal">\Pomm\Type\TsRange</tt> instance (Pg 9.2).</li>
+<li><tt class="docutils literal">TsRange</tt>: convert postgresql 'tsrange', 'daterange' to <tt class="docutils literal">\Pomm\Type\TsRange</tt> instance (Pg 9.2).</li>
 <li><tt class="docutils literal">NumberRange</tt>: convert postgresql 'int4range', 'int8range', 'numrange` into <tt class="docutils literal">\Pomm\Type\NumberRange</tt> instance (Pg 9.2).</li>
 </ul>
 </dd>
@@ -1746,12 +1746,13 @@ public function getOneWithPosts($author_name)
       %s
     _;
 
-    $sql = sprintf($sql,
-        join(', ', $this-&gt;getSelectFields('author')),
+    $sql = sprintf(
+        $sql,
+        $this-&gt;formatFieldsWithAlias('getSelectFields', 'author'),
         $this-&gt;getTableName('author'),
         $remote_map-&gt;getTableName('post'),
         $this-&gt;getGroupByFields('author')
-        );
+    );
 
     $this-&gt;addVirtualField('posts', 'schema_name.post[]');
 
@@ -1831,16 +1832,17 @@ $collection-&gt;registerFilter(function($values) {
 <p>Collection filters can also be used to create pseudo-relations between entity classes. Imagine we have to retrieve a post with its author. It would be nice if we could fetch selected fields of the author instead of a raw database object.</p>
 <pre class="literal-block">public function getPostWithAuthor($slug)
 {
-    $author_map = $this-&gt;connection-&gt;getMapFor('\MyDb\MySchema\Post');
+    $author_map = $this-&gt;connection-&gt;getMapFor('\MyDb\MySchema\Author');
 
     $sql = "SELECT %s, %s FROM %s p JOIN %s a ON p.author_id = a.id WHERE p.slug = ?";
 
     $sql = sprintf(
+        $sql,
         $this-&gt;formatFieldsWithAlias('getSelectFields', 'p'),
         $author_map-&gt;formatFieldsWithAlias('getRemoteSelectFields', 'a'),
         $this-&gt;getTableName(),
         $author_map-&gt;getTableName()
-        );
+    );
 
     return $this-&gt;query($sql, array($slug))
         -&gt;registerFilter(array($author_map, 'createFromForeign'))
