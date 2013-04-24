@@ -12,4 +12,4 @@ script: phpunit --configuration tests/phpunit.travis.xml
 
 branches:
   only:
-    - master
+    - "1.1"
