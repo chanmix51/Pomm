@@ -2,10 +2,10 @@
 
 namespace TestDb\PommTestProd\Base;
 
-use \Pomm\Object\BaseObjectMap;
+use TestDb\PommTest\PikaMap as BaseObjectMap;
 use \Pomm\Exception\Exception;
 
-abstract class ChuMap extends \\TestDb\PommTest\PikaMap
+abstract class ChuMap extends BaseObjectMap
 {
     public function initialize()
     {

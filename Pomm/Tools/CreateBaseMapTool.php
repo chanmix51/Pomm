@@ -127,16 +127,20 @@ class CreateBaseMapTool extends CreateFileTool
             $parent_call = "";
         }
 
+        $extends = ltrim($extends, '\\');
+        $use_map = ($extends === 'BaseObjectMap')
+            ? "use \\Pomm\\Object\\BaseObjectMap;"
+            : "use {$extends} as BaseObjectMap;";
 
         $php = <<<EOD
 <?php
 
 namespace $namespace;
 
-use \\Pomm\\Object\\BaseObjectMap;
+$use_map
 use \\Pomm\\Exception\\Exception;
 
-abstract class $map_name extends $extends
+abstract class $map_name extends BaseObjectMap
 {
     public function initialize()
     {

@@ -29,13 +29,13 @@ abstract class BaseTool
     final public function __construct(Array $options = array())
     {
         $this->options = new ParameterHolder($options);
-        $this->output_stack = new OutputLineStack($this->options->hasParameter('output_level') ? $this->options->get('output_level') : OutputLine::LEVEL_ALL);
+        $this->output_stack = new OutputLineStack($this->options->hasParameter('output_level') ? $this->options->getParameter('output_level') : OutputLine::LEVEL_ALL);
 
         $this->configure();
     }
 
     /**
-     * configure 
+     * configure
      *
      * This is called from the constructor. Override it to
      * configure the parameter holder.
@@ -46,7 +46,7 @@ abstract class BaseTool
     protected abstract function configure();
 
     /**
-     * execute 
+     * execute
      *
      * Is called when the tool is to be executed.
      *
