@@ -1588,7 +1588,7 @@ $this-&gt;findWhere(Pomm\Query\Where::createWhereIn("(station_id, line_no)", arr
 $where2 = new Pomm\Query\Where('age &lt; ?', array(18));
 
 $where1-&gt;orWhere($where2);
-$where1-&gt;andWhere(Pomm\Query\Where::createIn('other_id', array(1,2,3,5,7,11)));
+$where1-&gt;andWhere(Pomm\Query\Where::createWhereIn('other_id', array(1,2,3,5,7,11)));
 
 echo $where1; // (pika = ? OR age &lt; ?) AND other_id IN (?,?,?,?,?,?)
 </pre>
