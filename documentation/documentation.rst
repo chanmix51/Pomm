@@ -739,7 +739,7 @@ The ``Where`` class has two very handy methods: ``andWhere`` and ``orWhere`` whi
 Because the ``WHERE something IN (...)`` clause needs to declare as many '?' as given parameters, it has its own constructor::
 
     // WHERE (station_id, line_no) IN ((1, 1), (1, 3), ... );
-    
+
     $this->findWhere(Pomm\Query\Where::createWhereIn("(station_id, line_no)", array(array(1, 1), array(1, 3)))
 
 The ``Where`` instances can be combined together with respect of the logical precedence::
@@ -748,7 +748,7 @@ The ``Where`` instances can be combined together with respect of the logical pre
     $where2 = new Pomm\Query\Where('age < ?', array(18));
 
     $where1->orWhere($where2);
-    $where1->andWhere(Pomm\Query\Where::createIn('other_id', array(1,2,3,5,7,11))); 
+    $where1->andWhere(Pomm\Query\Where::createWhereIn('other_id', array(1,2,3,5,7,11)));
 
     echo $where1; // (pika = ? OR age < ?) AND other_id IN (?,?,?,?,?,?)
 
