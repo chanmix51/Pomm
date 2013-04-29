@@ -42,7 +42,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     /**
      * get
      *
-     * Returns the $name value
+     * Returns the $var value
      *
      * @final
      * @param String $var      Key you want to retrieve value from.
@@ -183,17 +183,27 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
         $array_recurse = function($val) use (&$array_recurse)
         {
             if (is_scalar($val))
+            {
                 return $val;
+            }
+
             if (is_array($val))
             {
                 if (is_array(current($val)) || (is_object(current($val)) && current($val) instanceof BaseObject))
                 {
                     return array_map($array_recurse, $val);
                 }
-                else return $val;
+                else
+                {
+                    return $val;
+                }
             }
+
             if (is_object($val) && $val instanceof BaseObject)
+            {
                 return $val->extract();
+            }
+
             return $val;
         };
 
