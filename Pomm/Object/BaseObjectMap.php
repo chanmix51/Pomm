@@ -232,7 +232,7 @@ abstract class BaseObjectMap
      */
     public function doQuery($sql, $values = array())
     {
-        return $this->connection->executeFilterChain($this, $sql, $values);
+        return $this->connection->query($sql, $values);
     }
 
     /**

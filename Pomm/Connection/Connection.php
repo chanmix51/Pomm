@@ -2,7 +2,8 @@
 
 namespace Pomm\Connection;
 
-use Pomm\Exception\Exception;
+use Pomm\Exception\Exception as PommException;
+use Pomm\Exception\SqlException;
 use Pomm\Connection\Database;
 use Pomm\FilterChain\QueryFilterChain;
 use Pomm\Identity\IdentityMapperInterface;
@@ -47,9 +48,6 @@ class Connection
     public function __construct(Database $database, IdentityMapperInterface $mapper = null)
     {
         $this->database = $database;
-        $this->query_filter_chain = new QueryFilterChain($this);
-        $this->query_filter_chain->registerFilter(new PDOQueryFilter());
-
         $this->parameter_holder = $database->getParameterHolder();
 
         $this->parameter_holder->setDefaultValue('isolation', self::ISOLATION_READ_COMMITTED);
@@ -97,7 +95,7 @@ class Connection
         }
         catch (\PDOException $e)
         {
-            throw new Exception(sprintf('Error connecting to the database with dsn «%s». Driver said "%s".', $connect_string, $e->getMessage()));
+            throw new PommException(sprintf('Error connecting to the database with dsn «%s». Driver said "%s".', $connect_string, $e->getMessage()));
         }
 
         // required for pg8.4 -> pg9.1 compatibility
@@ -180,7 +178,7 @@ class Connection
     {
         if ($this->in_transaction)
         {
-            throw new Exception("Cannot begin a new transaction, we are already in a transaction.");
+            throw new PommException("Cannot begin a new transaction, we are already in a transaction.");
         }
 
         $this->in_transaction = 0 === $this->getPdo()->exec(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->isolation));
@@ -199,7 +197,7 @@ class Connection
     {
         if (! $this->in_transaction)
         {
-            throw new Exception("COMMIT while not in a transaction");
+            throw new PommException("COMMIT while not in a transaction");
         }
 
         $this->in_transaction = 0 !== $this->getPdo()->exec('COMMIT');
@@ -221,7 +219,7 @@ class Connection
     {
         if (! $this->in_transaction)
         {
-            throw new Exception("ROLLBACK while not in a transaction");
+            throw new PommException("ROLLBACK while not in a transaction");
         }
 
         if (is_null($name))
@@ -293,33 +291,74 @@ class Connection
     }
 
     /**
-     * registerFilter
+     * query
+     * performs a prepared sql statement
      *
-     * Register a new Filter in the QueryFilterChain.
-     *
-     * @param FilterInterface $filter
-     * @return Connection
+     *@param String $sql The sql statement
+     *@param Array $values Values to be escaped (default [])
+     *@return \PDOStatement 
      */
-    public function registerFilter(FilterInterface $filter)
+    public function query($sql, Array $values = array())
     {
-        $this->query_filter_chain->registerFilter($filter);
+        $stmt = $this->getPdo()->prepare($sql);
+        $stmt = $this->bindParams($stmt, $values);
 
-        return $this;
+        try
+        {
+            if (!$stmt->execute())
+            {
+                throw new SqlException($stmt, $sql);
+            }
+        }
+        catch(\PDOException $e)
+        {
+            throw new PommException('PDOException while performing SQL query «%s». The driver said "%s".', $sql, $e->getMessage());
+        }
+
+        return $stmt;
     }
 
     /**
-     * executeFilterChain
+     * bindParams
+     * Bind parameters to a prepared statement.
      *
-     * Execute a SQL Query in the filter chain.
-     *
-     * @param BaseObjectMap $map     Map instance that sends the query.
-     * @param String        $sql     The SQL query.
-     * @param Array         $values  Optional parameter for the prepared query.
-     * @return \PDOStatement
+     * @param \PDOStatement $stmt
+     * @params Array $values 
+     * @return \PDOStatement 
      */
-    public function executeFilterChain(BaseObjectMap $map, $sql, Array $values = array())
+    protected function bindParams(\PDOStatement $stmt, Array $values)
     {
-        return $this->query_filter_chain->execute($map, $sql, $values);
+        foreach ($values as $pos => $value)
+        {
+            if (is_integer($value))
+            {
+                $type = \PDO::PARAM_INT;
+            }
+            elseif (is_bool($value))
+            {
+                $type = \PDO::PARAM_BOOL;
+            }
+            else
+            {
+                if ($value instanceof \DateTime)
+                {
+                    $value = $value->format('Y-m-d H:i:s.u');
+                }
+
+                $type = null;
+            }
+
+            if (is_null($type))
+            {
+                $stmt->bindValue($pos + 1, $value);
+            }
+            else
+            {
+                $stmt->bindValue($pos + 1, $value, $type);
+            }
+        }
+
+        return $stmt;
     }
 
     /**
