@@ -2,7 +2,7 @@
 
 namespace Pomm\Object;
 
-use \Pomm\Exception\Exception;
+use \Pomm\Exception\Exception as PommException;
 use \Pomm\External\sfInflector;
 
 /**
@@ -58,7 +58,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
             }
             else
             {
-                throw new Exception(sprintf("No such key '%s'.", $var));
+                throw new PommException(sprintf("No such key '%s'.", $var));
             }
         }
         elseif (is_array($var))
@@ -92,8 +92,14 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      */
     public function __call($method, $arguments)
     {
-        list($operation, $attribute) = preg_split('/(?=[A-Z])/', $method, 2);
-        $attribute = sfInflector::underscore($attribute);
+        $split = preg_split('/(?=[A-Z])/', $method, 2);
+
+        if (count($split) != 2) {
+            throw new PommException(sprintf('No such method "%s:%s()"', get_class($this), $method));
+        }
+
+        $operation = $split[0];
+        $attribute = sfInflector::underscore($split[1]);
 
         switch($operation)
         {
@@ -108,7 +114,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
         case 'clear':
             return $this->clear($attribute);
         default:
-            throw new Exception(sprintf('No such method "%s:%s()"', get_class($this), $method));
+            throw new PommException(sprintf('No such method "%s:%s()"', get_class($this), $method));
         }
     }
 
