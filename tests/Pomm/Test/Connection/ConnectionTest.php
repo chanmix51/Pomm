@@ -47,19 +47,19 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(static::$connection->isInTransaction(), "We ARE in a transaction after savepoint.");
         static::$connection->executeAnonymousQuery("INSERT INTO pomm_test.plop (chu) VALUES ('a'), ('b')");
         $stmt = static::$connection->executeAnonymousQuery("SELECT count(*) AS plop_count FROM pomm_test.plop");
-        $this->assertEquals(2, $stmt->fetchColumn(), "We have 2 results.");
+        $this->assertEquals(2, pg_fetch_result($stmt, 0), "We have 2 results.");
 
         static::$connection->rollback('schema');
         $this->assertTrue(static::$connection->isInTransaction(), "We ARE in a transaction after rollback to savepoint.");
         $stmt = static::$connection->executeAnonymousQuery("SELECT count(*) AS plop_count FROM pomm_test.plop");
-        $this->assertEquals(0, $stmt->fetchColumn(), "We have 0 results.");
+        $this->assertEquals(0, pg_fetch_result($stmt, 0), "We have 0 results.");
 
         static::$connection->setSavepoint('useless');
         static::$connection->executeAnonymousQuery("INSERT INTO pomm_test.plop (chu) VALUES ('c'), ('d')");
         static::$connection->commit();
         $this->assertFalse(static::$connection->isInTransaction(), "We are NOT in a transaction after commit.");
         $stmt = static::$connection->executeAnonymousQuery("SELECT count(*) AS plop_count FROM pomm_test.plop");
-        $this->assertEquals(2, $stmt->fetchColumn(), "We have 2 results.");
+        $this->assertEquals(2, pg_fetch_result($stmt, 0), "We have 2 results.");
 
         static::$connection->begin();
         static::$connection->rollback('useless'); //fail the current transaction
@@ -68,7 +68,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         static::$connection->commit(); //rollback
         $this->assertFalse(static::$connection->isInTransaction(), "We are NOT in a transaction after commit's rollback.");
         $stmt = static::$connection->executeAnonymousQuery("SELECT count(*) AS plop_count FROM pomm_test.plop");
-        $this->assertEquals(2, $stmt->fetchColumn(), "We have 2 results.");
+        $this->assertEquals(2, pg_fetch_result($stmt, 0), "We have 2 results.");
 
         static::$connection->begin();
         static::$connection->executeAnonymousQuery("DROP SCHEMA pomm_test CASCADE");

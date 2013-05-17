@@ -5,11 +5,8 @@ namespace Pomm\Connection;
 use Pomm\Exception\Exception as PommException;
 use Pomm\Exception\SqlException;
 use Pomm\Connection\Database;
-use Pomm\FilterChain\QueryFilterChain;
 use Pomm\Identity\IdentityMapperInterface;
 use Pomm\Object\BaseObjectMap;
-use Pomm\FilterChain\PDOQueryFilter;
-use Pomm\FilterChain\FilterInterface;
 
 /**
  * Pomm\Connection\Connection
@@ -31,7 +28,6 @@ class Connection
     protected $database;
     protected $parameter_holder;
     protected $isolation;
-    protected $in_transaction = false;
     protected $identity_mapper;
     protected $query_filter_chain;
     protected $maps = array();
@@ -81,25 +77,29 @@ class Connection
      */
     protected function launch()
     {
-        $connect_string = sprintf('%s:dbname=%s',
-            $this->parameter_holder['adapter'],
-            $this->parameter_holder['database']
-        );
+        $connect_parameters = array(sprintf("user=%s dbname=%s", $this->parameter_holder['user'], $this->parameter_holder['database']));
 
-        $connect_string .= $this->parameter_holder['host'] !== '' ? sprintf(';host=%s', $this->parameter_holder['host']) : '';
-        $connect_string .= $this->parameter_holder['port'] !== '' ? sprintf(';port=%d', $this->parameter_holder['port']) : '';
-
-        try
+        if ($this->parameter_holder['host'] !== '')
         {
-            $this->handler = new \PDO($connect_string, $this->parameter_holder['user'], $this->parameter_holder['pass'] != '' ? $this->parameter_holder['pass'] : null);
-        }
-        catch (\PDOException $e)
-        {
-            throw new PommException(sprintf('Error connecting to the database with dsn «%s». Driver said "%s".', $connect_string, $e->getMessage()));
+            $connect_parameters[] = sprintf('host=%s', $this->parameter_holder['host']);
         }
 
-        // required for pg8.4 -> pg9.1 compatibility
-        $this->handler->exec('SET standard_conforming_strings TO off; SET bytea_output TO escape');
+        if ($this->parameter_holder['port'] !== '')
+        {
+            $connect_parameters[] = sprintf('port=%s', $this->parameter_holder['port']);
+        }
+
+        if ($this->parameter_holder['pass'] !== '')
+        {
+            $connect_parameters[] = sprintf('pass=%s', addslashes($this->parameter_holder['pass']));
+        }
+
+        $this->handler = pg_connect(join(' ', $connect_parameters));
+
+        if ($this->handler === false)
+        {
+            throw new PommException(sprintf('Error connecting to the database with dsn «%s». Driver said "%s".', join(' ', $connect_parameters), pg_last_error()));
+        }
     }
 
     /*
@@ -114,14 +114,14 @@ class Connection
     }
 
     /**
-     * getPdo 
+     * getHandler
      *
-     * Returns the PDO instance of the associated connection.
+     * Returns the resource of the associated connection.
      * 
      * @access public
-     * @return \PDO
+     * @return Resource
      */
-    public function getPdo()
+    public function getHandler()
     {
         if (!isset($this->handler))
         {
@@ -176,12 +176,12 @@ class Connection
      */
     public function begin()
     {
-        if ($this->in_transaction)
+        if ($this->isIntransaction())
         {
             throw new PommException("Cannot begin a new transaction, we are already in a transaction.");
         }
 
-        $this->in_transaction = 0 === $this->getPdo()->exec(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->isolation));
+        $this->executeAnonymousQuery(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->isolation));
 
         return $this;
     }
@@ -195,13 +195,12 @@ class Connection
      */
     public function commit()
     {
-        if (! $this->in_transaction)
+        if (! $this->isIntransaction())
         {
             throw new PommException("COMMIT while not in a transaction");
         }
 
-        $this->in_transaction = 0 !== $this->getPdo()->exec('COMMIT');
-
+        $this->executeAnonymousQuery('COMMIT TRANSACTION');
         return $this;
     }
 
@@ -217,19 +216,18 @@ class Connection
      */
     public function rollback($name = null)
     {
-        if (! $this->in_transaction)
+        if (! $this->isIntransaction())
         {
             throw new PommException("ROLLBACK while not in a transaction");
         }
 
         if (is_null($name))
         {
-            $this->getPdo()->exec('ROLLBACK TRANSACTION');
-            $this->in_transaction = false;
+            $this->executeAnonymousQuery('ROLLBACK TRANSACTION');
         }
         else
         {
-            $this->getPdo()->exec(sprintf("ROLLBACK TO SAVEPOINT %s", $name));
+            $this->executeAnonymousQuery(sprintf("ROLLBACK TO SAVEPOINT %s", $name));
         }
 
         return $this;
@@ -246,7 +244,7 @@ class Connection
      */
     public function setSavepoint($name)
     {
-        $this->getPdo()->exec(sprintf("SAVEPOINT %s", $name));
+        $this->executeAnonymousQuery(sprintf("SAVEPOINT %s", $name));
 
         return $this;
     }
@@ -261,7 +259,7 @@ class Connection
      */
     public function releaseSavepoint($name)
     {
-        $this->getPdo()->exec(sprintf("RELEASE SAVEPOINT %s", $name));
+        $this->executeAnonymousQuery(sprintf("RELEASE SAVEPOINT %s", $name));
 
         return $this;
     }
@@ -275,7 +273,7 @@ class Connection
      */
     public function isInTransaction()
     {
-        return (bool) $this->in_transaction;
+        return (bool) pg_transaction_status($this->getHandler());
     }
 
     /**
@@ -300,7 +298,8 @@ class Connection
      */
     public function query($sql, Array $values = array())
     {
-        $stmt = $this->getPdo()->prepare($sql);
+        throw new \Exception('TODO : clean prepared statements.');
+        $stmt = $this->getHandler()->prepare($sql);
         $stmt = $this->bindParams($stmt, $values);
 
         try
@@ -366,10 +365,11 @@ class Connection
      * Performs a raw SQL query
      *
      * @param String $sql The sql statement to execute.
-     * @return \PDOStatement
+     * @return Resource
      */
     public function executeAnonymousQuery($sql)
     {
-        return $this->getPdo()->query($sql, \PDO::FETCH_LAZY);
+        return @pg_query($this->getHandler(), $sql);
+
     }
 }

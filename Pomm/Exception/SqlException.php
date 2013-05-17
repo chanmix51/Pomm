@@ -16,7 +16,7 @@ namespace Pomm\Exception;
 
 class SqlException extends Exception
 {
-  protected $error_state;
+  protected $stmt;
 
   /**
    * __construct 
@@ -24,10 +24,10 @@ class SqlException extends Exception
    * @param PDOStatement $stmt
    * @param Mixed        $sql
    */
-  public function __construct(\PDOStatement $stmt, $sql)
+  public function __construct($stmt, $sql)
   {
-    $this->error_state = $stmt->errorInfo();
-    $this->message = sprintf("«%s».\n\nSQL error state '%s'\nextended status '%s'\n====\n%s\n====", $sql, $this->error_state[0], $this->error_state[1], $this->error_state[2]);
+    $this->stmt = $stmt;
+    $this->message = sprintf("«%s».\n\nSQL error state '%s' [%s]\n====\n%s\n====", $sql, $this->getSQLErrorState(), $this->getSQLErrorSeverity(), $this->getSqlErrorMessage());
   }
 
   /**
@@ -35,33 +35,46 @@ class SqlException extends Exception
    *
    * Returns the SQLSTATE of the last SQL error.
    *
-   * @link http://www.postgresql.org/docs/8.4/interactive/errcodes-appendix.html
+   * @link http://www.postgresql.org/docs/9.0/interactive/errcodes-appendix.html
    * @return String
    */
   public function getSQLErrorState()
   {
-    return $this->error_state[0];
+    return pg_result_error_field($this->stmt, \PGSQL_DIAG_SQLSTATE);
   }
 
   /**
-   * getSQLExtendedErrorStatus 
+   * getSQLErrorSeverity
    *
-   * Returns the internal driver error code.
+   * Returns the severity level of the error.
    *
    * @return String
    */
-  public function getSQLExtendedErrorStatus()
+  public function getSQLErrorSeverity()
   {
-    return $this->error_state[1];
+    return pg_result_error_field($this->stmt, \PGSQL_DIAG_SEVERITY);
   }
 
   /**
-   * getSQLErrorMessage 
+   * getSqlErrorMessage
+   *
+   * Returns the error message sent by the server.
+   *
+   * @return String
+   */
+
+  public function getSqlErrorMessage()
+  {
+      return pg_result_error($this->stmt);
+  }
+
+  /**
+   * getSQLDetailedErrorMessage 
    * 
    * @return String
    */
-  public function getSQLErrorMessage()
+  public function getSQLDetailedErrorMessage()
   {
-    return $this->error_state[2];
+    return sprintf("«%s»\n%s\n(%s)", pg_result_error_field($this->stmt, \PGSQL_DIAG_MESSAGE_PRIMARY), pg_result_error_field($this->stmt, \PGSQL_DIAG_MESSAGE_DETAIL), pg_result_error_field($this->stmt, \PGSQL_DIAG_MESSAGE_HINT));
   }
 }
