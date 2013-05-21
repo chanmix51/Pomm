@@ -6,6 +6,7 @@ use Pomm\Connection\Database;
 use Pomm\Exception\Exception;
 use Pomm\Converter;
 use Pomm\Type;
+use Pomm\Query\PreparedQuery;
 
 class ConnectionTest extends \PHPUnit_Framework_TestCase
 {
@@ -40,6 +41,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(static::$connection->isInTransaction(), "We are NOT in a transaction.");
         static::$connection->begin();
         $this->assertTrue(static::$connection->isInTransaction(), "We ARE in a transaction.");
+        $this->assertEquals(\PGSQL_TRANSACTION_INTRANS, static::$connection->getTransactionStatus(), "Transaction status is OK");
         static::$connection->executeAnonymousQuery("CREATE SCHEMA pomm_test");
         static::$connection->executeAnonymousQuery("CREATE TABLE pomm_test.plop(pika serial, chu char)");
 
@@ -62,8 +64,18 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, pg_fetch_result($stmt, 0), "We have 2 results.");
 
         static::$connection->begin();
-        static::$connection->rollback('useless'); //fail the current transaction
+        try
+        {
+            static::$connection->rollback('useless'); //fail the current transaction
+            $this->fail("Rollback to unknown savepoint must raise an exception.");
+        }
+        catch (\Pomm\Exception\ConnectionException $e)
+        {
+            $this->assertTrue(true, "Error in transaction raises an exception.");
+        }
+
         $this->assertTrue(static::$connection->isInTransaction(), "We ARE STILL in a transaction after failing query.");
+        $this->assertEquals(\PGSQL_TRANSACTION_INERROR, static::$connection->getTransactionStatus(), "Transaction status is ERROR");
         static::$connection->executeAnonymousQuery("TRUNCATE pomm_test.plop");
         static::$connection->commit(); //rollback
         $this->assertFalse(static::$connection->isInTransaction(), "We are NOT in a transaction after commit's rollback.");
@@ -74,6 +86,16 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         static::$connection->executeAnonymousQuery("DROP SCHEMA pomm_test CASCADE");
         static::$connection->commit();
         $this->assertFalse(static::$connection->executeAnonymousQuery("SELECT count(*) AS plop_count FROM pomm_test.plop"), "Table does not exist anymore.");
+    }
+
+    public function testPreparedQueries()
+    {
+        $sql = "SELECT $1::int";
+
+        $this->assertFalse(static::$connection->hasQuery(PreparedQuery::getSignatureFor($sql)));
+        $stmt = static::$connection->query($sql, array(1));
+        $this->assertEquals(1, pg_num_rows($stmt), "We have one result returned by Postgresql");
+        $this->assertTrue(static::$connection->hasQuery(PreparedQuery::getSignatureFor($sql)));
     }
 }
 

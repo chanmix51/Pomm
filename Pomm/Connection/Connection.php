@@ -3,18 +3,23 @@
 namespace Pomm\Connection;
 
 use Pomm\Exception\Exception as PommException;
+use Pomm\Exception\ConnectionException;
 use Pomm\Exception\SqlException;
 use Pomm\Connection\Database;
 use Pomm\Identity\IdentityMapperInterface;
 use Pomm\Object\BaseObjectMap;
+use Pomm\Query\PreparedQuery;
 
 /**
  * Pomm\Connection\Connection
- * Manage a connection and related transactions
- * 
+ *
+ * Manage a connection to the database.
+ * Connection is a pool of Map and PreparedQuery instances. It holds the IdentityMapper.
+ * Connection also proposes handy methods to deal with transactions.
+ *
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -29,12 +34,12 @@ class Connection
     protected $parameter_holder;
     protected $isolation;
     protected $identity_mapper;
-    protected $query_filter_chain;
     protected $maps = array();
+    protected $queries = array();
 
     /**
      * __construct()
-     * 
+     *
      * Connection instance to the specified database.
      *
      * @access public
@@ -73,6 +78,7 @@ class Connection
      * launch
      *
      * Open a connection on the database.
+     *
      * @access protected
      */
     protected function launch()
@@ -98,14 +104,15 @@ class Connection
 
         if ($this->handler === false)
         {
-            throw new PommException(sprintf('Error connecting to the database with dsn «%s». Driver said "%s".', join(' ', $connect_parameters), pg_last_error()));
+            throw new ConnectionException(sprintf('Error connecting to the database with dsn «%s».', join(' ', $connect_parameters)));
         }
     }
 
-    /*
+    /**
      * __destruct
      *
-     * @access public
+     * Destroy the database connection resource.
+     *
      * @return void
      */
     public function __destruct()
@@ -117,7 +124,7 @@ class Connection
      * getHandler
      *
      * Returns the resource of the associated connection.
-     * 
+     *
      * @access public
      * @return Resource
      */
@@ -132,13 +139,14 @@ class Connection
     }
 
     /**
-     * getMapFor 
+     * getMapFor
      *
-     * Returns a Map instance of the given model name.
-     * 
-     * @param  String $class The fully qualified class name of the associated entity.
-     * @param  Bool   $force Force the creation of a new Map instance.
+     * Returns a Map instance of the given model name from the pool. If such
+     * instance does not exist, create it.
+     *
      * @access public
+     * @param  String           $class The fully qualified class name of the associated entity.
+     * @param  Bool             $force Force the creation of a new Map instance.
      * @return BaseObjectMap
      */
     public function getMapFor($class, $force = false)
@@ -172,16 +180,15 @@ class Connection
      *
      * Start a new transaction.
      *
-     * @return Pomm\Connection\Connection
+     * @access public
+     * @return Connection
      */
     public function begin()
     {
-        if ($this->isIntransaction())
+        if ($this->executeAnonymousQuery(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->isolation)) === false)
         {
-            throw new PommException("Cannot begin a new transaction, we are already in a transaction.");
+            throw new ConnectionException(sprintf("Cannot begin transaction (isolation level '%s').", $this->isolation));
         }
-
-        $this->executeAnonymousQuery(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->isolation));
 
         return $this;
     }
@@ -191,43 +198,44 @@ class Connection
      *
      * Commit a transaction in the database.
      *
+     * @access public
      * @return Pomm\Connection\Connection
      */
     public function commit()
     {
-        if (! $this->isIntransaction())
+        if ($this->executeAnonymousQuery('COMMIT TRANSACTION') === false)
         {
-            throw new PommException("COMMIT while not in a transaction");
+            throw new ConnectionException(sprintf("Cannot commit transaction (isolation level '%s').", $this->isolation));
         }
 
-        $this->executeAnonymousQuery('COMMIT TRANSACTION');
         return $this;
     }
 
     /**
      * rollback
-     * 
-     * rollback a transaction. This can be the whole transaction
-     * or if a savepoint name is specified only the queries since
+     *
+     * Rollback a transaction. This can be the whole transaction
+     * or, if a savepoint name is specified, only the queries since
      * this savepoint.
      *
-     * @param  String $name Optional name of the savepoint.
+     * @access public
+     * @param  String       $name Optional name of the savepoint.
      * @return Connection
      */
     public function rollback($name = null)
     {
-        if (! $this->isIntransaction())
-        {
-            throw new PommException("ROLLBACK while not in a transaction");
-        }
-
         if (is_null($name))
         {
-            $this->executeAnonymousQuery('ROLLBACK TRANSACTION');
+            $ret = $this->executeAnonymousQuery('ROLLBACK TRANSACTION');
         }
         else
         {
-            $this->executeAnonymousQuery(sprintf("ROLLBACK TO SAVEPOINT %s", $name));
+            $ret = $this->executeAnonymousQuery(sprintf("ROLLBACK TO SAVEPOINT %s", $name));
+        }
+
+        if ($ret === false)
+        {
+            throw new ConnectionException(sprintf("Cannot rollback transaction (isolation level '%s').", $this->isolation));
         }
 
         return $this;
@@ -239,12 +247,16 @@ class Connection
      *
      * Set a new savepoint with the given name.
      *
-     * @param String $name Savepoint's name.
+     * @access public
+     * @param  String       $name Savepoint's name.
      * @return Connection
      */
     public function setSavepoint($name)
     {
-        $this->executeAnonymousQuery(sprintf("SAVEPOINT %s", $name));
+        if ($this->executeAnonymousQuery(sprintf("SAVEPOINT %s", $name)) === false)
+        {
+            throw new ConnectionException(sprintf("Cannot set savepoint '%s'.", $name));
+        }
 
         return $this;
     }
@@ -254,12 +266,16 @@ class Connection
      *
      * Forget the specified savepoint.
      *
-     * @param String $name the savepoint's name
+     * @access public
+     * @param  String       $name the savepoint's name.
      * @return Connection
      */
     public function releaseSavepoint($name)
     {
-        $this->executeAnonymousQuery(sprintf("RELEASE SAVEPOINT %s", $name));
+        if ($this->executeAnonymousQuery(sprintf("RELEASE SAVEPOINT %s", $name)) === false)
+        {
+            throw new ConnectionException(sprintf("Cannot release savepoint named '%s'.", $name));
+        }
 
         return $this;
     }
@@ -269,11 +285,26 @@ class Connection
      *
      * Check if we are in transaction mode.
      *
+     * @access public
      * @return boolean
      */
     public function isInTransaction()
     {
-        return (bool) pg_transaction_status($this->getHandler());
+        return (bool) (pg_transaction_status($this->getHandler()) !== \PGSQL_TRANSACTION_IDLE);
+    }
+
+    /**
+     * getTransactionStatus
+     *
+     * Return the transaction status of the connection.
+     *
+     * @access public
+     * @link   see http://fr2.php.net/manual/en/function.pg-transaction-status.php
+     * @return Integer
+     */
+    public function getTransactionStatus()
+    {
+        return pg_transaction_status($this->getHandler());
     }
 
     /**
@@ -281,6 +312,7 @@ class Connection
      *
      * Get connection's related identity mapper.
      *
+     * @access public
      * @return IdentityMapperInterface
      */
     public function getIdentityMapper()
@@ -290,86 +322,81 @@ class Connection
 
     /**
      * query
+     *
      * performs a prepared sql statement
      *
-     *@param String $sql The sql statement
-     *@param Array $values Values to be escaped (default [])
-     *@return \PDOStatement 
+     * @access public
+     * @param  String           $sql    The sql statement
+     * @param  Array            $values Values to be escaped (default [])
+     * @return Resource
      */
     public function query($sql, Array $values = array())
     {
-        throw new \Exception('TODO : clean prepared statements.');
-        $stmt = $this->getHandler()->prepare($sql);
-        $stmt = $this->bindParams($stmt, $values);
-
-        try
-        {
-            if (!$stmt->execute())
-            {
-                throw new SqlException($stmt, $sql);
-            }
-        }
-        catch(\PDOException $e)
-        {
-            throw new PommException('PDOException while performing SQL query «%s». The driver said "%s".', $sql, $e->getMessage());
-        }
-
-        return $stmt;
+        return $this->getQuery($sql)->execute($values);
     }
 
     /**
-     * bindParams
-     * Bind parameters to a prepared statement.
+     * getquery
      *
-     * @param \PDOStatement $stmt
-     * @params Array $values 
-     * @return \PDOStatement 
+     * Return a prepared query from a sql signature. If no query match the 
+     * signature in the pool, a new query is prepared.
+     *
+     * @access public
+     * @return PreparedQuery
      */
-    protected function bindParams(\PDOStatement $stmt, Array $values)
+    public function getQuery($sql)
     {
-        foreach ($values as $pos => $value)
+        $signature = PreparedQuery::getSignatureFor($sql);
+
+        if (!$this->hasQuery($signature))
         {
-            if (is_integer($value))
-            {
-                $type = \PDO::PARAM_INT;
-            }
-            elseif (is_bool($value))
-            {
-                $type = \PDO::PARAM_BOOL;
-            }
-            else
-            {
-                if ($value instanceof \DateTime)
-                {
-                    $value = $value->format('Y-m-d H:i:s.u');
-                }
-
-                $type = null;
-            }
-
-            if (is_null($type))
-            {
-                $stmt->bindValue($pos + 1, $value);
-            }
-            else
-            {
-                $stmt->bindValue($pos + 1, $value, $type);
-            }
+            $query = new PreparedQuery($this->getHandler(), $sql);
+            $this->queries[$query->getName()] = $query;
         }
 
-        return $stmt;
+        return $this->queries[$signature];
+    }
+
+    /**
+     * hasQuery
+     *
+     * Check if a query with the given signature exists in the pool.
+     *
+     * @access public
+     * @param  String $name Query signature.
+     * @return Boolean
+     */
+    public function hasQuery($name)
+    {
+        return (bool) isset($this->queries[$name]);
     }
 
     /**
      * executeAnonymousQuery
+     *
      * Performs a raw SQL query
      *
-     * @param String $sql The sql statement to execute.
+     * @access public
+     * @param  String   $sql The sql statement to execute.
      * @return Resource
      */
     public function executeAnonymousQuery($sql)
     {
         return @pg_query($this->getHandler(), $sql);
+    }
 
+    /**
+     * executeParametrizedQuery
+     *
+     * Performs a SQL query with parameters (more secure).
+     *
+     * @access public
+     * @param  String $sql     Sql statement to execute.
+     * @param  Array  $values  Query parameters.
+     * @return Resource
+     */
+    public function executeParametrizedQuery($sql, $values)
+    {
+        return @pg_query_params($sql, $values);
     }
 }
