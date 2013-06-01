@@ -3,7 +3,7 @@
 namespace Pomm\Test\Object;
 
 use Pomm\Object\BaseObject;
-use Pomm\External\sfInflector;
+use Pomm\Tools\Inflector;
 
 class BaseObjectTest extends \PHPUnit_Framework_TestCase
 {
@@ -98,7 +98,7 @@ class BaseObjectTest extends \PHPUnit_Framework_TestCase
             $method = 'get'.ucwords($key);
             $this->assertEquals($value, $entity->{$method}(), "Getter access.");
             $this->assertTrue($entity->has($key), "Key exists");
-            $method = 'has'.sfInflector::camelize($key);
+            $method = 'has'.Inflector::camelize($key);
             $this->assertTrue($entity->{$method}(), "Key exists");
         }
 

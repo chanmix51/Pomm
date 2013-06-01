@@ -2,8 +2,7 @@
 namespace Pomm\Tools;
 
 use Pomm\Exception\ToolException;
-use Pomm\Tools\ParameterHolder;
-use Pomm\External\sfInflector;
+use Pomm\Tools\Inflector;
 
 /**
  * CreateFileTool - Base class for creating files
@@ -75,8 +74,8 @@ abstract class CreateFileTool extends BaseTool
      */
     protected function parseNamespace($string)
     {
-        $string = str_replace('%dbname%', sfInflector::camelize($this->options['database']->getName()), $string);
-        $string = str_replace('%schema%', $this->options['schema'] == 'public' ? 'PublicSchema' : sfInflector::camelize($this->options['schema']), $string);
+        $string = str_replace('%dbname%', Inflector::camelize($this->options['database']->getName()), $string);
+        $string = str_replace('%schema%', $this->options['schema'] == 'public' ? 'PublicSchema' : Inflector::camelize($this->options['schema']), $string);
 
         return $string;
     }

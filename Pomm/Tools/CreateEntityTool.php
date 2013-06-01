@@ -3,8 +3,6 @@
 namespace Pomm\Tools;
 
 use Pomm\Pomm;
-use Pomm\Exception\Exception;
-use Pomm\External\sfInflector;
 
 /**
  * Pomm\Tools\CreateEntityTool
