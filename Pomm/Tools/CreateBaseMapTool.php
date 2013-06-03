@@ -2,9 +2,8 @@
 
 namespace Pomm\Tools;
 
-use Pomm\External\sfInflector;
+use Pomm\Tools\Inflector;
 use Pomm\Tools\Inspector;
-use Pomm\Exception\ToolException;
 
 /**
  * Pomm\Tools\CreateBaseMapTool - Create a BaseMap class from the database.
@@ -56,7 +55,7 @@ class CreateBaseMapTool extends CreateFileTool
 
         $this->output_stack->add(sprintf("Table oid '%d' is '%s'.", $this->options['oid'], $this->options['table']));
 
-        $this->options->setDefaultValue('class_name', sfInflector::camelize($this->options['table']));
+        $this->options->setDefaultValue('class_name', Inflector::camelize($this->options['table']));
         $this->options->setDefaultValue('extends', 'BaseObjectMap');
     }
 
@@ -104,13 +103,13 @@ class CreateBaseMapTool extends CreateFileTool
 
             if ($this->options->hasParameter('parent_namespace'))
             {
-                $extends = sprintf("\\%s\\%sMap", $this->parseNamespace($this->options['parent_namespace']), sfInflector::camelize($parent_table_infos['table']));
+                $extends = sprintf("\\%s\\%sMap", $this->parseNamespace($this->options['parent_namespace']), Inflector::camelize($parent_table_infos['table']));
             }
             else
             {
                 $extends = sprintf("\\%s\\%sMap",
                     $this->getNamespace(),
-                    sfInflector::camelize($parent_table_infos['table']));
+                    Inflector::camelize($parent_table_infos['table']));
             }
 
             $this->output_stack->add(sprintf("Detected inheritance to table '%s'.", $parent_table_infos['table']));

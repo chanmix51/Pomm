@@ -3,7 +3,7 @@
 namespace Pomm\Object;
 
 use \Pomm\Exception\Exception as PommException;
-use \Pomm\External\sfInflector;
+use \Pomm\Tools\Inflector;
 
 /**
  * BaseObject - Parent for entity classes
@@ -99,7 +99,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
         }
 
         $operation = $split[0];
-        $attribute = sfInflector::underscore($split[1]);
+        $attribute = Inflector::underscore($split[1]);
 
         switch($operation)
         {
@@ -238,7 +238,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      */
     public function __set($var, $value)
     {
-        $method_name = "set".sfInflector::camelize($var);
+        $method_name = "set".Inflector::camelize($var);
         $this->$method_name($value);
     }
 
@@ -252,7 +252,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      */
     public function __get($var)
     {
-        $method_name = "get".sfInflector::camelize($var);
+        $method_name = "get".Inflector::camelize($var);
 
         return $this->$method_name();
     }
@@ -339,7 +339,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      */
     public function offsetExists($offset)
     {
-        $method_name = "has".sfInflector::camelize($offset);
+        $method_name = "has".Inflector::camelize($offset);
 
         return $this->$method_name();
     }
