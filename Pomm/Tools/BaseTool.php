@@ -1,9 +1,7 @@
 <?php
 namespace Pomm\Tools;
 
-use Pomm\Exception\ToolException;
 use Pomm\Tools\ParameterHolder;
-use Pomm\External\sfInflector;
 
 /**
  * BaseTool - Base class for tools.
