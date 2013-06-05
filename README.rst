@@ -5,6 +5,12 @@ POMM: The PHP Object Model Manager for Postgresql
 .. image:: https://secure.travis-ci.org/chanmix51/Pomm.png?branch=1.1
    :target: http://travis-ci.org/#!/chanmix51/Pomm
 
+.. image:: https://poser.pugx.org/Pomm/Pomm/version.png
+   :target: https://poser.pugx.org/
+
+.. image:: https://poser.pugx.org/Pomm/Pomm/d/total.png
+   :target: https://packagist.org/packages/pomm/pomm
+
 This is the **stable** branch of Pomm. It is devoted for bug corrections and security updates, no more functionalities will be added in this version. You can use it in production or to test Pomm's features.
 
 What is Pomm ?
