@@ -1,12 +1,12 @@
 === 1.1.3
 
-9bdae8f Indispensable icons in the README.
-b49b27a Add PHP 5.5 compatibility - Remove old Sf sfInflector class, add specific class (#95 from FabienD/issue94)
-f805274 improved error message for unknown methods in BaseObject (from akp999/master)
-c4654f7 Fixed errors in BaseTool and doc (from akp999/master)
-e9ddcef Fixed some errors in documentation (from akp999/master)
-7e8ea03 added support for 'iso_8601' IntervalStyle configuration (#83 from akp999/master)
-e766b8e PHPDoc / Types fixes (#82 from adrienbrault/fixes)
+ *  Indispensable icons in the README.
+ *  Add PHP 5.5 compatibility - Remove old Sf sfInflector class, add specific class (#95 from FabienD/issue94)
+ *  improved error message for unknown methods in BaseObject (from akp999/master)
+ *  Fixed errors in BaseTool and doc (from akp999/master)
+ *  Fixed some errors in documentation (from akp999/master)
+ *  added support for 'iso_8601' IntervalStyle configuration (#83 from akp999/master)
+ *  PHPDoc / Types fixes (#82 from adrienbrault/fixes)
 
 === 1.1.2
 
