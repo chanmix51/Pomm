@@ -2,6 +2,7 @@ language: php
 php:
   - "5.3"
   - "5.4"
+  - "5.5"
 services: postgresql
 before_script:
   - psql -c 'CREATE DATABASE pomm_test' -U postgres -h 127.0.0.1
@@ -11,5 +12,7 @@ install: composer install --dev
 script: phpunit --configuration tests/phpunit.travis.xml
 
 branches:
-  only:
-    - "1.1"
+  except:
+    - master
+    - "1.0"
+    - "rid_of_pdo"
