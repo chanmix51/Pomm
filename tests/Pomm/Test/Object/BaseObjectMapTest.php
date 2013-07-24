@@ -117,15 +117,15 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
      **/
     public function testFindWhere(BaseEntity $entity)
     {
-        $test_entity = static::$map->findWhere('"some data" = ?', array($entity['some data']), 'ORDER BY id DESC LIMIT 1')->current();
+        $test_entity = static::$map->findWhere('"some data" = $*', array($entity['some data']), 'ORDER BY id DESC LIMIT 1')->current();
         $this->assertNotSame($entity, $test_entity, "Entities are not the same instance 'check ident mapper'.");
         $this->assertEquals($entity['id'], $test_entity['id'], "Entities have the same id.");
 
-        $test_entity = static::$map->findWhere(Where::create('"some data" = ?', array($entity['some data'])), null, 'ORDER BY id DESC LIMIT 1')->current();
+        $test_entity = static::$map->findWhere(Where::create('"some data" = $*', array($entity['some data'])), null, 'ORDER BY id DESC LIMIT 1')->current();
         $this->assertNotSame($entity, $test_entity, "Entities are not the same instance 'check ident mapper'.");
         $this->assertEquals($entity['id'], $test_entity['id'], "Entities have the same id.");
 
-        $test_entity = static::$map->findWhere('ts_data > ?', array(new \DateTime("2000-01-01")))->current();
+        $test_entity = static::$map->findWhere('ts_data > $*', array(new \DateTime("2000-01-01")))->current();
         $this->assertEquals(1, $test_entity['id'], "Can feed findWhere with a DateTime instance.");
 
 
@@ -150,17 +150,17 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
      **/
     public function testQuery(BaseEntity $entity)
     {
-        $sql = "SELECT %s FROM %s WHERE plop.id = ?";
+        $sql = "SELECT %s FROM %s WHERE plop.id = $*";
         $sql = sprintf($sql,
             join(', ', static::$map->getSelectFields('plop')),
             static::$map->getTableName('plop')
         );
 
         $collection = static::$map->query($sql, array(1), 'ORDER BY id DESC LIMIT 1');
-        $this->assertInstanceOf('\Pomm\Object\Collection', $collection, "Query returns 'Collection' instance.");
+        $this->assertInstanceOf('\Pomm\Object\SimpleCollection', $collection, "Query returns 'SimpleCollection' instance.");
 
         $collection = static::$map->query($sql, array(0), 'ORDER BY id DESC LIMIT 1');
-        $this->assertInstanceOf('\Pomm\Object\Collection', $collection, "Query returns 'Collection' instance with no results.");
+        $this->assertInstanceOf('\Pomm\Object\SimpleCollection', $collection, "Query returns 'SimpleCollection' instance with no results.");
 
         return $entity;
     }

@@ -37,7 +37,7 @@ class PreparedQuery
     {
         $this->handler = $handler;
         $this->name = static::getSignatureFor($sql);
-        $this->stmt = pg_prepare($this->handler, $this->name, $sql);
+        $this->stmt = pg_prepare($this->handler, $this->name, $this->escapePlaceHolders($sql));
 
         if ($this->stmt === false)
         {
@@ -54,7 +54,7 @@ class PreparedQuery
      */
     public function __destruct()
     {
-        @pg_query($this->handler, sprintf("DEALLOCATE STATEMENT %s", $this->getName()));
+        @pg_query($this->handler, sprintf("DEALLOCATE \"%s\"", $this->getName()));
     }
 
     /**
@@ -113,4 +113,10 @@ class PreparedQuery
 
         return $values;
     }
+
+    private function escapePlaceHolders($sql)
+    {
+        return preg_replace_callback('/ \$\*/', function ($sub) { static $nb = 0; return sprintf(" $%d", ++$nb); }, $sql );
+    }
+
 }

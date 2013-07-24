@@ -5,31 +5,31 @@ namespace Pomm\Object;
 use \Pomm\Exception\Exception;
 
 /**
- * SimpleCollection 
- * 
+ * SimpleCollection
+ *
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */
 class SimpleCollection implements \Iterator, \Countable
 {
-    protected $stmt;
+    protected $result_resource;
     protected $object_map;
     protected $position = 0;
 
     /**
-     * __construct 
-     * 
-     * @param \PDOStatement              $stmt
+     * __construct
+     *
+     * @param Resource      $result_resource
      * @param BaseObjectMap $object_map
      */
-    public function __construct(\PDOStatement $stmt, BaseObjectMap $object_map)
+    public function __construct($result_resource, BaseObjectMap $object_map)
     {
-        $this->stmt = $stmt;
+        $this->result_resource = $result_resource;
         $this->object_map = $object_map;
-        $this->position = $this->stmt === false ? null : 0;
+        $this->position = $this->result_resource === false ? null : 0;
     }
 
     /**
@@ -39,7 +39,7 @@ class SimpleCollection implements \Iterator, \Countable
      */
     public function __destruct()
     {
-        $this->stmt->closeCursor();
+        pg_free_result($this->result_resource);
     }
 
     /**
@@ -53,7 +53,7 @@ class SimpleCollection implements \Iterator, \Countable
 
     public function get($index)
     {
-        $values = $this->stmt->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_ABS, $index);
+        $values = pg_fetch_assoc($this->result_resource, $index);
 
         if ($values === false)
             return false;
@@ -75,19 +75,19 @@ class SimpleCollection implements \Iterator, \Countable
     }
 
     /**
-     * count 
-     * 
+     * count
+     *
      * @see \Countable
      * @return Integer
      */
     public function count()
     {
-        return $this->stmt->rowCount();
+        return pg_num_rows($this->result_resource);
     }
 
     /**
-     * rewind 
-     * 
+     * rewind
+     *
      * @see \Iterator
      */
     public function rewind()
@@ -99,8 +99,8 @@ class SimpleCollection implements \Iterator, \Countable
     }
 
     /**
-     * current 
-     * 
+     * current
+     *
      * @see \Iterator
      */
     public function current()
@@ -109,8 +109,8 @@ class SimpleCollection implements \Iterator, \Countable
     }
 
     /**
-     * key 
-     * 
+     * key
+     *
      * @see \Iterator
      */
     public function key()
@@ -119,8 +119,8 @@ class SimpleCollection implements \Iterator, \Countable
     }
 
     /**
-     * next 
-     * 
+     * next
+     *
      * @see \Iterator
      */
     public function next()
@@ -129,8 +129,8 @@ class SimpleCollection implements \Iterator, \Countable
     }
 
     /**
-     * valid 
-     * 
+     * valid
+     *
      * @see \Iterator
      * @return Boolean
      */
@@ -140,7 +140,7 @@ class SimpleCollection implements \Iterator, \Countable
     }
 
     /**
-     * isFirst 
+     * isFirst
      * Is the iterator on the first element ?
      *
      * @return Boolean
@@ -151,10 +151,10 @@ class SimpleCollection implements \Iterator, \Countable
     }
 
     /**
-     * isLast 
+     * isLast
      *
      * Is the iterator on the last element ?
-     * 
+     *
      * @return Boolean
      */
     public function isLast()
@@ -163,22 +163,22 @@ class SimpleCollection implements \Iterator, \Countable
     }
 
     /**
-     * isEmpty 
+     * isEmpty
      *
      * Is the collection empty (no element) ?
-     * 
+     *
      * @return Boolean
      */
     public function isEmpty()
     {
-        return $this->stmt->rowCount() === 0;
+        return $this->result_resource->rowCount() === 0;
     }
 
     /**
-     * isEven 
+     * isEven
      *
      * Is the iterator on an even position ?
-     * 
+     *
      * @return Boolean
      */
     public function isEven()
@@ -187,10 +187,10 @@ class SimpleCollection implements \Iterator, \Countable
     }
 
     /**
-     * isOdd 
+     * isOdd
      *
      * Is the iterator on an odd position ?
-     * 
+     *
      * @return Boolean
      */
     public function isOdd()
@@ -199,12 +199,12 @@ class SimpleCollection implements \Iterator, \Countable
     }
 
     /**
-     * getOddEven 
+     * getOddEven
      *
      * Return 'odd' or 'even' depending on the element index position.
-     * Useful to style list elements when printing lists to do 
+     * Useful to style list elements when printing lists to do
      * <li class="line_<?php $list->getOddEven() ?>">.
-     * 
+     *
      * @return String
      */
     public function getOddEven()
@@ -215,8 +215,8 @@ class SimpleCollection implements \Iterator, \Countable
     /**
      * extract
      *
-     * Return an array of results. Useful if you want to serialize a result or 
-     * export it as a JSON format. Filters are still executed on all the 
+     * Return an array of results. Useful if you want to serialize a result or
+     * export it as a JSON format. Filters are still executed on all the
      * fetched results.
      *
      * @param String $name The name of the resultset (Defaults to entity FQCN)

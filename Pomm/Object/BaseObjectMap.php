@@ -817,7 +817,7 @@ abstract class BaseObjectMap
         $where = new Where();
         foreach ($values as $key => $value)
         {
-            $where->andWhere(sprintf('%s = ?', $key), array($value));
+            $where->andWhere(sprintf('%s = $*', $key), array($value));
         }
 
         return $where;
@@ -829,12 +829,12 @@ abstract class BaseObjectMap
      * Creates a \Pomm\Object\Collection instance from a PDOStatement.
      * 
      * @access protected
-     * @param \PDOStatement $stmt 
+     * @param resource $result
      * @return \Pomm\Object\Collection
      */
-    protected function createCollectionFromStatement(\PDOStatement $stmt)
+    protected function createCollectionFromStatement($result)
     {
-        return new Collection($stmt, $this);
+        return new SimpleCollection($result, $this);
     }
 
     /**
