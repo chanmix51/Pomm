@@ -55,7 +55,7 @@ abstract class BaseObjectMap
 
         if (is_null($this->connection))
         {
-            throw new Exception(sprintf('PDO connection not set after initializing db map "%s".', get_class($this)));
+            throw new Exception(sprintf('Postgresql connection not set after initializing db map "%s".', get_class($this)));
         }
         if (is_null($this->object_class))
         {
@@ -228,7 +228,7 @@ abstract class BaseObjectMap
      *
      * @param String  $sql    SQL statement.
      * @param Array  $values Optional parameters for the prepared query.
-     * @return \PDOStatement
+     * @return Resource
      */
     public function doQuery($sql, $values = array())
     {
@@ -242,7 +242,7 @@ abstract class BaseObjectMap
      * 
      * @param String  $sql    SQL statement.
      * @param Array  $values Optional parameters for the prepared query.
-     * @return \Pomm\Object\Collection
+     * @return \Pomm\Object\SimpleCollection
      */
     public function query($sql, $values = array())
     {
@@ -826,7 +826,7 @@ abstract class BaseObjectMap
     /**
      * createCollectionFromStatement
      *
-     * Creates a \Pomm\Object\Collection instance from a PDOStatement.
+     * Creates a \Pomm\Object\SimpleCollection instance from a result resource.
      * 
      * @access protected
      * @param resource $result

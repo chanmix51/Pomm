@@ -3,7 +3,7 @@
 namespace Pomm\Exception;
 
 /**
- * Pomm\SqlException - errors from the rdbms with the PDOStatement object
+ * Pomm\SqlException - errors from the rdbms with the result resource.
  * 
  * @link http://www.postgresql.org/docs/8.4/static/errcodes-appendix.html
  * @package Pomm
@@ -16,17 +16,17 @@ namespace Pomm\Exception;
 
 class SqlException extends Exception
 {
-  protected $stmt;
+  protected $result_resource;
 
   /**
    * __construct 
    * 
-   * @param PDOStatement $stmt
+   * @param Resource     $result_resource
    * @param Mixed        $sql
    */
-  public function __construct($stmt, $sql)
+  public function __construct($result_resource, $sql)
   {
-    $this->stmt = $stmt;
+    $this->result_resource = $result_resource;
     $this->message = sprintf("«%s».\n\nSQL error state '%s' [%s]\n====\n%s\n====", $sql, $this->getSQLErrorState(), $this->getSQLErrorSeverity(), $this->getSqlErrorMessage());
   }
 
@@ -40,7 +40,7 @@ class SqlException extends Exception
    */
   public function getSQLErrorState()
   {
-    return pg_result_error_field($this->stmt, \PGSQL_DIAG_SQLSTATE);
+    return pg_result_error_field($this->result_resource, \PGSQL_DIAG_SQLSTATE);
   }
 
   /**
@@ -52,7 +52,7 @@ class SqlException extends Exception
    */
   public function getSQLErrorSeverity()
   {
-    return pg_result_error_field($this->stmt, \PGSQL_DIAG_SEVERITY);
+    return pg_result_error_field($this->result_resource, \PGSQL_DIAG_SEVERITY);
   }
 
   /**
@@ -65,7 +65,7 @@ class SqlException extends Exception
 
   public function getSqlErrorMessage()
   {
-      return pg_result_error($this->stmt);
+      return pg_result_error($this->result_resource);
   }
 
   /**
@@ -75,6 +75,6 @@ class SqlException extends Exception
    */
   public function getSQLDetailedErrorMessage()
   {
-    return sprintf("«%s»\n%s\n(%s)", pg_result_error_field($this->stmt, \PGSQL_DIAG_MESSAGE_PRIMARY), pg_result_error_field($this->stmt, \PGSQL_DIAG_MESSAGE_DETAIL), pg_result_error_field($this->stmt, \PGSQL_DIAG_MESSAGE_HINT));
+    return sprintf("«%s»\n%s\n(%s)", pg_result_error_field($this->result_resource, \PGSQL_DIAG_MESSAGE_PRIMARY), pg_result_error_field($this->result_resource, \PGSQL_DIAG_MESSAGE_DETAIL), pg_result_error_field($this->result_resource, \PGSQL_DIAG_MESSAGE_HINT));
   }
 }
