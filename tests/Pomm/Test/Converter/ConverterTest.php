@@ -577,9 +577,10 @@ class ConverterEntityMap extends BaseObjectMap
     {
         $sql = sprintf("SELECT pg_namespace.nspname FROM pg_type JOIN pg_namespace ON pg_type.typnamespace = pg_namespace.oid WHERE typname = '%s'", $type);
 
-        return $this->connection
-            ->executeAnonymousQuery($sql)
-            ->fetchColumn(0);
+        $result = pg_fetch_assoc($this->connection
+            ->executeAnonymousQuery($sql));
+
+        return $result['nspname'];
     }
 
     public function alterText()
