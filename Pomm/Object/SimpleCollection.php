@@ -171,7 +171,7 @@ class SimpleCollection implements \Iterator, \Countable
      */
     public function isEmpty()
     {
-        return $this->result_resource->rowCount() === 0;
+        return pg_num_rows($this->result_resource) === 0;
     }
 
     /**

@@ -89,8 +89,8 @@ class CollectionTest extends ASimpleCollectionTest
 
 class CollectionEntityMap extends SimpleCollectionEntityMap
 {
-    public function createCollectionFromStatement(\PDOStatement $stmt)
+    public function createCollectionFromStatement($result)
     {
-        return new \Pomm\Object\Collection($stmt, $this);
+        return new \Pomm\Object\Collection($result, $this);
     }
 }

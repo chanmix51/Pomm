@@ -39,6 +39,7 @@ class ASimpleCollectionTest extends \PHPUnit_Framework_TestCase
     {
         !is_null(static::$logger) && print_r(static::$logger);
     }
+
     public function testGetCollection()
     {
         $collection = static::$map->findAll();
@@ -114,9 +115,9 @@ class SimpleCollectionEntityMap extends BaseObjectMap
         $this->pk_fields = array('id');
     }
 
-    public function createCollectionFromStatement(\PDOStatement $stmt)
+    public function createCollectionFromStatement($result)
     {
-        return new \Pomm\Object\SimpleCollection($stmt, $this);
+        return new \Pomm\Object\SimpleCollection($result, $this);
     }
 }
 
