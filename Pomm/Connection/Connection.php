@@ -100,7 +100,7 @@ class Connection
             $connect_parameters[] = sprintf('pass=%s', addslashes($this->parameter_holder['pass']));
         }
 
-        $this->handler = pg_connect(join(' ', $connect_parameters));
+        $this->handler = pg_connect(join(' ', $connect_parameters), \PGSQL_CONNECT_FORCE_NEW);
 
         if ($this->handler === false)
         {
@@ -348,7 +348,7 @@ class Connection
     {
         $signature = PreparedQuery::getSignatureFor($sql);
 
-        if (!$this->hasQuery($signature))
+        if ($this->hasQuery($signature) === false)
         {
             $query = new PreparedQuery($this->getHandler(), $sql);
             $this->queries[$query->getName()] = $query;
