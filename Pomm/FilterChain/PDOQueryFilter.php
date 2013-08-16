@@ -111,7 +111,7 @@ class PDOQueryFilter implements FilterInterface
         }
         catch(\PDOException $e)
         {
-            throw new Exception('PDOException while performing SQL query «%s». The driver said "%s".', $sql, $e->getMessage());
+            throw new Exception(sprintf("PDOException while performing SQL query «%s». The driver said '%s'.", $sql, $e->getMessage()));
         }
 
         return $stmt;
