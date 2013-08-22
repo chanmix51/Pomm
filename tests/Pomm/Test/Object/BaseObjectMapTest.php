@@ -157,10 +157,10 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
         );
 
         $collection = static::$map->query($sql, array(1), 'ORDER BY id DESC LIMIT 1');
-        $this->assertInstanceOf('\Pomm\Object\SimpleCollection', $collection, "Query returns 'SimpleCollection' instance.");
+        $this->assertInstanceOf('\Pomm\Object\Collection', $collection, "Query returns 'Collection' instance.");
 
         $collection = static::$map->query($sql, array(0), 'ORDER BY id DESC LIMIT 1');
-        $this->assertInstanceOf('\Pomm\Object\SimpleCollection', $collection, "Query returns 'SimpleCollection' instance with no results.");
+        $this->assertInstanceOf('\Pomm\Object\Collection', $collection, "Query returns 'Collection' instance with no results.");
 
         return $entity;
     }
@@ -191,16 +191,6 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_null(static::$map->findByPk(array('id' => $entity['id']))), "Object does not exist in the DB anymore.");
 
         return $entity;
-    }
-
-    /**
-     * @depends testUpdateByPk
-     **/
-    public function testGetRemoteSelectFields()
-    {
-        $fields = static::$map->getRemoteSelectFields('plop');
-        $fields = join(', ', array_map(function($alias, $field) { return sprintf('%s AS "%s"', $field, $alias); }, array_keys($fields), $fields));
-        $this->assertEquals('plop."id" AS "pomm_test.base_entity{id}", plop."some data" AS "pomm_test.base_entity{some data}", plop."bool_data" AS "pomm_test.base_entity{bool_data}", plop."ts_data" AS "pomm_test.base_entity{ts_data}"', $fields, "Remote fields are ok");
     }
 
     /**

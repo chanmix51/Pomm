@@ -5,16 +5,19 @@ namespace Pomm\Test\Object;
 use Pomm\Connection\Database;
 use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
-use Pomm\Object\SimpleCollection;
 use Pomm\Object\Collection;
 use Pomm\Exception\Exception;
 use Pomm\Query\Where;
 
-class CollectionTest extends ASimpleCollectionTest
+
+class CollectionTest extends \PHPUnit_Framework_TestCase
 {
+    protected static $map;
+    protected static $logger;
+
     public static function setUpBeforeClass()
     {
-        $database = parent::setUpBeforeClass();
+        $database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
 
         if (isset($GLOBALS['dev']) && $GLOBALS['dev'] == 'true') {
             static::$logger = new \Pomm\Tools\Logger();
@@ -28,6 +31,13 @@ class CollectionTest extends ASimpleCollectionTest
                 ->createConnection()
                 ->getMapFor('Pomm\Test\Object\CollectionEntity');
         }
+
+        return $database;
+    }
+
+    public static function tearDownAfterClass()
+    {
+        !is_null(static::$logger) && print_r(static::$logger);
     }
 
     public function testGetCollection()
@@ -43,54 +53,69 @@ class CollectionTest extends ASimpleCollectionTest
     /**
      * @depends testGetCollection
      **/
-    public function testFilters(SimpleCollection $collection)
+    public function testResult(Collection $collection)
     {
-        $collection = static::$map->findAll();
-        $collection
-            ->registerFilter(function ($vals) { return array('id' => $vals['id'] * 2); })
-            ->registerFilter(array($this, 'doNothing'))
-            ;
         $n = 1;
-        foreach ($collection as $entity)
+        foreach($collection as $entity) 
         {
-            $this->assertEquals(2 * $n++, $entity->get('id'), "Filter multiply everthing by 2.");
+            $this->assertEquals($n++, $entity['id'], sprintf("We have id '%d'.", $n - 1));
         }
+
+        $this->assertEquals($n - 1, $collection->count(), "As many results as count says.");
     }
 
     /**
      * @depends testGetCollection
      **/
-    public function testRewind(SimpleCollection $collection)
+    public function testStats(Collection $collection)
     {
-        $collection = static::$map->findAll();
+        $this->assertEquals(10, $collection->count(), "Collection has 10 results.");
+        $this->assertFalse($collection->isEmpty(), "Collection is NOT empty.");
 
-        foreach ($collection as $result)
-        {
-        }
-
-        foreach ($collection as $index => $result)
-        {
-            $this->assertTrue( $index + 1 == $result['id'], "Index follows status.");
-        }
+        $collection = static::$map->findWhere('id > $*', array(135));
+        $this->assertEquals(0, $collection->count(), "Collection has no results.");
+        $this->assertTrue($collection->isEmpty(), "Collection IS empty.");
     }
 
+    /**
+     * @depends testGetCollection
+     * @expectedException \Pomm\Exception\Exception
+     **/
+    public function testRewind(Collection $collection)
+    {
+        $collection->rewind();
+        $this->assertTrue(true, "Rewind a brand new Collection is all right.");
+        $collection->next();
+        $collection->rewind();
+        $this->assertTrue(false, "Rewind a moved cursor throws an Exception.");
+    }
+
+    /**
+     * @depends testGetCollection
+     **/
     public function testExtract()
     {
-        $collection = parent::testExtract();
+        $collection = static::$map->findWhere('id < $*', array(5));
 
-        $this->assertEquals(array('plop' => array(array('id' => 1), array('id' => 2), array('id' => 3), array('id' => 4))), $collection->extract('plop'), 'Extract is an array of extracts.');
-    }
+        $this->assertEquals(array('Pomm\Test\Object\CollectionEntity' => array(array('id' => 1), array('id' => 2), array('id' => 3), array('id' => 4))), $collection->extract(), 'Extract is an array of extracts.');
 
-    public function doNothing($values)
-    {
-        return $values;
+        return $collection;
     }
 }
 
-class CollectionEntityMap extends SimpleCollectionEntityMap
+class CollectionEntityMap extends BaseObjectMap
 {
-    public function createCollectionFromStatement($result)
+    protected function initialize()
     {
-        return new \Pomm\Object\Collection($result, $this);
+        $this->object_class = 'Pomm\Test\Object\CollectionEntity';
+        $this->object_name  = 'generate_series(1, 10) AS id';
+
+        $this->addField('id', 'int4');
+
+        $this->pk_fields = array('id');
     }
+}
+
+class CollectionEntity extends BaseObject
+{
 }

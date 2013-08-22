@@ -242,7 +242,7 @@ abstract class BaseObjectMap
      *
      * @param String  $sql    SQL statement.
      * @param Array  $values Optional parameters for the prepared query.
-     * @return \Pomm\Object\SimpleCollection
+     * @return \Pomm\Object\Collection
      */
     public function query($sql, $values = array())
     {
@@ -617,61 +617,6 @@ abstract class BaseObjectMap
     }
 
     /**
-     * getRemoteSelectFields
-     *
-     * Return the select fields aliased as table{%s} for use with
-     * createFromForeign filter.
-     *
-     * @param String $alias Optional alias prefix.
-     * @return Array $fields
-     */
-    public function getRemoteSelectFields($alias = null)
-    {
-        $fields = array();
-        foreach ($this->getSelectFields($alias) as $field_alias => $field_name)
-        {
-            $fields[sprintf("%s{%s}", $this->getTableName(), $field_alias)] = $field_name;
-        }
-
-        return $fields;
-    }
-
-    /**
-     * createFromForeign
-     *
-     * This method is intended to be used as a Collection filter.
-     * Hydrate an object from the values with keys formatted like table{field}
-     * and set it in the values with the table name as key. All the values used
-     * to hydrate the object are removed from the array.
-     *
-     * @param Array $old_values
-     * @return Array
-     */
-    public function createFromForeign(Array $old_values)
-    {
-        $values = array();
-        $new_values = array();
-        $table = $this->getTableName();
-        $table_name = strpos($table, '.') ? substr(strstr($table, '.'), 1) : $table;
-
-        foreach($old_values as $name => $value)
-        {
-            if (preg_match(sprintf('/%s\{(\w+)\}/', $table_name), $name, $matchs))
-            {
-                $values[$matchs[1]] = $value;
-            }
-            else
-            {
-                $new_values[$name] = $value;
-            }
-        }
-
-        $new_values[$table_name] = $this->createObjectFromPg($values);
-
-        return $new_values;
-    }
-
-    /**
      * convertToPg
      *
      * Convert values to Postgresql.
@@ -826,7 +771,7 @@ abstract class BaseObjectMap
     /**
      * createCollectionFromStatement
      *
-     * Creates a \Pomm\Object\SimpleCollection instance from a result resource.
+     * Creates a \Pomm\Object\Collection instance from a result resource.
      *
      * @access protected
      * @param resource $result
@@ -834,7 +779,7 @@ abstract class BaseObjectMap
      */
     protected function createCollectionFromStatement($result)
     {
-        return new SimpleCollection($result, $this);
+        return new Collection($result, $this);
     }
 
     /**
