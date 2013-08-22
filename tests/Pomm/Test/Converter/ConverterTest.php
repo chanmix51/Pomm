@@ -193,9 +193,6 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
      * I don't know why PHP seems to strip some chars from bytea when fetching 
      * results on some large objects wich makes fail tests (See issue #31).
      *
-     * Arrays of bytea is not supported as PHP returns this field as string and 
-     * it (or myself) was not able to convert strings to binary (See issue #32).
-     *
      * @depends testInteger
      **/
     public function testBinary()
@@ -217,7 +214,7 @@ _;
 
         $this->assertEquals(2, count($entity['arr_bin']), "The array has 2 elements.");
         $this->assertEquals($binary, $entity['arr_bin'][0], "First value in the array is preserved.");
-        //$this->assertEquals($base64, base64_encode($entity['arr_bin'][1]), "Second value in the array is preserved.");
+        $this->assertEquals($base64, base64_encode($entity['arr_bin'][1]), "Second value in the array is preserved.");
 
         $entity['some_bin'] = base64_decode($base64);
         static::$cv_map->updateOne($entity, array('some_bin'));

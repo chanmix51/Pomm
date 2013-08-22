@@ -19,8 +19,7 @@ class PgString implements ConverterInterface
      */
     public function toPg($data, $type = null)
     {
-        $data = str_replace("'", "''", $data);
-        $data = str_replace("\\", "\\\\", $data);
+        $data = pg_escape_string($data);
         $type = is_null($type) ? '' : sprintf("%s ", $type);
         $data = sprintf("%s'%s'",  $type, $data);
 
@@ -32,6 +31,6 @@ class PgString implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
-        return str_replace('\\"', '"', $data);
+        return $data;
     }
 }
