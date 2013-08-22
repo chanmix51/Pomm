@@ -41,7 +41,7 @@ class Inspector
     public function getTableOid($schema, $table)
     {
         $sql = sprintf("SELECT c.oid FROM pg_catalog.pg_class c LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = '%s' AND c.relname ~ '^(%s)$';", $schema, $table);
-        $oid = pg_fetch_assoc(pg_query($this->connection->getHandler(), $this->connection->getHandler(), $sql));
+        $oid = pg_fetch_result(pg_query($this->connection->getHandler(), $sql), 'oid');
 
         if ($oid === FALSE)
         {
@@ -88,6 +88,7 @@ SQL;
         }
 
         $tables = array();
+
         while($row = pg_fetch_assoc($result_handler))
         {
             $tables[$row['table_name']] = $row['oid'];
@@ -214,9 +215,9 @@ SQL;
             return FALSE;
         }
 
-        $result = pg_fetch_assoc($result_handler);
+        $result = pg_fetch_result($result_handler, 'inhparent');
 
-        return $result[0];
+        return $result;
     }
 
 
