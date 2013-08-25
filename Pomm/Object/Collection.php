@@ -5,11 +5,12 @@ namespace Pomm\Object;
 use \Pomm\Exception\Exception;
 
 /**
- * Collection
+ * Collection - Iterator for query results
  *
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT
+ * @uses Pomm\Exception\Exception
+ * @copyright 2011 - 2013 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */

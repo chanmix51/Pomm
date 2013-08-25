@@ -12,6 +12,11 @@ use \Pomm\Type as Type;
  *
  * @abstract
  * @package Pomm
+ * @uses Pomm\Exception\Exception
+ * @uses Pomm\Exception\SqlException
+ * @uses Pomm\Query\Where
+ * @uses Pomm\Connection\Connection
+ * @uses Pomm\Type
  * @version $id$
  * @copyright 2011 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
@@ -827,5 +832,4 @@ abstract class BaseObjectMap
 
         return implode(',', $tmp);
     }
-
 }

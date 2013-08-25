@@ -7,10 +7,10 @@ use Pomm\Exception\Exception;
 
 /**
  * Pomm\Converter\pgArray - Array converter
- * 
+ *
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 - 2013 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -76,8 +76,8 @@ class PgArray implements ConverterInterface
         $converter = $this->database
             ->getConverterForType($type);
 
-        return sprintf('ARRAY[%s]::%s[]', join(',', array_map(function ($val) use ($converter, $type) { 
-                    return !is_null($val) ? $converter->toPg($val, $type) : 'NULL'; 
+        return sprintf('ARRAY[%s]::%s[]', join(',', array_map(function ($val) use ($converter, $type) {
+                    return !is_null($val) ? $converter->toPg($val, $type) : 'NULL';
                 }, $data)), $type);
     }
 }

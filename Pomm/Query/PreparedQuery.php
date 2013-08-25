@@ -3,6 +3,16 @@ namespace Pomm\Query;
 
 use \Pomm\Exception\ConnectionException;
 
+/**
+ * Pomm\Query\PreparedQuery
+ *
+ * @package Pomm
+ * @uses Pomm\Exception\ConnectionException
+ * @version $id$
+ * @copyright 2013 Grégoire HUBERT
+ * @author Grégoire HUBERT <hubert.greg@gmail.com>
+ * @license X11 {@link http://opensource.org/licenses/mit-license.php}
+ */
 class PreparedQuery
 {
     private $handler;
@@ -114,6 +124,15 @@ class PreparedQuery
         return $values;
     }
 
+    /**
+     * escapePlaceHolders
+     *
+     * Replace Pomm values placeholders by indexed placeholders.
+     *
+     * @access private
+     * @param String $sql SQL statement
+     * @return String PHP Pg compatible sql statement.
+     */
     private function escapePlaceHolders($sql)
     {
         return preg_replace_callback('/ \$\*/', function ($sub) { static $nb = 0; return sprintf(" $%d", ++$nb); }, $sql );

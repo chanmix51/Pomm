@@ -4,10 +4,10 @@ namespace Pomm\Converter;
 
 /**
  * Pomm\Converter\ConverterInterface - Interface for converters
- * 
+ *
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 - 2013 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -17,7 +17,7 @@ interface ConverterInterface
     /**
      * fromPg
      *
-     * Parse the output string from Postgresql and returns the converted value 
+     * Parse the output string from Postgresql and returns the converted value
      * into an according PHP representation.
      *
      * @param string $data Input string from Pg row result.

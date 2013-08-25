@@ -1,16 +1,16 @@
 <?php
 
-/*
- * This file is part of a Pomm project.
- * 
- * (c) Fabien D. <fabien at myprod.net>
- * 
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Pomm\Tools;
 
+/**
+ * Pomm\Tools\Inflector
+ *
+ * @package Pomm
+ * @version $id$
+ * @copyright 2011 - 2013 Grégoire HUBERT
+ * @author Fabien D. <fabien at myprod.net>
+ * @license X11 {@link http://opensource.org/licenses/mit-license.php}
+ */
 class Inflector
 {
     /**

@@ -4,6 +4,16 @@ namespace Pomm\Identity;
 
 use Pomm\Object\BaseObject;
 
+/**
+ * Pomm\Identity\IdentityMapperInterface - Interface for identity mappers
+ *
+ * @package Pomm
+ * @uses Pomm\Object\BaseObject
+ * @version $id$
+ * @copyright 2011 - 2013 Grégoire HUBERT
+ * @author Grégoire HUBERT <hubert.greg@gmail.com>
+ * @license X11 {@link http://opensource.org/licenses/mit-license.php}
+ */
 interface IdentityMapperInterface
 {
     /**

@@ -4,6 +4,16 @@ namespace Pomm\Identity;
 
 use Pomm\Object\BaseObject;
 
+/**
+ * Pomm\Identity\IdentityMapperNone - "smart" identity mapper
+ *
+ * @package Pomm
+ * @uses Pomm\Object\BaseObject
+ * @version $id$
+ * @copyright 2011 - 2013 Grégoire HUBERT
+ * @author Grégoire HUBERT <hubert.greg@gmail.com>
+ * @license X11 {@link http://opensource.org/licenses/mit-license.php}
+ */
 class IdentityMapperSmart extends IdentityMapperStrict
 {
     /**

@@ -2,15 +2,15 @@
 namespace Pomm\Query;
 
 /**
- * Where 
- * 
- * This class represents a WHERE clause of a SQL statement. It deals with AND & 
- * OR operator you can add using handy methods. This allows you to build 
+ * Where
+ *
+ * This class represents a WHERE clause of a SQL statement. It deals with AND &
+ * OR operator you can add using handy methods. This allows you to build
  * queries dynamically.
  *
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 - 2013 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  **/
@@ -22,10 +22,10 @@ class Where
     public $operator;
 
     /**
-     * create 
+     * create
      *
      * A constructor you can chain from.
-     * 
+     *
      * @static
      * @param String $element Optional logical element.
      * @param Array  $values  Optional elements' values.
@@ -83,8 +83,8 @@ class Where
     }
 
     /**
-     * __construct 
-     * 
+     * __construct
+     *
      * @param String $element  (optional)
      * @param Array  $values   (optional)
      */
@@ -99,12 +99,12 @@ class Where
     }
 
     /**
-     * setOperator 
-     * 
+     * setOperator
+     *
      * is it an AND or an OR ?
      * or something else (XOR maybe).
      *
-     * @param String $operator 
+     * @param String $operator
      * @return Where
      */
     public function setOperator($operator)
@@ -115,8 +115,8 @@ class Where
     }
 
     /**
-     * isEmpty 
-     * 
+     * isEmpty
+     *
      * is it a fresh brand new object ?
      *
      * @return Boolean
@@ -142,13 +142,13 @@ class Where
     }
 
     /**
-     * addWhere 
+     * addWhere
      *
      * You can add a new WHERE clause with your own operator.
-     * 
-     * @param Mixed  $element 
-     * @param Array  $values 
-     * @param String $operator 
+     *
+     * @param Mixed  $element
+     * @param Array  $values
+     * @param String $operator
      * @return Where
      */
     public function addWhere($element, Array $values, $operator)
@@ -190,12 +190,12 @@ class Where
     }
 
     /**
-     * andWhere 
-     * 
+     * andWhere
+     *
      * Or use a ready to use AND where clause.
      *
-     * @param Mixed $element 
-     * @param Array $values 
+     * @param Mixed $element
+     * @param Array $values
      * @return Where
      */
     public function andWhere($element, Array $values = array())
@@ -204,10 +204,10 @@ class Where
     }
 
     /**
-     * orWhere 
-     * 
-     * @param Mixed $element 
-     * @param Array $values 
+     * orWhere
+     *
+     * @param Mixed $element
+     * @param Array $values
      * @return Where
      */
     public function orWhere($element, Array $values = array())
@@ -216,9 +216,9 @@ class Where
     }
 
     /**
-     * setStack 
-     * 
-     * @param Array $stack 
+     * setStack
+     *
+     * @param Array $stack
      * @return Where
      */
     public function setStack(Array $stack)
@@ -229,8 +229,8 @@ class Where
     }
 
     /**
-     * __toString 
-     * 
+     * __toString
+     *
      * where your SQL statement is built.
      *
      * @return String
@@ -248,8 +248,8 @@ class Where
     }
 
     /**
-     * hasElement 
-     * 
+     * hasElement
+     *
      * @return Boolean
      */
     public function hasElement()
@@ -258,8 +258,8 @@ class Where
     }
 
     /**
-     * getElement 
-     * 
+     * getElement
+     *
      * @return String
      */
     public function getElement()
@@ -268,8 +268,8 @@ class Where
     }
 
     /**
-     * parse 
-     * 
+     * parse
+     *
      * @access protected
      * @return String
      */
@@ -290,7 +290,7 @@ class Where
     }
 
     /**
-     * getValues 
+     * getValues
      *
      * Get all the values back for the prepared statement.
      *

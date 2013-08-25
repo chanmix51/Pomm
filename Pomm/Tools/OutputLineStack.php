@@ -12,7 +12,7 @@ class OutputLineStack implements \Iterator, \Countable
     /**
      * __construct
      *
-     * @param Integer $level 
+     * @param Integer $level
      */
     public function __construct($level = OutputLine::LEVEL_ALL)
     {
@@ -168,7 +168,7 @@ class OutputLineStack implements \Iterator, \Countable
     /**
      * getStack
      *
-     * @return OutputLineStack 
+     * @return OutputLineStack
      */
     public function getStack()
     {

@@ -9,9 +9,11 @@ use \Pomm\Tools\Inflector;
  * BaseObject - Parent for entity classes
  *
  * @abstract
+ * @uses Pomm\Exception\Exception
+ * @uses Pomm\Tools\Inflector
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT
+ * @copyright 2011 - 2013 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
  */

@@ -5,11 +5,11 @@ namespace Pomm\Tools;
 use Pomm\Exception\Exception;
 
 /**
- * Pomm\Tools\ParameterHolder 
+ * Pomm\Tools\ParameterHolder
  *
  * @package Pomm
  * @version $id$
- * @copyright 2011 Grégoire HUBERT 
+ * @copyright 2011 - 2013 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -19,7 +19,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
 
     /**
      * __construct()
-     * 
+     *
      * @param Array $parameters (optional)
      */
     public function __construct(Array $parameters = array())
@@ -83,6 +83,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
      * mustHave()
      *
      * Throw an exception if a param is not set
+     *
      * @access public
      * @param String $name the parameter's name
      */
@@ -98,6 +99,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
      * setDefaultValue()
      *
      * Sets a default value if the param $name is not set
+     *
      * @access public
      * @param String $name the parameter's name
      * @param mixed $value the default value
@@ -113,14 +115,13 @@ class ParameterHolder implements \ArrayAccess, \Iterator
     /**
      * mustBeOneOf()
      *
-     * Check if the given parameter is one of the values passed as argument. If 
+     * Check if the given parameter is one of the values passed as argument. If
      * not, an exception is thrown.
      *
      * @param String $name the parameter's name
      * @param Array $values
      * @return Boolean (true)
      */
-
     public function mustBeOneOf($name, Array $values)
     {
         if (!in_array($this[$name], $values))
@@ -134,7 +135,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
     /**
      * unsetParameter()
      *
-     * @param String $name 
+     * @param String $name
      */
     public function unsetParameter($name)
     {
@@ -143,6 +144,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
 
     /**
      * offsetExists()
+     *
      * @see ArrayAccess
      */
     public function offsetExists($name)
@@ -152,6 +154,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
 
     /**
      * offsetGet()
+     *
      * @see ArrayAccess
      */
     public function offsetGet($name)
@@ -161,6 +164,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
 
     /**
      * offsetSet()
+     *
      * @see ArrayAccess
      */
     public function offsetSet($name, $value)
@@ -170,6 +174,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
 
     /**
      * offsetUnset()
+     *
      * @see ArrayAccess
      */
     public function offsetUnset($name)
@@ -179,6 +184,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
 
     /**
      * current()
+     *
      * @see Iterator
      */
     public function current()
@@ -186,9 +192,9 @@ class ParameterHolder implements \ArrayAccess, \Iterator
         return current($this->parameters);
     }
 
-
     /**
      * next()
+     *
      * @see Iterator
      */
     public function next()
@@ -198,6 +204,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
 
     /**
      * key()
+     *
      * @see Iterator
      */
     public function key()
@@ -207,6 +214,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
 
     /**
      * valid()
+     *
      * @see Iterator
      */
     public function valid()
@@ -216,6 +224,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
 
     /**
      * rewind()
+     *
      * @see Iterator
      */
     public function rewind()
