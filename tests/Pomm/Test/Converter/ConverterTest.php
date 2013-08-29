@@ -132,7 +132,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $values = array(
             'some_ts' => '2012-06-20 18:34:16.640044',
             'some_intv' => '37 years 3 months 7 days 2 hours 14 minutes 46 seconds',
-            'arr_ts' => array('2015-06-08 03:54:08.880287', '1994-12-16 21:23:50.224208', '1941-02-18 17:29:52.216309')
+            'arr_ts' => array('2015-06-08 03:54:08.880287', '1994-12-16 21:23:50.224208', '1941-02-18 17:29:52.216309'),
         );
 
         $entity->hydrate($values);
@@ -151,6 +151,12 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(3, count($entity['arr_ts']), "'arr_ts' is an array of 3 elements.");
         $this->assertTrue(is_null($entity['arr_ts'][1]), "Second element of 'arr_ts' is null.");
+
+        $entity['some_intv'] =  '1 year 1 month 1 day 1 hour 1 minute 1 second';
+        static::$cv_map->updateOne($entity, array('some_intv'));
+
+        $this->assertInstanceOf('\DateInterval', $entity['some_intv'], "'some_intv' is a \DateInterval instance.");
+        $this->assertEquals('1 1 1 01:1:1', $entity['some_intv']->format("%y %m %d %H:%i:%s"), "'some_intv' is '1 1 01:01:01'.");
 
         return $entity;
     }
