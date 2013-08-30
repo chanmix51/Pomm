@@ -21,6 +21,7 @@ class Database
     protected $converters = array();
     protected $handled_types = array();
     protected $connection;
+    protected $configuration = array();
 
     /**
      * __construct
@@ -28,7 +29,8 @@ class Database
      * Parameters that can be sent :
      * dsn : an url like psql://user:pass@host:port/dbname
      * name : the connection name for this database (optional)
-     * persistant : a boolean to use persistant connections or not (default true)
+     * configuration : An array containing configuration settings (see
+     * http://www.postgresql.org/docs/9.0/static/runtime-config-client.html)
      * isolation : transaction isolation level (default READ COMMITED)
      *
      * @final
@@ -112,7 +114,8 @@ class Database
     {
         $this->parameter_holder->mustHave('dsn');
         $this->processDsn();
-        $this->parameter_holder->setDefaultValue('persistant', true);
+        $this->parameter_holder->setDefaultValue('configuration', array());
+        $this->initializeConfiguration();
         $this->registerBaseConverters();
     }
 
@@ -260,7 +263,7 @@ class Database
         $this->registerConverter('Number', new Converter\PgNumber(), array('int2', 'int4', 'int8', 'numeric', 'float4', 'float8'));
         $this->registerConverter('String', new Converter\PgString(), array('varchar', 'char', 'text', 'uuid', 'tsvector', 'xml', 'bpchar', 'json', 'name'));
         $this->registerConverter('Timestamp', new Converter\PgTimestamp(), array('timestamp', 'date', 'time'));
-        $this->registerConverter('Interval', new Converter\PgInterval(), array('interval'));
+        $this->registerConverter('Interval', new Converter\PgIntervalISO8601(), array('interval'));
         $this->registerConverter('Binary', new Converter\PgBytea(), array('bytea'));
         $this->registerConverter('NumberRange', new Converter\PgNumberRange(), array('int4range', 'int8range', 'numrange'));
         $this->registerConverter('TsRange', new Converter\PgTsRange(), array('tsrange', 'daterange'));
@@ -291,5 +294,32 @@ class Database
     public function setName($name)
     {
         $this->parameter_holder->setParameter('name', $name);
+    }
+
+    /**
+     * initializeConfiguration
+     *
+     * Create configuration settings
+     *
+     * @access protected
+     */
+    protected function initializeConfiguration()
+    {
+        $default_configuration = array( 'bytea_output' => 'escape', 'intervalstyle' => 'ISO_8601' );
+
+        $this->configuration = array_merge($default_configuration, $this->parameter_holder['configuration']);
+    }
+
+    /**
+     * getConfiguration
+     *
+     * Returns configuration for each connection
+     *
+     * @access public
+     * @return Array configuration settings
+     */
+    public function getConfiguration()
+    {
+        return $this->configuration;
     }
 }

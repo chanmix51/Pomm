@@ -21,13 +21,6 @@ class PgInterval implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
-        // if IntervalStyle is 'iso_8601'
-        if (preg_match("/^P/", $data))
-        {
-            return new \DateInterval($data);
-        }
-
-        // if IntervalStyle is 'postgres'
         if (preg_match("/(?:([0-9]+) years ?)?(?:([0-9]+) mons ?)?(?:([0-9]+) days ?)?(?:([0-9]{1,2}):([0-9]{1,2}):([0-9]+))?/", $data, $matchs))
         {
             return \DateInterval::createFromDateString(

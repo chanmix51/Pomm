@@ -107,9 +107,16 @@ class Connection
             throw new ConnectionException(sprintf("Error connecting to the database with dsn «%s».", join(' ', $connect_parameters)));
         }
 
-        if (pg_query($this->handler, 'SET bytea_output = "escape";') === false)
+        $sql = '';
+
+        foreach ($this->database->getConfiguration() as $setting => $value)
         {
-            throw new ConnectionException(sprintf("Error while seting bytea_output to 'escape'."));
+            $sql .= sprintf("SET %s = \"%s\";", $setting, $value);
+        }
+
+        if (pg_query($this->handler, $sql) === false)
+        {
+            throw new ConnectionException(sprintf("Error while applying settings '%s'.", $sql));
         }
     }
 
