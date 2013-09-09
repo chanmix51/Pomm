@@ -136,7 +136,7 @@ class Pager
      *
      * Get the total number of results in all pages.
      *
-     * @return Boolean
+     * @return Integer
      */
     public function getCount()
     {
