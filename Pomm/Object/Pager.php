@@ -141,4 +141,16 @@ class Pager
     {
         return $this->count;
     }
+
+    /**
+     * getMaxPerPage
+     *
+     * Get maximum result per page.
+     *
+     * @return Interger
+     */
+    public function getMaxPerPage()
+    {
+        return $this->max_per_page;
+    }
 }
