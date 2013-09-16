@@ -8,13 +8,13 @@ POMM: The PHP Object Model Manager for Postgresql
 Note
 ****
 
-This is the development branch of Pomm. It might contain experimental features, bugs and some parts may not work properly. There are also good chances the documentation not to be up to date. If you intend to try Pomm or use it in Production, you should choose the `stable branch <https://github.com/chanmix51/Pomm>`_. If you are a developer and want to test, enhance or report bugs, feel free to brake and submit.
+This branch is still in Release Candidate state which means it might contain bugs or the documentation might be incomplete or inaccurate. **Testers welcome** Feel free to open bugs or talk with us on #pomm channel on freenode.
 
 What is Pomm ?
 **************
-**Pomm** is a *lightweight*, *fast*, *efficient* and *powerful* PHP object manager for the Postgresql relational database. **Pomm is not an ORM**, it is more like an object hydrator above PDO implementing the `identity map <http://en.wikipedia.org/wiki/Identity_map>`_ design pattern and proposing convenient functionalities. Dropping the abstraction layer makes programmers able to take advantage of most of Postgresql's awesome features.
+**Pomm** is a *lightweight*, *fast*, *efficient* and *powerful* PHP object manager for the Postgresql relational database. **Pomm is not an ORM**, it is more like an object manager over PHP's Postgresql interface implementing the `identity map <http://en.wikipedia.org/wiki/Identity_map>`_ design pattern and proposing convenient functionalities. Dropping the abstraction layer makes programmers able to take advantage of most of Postgresql's awesome features.
 
-Pomm works with PHP 5.3 and Postgresql 8.4 and above.
+Pomm works with PHP 5.3 and Postgresql 9.0 and above.
 
 You can reach
 

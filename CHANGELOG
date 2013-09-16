@@ -1,3 +1,16 @@
-=== DEVELOPMENT BRANCH
+=== 1.2-RC1
 
-* Forked from 1.1
+ * New Escape type.
+ * Collection filters.
+ * Forced datestyle to be ISO.
+ * Conf parameters and ISO8601 intervals.
+ * Remove old Sf sfInflector class, add specific class
+ * Updated converters to native Pg API (closes #74).
+ * Only one simple Collection type.
+ * Force new connection for every instance of Connection.
+ * Changed PDOStatement to resource in collections.
+ * Prepared statements work without PDO.
+ * Connection is a pool of PrepatedStatement instances.
+ * improved error message for unknown methods in BaseObject
+ * Got rid of the FilterChain (close #86).
+ * Forked from 1.1
