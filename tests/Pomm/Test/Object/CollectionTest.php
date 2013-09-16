@@ -79,15 +79,20 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testGetCollection
-     * @expectedException \Pomm\Exception\Exception
      **/
     public function testRewind(Collection $collection)
     {
-        $collection->rewind();
-        $this->assertTrue(true, "Rewind a brand new Collection is all right.");
-        $collection->next();
-        $collection->rewind();
-        $this->assertTrue(false, "Rewind a moved cursor throws an Exception.");
+        $val1 = $val2 = array();
+
+        foreach($collection as $entity)
+        {
+            $val1[] = $entity;
+        }
+
+        foreach($collection as $index => $entity)
+        {
+            $this->assertTrue($val1[$key] !== $entity, "Iterating twice on a Collection returns the same results");
+        }
     }
 
     /**
@@ -100,6 +105,19 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('Pomm\Test\Object\CollectionEntity' => array(array('id' => 1), array('id' => 2), array('id' => 3), array('id' => 4))), $collection->extract(), 'Extract is an array of extracts.');
 
         return $collection;
+    }
+
+    /**
+     * @depends testGetCollection
+     **/
+    public function testFilters(Collection $collection)
+    {
+        $collection->registerFilter(function($values) { return array_map(function($val) { return $val * 2; }, $values); });
+
+        foreach ($collection as $index => $entity)
+        {
+            $this->assertTrue($entity['id'] = ($index + 1) * 2, "Check filter");
+        }
     }
 }
 

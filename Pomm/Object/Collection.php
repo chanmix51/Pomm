@@ -19,6 +19,7 @@ class Collection implements \Iterator, \Countable
     protected $result_resource;
     protected $object_map;
     protected $position = 0;
+    protected $filters = array();
 
     /**
      * __construct
@@ -31,6 +32,7 @@ class Collection implements \Iterator, \Countable
         $this->result_resource = $result_resource;
         $this->object_map = $object_map;
         $this->position = $this->result_resource === false ? null : 0;
+        $this->clearFilters();
     }
 
     /**
@@ -58,6 +60,20 @@ class Collection implements \Iterator, \Countable
 
         if ($values === false)
             return false;
+
+        foreach ($this->filters as $index => $filter)
+        {
+            $values = call_user_func($filter, $values);
+
+            if ($values === false)
+            {
+                throw new Exception(sprintf("Filter %d returned an error.", $index));
+            }
+            elseif(! is_array($values))
+            {
+                throw new Exception(sprintf("Filter %d did not return an array.", $index));
+            }
+        }
 
         return $this->object_map->createObjectFromPg($values);
     }
@@ -93,10 +109,7 @@ class Collection implements \Iterator, \Countable
      */
     public function rewind()
     {
-        if ($this->position !== 0)
-        {
-            throw new Exception(sprintf("Can not rewind a cursor. Use the \\Pomm\\Object\\Collection instead."));
-        }
+        $this->index = 0;
     }
 
     /**
@@ -217,9 +230,7 @@ class Collection implements \Iterator, \Countable
      * extract
      *
      * Return an array of results. Useful if you want to serialize a result or
-     * export it as a JSON format. Filters are still executed on all the
-     * fetched results.
-     *
+     * export it as a JSON format.
      * @param String $name The name of the resultset (Defaults to entity FQCN)
      * @return Array
      */
@@ -234,5 +245,32 @@ class Collection implements \Iterator, \Countable
         }
 
         return array($name => $results);
+    }
+
+    /**
+     * registerFilter
+     *
+     * Register a new callable filter. All filters MUST return an associative 
+     * array with field name as key.
+     * @param Callable $callable the filter.
+     */
+    public function registerFilter($callable)
+    {
+        if (!is_callable($callable))
+        {
+            throw new Exception(sprintf("Given filter is not a callable (type '%s').", gettype($callable)));
+        }
+
+        $this->filters[] = $callable;
+    }
+
+    /**
+     * clearFilters
+     *
+     * Empty the filter stack.
+     */
+    public function clearFilters()
+    {
+        $this->filters = array();
     }
 }
