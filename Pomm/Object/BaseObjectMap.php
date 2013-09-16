@@ -632,6 +632,7 @@ abstract class BaseObjectMap
     public function convertToPg(Array $values)
     {
         $out_values = array();
+
         foreach ($this->field_definitions as $field_name => $pg_type)
         {
             if (!array_key_exists($field_name, $values))
@@ -642,6 +643,12 @@ abstract class BaseObjectMap
             if (is_null($values[$field_name]))
             {
                 $out_values[$field_name] = 'NULL';
+                continue;
+            }
+
+            if ($values[$field_name] instanceOf \Pomm\Type\Escape)
+            {
+                $out_values[$field_name] = (string) $values[$field_name];
                 continue;
             }
 
