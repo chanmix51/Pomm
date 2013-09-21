@@ -737,7 +737,7 @@ abstract class BaseObjectMap
         $out_values = array();
         foreach ($values as $name => $value)
         {
-            if (is_null($value) or $value === '')
+            if (is_null($value))
             {
                 $out_values[$name] = null;
                 continue;
