@@ -9,7 +9,7 @@ interface IdentityMapperInterface
     /**
      * getInstance
      *
-     * Sets the given model instance to de data mapper if not
+     * Sets the given model instance to the data mapper if not
      * set already. Return the set instance.
      *
      * @param BaseObject $object    Entity instance.
