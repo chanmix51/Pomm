@@ -172,6 +172,35 @@ abstract class BaseObjectMap
     }
 
     /**
+     * createAndSaveObjects
+     *
+     * Create new instances in a single INSERT statement and return a
+     * Collection from it. All values MUST have the same column set.
+     *
+     * @param Array Array of values.
+     * @return Collection
+     */
+    public function createAndSaveObjects(Array $values_array)
+    {
+        if (count($values_array) == 0)
+        {
+            throw new Exception(sprintf("Empty array passed."));
+        }
+
+        $pg_values = array();
+
+        foreach($values_array as $values)
+        {
+            $pg_values[] = $this->convertToPg($values);
+        }
+
+        $fields = array_keys($pg_values[1]);
+        $sql = sprintf('INSERT INTO %s (%s) VALUES %s RETURNING %s;', $this->object_name, join(',', array_map(function($val) { return sprintf('"%s"', $val); }, $fields)), join(',', array_map(function ($tuple) { return sprintf("(%s)", join(', ', array_values($tuple))); }, $pg_values)), $this->formatFieldsWithAlias('getSelectFields'));
+
+        return $this->query($sql);
+    }
+
+    /**
      * createAndSaveObject
      *
      * Create a new instance of the corresponding model class and save it in

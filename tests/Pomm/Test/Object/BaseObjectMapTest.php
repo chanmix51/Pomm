@@ -54,7 +54,7 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testHydrate
-     **/
+     */
     public function testSave(BaseEntity $entity)
     {
         $entity['some data'] = 'plop';
@@ -77,8 +77,8 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @depends testSave 
-     **/
+     * @depends testSave
+     */
     public function testSaveUpdate(BaseEntity $entity)
     {
         $entity['some data'] = 'pika chu';
@@ -95,7 +95,7 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testSaveUpdate
-     **/
+     */
     public function testUpdate(BaseEntity $entity)
     {
         $entity['some data'] = 'some other data';
@@ -114,7 +114,7 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testUpdate
-     **/
+     */
     public function testFindWhere(BaseEntity $entity)
     {
         $test_entity = static::$map->findWhere('"some data" = $*', array($entity['some data']), 'ORDER BY id DESC LIMIT 1')->current();
@@ -134,8 +134,8 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * @depends testFindWhere 
-     **/
+     * @depends testFindWhere
+     */
     public function testFindByPK(BaseEntity $entity)
     {
         $test_entity = static::$map->findByPk(array('id' => $entity['id']));
@@ -147,7 +147,7 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testFindByPK
-     **/
+     */
     public function testQuery(BaseEntity $entity)
     {
         $sql = "SELECT %s FROM %s WHERE plop.id = $*";
@@ -167,7 +167,7 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testQuery
-     **/
+     */
     public function testUpdateByPk(BaseEntity $entity)
     {
         $dt = new \DateTime();
@@ -183,7 +183,7 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testUpdateByPk
-     **/
+     */
     public function testDelete(BaseEntity $entity)
     {
         static::$map->deleteOne($entity);
@@ -195,7 +195,7 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testDelete
-     **/
+     */
     public function testChangePrimaryKey(BaseEntity $entity)
     {
         static::$map->changeToMultiplePrimaryKey();
@@ -222,7 +222,7 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testChangePrimaryKey
-     **/
+     */
     public function testFindAll(BaseEntity $entity)
     {
         static::$map->insertSomeData();
@@ -239,6 +239,22 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertEquals(3, $limited_res->count(), "We have 3 results.");
+    }
+
+    public function testCreateAndSaveObjects()
+    {
+        $collection = static::$map->createAndSaveObjects(array(
+            array('name' => 'name1', 'some data' => 'one', 'bool_data' => true, 'ts_data' => new \DateTime()),
+            array('name' => 'name2', 'some data' => 'two', 'bool_data' => true, 'ts_data' => null),
+            array('name' => 'name3', 'some data' => 'three', 'bool_data' => false, 'ts_data' => null)
+        ));
+
+        $this->assertEquals(3, $collection->count(), 'The collection has 3 members');
+        $first = $collection->current();
+
+        $this->assertTrue($first->hasId(), "The first element has a primary key.");
+        $this->assertTrue((BaseObject::EXIST & $first->_getStatus()) !== 0, "The first element exists in the database.");
+        $this->assertFalse($first->isModified(), "The first element is not modified.");
     }
 }
 
