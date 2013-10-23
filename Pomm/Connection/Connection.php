@@ -242,7 +242,7 @@ class Connection
         }
         else
         {
-            $ret = $this->executeAnonymousQuery(sprintf("ROLLBACK TO SAVEPOINT %s", $name));
+            $ret = $this->executeAnonymousQuery(sprintf("ROLLBACK TO SAVEPOINT %s", $this->escapeIdentifier($name)));
         }
 
         if ($ret === false)
@@ -265,7 +265,7 @@ class Connection
      */
     public function setSavepoint($name)
     {
-        if ($this->executeAnonymousQuery(sprintf("SAVEPOINT %s", $name)) === false)
+        if ($this->executeAnonymousQuery(sprintf("SAVEPOINT %s", $this->escapeIdentifier($name))) === false)
         {
             throw new ConnectionException(sprintf("Cannot set savepoint '%s'.", $name));
         }
@@ -284,7 +284,7 @@ class Connection
      */
     public function releaseSavepoint($name)
     {
-        if ($this->executeAnonymousQuery(sprintf("RELEASE SAVEPOINT %s", $name)) === false)
+        if ($this->executeAnonymousQuery(sprintf("RELEASE SAVEPOINT %s", $this->escapeIdentifier($name))) === false)
         {
             throw new ConnectionException(sprintf("Cannot release savepoint named '%s'.", $name));
         }
@@ -317,6 +317,44 @@ class Connection
     public function getTransactionStatus()
     {
         return pg_transaction_status($this->getHandler());
+    }
+
+    /**
+     * createObserver
+     *
+     * Return an observer object. This is a convenient method to create an
+     * observer and chain methods.
+     *
+     * @access public
+     * @return Observer
+     */
+    public function createObserver()
+    {
+        return new Observer($this);
+    }
+
+    /**
+     * notify
+     *
+     * Send a server notification.
+     *
+     * @access public
+     * @link see http://www.postgresql.org/docs/9.0/static/sql-notify.html
+     * @param  String $name the notification name
+     * @param  Sting  $payload optionnal transmitted data
+     */
+    public function notify($name, $payload = null)
+    {
+        $name = $this->escapeIdentifier($name);
+
+        if (empty($payload))
+        {
+            $this->executeAnonymousQuery(sprintf("NOTIFY %s", $name));
+        }
+        else
+        {
+            $this->executeAnonymousQuery(sprintf("NOTIFY %s, %s", $name,  $this->escapeLiteral($payload)));
+        }
     }
 
     /**
@@ -410,5 +448,34 @@ class Connection
     public function executeParametrizedQuery($sql, $values)
     {
         return @pg_query_params($sql, $values);
+    }
+
+    /**
+     * escapeIdentifier
+     *
+     * Escape database object's names. This is different from value escaping
+     * since objects names are surrounded by double quotes.
+     *
+     * @access protected
+     * @param String $name The string to be escaped.
+     * @return String the escaped string.
+     */
+    protected function escapeIdentifier($name)
+    {
+        return \pg_escape_identifier($this->getHandler(), $name);
+    }
+
+    /**
+     * escapeLiteral
+     *
+     * Escape a text value.
+     *
+     * @access protected
+     * @param String The string to be escaped
+     * @return String the escaped string.
+     */
+    protected function escapeLiteral($var)
+    {
+        return \pg_escape_literal($this->getHandler(), $var);
     }
 }
