@@ -33,7 +33,7 @@ class ObserverTest extends \PHPUnit_Framework_TestCase
                 $connection2->notify('other event');
             }
 
-            sleep(0.1);
+            sleep(0.3);
             $data = $observer->getNotification();
 
             if ($i % 3 === 0)
