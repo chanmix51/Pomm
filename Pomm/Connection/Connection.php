@@ -97,7 +97,7 @@ class Connection
 
         if ($this->parameter_holder['pass'] !== '')
         {
-            $connect_parameters[] = sprintf('pass=%s', addslashes($this->parameter_holder['pass']));
+            $connect_parameters[] = sprintf('password=%s', addslashes($this->parameter_holder['pass']));
         }
 
         $this->handler = pg_connect(join(' ', $connect_parameters), \PGSQL_CONNECT_FORCE_NEW);
