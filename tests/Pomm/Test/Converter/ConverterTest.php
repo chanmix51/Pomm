@@ -60,8 +60,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
 
     public function testInteger()
     {
-        $entity = static::$cv_map->createObject(array('id' => 1, 'fixed' => 12.345, 'fl' => 0.000001, 'arr_fl' => array(1.0,1.1,1.2,1.3)));
-        static::$cv_map->saveOne($entity);
+        $entity = static::$cv_map->createAndSaveObject(array('id' => 1, 'fixed' => 12.345, 'fl' => 0.000001, 'arr_fl' => array(1.0,1.1,1.2,1.3), 'not_null_string' => ''));
 
         $this->assertEquals(1, $entity['id'], "PHP int 1 <=> PG int 1");
         $this->assertEquals(12.345, $entity['fixed'], "PHP 12.345 <=> PG 12.345 numeric");
@@ -85,7 +84,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
     {
         static::$cv_map->alterText();
         $entity = static::$cv_map->findAll()->current();
-        $values = array('some_char' => 'abcdefghij', 'some_varchar' => '1234567890 abcdefghij', 'some_text' => 'Lorem Ipsum', 'arr_varchar' => array('pika', '{"a","b b \'c"}'));
+        $values = array('some_char' => 'abcdefghij', 'some_varchar' => '1234567890 abcdefghij', 'some_text' => 'Lorem Ipsum', 'arr_varchar' => array('pika', '{"a","b b \'c"}'), 'not_null_string' => 'something');
 
         $entity->hydrate($values);
         static::$cv_map->updateOne($entity, array_keys($values));
@@ -547,13 +546,14 @@ class ConverterEntityMap extends BaseObjectMap
         $this->addField('fixed', 'numeric');
         $this->addField('fl', 'float4');
         $this->addField('arr_fl', 'float4[]');
+        $this->addField('not_null_string', 'text');
 
         $this->pk_fields = array('id');
     }
 
     public function createTable()
     {
-        $sql = sprintf("CREATE TABLE %s (id serial PRIMARY KEY, fixed numeric(5,3), fl float4, arr_fl float4[])", $this->getTableName());
+        $sql = sprintf("CREATE TABLE %s (id serial PRIMARY KEY, fixed numeric(5,3), fl float4, arr_fl float4[], not_null_string text NOT NULL)", $this->getTableName());
         $this->connection->executeAnonymousQuery($sql);
     }
 

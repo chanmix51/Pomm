@@ -20,7 +20,7 @@ class PgHStore implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
-        if ($data === 'NULL') return null;
+        if ($data === 'NULL' or empty($data)) return null;
 
         @eval(sprintf("\$hstore = array(%s);", $data));
 

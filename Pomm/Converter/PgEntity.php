@@ -65,6 +65,11 @@ class PgEntity implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
+        if (empty($data))
+        {
+            return null;
+        }
+
         $elts = str_getcsv(trim($data, '()'));
 
         $fields = array();

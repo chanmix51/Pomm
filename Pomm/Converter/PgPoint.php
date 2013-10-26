@@ -34,6 +34,11 @@ class PgPoint implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
+        if (empty($data))
+        {
+            return null;
+        }
+
         if (!preg_match('/([0-9e\-+\.]+,[0-9e\-+\.]+)/', $data))
         {
             throw new Exception(sprintf("Bad point representation '%s' (asked type '%s').", $data, $type));

@@ -67,6 +67,11 @@ class PgBytea implements ConverterInterface
             return stripcslashes(@stream_get_contents($data));
         }
 
+        if (empty($data))
+        {
+            return null;
+        }
+
         return $this->unescByteA(stripcslashes($data));
     }
 }

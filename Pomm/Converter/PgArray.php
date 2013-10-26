@@ -39,6 +39,11 @@ class PgArray implements ConverterInterface
             throw new Exception(sprintf('Array converter must be given a type.'));
         }
 
+        if (empty($data))
+        {
+            return null;
+        }
+
         if ($data !== "{NULL}" and $data !== "{}")
         {
             $converter = $this->database

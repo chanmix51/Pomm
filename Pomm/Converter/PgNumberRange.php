@@ -34,6 +34,11 @@ class PgNumberRange implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
+        if (empty($data))
+        {
+            return null;
+        }
+
         if (!preg_match('/([\[\(])(-?[0-9\.]+),-?([0-9\.]+)([\]\)])/', $data, $matchs))
         {
             throw new Exception(sprintf("Bad number range representation '%s' (asked type '%s').", $data, $type));

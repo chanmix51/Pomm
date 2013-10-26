@@ -21,6 +21,11 @@ class PgBoolean implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
+        if ($data === null or $data === '')
+        {
+            return null;
+        }
+
         return ($data == 't');
     }
 

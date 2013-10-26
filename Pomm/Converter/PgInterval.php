@@ -21,6 +21,11 @@ class PgInterval implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
+        if (empty($data))
+        {
+            return null;
+        }
+
         // if IntervalStyle is 'iso_8601'
         if (preg_match("/^P/", $data))
         {
