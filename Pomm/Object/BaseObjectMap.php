@@ -307,12 +307,12 @@ abstract class BaseObjectMap
         $collection = $this->query($sql, $values);
         $stmt = $this->doQuery($sql_count, $values);
 
-        if ($stmt->columnCount() > 1)
+        if (\pg_num_rows($stmt) > 1)
         {
             throw new Exception(sprintf("Count query '%s' return more than one field.", $sql_count));
         }
 
-        return new Pager($collection, $stmt->fetchColumn(), $items_per_page, $page);
+        return new Pager($collection, \pg_fetch_result($stmt, 0, 0), $items_per_page, $page);
     }
 
     /**
@@ -686,16 +686,16 @@ abstract class BaseObjectMap
                 if (count($matchs) > 2)
                 {
                     $converter = $this->connection
-                    ->getDatabase()
-                    ->getConverterFor('Array')
-                    ;
+                        ->getDatabase()
+                        ->getConverterFor('Array')
+                        ;
                 }
                 else
                 {
                     $converter = $this->connection
-                    ->getDatabase()
-                    ->getConverterForType($pg_type)
-                    ;
+                        ->getDatabase()
+                        ->getConverterForType($pg_type)
+                        ;
                 }
 
                 $out_values[$field_name] = $converter
@@ -746,16 +746,16 @@ abstract class BaseObjectMap
                 if (count($matchs) > 2)
                 {
                     $converter = $this->connection
-                    ->getDatabase()
-                    ->getConverterFor('Array')
-                    ;
+                        ->getDatabase()
+                        ->getConverterFor('Array')
+                        ;
                 }
                 else
                 {
                     $converter = $this->connection
-                    ->getDatabase()
-                    ->getConverterForType($pg_type)
-                    ;
+                        ->getDatabase()
+                        ->getConverterForType($pg_type)
+                        ;
                 }
 
                 $out_values[$name] = $converter

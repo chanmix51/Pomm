@@ -256,6 +256,14 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue((BaseObject::EXIST & $first->_getStatus()) !== 0, "The first element exists in the database.");
         $this->assertFalse($first->isModified(), "The first element is not modified.");
     }
+
+    public function testPager()
+    {
+        $pager = static::$map->paginateFindWhere('bool_data', array(), '', 10);
+
+        $this->assertTrue(is_object($pager), 'Pager in an object');
+        $this->assertInstanceOf('\Pomm\Object\Pager', $pager, 'Pager is a Pager instance.');
+    }
 }
 
 class BaseEntityMap extends BaseObjectMap
