@@ -3,6 +3,7 @@
 namespace Pomm\Converter;
 
 use Pomm\Converter\ConverterInterface;
+use Pomm\Exception\Exception;
 
 /**
  * Pomm\Converter\PgBoolean - Boolean converter
@@ -21,7 +22,17 @@ class PgBoolean implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
-        return ($data == 't');
+        if (!preg_match('/(t|f)/', $data))
+        {
+            if ($data === null or $data === '')
+            {
+                return null;
+            }
+
+            throw new Exception(sprintf("Unknown boolean data '%s'.", $data));
+        }
+
+        return (bool) ($data === 't');
     }
 
     /**

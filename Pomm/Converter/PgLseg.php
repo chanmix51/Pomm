@@ -42,6 +42,11 @@ class PgLseg implements ConverterInterface
 
         if (count($elts) !== 2)
         {
+            if ($data === '')
+            {
+                return null;
+            }
+
             throw new Exception(sprintf("Cannot parse segment data '%s'.", $data));
         }
 

@@ -21,6 +21,11 @@ class PgIntervalISO8601 extends PgInterval
      */
     public function fromPg($data, $type = null)
     {
+        if ($data === null or $data === '')
+        {
+            return null;
+        }
+
         try
         {
             return new \DateInterval($data);

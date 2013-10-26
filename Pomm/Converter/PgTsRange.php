@@ -36,6 +36,11 @@ class PgTsRange implements ConverterInterface
     {
         if (!preg_match('/([\[\(])"([0-9 :-]+)","([0-9 :-]+)"([\]\)])/', $data, $matchs))
         {
+            if ($data === null or $data === '')
+            {
+                return null;
+            }
+
             throw new Exception(sprintf("Bad timestamp range representation '%s' (asked type '%s').", $data, $type));
         }
 

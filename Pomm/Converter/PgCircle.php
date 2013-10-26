@@ -38,11 +38,15 @@ class PgCircle implements ConverterInterface
     public function fromPg($data, $type = null)
     {
         $data = trim($data, '<>');
-
         $elts = preg_split('/[,\s]*(\([^\)]+\))[,\s]*|[,\s]+/', $data, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
         if (count($elts) !== 2)
         {
+            if ($data === null or $data === '')
+            {
+                return null;
+            }
+
             throw new Exception(sprintf("Cannot parse circle data '%s'.", $data));
         }
 

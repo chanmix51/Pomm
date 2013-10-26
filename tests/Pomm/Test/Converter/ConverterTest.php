@@ -60,7 +60,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
 
     public function testInteger()
     {
-        $entity = static::$cv_map->createObject(array('id' => 1, 'fixed' => 12.345, 'fl' => 0.000001, 'arr_fl' => array(1.0,1.1,1.2,1.3)));
+        $entity = static::$cv_map->createObject(array('id' => 1, 'fixed' => 12.345, 'fl' => 0.000001, 'arr_fl' => array(1.0,1.1,1.2,1.3), 'not_null_string' => ''));
         static::$cv_map->saveOne($entity);
 
         $this->assertEquals(1, $entity['id'], "PHP int 1 <=> PG int 1");
@@ -118,6 +118,10 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped("Json type is supported since postgresql 9.2. Test skipped.");
         }
 
+        $entity['some_char'] = null;
+        static::$cv_map->saveOne($entity);
+
+        $this->assertTrue(is_null($entity['some_char']), "Strings NULL are preserved.");
 
         return $entity;
     }
@@ -538,13 +542,14 @@ class ConverterEntityMap extends BaseObjectMap
         $this->addField('fixed', 'numeric');
         $this->addField('fl', 'float4');
         $this->addField('arr_fl', 'float4[]');
+        $this->addField('not_null_string', 'text');
 
         $this->pk_fields = array('id');
     }
 
     public function createTable()
     {
-        $sql = sprintf("CREATE TABLE %s (id serial PRIMARY KEY, fixed numeric(5,3), fl float4, arr_fl float4[])", $this->getTableName());
+        $sql = sprintf("CREATE TABLE %s (id serial PRIMARY KEY, fixed numeric(5,3), fl float4, arr_fl float4[], not_null_string text NOT NULL)", $this->getTableName());
         $this->connection->executeAnonymousQuery($sql);
     }
 

@@ -34,6 +34,12 @@ class PgInterval implements ConverterInterface
                 ));
         }
 
+        if ($data === null or $data === '')
+        {
+            return null;
+        }
+
+
         throw new Exception(sprintf("Data '%s' is not a supported pg interval representation.", $data));
     }
 

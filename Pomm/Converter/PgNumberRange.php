@@ -36,6 +36,11 @@ class PgNumberRange implements ConverterInterface
     {
         if (!preg_match('/([\[\(])(-?[0-9\.]+),-?([0-9\.]+)([\]\)])/', $data, $matchs))
         {
+            if ($data === null or $data === '')
+            {
+                return null;
+            }
+
             throw new Exception(sprintf("Bad number range representation '%s' (asked type '%s').", $data, $type));
         }
 
