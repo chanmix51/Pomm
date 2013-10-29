@@ -358,6 +358,18 @@ class Connection
     }
 
     /**
+     * createPreparedQuery
+     *
+     * @access public
+     * @param String $sql Statement to prepare.
+     * @return PreparedQuery 
+     */
+    public function createPreparedQuery($sql)
+    {
+        return new PreparedQuery($this->getHandler(), $sql);
+    }
+
+    /**
      * getIdentityMapper
      *
      * Get connection's related identity mapper.
