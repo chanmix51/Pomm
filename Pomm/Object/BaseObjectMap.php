@@ -675,7 +675,7 @@ abstract class BaseObjectMap
                 continue;
             }
 
-            if ($values[$field_name] instanceOf \Pomm\Type\Escape)
+            if ($values[$field_name] instanceOf \Pomm\Type\RawString)
             {
                 $out_values[$field_name] = (string) $values[$field_name];
                 continue;

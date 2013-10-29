@@ -2,7 +2,7 @@
 
 namespace Pomm\Type;
 
-class Escape
+class RawString
 {
     protected $data;
 

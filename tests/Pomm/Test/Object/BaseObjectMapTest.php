@@ -66,7 +66,7 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('plop', $entity['some data'], "'some data' is unchanged.");
         $this->assertFalse($entity['bool_data'], "Bool data has been added.");
 
-        $another_entity = static::$map->createAndSaveObject(Array('some data' => new \Pomm\Type\Escape("lower('MoRe pLoP')")));
+        $another_entity = static::$map->createAndSaveObject(Array('some data' => new \Pomm\Type\RawString("lower('MoRe pLoP')")));
         $this->assertTrue((boolean) ($another_entity->_getStatus() & BaseObject::EXIST), "Object now exists in database.");
         $this->assertEquals('more plop', $another_entity['some data'], "'some data' is unchanged.");
 
