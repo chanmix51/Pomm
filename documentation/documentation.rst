@@ -8,13 +8,13 @@ Pomm Documentation
 Overview
 ********
 
-Pomm is a fast, lightweight, efficient model manager for Postgresql written in PHP. It can be seen as an enhanced object hydrator above PDO with the following features:
+Pomm is a fast, lightweight, efficient model manager for Postgresql written in PHP. It can be seen as an enhanced object hydrator above PHP's native Postgresql library with the following features:
 
  * Database Inspector to build automatically your PHP model files (support inheritance).
- * Namespaces to avoid collision between objects located in different Pg schemas.
+ * Postgresql's schema support mapped to PHP namespaces.
  * PHP <=> Postgres type converter that support HStore, geometric types, objects, ranges etc.
  * Lazy fetching for results.
- * Pre and post hydration filters trough PHP callables.
+ * Hydration filters trough PHP callables.
  * Field selector methods for all SQL queries.
  * Identity mapper with several different algorithms available.
 
@@ -25,10 +25,26 @@ Databases and converters
 Service: the database provider
 ==============================
 
-Database class and isolation level
------------------------------------
+Database class and configuration
+--------------------------------
 
-The ``Service`` class just stores your ``Database`` instances and provides convenient methods to create connections from them. It is mainly intended to be used with dependency injection containers used by some popular frameworks. 
+The ``Service`` class just stores the ``Database`` instances and provides convenient methods to create connections from them. It is mainly intended to be used with dependency injection containers used by some popular frameworks. The Database class has different roles:
+
+ * Connection builder and pool.
+ * Converters holder.
+ * Configuration holder.
+
+It is either possible to instance `Database` class alone or use the `Service` class to do so. The simplest way to get a database instance is::
+
+    $database = new Pomm\Connection\Database(array('name' => 'database_name', 'dsn' => 'pgsql://user:pass@host:port/db_name'));
+
+Database expected parameters are:
+
+ * dsn (string, mandatory): Connection string (see `DSN`_).
+ * name (string, optional, default: physical database name): Logical database name that is used as primary namespace for PHP entity object.
+ * configuration (array, optional, see `Connection configuration`_ below): Client configuration for each connection.
+ * isolation (string, optional, default: ``ISOLATION_READ_COMMITTED``, see `Standard transaction`_): isolation level used in transactions.
+ * identity_mapper (string, optional, default: ``Smart``, see `Identity mappers`_ below): default identity mapper class name for connections.
 
 There are several ways to declare databases to the service class. Either you use the constructor passing an array "name" => "connection parameters" or you can use the ``setDatabase()`` method of the service class.::
 
@@ -57,13 +73,7 @@ There are several ways to declare databases to the service class. Either you use
       'name'  => 'my_db'
     )));
 
-The *setDatabase* method is used internally by the constructor. The parameters may be any of the following:
- * ``dsn`` (mandatory): a URL like string to connect the database. It is in the form ``pgsql://user:password@host:port/database_name``
- * ``class``: The *Database* class to instantiate as a database. This class must extend ``Pomm\Database`` as we will see below.
- * ``isolation``: transaction isolation level. (default is ``ISOLATION_READ_COMMITTED``, see `Standard transactions`_)
- * ``name``: the database alias name. If none is provided, the database real name is substituted. This option is notably used for namespacing map classes during database introspection (see `CreateBaseMapTool`_ and `Introspected tables`_).
-
-Once registered, you can retrieve the databases with their name by calling the *getDatabase* method passing the name as argument. If no name is given, the first declared *Database* will be returned.
+The *setDatabase* method is used internally by the constructor. Once registered, you can retrieve the databases with their name by calling the *getDatabase* method passing the name as argument. If no name is given, the first declared *Database* will be returned.
 
 DSN
 ---
@@ -81,7 +91,21 @@ The **dsn** parameter format is important because it interacts with Postgresql s
  * ``pgsql://user@host/database`` Connect *user* to the db *database* on host *host* using TCP/IP.
  * ``pgsql://user:pass@host:port/database`` The same but with password and TCP port specified. 
 
-The ``identity_mapper`` option gives you the opportunity to register a default identity mapper. When connections are created, they will instantiate the given class. By default, the Smart IM is loaded. This can be overridden for specific connections (see the `Identity mappers`_ section below).
+Connection configuration
+------------------------
+
+Connections set client parameters at launch (see `documentation <http://www.postgresql.org/docs/9.3/static/runtime-config-client.html>`_). Default parameters are the following
+ * bytea_output = escape
+ * intervalstyle = ISO_8601
+ * datestyle = ISO
+
+These parameters are important since the default converters expect client output to be formatted this way. If you change these parameters, register the according converter. 
+
+Some other parameters can be tuned that way, by default they are set by the server's default configuration:
+ * statement_timeout
+ * lock_timeout
+ * TimeZone
+ * extra_float_digits
 
 Converters
 ==========
@@ -120,8 +144,8 @@ Postgresql contribs come with handy extra data type (like HStore, a key => value
   
     $database
     ->registerConverter(
-      'HStore', 
-       new Pomm\Converter\PgHStore(), 
+      'HStore',
+       new Pomm\Converter\PgHStore(),
        array('public.hstore')
       );
 
@@ -137,13 +161,14 @@ If your database has a lot of custom types, it is a better idea to create your o
     protected function initialize()
     {
       parent::initialize();
-      $this->registerConverter('HStore', 
+
+      $this->registerConverter('HStore',
         new Pomm\Converter\Hstore(), array('hstore'));
 
-      $this->registerConverter('Point', 
+      $this->registerConverter('Point',
         new Pomm\Converter\Pgpoint(), array('point'));
 
-      $this->registerConverter('Circle', 
+      $this->registerConverter('Circle',
         new Pomm\Converter\PgCircle(), array('circle'));
     }
   }
@@ -152,10 +177,11 @@ This way, converters will be automatically registered at instantiation.
 
 Converters and types
 ====================
+
 Domains
 -------
 
-In case your database uses ``DOMAIN`` types you can add them to an already registered converter. The ``registerTypeForConverter()`` method stands for that.::
+In case your database uses ``DOMAIN`` types you can associate them with an already registered converter. The ``registerTypeForConverter()`` method stands for that.::
 
     $database
       ->registerTypeForConverter('email_address', 'String');
