@@ -135,26 +135,26 @@ Migrating from 1.1 to 1.2
 =========================
 
 Postgresql 8.4 end of life
---------------------------
+==========================
 
 Support of the version 8.4 of Postgresql has been dropped. Pomm 1.2 only works with Postgresql 9.x.
 
 SQL queries
------------
+===========
 
 The new query system uses `$*` instead of `?` as values placeholder in prepared queries. This must be changed either in your raw SQL queries or queries that use the `Where` condition builder.
 
 Collections
------------
+===========
 
 Collection system has been simplified, there is no more `SimpleCollection`, the only class is a `Collection` providing scrollable cursor and filters. Filters method has been simplified, the clumsy `unregisterFilter()` method has been dropped in favor of a more general `clearFilters()` one.
 
 Filter Chain
-------------
+============
 
 The filter chain used to hook code before or after queries has been removed as it was too expensive -- from a performance point of view -- than useful. In the end, it was only needed to hook the logger.
 
 Logger
-------
+======
 
 With the filter chain re worked, the logger part has been replaced by a more generic support of any PSR-3 compliant logger (ie Monolog).
