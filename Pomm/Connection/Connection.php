@@ -362,11 +362,11 @@ class Connection
      *
      * @access public
      * @param String $sql Statement to prepare.
-     * @return PreparedQuery 
+     * @return PreparedQuery
      */
     public function createPreparedQuery($sql)
     {
-        return new PreparedQuery($this->getHandler(), $sql);
+        return new PreparedQuery($this, $sql);
     }
 
     /**

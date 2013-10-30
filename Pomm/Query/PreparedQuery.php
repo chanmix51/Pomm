@@ -1,6 +1,7 @@
 <?php
 namespace Pomm\Query;
 
+use \Pomm\Connection\Connection;
 use \Pomm\Exception\ConnectionException;
 
 /**
@@ -15,7 +16,7 @@ use \Pomm\Exception\ConnectionException;
  */
 class PreparedQuery
 {
-    private $handler;
+    private $connection;
     private $stmt;
     private $name;
 
@@ -40,14 +41,14 @@ class PreparedQuery
      * Build the prepared query.
      *
      * @access public
-     * @param Resource $handler Database handler
+     * @param Connection $connection
      * @param String   $sql     SQL query
      */
-    public function __construct($handler, $sql)
+    public function __construct(Connection $connection, $sql)
     {
-        $this->handler = $handler;
+        $this->connection = $connection;
         $this->name = static::getSignatureFor($sql);
-        $this->stmt = pg_prepare($this->handler, $this->name, $this->escapePlaceHolders($sql));
+        $this->stmt = pg_prepare($this->connection->getHandler(), $this->name, $this->escapePlaceHolders($sql));
 
         if ($this->stmt === false)
         {
@@ -64,7 +65,7 @@ class PreparedQuery
      */
     public function __destruct()
     {
-        @pg_query($this->handler, sprintf("DEALLOCATE \"%s\"", $this->getName()));
+        @pg_query($this->connection->getHandler(), sprintf("DEALLOCATE \"%s\"", $this->getName()));
     }
 
     /**
@@ -89,9 +90,9 @@ class PreparedQuery
      * @param  Array $values Query parameters
      * @return Resource
      */
-    public function execute($values)
+    public function execute(Array $values = array())
     {
-        $res = pg_execute($this->handler, $this->name, $this->prepareValues($values));
+        $res = pg_execute($this->connection->getHandler(), $this->name, $this->prepareValues($values));
 
         if ($res === false)
         {
@@ -137,5 +138,4 @@ class PreparedQuery
     {
         return preg_replace_callback('/ \$\*/', function ($sub) { static $nb = 0; return sprintf(" $%d", ++$nb); }, $sql );
     }
-
 }
