@@ -69,7 +69,7 @@ The native PHP's pgsql lib, uses the `$n` form as placeholder. It ovoid collisio
 
     SELECT field1, field2 FROM my_table WHERE field2 IN ($1, $2, $3) AND field1 BETWEEN $4 AND $5 ;
 
-When looking at the query above, it is easy to understand positional parameters are a pain when it is about building dynamic queries. Pomm proposes the following to ovoid the problem::
+When looking at the query above, it is easy to understand positional parameters are a pain when it is about building dynamic queries. Pomm proposes the following form to solve the puzzle::
 
     SELECT field1, field2 FROM my_table WHERE field2 IN ($*, $*, $*) AND field1 BETWEEN $* AND $* ;
 
@@ -79,11 +79,10 @@ If you are upgrading from previous version of Pomm, you will have to migrate you
         ->andWhere('field1 BETWEEN $* AND $*', array($val1, $val2));
 
 
-Other features gained
----------------------
+Binary type full support
+------------------------
 
-    * Bytea binary type full support: Switching to the native API provided Pomm with the ability to read and write binary strings and arrays of such. 
-    * Scrollable cursors (see below).
+The `bytea` converter using native escaping functions is now able to read and write binary strings and arrays of such.
 
 
 Other features
@@ -98,7 +97,9 @@ Since, the previous versions of Pomm were sensitive to server's configuration, a
  * intervalstyle = ISO_8601
  * datestyle = ISO
 
-You can add other runtime client configuration (see http://www.postgresql.org/docs/9.0/static/runtime-config-client.html) or enforce the default ones but if you do so, you have to provide your own converters since this affects the way the database formats the data it returns to the client.
+You can add other runtime client configuration parameters (see http://www.postgresql.org/docs/9.0/static/runtime-config-client.html) or enforce the default ones but if you do so, you have to provide your own converters since this affects the way the database formats the data it returns to the client.
+
+**Be aware** `bytea_output` is only supported with Postgresql 9.x. Please consider migrating to a newer Postgresql version if you plan to upgrade to Pomm 1.2.
 
 
 On the fly prepared queries
@@ -133,22 +134,27 @@ This will issue the following query::
 Migrating from 1.1 to 1.2
 =========================
 
+Postgresql 8.4 end of life
+--------------------------
+
+Support of the version 8.4 of Postgresql has been dropped. Pomm 1.2 only works with Postgresql 9.x.
+
 SQL queries
-===========
+-----------
 
 The new query system uses `$*` instead of `?` as values placeholder in prepared queries. This must be changed either in your raw SQL queries or queries that use the `Where` condition builder.
 
 Collections
-===========
+-----------
 
 Collection system has been simplified, there is no more `SimpleCollection`, the only class is a `Collection` providing scrollable cursor and filters. Filters method has been simplified, the clumsy `unregisterFilter()` method has been dropped in favor of a more general `clearFilters()` one.
 
 Filter Chain
-============
+------------
 
 The filter chain used to hook code before or after queries has been removed as it was too expensive -- from a performance point of view -- than useful. In the end, it was only needed to hook the logger.
 
 Logger
-======
+------
 
 With the filter chain re worked, the logger part has been replaced by a more generic support of any PSR-3 compliant logger (ie Monolog).
