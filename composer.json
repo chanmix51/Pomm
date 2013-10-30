@@ -6,7 +6,10 @@
     "homepage": "http://pomm.coolkeums.org",
     "license":  "MIT",
     "authors":  [ { "name": "Grégoire HUBERT", "email": "hubert.greg@gmail.com", "homepage": "http://www.coolkeums.org" } ],
-    "require": { "php": ">=5.3.0" },
+    "require": {
+        "php": ">=5.3.0",
+        "psr/log": "dev-master"
+    },
     "autoload": { "psr-0": { "Pomm": "." } },
     "minimum-stability": "RC"
 }

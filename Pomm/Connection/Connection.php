@@ -9,6 +9,9 @@ use Pomm\Connection\Database;
 use Pomm\Identity\IdentityMapperInterface;
 use Pomm\Object\BaseObjectMap;
 use Pomm\Query\PreparedQuery;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 /**
  * Pomm\Connection\Connection
@@ -23,7 +26,7 @@ use Pomm\Query\PreparedQuery;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class Connection
+class Connection implements LoggerAwareInterface
 {
     const ISOLATION_READ_COMMITTED = "READ COMMITTED";
     const ISOLATION_READ_REPEATABLE = "READ REPEATABLE"; // from Pg 9.1
@@ -36,6 +39,7 @@ class Connection
     protected $identity_mapper;
     protected $maps = array();
     protected $queries = array();
+    protected $logger;
 
     /**
      * __construct()
@@ -104,7 +108,7 @@ class Connection
 
         if ($this->handler === false)
         {
-            throw new ConnectionException(sprintf("Error connecting to the database with dsn «%s».", join(' ', $connect_parameters)));
+            $this->throwConnectionException(sprintf("Error connecting to the database with dsn '%s'.", join(' ', $connect_parameters)), LogLevel::ALERT);
         }
 
         $sql = '';
@@ -116,7 +120,7 @@ class Connection
 
         if (pg_query($this->handler, $sql) === false)
         {
-            throw new ConnectionException(sprintf("Error while applying settings '%s'.", $sql));
+            $this->throwConnectionException(sprintf("Error while applying settings '%s'.", $sql), LogLevel::CRITICAL);
         }
     }
 
@@ -188,18 +192,34 @@ class Connection
     }
 
     /**
+     * setLogger
+     *
+     * Register a logger.
+     * Unfortunately, the specification says this method returns null. This
+     * prevents us from returning a handy $this.
+     *
+     * @access public
+     * @param LoggerInterface
+     * @return null
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
      * begin
      *
      * Start a new transaction.
      *
      * @access public
-     * @return Connection
+     * @return Connection $this
      */
     public function begin()
     {
         if ($this->executeAnonymousQuery(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->isolation)) === false)
         {
-            throw new ConnectionException(sprintf("Cannot begin transaction (isolation level '%s').", $this->isolation));
+            $this->throwConnectionException(sprintf("Cannot begin transaction (isolation level '%s').", $this->isolation), LogLevel::ERROR);
         }
 
         return $this;
@@ -211,13 +231,13 @@ class Connection
      * Commit a transaction in the database.
      *
      * @access public
-     * @return Pomm\Connection\Connection
+     * @return Connection $this
      */
     public function commit()
     {
         if ($this->executeAnonymousQuery('COMMIT TRANSACTION') === false)
         {
-            throw new ConnectionException(sprintf("Cannot commit transaction (isolation level '%s').", $this->isolation));
+            $this->throwConnectionException(sprintf("Cannot commit transaction (isolation level '%s').", $this->isolation), LogLevel::ERROR);
         }
 
         return $this;
@@ -232,7 +252,7 @@ class Connection
      *
      * @access public
      * @param  String       $name Optional name of the savepoint.
-     * @return Connection
+     * @return Connection $this
      */
     public function rollback($name = null)
     {
@@ -247,7 +267,7 @@ class Connection
 
         if ($ret === false)
         {
-            throw new ConnectionException(sprintf("Cannot rollback transaction (isolation level '%s').", $this->isolation));
+            $this->throwConnectionException(sprintf("Cannot rollback transaction (isolation level '%s').", $this->isolation), LogLevel::ERROR);
         }
 
         return $this;
@@ -261,13 +281,13 @@ class Connection
      *
      * @access public
      * @param  String       $name Savepoint's name.
-     * @return Connection
+     * @return Connection $this
      */
     public function setSavepoint($name)
     {
         if ($this->executeAnonymousQuery(sprintf("SAVEPOINT %s", $this->escapeIdentifier($name))) === false)
         {
-            throw new ConnectionException(sprintf("Cannot set savepoint '%s'.", $name));
+            throw new ConnectionException(sprintf("Cannot set savepoint '%s'.", $name), LogLevel::ERROR);
         }
 
         return $this;
@@ -280,13 +300,13 @@ class Connection
      *
      * @access public
      * @param  String       $name the savepoint's name.
-     * @return Connection
+     * @return Connection $this
      */
     public function releaseSavepoint($name)
     {
         if ($this->executeAnonymousQuery(sprintf("RELEASE SAVEPOINT %s", $this->escapeIdentifier($name))) === false)
         {
-            throw new ConnectionException(sprintf("Cannot release savepoint named '%s'.", $name));
+            throw new ConnectionException(sprintf("Cannot release savepoint named '%s'.", $name), LogLevel::ERROR);
         }
 
         return $this;
@@ -349,11 +369,16 @@ class Connection
 
         if (empty($payload))
         {
-            $this->executeAnonymousQuery(sprintf("NOTIFY %s", $name));
+            $ret = $this->executeAnonymousQuery(sprintf("NOTIFY %s", $name));
         }
         else
         {
-            $this->executeAnonymousQuery(sprintf("NOTIFY %s, %s", $name,  $this->escapeLiteral($payload)));
+            $ret = $this->executeAnonymousQuery(sprintf("NOTIFY %s, %s", $name,  $this->escapeLiteral($payload)));
+        }
+
+        if ($ret === false)
+        {
+            $this->throwConnectionException(sprintf("Could not notify '%s' event.", $name), LogLevel::ERROR);
         }
     }
 
@@ -412,7 +437,7 @@ class Connection
 
         if ($this->hasQuery($signature) === false)
         {
-            $query = new PreparedQuery($this->getHandler(), $sql);
+            $query = new PreparedQuery($this, $sql);
             $this->queries[$query->getName()] = $query;
         }
 
@@ -444,6 +469,8 @@ class Connection
      */
     public function executeAnonymousQuery($sql)
     {
+        $this->log(LogLevel::NOTICE, sprintf("Anonymous query « %s ».", $sql));
+
         return @pg_query($this->getHandler(), $sql);
     }
 
@@ -459,7 +486,46 @@ class Connection
      */
     public function executeParametrizedQuery($sql, $values)
     {
+        $this->log(LogLevel::NOTICE, sprintf("Parametrized anonymous query « %s ».", $sql));
+
         return @pg_query_params($sql, $values);
+    }
+
+    /**
+     * log
+     *
+     * If a logger is defined, log the given message.
+     * @see https://github.com/php-fig/log/blob/master/Psr/Log/LoggerInterface.php
+     *
+     * @param String level
+     * @param String message
+     * @param Array  environnment
+     * @return Connection $this
+     */
+    public function log($level, $message, Array $env = array())
+    {
+        if (isset($this->logger))
+        {
+            $this->logger->log($level, $message, $env + array('connection' => $this));
+        }
+
+        return $this;
+    }
+
+    /**
+     * throwConnectionException
+     *
+     * Log error message and throw a ConnectionException
+     *
+     * @param String Error message
+     * @param String Error level
+     */
+    public function throwConnectionException($message, $level)
+    {
+        $e = new ConnectionException($message);
+        $this->log($level, $message, array('exception' => $e));
+
+        throw $e;
     }
 
     /**

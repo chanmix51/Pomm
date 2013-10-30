@@ -3,6 +3,7 @@ namespace Pomm\Query;
 
 use \Pomm\Connection\Connection;
 use \Pomm\Exception\ConnectionException;
+use \Psr\Log\LogLevel;
 
 /**
  * Pomm\Query\PreparedQuery
@@ -52,8 +53,10 @@ class PreparedQuery
 
         if ($this->stmt === false)
         {
-            throw new ConnectionException(sprintf("Could not prepare statement «%s».", $sql));
+            $this->connection->throwConnectionException(sprintf("Could not prepare statement «%s».", $sql), LogLevel::ERROR);
         }
+
+        $this->connection->log(LogLevel::INFO, sprintf("Prepared query '%s' => START -- %s -- END", $this->name, $sql));
     }
 
     /**
@@ -65,6 +68,7 @@ class PreparedQuery
      */
     public function __destruct()
     {
+        $this->connection->log(LogLevel::INFO, sprintf("Freeing query '%s'.", $this->getName()));
         @pg_query($this->connection->getHandler(), sprintf("DEALLOCATE \"%s\"", $this->getName()));
     }
 
@@ -96,7 +100,7 @@ class PreparedQuery
 
         if ($res === false)
         {
-            throw new ConnectionException(sprintf("Error while executing prepared statement '%s'.", $this->getName()));
+            $this->connection->throwConnectionException(sprintf("Error while executing prepared statement '%s'.", $this->getName()), LogLevel::ERROR);
         }
 
         return $res;
