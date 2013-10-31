@@ -97,7 +97,7 @@ The **dsn** parameter format is important because it interacts with Postgresql s
 Connection configuration
 ------------------------
 
-Connections set client parameters at launch (see `documentation <http://www.postgresql.org/docs/9.3/static/runtime-config-client.html>`_). Default parameters are the following
+Connections set client parameters at launch (see `documentation <http://www.Postgresql.org/docs/9.3/static/runtime-config-client.html>`_). Default parameters are the following
  * bytea_output = escape
  * intervalstyle = ISO_8601
  * datestyle = ISO
@@ -119,9 +119,9 @@ Built-in converters
 The ``Database`` class brings access to mechanisms to create connections and also to register converters. A ``Converter`` is a class that translates a data type between PHP and Postgresql.
 
 By default, the following converters are registered, this means you can use them without configuring anything:
- * ``Boolean``: convert postgresql booleans 't' and 'f' to/from PHP boolean values
- * ``Number``: convert postgresql 'smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial' types to numbers
- * ``String``: convert postgresql 'varchar', 'char', 'bpchar', 'uuid', 'tsvector', 'xml', 'json' (Pg 9.2), 'name' and 'text' into PHP string
+ * ``Boolean``: convert Postgresql booleans 't' and 'f' to/from PHP boolean values
+ * ``Number``: convert Postgresql 'smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial' types to numbers
+ * ``String``: convert Postgresql 'varchar', 'char', 'bpchar', 'uuid', 'tsvector', 'xml', 'json' (Pg 9.2), 'name' and 'text' into PHP string
  * ``Timestamp``: convert Postgresql 'timestamp', 'date', 'time' to PHP ``DateTime`` instance.
  * ``Interval``: convert Postgresql's 'interval' type into PHP ``DateInterval`` instance.
  * ``Binary``: convert Postgresql's 'bytea' type into PHP binary string.
@@ -132,8 +132,8 @@ By default, the following converters are registered, this means you can use them
 Registering converters
 ----------------------
 
-Other types are natively available in postgresql but are not loaded automatically at startup by Pomm.
- * ``Point``: convert postgresql 'point' representation as ``Pomm\Type\Point`` instance.
+Other types are natively available in Postgresql but are not loaded automatically at startup by Pomm.
+ * ``Point``: convert Postgresql 'point' representation as ``Pomm\Type\Point`` instance.
  * ``Segment``: convert 'segment' representation as ``Pomm\Type\Segment``.
  * ``Circle``: 'convert circle' representation as ``Pomm\Type\Circle``.
 
@@ -190,7 +190,7 @@ In the example above, the database contains a domain ``email_address`` which is 
 Custom types and converters
 ---------------------------
 
-Composite types are particularly useful to store complex set of data. In fact, with Postgresql, defining a table automatically defines the corresponding type. Hydrating type instances with postgresql values are the work of your custom converters. Let's take an example: electrical transformers. Electrical transformers are composed by at least two wiring, an input one (named primary) and an output one (named secondary) but it can be more of them. A transformer winding is defined by the voltage it is supposed to have and the maximum current it can stands.   ::
+Composite types are particularly useful to store complex set of data. In fact, with Postgresql, defining a table automatically defines the corresponding type. Hydrating type instances with Postgresql values are the work of your custom converters. Let's take an example: electrical transformers. Electrical transformers are composed by at least two wiring, an input one (named primary) and an output one (named secondary) but it can be more of them. A transformer winding is defined by the voltage it is supposed to have and the maximum current it can stands.   ::
 
   -- SQL
   CREATE TYPE winding_power AS (
@@ -407,7 +407,7 @@ Entities and database
 Hydrate and convert
 -------------------
 
-It may happen you need to create objects with data as array. ``Pomm`` uses this mechanism internally to hydrate the entities with database values. The ``hydrate()`` method takes an array and merge it with the entity's internal values. Be aware PHP associative arrays keys are case sensitive while postgresql's field names are not. If you need some sort of conversion the ``convert()`` method will help. You can overload the ``convert()`` method to create a more specific conversion (if you use web services data provider by example) but you cannot overload the ``hydrate()`` method.
+It may happen you need to create objects with data as array. ``Pomm`` uses this mechanism internally to hydrate the entities with database values. The ``hydrate()`` method takes an array and merge it with the entity's internal values. Be aware PHP associative arrays keys are case sensitive while Postgresql's field names are not. If you need some sort of conversion the ``convert()`` method will help. You can overload the ``convert()`` method to create a more specific conversion (if you use web services data provider by example) but you cannot overload the ``hydrate()`` method.
 
 Life cycle
 ----------
@@ -464,7 +464,7 @@ When Map classes are instantiated, the method ``initialize`` is triggered. This 
  * ``field_structure``: the fields with their corresponding Postgresql type
  * ``primary_key``: an array with simple or composite primary key
 
-If the table is stored in a special database schema, it must appear in the ``object_name`` attribute. If you do not use schemas, postgresql will store everything in the public schema. You do not have to specify it in the ``object_name`` attribute but it will be used in the class namespace. As ``public`` is also a reserved keyword of PHP, the namespace for the public schema is ``PublicSchema``.
+If the table is stored in a special database schema, it must appear in the ``object_name`` attribute. If you do not use schemas, Postgresql will store everything in the public schema. You do not have to specify it in the ``object_name`` attribute but it will be used in the class namespace. As ``public`` is also a reserved keyword of PHP, the namespace for the public schema is ``PublicSchema``.
 
 Let's say we have the following table ``student`` in the ``public`` schema of the database ``college``::
 
@@ -1117,7 +1117,7 @@ By default, connections are in auto-commit mode which means every change in the 
 
 The transaction type is determined by ``ISOLATION LEVEL`` you set in your connection's parameters (see `Database class and configuration`_)
 
-Isolation level must be one of ``Pomm\Connection\Connection::ISOLATION_READ_COMMITTED``, ``ISOLATION_READ_REPEATABLE`` or ``ISOLATION_SERIALIZABLE``. Check your Postgresql version for the available levels. Starting from pg 9.1, what was called ``SERIALIZABLE`` is called ``READ_REPEATABLE`` and ``SERIALIZABLE`` is a race for the first transaction to COMMIT. This means if the transaction fails, you may just try again until it works. Check the `postgresql documentation <http://www.postgresql.org/docs/9.1/static/transaction-iso.html>`_ about transactions for details.
+Isolation level must be one of ``Pomm\Connection\Connection::ISOLATION_READ_COMMITTED``, ``ISOLATION_READ_REPEATABLE`` or ``ISOLATION_SERIALIZABLE``. Check your Postgresql version for the available levels. Starting from pg 9.1, what was called ``SERIALIZABLE`` is called ``READ_REPEATABLE`` and ``SERIALIZABLE`` is a race for the first transaction to COMMIT. This means if the transaction fails, you may just try again until it works. Check the `Postgresql documentation <http://www.Postgresql.org/docs/9.1/static/transaction-iso.html>`_ about transactions for details.
 
 Partial transactions and savepoints
 -----------------------------------
