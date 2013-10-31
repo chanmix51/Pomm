@@ -11,7 +11,7 @@ Overview
 Pomm is a fast, lightweight, efficient model manager for Postgresql written in PHP. It can be seen as an enhanced object hydrator above PHP's native Postgresql library with the following features:
 
  * Database Inspector to build automatically your PHP model files (support inheritance).
- * Postgresql's schema support mapped to PHP namespaces.
+ * Postgresql's schemas are mapped to PHP namespaces.
  * PHP <=> Postgres type converter that support HStore, geometric types, objects, ranges etc.
  * Lazy fetching for results.
  * Hydration filters trough PHP callables.
@@ -36,7 +36,10 @@ The ``Service`` class just stores the ``Database`` instances and provides conven
 
 It is either possible to instance `Database` class alone or use the `Service` class to do so. The simplest way to get a database instance is::
 
-    $database = new Pomm\Connection\Database(array('name' => 'database_name', 'dsn' => 'pgsql://user:pass@host:port/db_name'));
+    $database = new Pomm\Connection\Database(array(
+        'name' => 'database_name',
+        'dsn' => 'pgsql://user:pass@host:port/db_name'
+        ));
 
 Database expected parameters are:
 
@@ -61,7 +64,7 @@ There are several ways to declare databases to the service class. Either you use
         'name'  => 'my_db'
       )
       ));
-    
+
     # Using the setDatabase method
     $service = new Pomm\Service();
     $service->setDatabase('db_one', new Pomm\Connection\Database(array(
@@ -81,7 +84,7 @@ DSN
 The **dsn** parameter format is important because it interacts with Postgresql server's access policy.
 
  * **socket connection**
- * ``pgsql://user/database`` Connect *user* to the db *database* without password through the Unix socket system. 
+ * ``pgsql://user/database`` Connect *user* to the db *database* without password through the Unix socket system.
  * ``pgsql://user:pass/database`` The same but with password.
  * ``pgsql://user:pass@!/path/to/socket!/database`` When the socket is not in the default directory, it is possible to specify it in the host part of the DSN. Note it is surrounded by '!' and there are NO ending /. Using the «!» as delimiter assumes there are no «!» in your socket's path. But you don't have «!» in your socket's path do you ?
  * ``pgsql://user@!/path/to/socket!:port/database`` Postgresql's listening socket's names are the same as TCP ports. If different than default socket, specify it in the port part.
@@ -89,7 +92,7 @@ The **dsn** parameter format is important because it interacts with Postgresql s
 
  * **TCP connection**
  * ``pgsql://user@host/database`` Connect *user* to the db *database* on host *host* using TCP/IP.
- * ``pgsql://user:pass@host:port/database`` The same but with password and TCP port specified. 
+ * ``pgsql://user:pass@host:port/database`` The same but with password and TCP port specified.
 
 Connection configuration
 ------------------------
@@ -99,7 +102,7 @@ Connections set client parameters at launch (see `documentation <http://www.post
  * intervalstyle = ISO_8601
  * datestyle = ISO
 
-These parameters are important since the default converters expect client output to be formatted this way. If you change these parameters, register the according converter. 
+These parameters are important since the default converters expect client output to be formatted this way. If you change these parameters, register the according converter.
 
 Some other parameters can be tuned that way, by default they are set by the server's default configuration:
  * statement_timeout
@@ -119,42 +122,36 @@ By default, the following converters are registered, this means you can use them
  * ``Boolean``: convert postgresql booleans 't' and 'f' to/from PHP boolean values
  * ``Number``: convert postgresql 'smallint', 'bigint', 'integer', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial' types to numbers
  * ``String``: convert postgresql 'varchar', 'char', 'bpchar', 'uuid', 'tsvector', 'xml', 'json' (Pg 9.2), 'name' and 'text' into PHP string
- * ``Timestamp``: convert postgresql 'timestamp', 'date', 'time' to PHP ``DateTime`` instance.
- * ``Interval``: convert postgresql's 'interval' type into PHP ``DateInterval`` instance. 
- * ``Binary``: convert postgresql's 'bytea' type into PHP string (see bugs `here <https://github.com/chanmix51/Pomm/issues/31>_` and `here <https://github.com/chanmix51/Pomm/issues/32>_`).
- * ``Array``: convert postgresql arrays from/to PHP arrays.
- * ``TsRange``: convert postgresql 'tsrange', 'daterange' to ``\Pomm\Type\TsRange`` instance (Pg 9.2).
- * ``NumberRange``: convert postgresql 'int4range', 'int8range', 'numrange` into ``\Pomm\Type\NumberRange`` instance (Pg 9.2).
+ * ``Timestamp``: convert Postgresql 'timestamp', 'date', 'time' to PHP ``DateTime`` instance.
+ * ``Interval``: convert Postgresql's 'interval' type into PHP ``DateInterval`` instance.
+ * ``Binary``: convert Postgresql's 'bytea' type into PHP binary string.
+ * ``Array``: convert Postgresql arrays from/to PHP arrays.
+ * ``TsRange``: convert Postgresql 'tsrange', 'daterange' to ``\Pomm\Type\TsRange`` instance (Pg 9.2).
+ * ``NumberRange``: convert Postgresql 'int4range', 'int8range', 'numrange` into ``\Pomm\Type\NumberRange`` instance (Pg 9.2).
 
 Registering converters
 ----------------------
 
-Other types are natively available in postgresql databases but are not loaded automatically by Pomm.
+Other types are natively available in postgresql but are not loaded automatically at startup by Pomm.
+ * ``Point``: convert postgresql 'point' representation as ``Pomm\Type\Point`` instance.
+ * ``Segment``: convert 'segment' representation as ``Pomm\Type\Segment``.
+ * ``Circle``: 'convert circle' representation as ``Pomm\Type\Circle``.
 
- * ``Point``: postgresql 'point' representation as ``Pomm\Type\Point`` instance.
- * ``Segment``: 'segment' representation as ``Pomm\Type\Segment``.
- * ``Circle``: 'circle' representation as ``Pomm\Type\Circle``.
+Postgresql contribs come with handy extra data type (like HStore, a key => value array and LTree a materialized path data type). If you use these types in your database you have to register the according converters from your database instance::
 
-Postgresql contribs come with handy extra data type (like HStore, a key => value array and LTree a materialized path data type). If you use these types in your database you have to **register the according converters** from your database instance::
-
-  # The HStore converter converts a postgresql HStore to a PHP associative 
-  # array and the other way around.
-  # The following line registers the HStore converter to the default 
-  # database.
-  
-    $database
-    ->registerConverter(
-      'HStore',
-       new Pomm\Converter\PgHStore(),
-       array('public.hstore')
-      );
+    $database->registerConverter('HStore', new Pomm\Converter\PgHStore(), array('public.hstore'));
 
 Arguments to instantiate a ``Converter`` are the following:
- * the first argument is the converter name. It is used in the map classes to link with fields (see `Map Classes`_ below).
+ * the first argument is the converter name.
  * the second argument is the instance of the ``Converter``
- * the third argument is a type or a set of types for Pomm to link them with the given converter.
+ * the third argument is a Postgresql type or a set of types for Pomm to link them with the given converter.
 
-If your database has a lot of custom types, it is a better idea to create your own ``Database`` class.::
+Although Postgresql native types are stored in an internal schema hence are reachable from everywhere without mention to fully qualified name, user defined types and extensions definitions are stored in user schemas (by default ``public``). It is advised to provide the fqn for user defined types and extensions.
+
+Creating your own Database class
+--------------------------------
+
+If your database has a lot of custom types, it is a good idea to create your own ``Database`` class.::
 
   class MyDatabase extends Pomm\Connection\Database
   {
@@ -181,17 +178,18 @@ Converters and types
 Domains
 -------
 
-In case your database uses ``DOMAIN`` types you can associate them with an already registered converter. The ``registerTypeForConverter()`` method stands for that.::
+In case your database uses ``DOMAIN`` types, you can associate them with an already registered converter. The ``registerTypeForConverter()`` method stands for that.::
 
     $database
-      ->registerTypeForConverter('email_address', 'String');
+      ->registerTypeForConverter('public.email_address', 'String');
 
 In the example above, the database contains a domain ``email_address`` which is a subtype of ``varchar`` so it is associated with the built-in converter ``String``.
 
 **Note** ``registerTypeForConverter`` and ``registerConverter`` methods implement the fluid interface so you can chain calls.
 
-Custom types
-------------
+Custom types and converters
+---------------------------
+
 Composite types are particularly useful to store complex set of data. In fact, with Postgresql, defining a table automatically defines the corresponding type. Hydrating type instances with postgresql values are the work of your custom converters. Let's take an example: electrical transformers. Electrical transformers are composed by at least two wiring, an input one (named primary) and an output one (named secondary) but it can be more of them. A transformer winding is defined by the voltage it is supposed to have and the maximum current it can stands.   ::
 
   -- SQL
@@ -203,54 +201,47 @@ Composite types are particularly useful to store complex set of data. In fact, w
 Tables containing a field with this type will return a tuple. A good way to manipulate that kind of data would be to create a ``WindingPower`` type class::
 
   <?php
-  
+
   namespace Model\Pomm\Type;
-   
+
   class WindingPower
   {
       public $voltage;
       public $current;
-   
+
       public function __construct($voltage, $current)
       {
           $this->voltage = $voltage;
           $this->current = $current;
       }
-   
-      public getPowerMax()
-      {
-        return $this->voltage * $this->current;
-      }
   }
-
-Here, we can see the very good side of this method: we can implement a ``getPowerMax()`` method and make our type richer. 
 
 Writing your own converters
 ---------------------------
 
-You can write your own converters for your custom postgresql types. All they have to do is to implement the ``Pomm\Converter\ConverterInterface``. This interface makes your converter to have two methods:
- * ``fromPg($data, $type)``: converts string data from Postgesql to a PHP representation. The returned value will be hydrated in your entities.
- * ``toPg($data, $type)``: returns a string with the Postgresql representation of a PHP structure. This string will be used in the SQL queries generated by the Map files to save or update entities.
+All converters must implement the ``Pomm\Converter\ConverterInterface``. This interface makes converters to have two methods:
+ * ``fromPg($data, $type)``: converts string data fetched from a Postgresql result to a PHP representation.
+ * ``toPg($data, $type)``: converts PHP data representation to a string that will be used in a SQL query.
 
 Here is the converter for the ``WindingPower`` type mentioned above::
 
   <?php
-  
+
   namespace Model\Pomm\Converter;
-   
+
   use Pomm\Converter\ConverterInterface;
   use Model\Pomm\Type\WindingPower as WindingPowerType;
-   
+
   class WindingPower implements ConverterInterface
   {
       public function fromPg($data, $type = null)
       {
           $data = trim($data, "()");
           $values = preg_split('/,/', $data);
-   
+
           return new WindingPowerType($values[0], $values[1]);
       }
-   
+
       public function toPg($data, $type = null)
       {
           return sprintf("winding_power '(%4.1f,%4.3f)'", $data->voltage, $data->current);
@@ -279,9 +270,9 @@ Overview
 What is an Entity class ?
 -------------------------
 
-Entities are what programmers use in the end of the process. They are an object oriented implementation of the data retrieved from the database. Most of the time, these PHP classes are automatically generated by the introspection tool (see `CreateBaseMapTool`_) but you can write you own classes by hand. They just have to extends ``Pomm\Object\BaseObject`` class to know about status (see `Life cycle`_). Important things to know about entities are **they are schema less** and **they are data source agnostic**. 
+Entities are what programmers use in the end of the process. They are an object oriented implementation of the data retrieved from the database. Most of the time, these PHP classes are automatically generated by the introspection tool (see `CreateBaseMapTool`_) but you can write you own classes by hand. They just have to extends the ``Pomm\Object\BaseObject`` class to know about status (see `Life cycle`_). Important things to know about entities are **they are schema less** and **they are data source agnostic**.
 
-By default, entities lie in the same directory than their map classes and de facto share the same namespace but this is only convention.
+By default, entities lie in the same directory than their map classes and de facto share the same namespace but this is only a convention.
 
 ::
 
@@ -317,25 +308,17 @@ Living with entities
 Creator
 -------
 
-There are several ways to create entities. Use the constructor or use the creator methods from its related map class (see `Map classes`_).
+There are several ways to create entities.
 
 ::
 
   $entity = new Database\Schema\MyEntity();
 
-  $entity = $database
-    ->createConnection()
-    ->getMapFor('Database\Schema\MyEntity')
-    ->createObject();
+It is possible to directly specify values to the constructor::
 
-These methods accept an optional array of values. If provided, values will hydrate the entity.
+  $entity = new Database\Schema\MyEntity(array('value1' => $value1, ... ));
 
-::
-
-  $entity = $database
-    ->createConnection()
-    ->getMapFor('Database\Schema\MyEntity')
-    ->createAndSaveObject(array('name' => 'pika', 'age' => 23, 'stamped_at' => new \DateTime()));
+Entity's according map class also proposes methods to create entities (see `Map classes`_).
 
 
 Accessors and mutators
@@ -356,27 +339,25 @@ Note that ``get()`` can take an array with multiple attributes::
   $entity->set('plop', true);
 
   $entity->get(array('pika', 'plop')); // returns array('pika' => 'chu', 'plop' => true);
-  $entity->get($map->getPrimaryKey()); // returns the primary key if set.
-
 
 ``get()``, ``clear()`` and ``set()`` are **generic accessors**. They are used internally and cannot be overloaded. But you can also use **virtual accessors**::
 
     $entity = new Database\Schema\MyEntity(array('pika' => 'chu'));
     $entity->getPika();      // chu
 
-They are called virtual because they do not exist by default but ``BaseObject`` implements the ``__call()`` method to trap accessors calls using the ``get()`` and ``set()`` generic methods. Of course all these can be overloaded::
+They are called virtual because they do not exist by default but ``BaseObject`` implements the ``__call()`` method to trap accessors calls using the ``get()`` and ``set()`` generic methods. Of course, they can be overloaded::
 
   // in the Entity class
   public function getPika()
   {
     return strtoupper($this->get('pika'));
   }
-    
+
   // elsewhere
   $entity = new Database\Schema\MyEntity(array('pika' => 'chu'));
   $entity->getPika();     // CHU
 
-The methods ``set()`` and ``get()`` should be used only if you want to bypass any overload that could exist.
+Since the methods ``set()`` and ``get()`` cannot be overloaded, they will always return raw values stored in the entity container. They are used to bypass overloading methods.
 
 Interfaces and overloads
 ------------------------
@@ -395,15 +376,17 @@ Entities implement PHP's ``ArrayAccess`` interface to use the accessors if any. 
   $entity->getPika();     // CHU
   $entity['pika'];        // CHU
   $entity->pika;          // CHU
-  
+
   $entity->get('pika');   // chu
 
 This also applies to ``set()`` and ``clear()`` methods.
 
+This is particularly useful when exposing entities data in interfaced or template system.
+
 Extending entities
 ------------------
 
-Of course you can extend your entities providing new accessors. If by example you have an entity with a weight in grams and you would like to have a getter that returns it in ounces::
+ It is possible to extend entities providing new accessors. If by example there is an entity with a weight in grams and you would like to have a getter that returns it in ounces::
 
   public function getWeightInOunce()
   {
@@ -424,7 +407,7 @@ Entities and database
 Hydrate and convert
 -------------------
 
-It may happen you need to create objects with data as array. ``Pomm`` uses this mechanism internally to hydrate the entities with database values. The ``hydrate()`` method takes an array and merge it with the entity's internal values. Be aware PHP associative arrays keys are case sensitive while postgresql's field names are not. If you need some sort of conversion the ``convert()`` method will help. You can overload the ``convert()`` method to create a more specific conversion (if you use web services data provider by example) but you cannot overload the ``hydrate()`` method. 
+It may happen you need to create objects with data as array. ``Pomm`` uses this mechanism internally to hydrate the entities with database values. The ``hydrate()`` method takes an array and merge it with the entity's internal values. Be aware PHP associative arrays keys are case sensitive while postgresql's field names are not. If you need some sort of conversion the ``convert()`` method will help. You can overload the ``convert()`` method to create a more specific conversion (if you use web services data provider by example) but you cannot overload the ``hydrate()`` method.
 
 Life cycle
 ----------
@@ -432,9 +415,9 @@ Life cycle
 Entities also propose mechanisms to check what state are their data compared to the data source. There are 2 states which present 4 possible combinations:
 
 **EXIST**
-  The instance is fetched from the data source.
+  The instance exists in the database.
 **MODIFIED**
-  This instance has been modified with mutators.
+  This instance has been modified with mutators since hydration.
 
 So, of course, an entity can be in both states EXIST and MODIFIED or NONE of them. The ``BaseObject`` class grants you with several methods to check this internal state: ``isNew()``, ``isModified()`` or you can directly access the ``_state`` attribute from within your class definition::
 
@@ -449,16 +432,15 @@ So, of course, an entity can be in both states EXIST and MODIFIED or NONE of the
 Map classes
 ***********
 
-
 Overview
 ========
 
-Map classes are the central point of Pomm because 
+Map classes are the central point of Pomm because
  * they are a bridge between the database and your entities
- * they own the structure of their corresponding entities 
+ * they own the structure of their corresponding entities
  * They act as entity providers
 
-Every action you will perform with your entities will use a Map class. They are roughly the equivalent of Propel's *Peer* classes. Although it might look like Propel, it is important to understand unlike the normal Active Record design pattern, entities do not even know their structure and how to save themselves. You have to use their relative Map class to save them.
+Every action you will perform with your entities will use a Map class. They are roughly the equivalent of Propel's *Peer* classes or Doctrine's repositories. Although it might looks like Propel, it is important to understand unlike the normal Active Record design pattern, entities do not even know their structure and how to save themselves. You have to use their relative Map class to save them.
 
 Map classes represent a structure in the database and provide methods to retrieve and save data with this structure. To be short, one table or view => one map class.
 
@@ -479,7 +461,7 @@ Introspected tables
 When Map classes are instantiated, the method ``initialize`` is triggered. This method is responsible of setting various structural elements:
  * ``object_name``: the related table name
  * ``object_class``: the related entity's fully qualified class name
- * ``field_structure``: the fields with their corresponding type
+ * ``field_structure``: the fields with their corresponding Postgresql type
  * ``primary_key``: an array with simple or composite primary key
 
 If the table is stored in a special database schema, it must appear in the ``object_name`` attribute. If you do not use schemas, postgresql will store everything in the public schema. You do not have to specify it in the ``object_name`` attribute but it will be used in the class namespace. As ``public`` is also a reserved keyword of PHP, the namespace for the public schema is ``PublicSchema``.
@@ -517,19 +499,19 @@ The last field ``exam_dates`` is an array of timestamps (see `Arrays`_ below). T
       {
           $this->object_class =  '\College\PublicSchema\Student';
           $this->object_name  =  'student';
-  
+
           $this->addField('reference', 'char');
           $this->addField('first_name', 'varchar');
           $this->addField('last_name', 'varchar');
           $this->addField('birthdate', 'timestamp');
           $this->addField('level', 'smallint');
           $this->addField('exam_dates', 'timestamp[]');
-  
+
           $this->pk_fields = array('reference');
       }
   }
 
-All generated map classes use PHP namespace. This namespace is composed by the database name and the database schema the table is located in. If database name is not supplied to the ``Database`` constructor (see `Database class and isolation level`_), the real database name is used. If by example, the previous table were in the ``school`` database schema, the following lines would change::
+All generated map classes use PHP namespace. This namespace is composed by the database name and the database schema the table is located in. If database name is not supplied to the ``Database`` constructor (see `Database class and configuration`_), the real database name is used. If by example, the previous table were in the ``school`` database schema, the following lines would change::
 
  <?php
 
@@ -537,16 +519,16 @@ All generated map classes use PHP namespace. This namespace is composed by the d
   ...
           $this->object_class =  'College\School\Student';
           $this->object_name  =  'school.student';
-  
+
 Arrays
 ------
 
-Postgresql supports arrays. An array can contain several entities all from the same type. Pomm of course supports this feature using the ``[]`` notation after the converter declaration::
+Postgresql supports arrays. An array can contain several data all from the same type. Pomm of course supports this feature using the ``[]`` notation after the converter declaration::
 
     $this->addField('authors', 'varchar[]');   // Array of strings
     $this->addField('locations', 'point[]');   // Array of points
 
-The converter system handles that and the entities will be hydrated with an array of the according type depending on the given converter. Of course, all converters must be registered prior to the declaration.
+The converter system handles that and the entities will be hydrated with an array of the according type depending on the given converter.
 
 Temporary tables
 ----------------
@@ -610,7 +592,7 @@ The main goal of the map classes is to provide a layer between your database and
 
   $map->saveOne($entity);     // UPDATE
 
-As illustrated above, the ``saveOne()`` method saves your object whatever it is an update or an insert. It is important to know that the internal state (see `Life cycle`_) of the entity is used to determine if the object exists or not and choose between the ``INSERT`` or the ``UPDATE`` statement. 
+As illustrated above, the ``saveOne()`` method saves your object whatever it is an update or an insert. It is important to know that the internal state (see `Life cycle`_) of the entity is used to determine if the object exists or not and choose between the ``INSERT`` or the ``UPDATE`` statement.
 Whatever is used, the whole structure is saved every time this method is called. In case you do just update some fields you can use the ``updateOne()`` method.
 Note that if the table related to this entity sets default values (like ``created_at`` field by example) they will be **automatically hydrated in the entity**.
 
@@ -624,7 +606,7 @@ Note that if the table related to this entity sets default values (like ``create
   $map->getPika();            // chu
   $map->getPlop();            // true
 
-In the example above, two fields are set and only one is updated. The result of this is the second field to be **replaced with the value from the database**. 
+In the example above, two fields are set and only one is updated. The result of this is the second field to be **replaced with the value from the database**.
 
 ::
 
@@ -633,12 +615,12 @@ In the example above, two fields are set and only one is updated. The result of 
   $entity->isNew();           // false
   $entity->isModified();        // false
 
-The ``deleteOne()`` method is pretty straightforward. Like the other modifiers, it hydrates the object with the deleted row from the database in case you want to save it elsewhere.
+The ``deleteOne()`` method is pretty straightforward. Like the other modifiers, it hydrates the entity with the deleted row from the database in case you want to save it elsewhere.
 
 Built-in finders
 ----------------
 
-The first time you generate the base map classes, it will also generate the map classes and the entity classes. Using the example with student, the empty map file should look like this::
+The first time the base map classes are generated, the map classes and the entity classes will be also created. Using the example with student, the empty map file should look like this::
 
   <?php
   namespace College\School;
@@ -656,15 +638,14 @@ This is the place you are going to create your own finder methods. As it extends
 
  * ``findAll(...)`` return all entities
  * ``findByPK(...)`` return a single entity
- * ``findWhere(...)`` perform a 
-   ``SELECT ... FROM my.table WHERE ...``
+ * ``findWhere(...)`` perform a ``SELECT ... FROM my.table WHERE ...``
 
-Finders return either a ``Collection`` instance virtually containing all model instances returned by the query (see `Collections`_) or just a related model entity instance (like ``findByPK``).
+Finders return either a ``Collection`` instance virtually containing all entities returned by the query (see `Collections`_) or just a related model entity instance (like ``findByPK``).
 
 findAll
 -------
 
-``findAll`` is the simplest query you can make on a database set, it returns all the tuples of the set. This method takes a query suffix as optional argument. This is useful for query modifiers like ``LIMIT ... OFFSET`` or ``ORDER BY``.
+``findAll`` is the simplest query you can issue on a database set, it returns all the tuples of the set. This method takes a query suffix as optional argument. This is useful for query modifiers like ``LIMIT ... OFFSET`` or ``ORDER BY``.
 
 ::
 
@@ -692,45 +673,45 @@ It is possible to use it directly because we are in a Map class hence Pomm knows
 
 ::
 
-  /* SELECT 
-       reference, 
-       first_name, 
-       last_name, 
-       birthdate 
-     FROM 
-       shool.student 
-     WHERE 
-         birthdate > '1980-01-01 
-       AND 
+  /* SELECT
+       reference,
+       first_name,
+       last_name,
+       birthdate
+     FROM
+       shool.student
+     WHERE
+         birthdate > '1980-01-01
+       AND
          first_name ILIKE '%an%'
   */
 
   // don't do that !
-  $students = $this->findWhere("birthdate > '1980-01-01' AND first_name ILIKE '%an%'"); 
-  
+  $students = $this->findWhere("birthdate > '1980-01-01' AND first_name ILIKE '%an%'");
+
 
 Of course, this is not very useful, because the date is very likely to be a parameter. A finder ``getYoungerThan`` would be::
 
   public function getYoungerThan(DateTime $date)
   {
-  /* SELECT 
-       reference, 
-       first_name, 
-       last_name, 
-       birthdate 
-     FROM 
-       shool.student 
-     WHERE 
+  /* SELECT
+       reference,
+       first_name,
+       last_name,
+       birthdate
+     FROM
+       shool.student
+     WHERE
          birthdate > $date
-       AND 
+       AND
          first_name ILIKE '%an%'
-     ORDER BY 
+     ORDER BY
        birthdate DESC
      LIMIT 10
   */
 
-    return $this->findWhere("birthdate > ? AND first_name ILIKE ?", 
-        array($date, '%an%'), 
+    return $this->findWhere("birthdate > $* AND first_name ILIKE $*",
+        array($date, '%an%'),
         'ORDER BY birthdate DESC LIMIT 10'
         );
   }
@@ -739,15 +720,15 @@ All queries are prepared, this might increase the performance but it certainly i
 
 **Note** The DateTime PHP instances can be passed as is, they will be converted into string internally.
 
-AND OR: The Where class
------------------------
+AND, OR: The Where class
+------------------------
 
 Sometimes, you do not know in advance what will be the clauses of your query because it depends on variable factors. You can use the ``Where`` class to chain logical statements::
 
   public function getYoungerThan(DateTime $date, $needle)
   {
-    $where = new Pomm\Query\Where("birthdate > ?", array($date));
-    $where->andWhere('first_name ILIKE ?', array(sprintf('%%%s%%', $needle)));
+    $where = new Pomm\Query\Where("birthdate > $*", array($date));
+    $where->andWhere('first_name ILIKE $*', array(sprintf('%%%s%%', $needle)));
 
     return $this->findWhere($where, null, 'ORDER BY birthdate DESC LIMIT 10');
   }
@@ -756,13 +737,13 @@ The ``Where`` class has two very handy methods: ``andWhere`` and ``orWhere`` whi
 
   public function getYoungerThan(DateTime $date, $needle)
   {
-    $where = Pomm\Query\Where::create("birthdate > ?", array($date))
-        ->andWhere('first_name ILIKE ?', array(sprintf('%%%s%%', $needle)))
+    $where = Pomm\Query\Where::create("birthdate > $*", array($date))
+        ->andWhere('first_name ILIKE $*', array(sprintf('%%%s%%', $needle)))
 
     return $this->findWhere($where, null, 'ORDER BY birthdate DESC LIMIT 10');
   }
 
-Because the ``WHERE something IN (...)`` clause needs to declare as many '?' as given parameters, it has its own constructor::
+Because the ``WHERE something IN (...)`` clause needs to declare as many '$*' as given parameters, it has its own constructor::
 
     // WHERE (station_id, line_no) IN ((1, 1), (1, 3), ... );
 
@@ -770,13 +751,13 @@ Because the ``WHERE something IN (...)`` clause needs to declare as many '?' as 
 
 The ``Where`` instances can be combined together with respect of the logical precedence::
 
-    $where1 = new Pomm\Query\Where('pika = ?', array('chu'));
-    $where2 = new Pomm\Query\Where('age < ?', array(18));
+    $where1 = new Pomm\Query\Where('pika = $*', array('chu'));
+    $where2 = new Pomm\Query\Where('age < $*', array(18));
 
     $where1->orWhere($where2);
     $where1->andWhere(Pomm\Query\Where::createWhereIn('other_id', array(1,2,3,5,7,11)));
 
-    echo $where1; // (pika = ? OR age < ?) AND other_id IN (?,?,?,?,?,?)
+    echo $where1; // (pika = $* OR age < $*) AND other_id IN ($*,$*,$*,$*,$*,$*)
 
 Fields methods
 --------------
@@ -822,15 +803,15 @@ Building custom queries
 Even if generic finders may fulfill 90% of developers needs, it is possible to define your own finders using SQL. The generic structures of the SQL with Pomm follow the principle described below::
 
     SELECT
-      %s
+      :table_fields
     FROM
-      %s
+      :table_name
     WHERE
-      %s
+      :conditions
 
  * The first string is provided by one fields getter method (see `Fields methods`_ above).
  * The second string is the set's source, most of the time a table name. This is provided by the ``getTableName($alias)`` method.
- * The last string is the where clause. If a ``Where`` instance is provided it is as easy as casting it to String.
+ * The last string is the where clause. If a ``Where`` instance is provided, it is as easy as casting it to String.
 
 Fields formatters
 -----------------
@@ -842,25 +823,31 @@ The problem with the fields getters is that they return an array. This array has
 
 These methods call the fields getter given as *method_name* and return the formatted list of fields::
 
-    $where = new \Pomm\Query\Where::create("age < ?", array(18))
-        ->andWhere('main_teacher_id = ?', array(1));
+    $where = new \Pomm\Query\Where::create("age < $*", array(18))
+        ->andWhere('main_teacher_id = $*', array(1));
 
-    $sql = sprintf("SELECT %s FROM %s WHERE %s", 
-        $this->formatFieldsWithAlias('getSelectFields', 'my_table'),
-        $this->getTableName('my_table'),
-        (string) $where
-        )
+    $sql = "SELECT :table_fields FROM :table_name WHERE :conditions";
+
+    $sql = strtr($sql, array(
+        ':table_fields' => $this->formatFieldsWithAlias('getSelectFields', 'my_table'),
+        ':table_name' => $this->getTableName('my_table'),
+        'conditions' => (string) $where
+        ));
 
     return $this->query->($sql, $where->getValues());
 
-    // This will perform
+This will perform the following query::
+
     SELECT
       "my_table.field1" AS "field1",
+      "my_table.field2" AS "field2",
       ...
     FROM
       a_table my_table
     WHERE
-      age < ? AND main_teacher_id = ?
+      age < $* AND main_teacher_id = $*
+
+with parameter 1 = 18 and parameter 2 = 1.
 
 Complex queries
 ---------------
@@ -876,37 +863,37 @@ The example above is roughly what is coded in ``findWhere``.In real life, it is 
 
     $sql = <<<_
     SELECT
-      %s,
+      :post_fields,
       COUNT(c.id) as "comment_count"
     FROM
-      %s p
-        LEFT JOIN %s c ON
+      :post_table p
+        LEFT JOIN :comment_table c ON
             p.id = c.p_id
     WHERE
-        %s
+        :conditions
     GROUP BY
-        %s
+        :post_groupby_fields
     _;
 
-    $sql = sprintf($sql,
-        $this->formatFieldsWithAlias('getSelectFields', 'p'),
-        $this->getTableName(),
-        $comment_map->getTableName(),
-        (string) $where,
-        $this->formatFields('getGroupByFields', 'p')
-        );
+    $sql = strtr($sql, array(
+        ':post_fields' => $this->formatFieldsWithAlias('getSelectFields', 'p'),
+        ':post_table' => $this->getTableName(),
+        ':comment_table' => $comment_map->getTableName(),
+        'conditions' => (string) $where,
+        'post_groupby_fields' => $this->formatFields('getGroupByFields', 'p')
+        ));
 
     return $this->query($sql, $where->getValues());
   }
 
-The ``query()`` method is available for your custom queries. It takes 2 parameters, the SQL statement and an optional array of values to be escaped. Keep in mind, the number of values must match the '?' Occurrences in the query.
+The ``query()`` method is available for your custom queries. It takes 2 parameters, the SQL statement and an optional array of values to be escaped. Keep in mind, the number of values must match the '$*' Occurrences in the query.
 
-Whatever you are retrieving, Pomm will hydrate objects according to what is in structure definition of your map class. **Entities do not know about their structure** they just contain data and methods. The entity instances returned here will have this extra field "comment_count" exactly as it would be a normal field. Of course if you update this entity in the database, this field will be ignored. 
+Whatever you are retrieving, Pomm will hydrate objects according to what is in structure definition of your map class. **Entities do not know about their structure** they just contain data and methods. The entity instances returned here will have this extra field "comment_count" exactly as it would be a normal field. Of course if you update this entity in the database, this field will be ignored.
 
 Virtual fields
 --------------
 
-Adding new fields in the SELECT trough the fields getter methods do not make them mapped to any known type hence not converted with the converter system. It is possible to assign these now "virtual fields" a converter. 
+Adding new fields in the SELECT trough the fields getter methods do not make them mapped to any known type hence not converted with the converter system. It is possible to assign these now "virtual fields" a converter.
 
 ::
 
@@ -935,26 +922,25 @@ Using an entity converter will make an entity instance fetched directly from the
         $remote_map = $this->connection->getMapFor('YourDb\SchemaName\Post');
 
         $sql = <<<_
-        SELECT 
-          %s,
+        SELECT
+          :author_fields,
           array_agg(post) AS posts
-        FROM 
-          %s 
-            LEFT JOIN %s ON 
-                author.id = post.author_id 
+        FROM
+          :author_table
+            LEFT JOIN :post_table ON
+                author.id = post.author_id
         WHERE
-            author.name = ?
-        GROUP BY 
-          %s
-        _;
+            author.name = $*
+        GROUP BY
+          :author_groupby_fields
+        ;
 
-        $sql = sprintf(
-            $sql,
-            $this->formatFieldsWithAlias('getSelectFields', 'author'),
-            $this->getTableName('author'),
-            $remote_map->getTableName('post'),
-            $this->getGroupByFields('author')
-        );
+        $sql = strtr($sql, array(
+            ':author_fields' => $this->formatFieldsWithAlias('getSelectFields', 'author'),
+            ':author_table' => $this->getTableName('author'),
+            ':post_table' => $remote_map->getTableName('post'),
+            ':author_groupby_fields' => $this->getGroupByFields('author')
+            ));
 
         $this->addVirtualField('posts', 'schema_name.post[]');
 
@@ -969,30 +955,24 @@ Collections
 Fetching results
 ----------------
 
-The ``query()`` method return a ``Collection`` instance that holds the PDOStatement with the results. The ``Collection`` class implements the ``Countable`` and ``Iterator`` interfaces so you can foreach on a Collection to retrieve the results:
-
-::
+The ``query()`` method return a ``Collection`` instance that holds the PDOStatement with the results. The ``Collection`` class implements the ``Countable`` and ``Iterator`` interfaces so you can iterate over them using a ``foreach`` PHP statement to retrieve the results::
 
   printf("Your search returned '%d' results.", $collection->count());
 
   foreach($collection as $blog_post)
   {
-    printf("Blog post '%s' posted on '%s' by '%s'.", 
-        $blog_post['title'], 
-        $blog_post['created_at']->format('Y-m-d'), 
+    printf("Blog post '%s' posted on '%s' by '%s'.",
+        $blog_post['title'],
+        $blog_post['created_at']->format('Y-m-d'),
         $blog_post['author']
         );
   }
 
-Sometimes, you want to access a particular result in a collection knowing the result's index. It is possible using the ``has()`` and ``get()`` methods:
+Sometimes, you want to access a particular result in a collection knowing the result's index. It is possible using the ``has()`` and ``get()`` methods::
 
-::
-
-  # Get an object from the collection at a given index 
-  # or create a new one if index does not exist 
-  $object = $collection->has($index) ?
-    $collection->get($index) : 
-    new Object();
+  # Get an object from the collection at a given index
+  # or create a new one if index does not exist
+  $object = $collection->has($index) ?  $collection->get($index) : new Object();
 
 Collections have other handful methods like:
  * ``isFirst()``
@@ -1003,27 +983,10 @@ Collections have other handful methods like:
  * ``getOddEven()``
  * ``extract()``
 
-Collection types
-----------------
-
-Pomm proposes two types of collections: `Collection` and `SimpleCollection`. Because internally, collections are an iterator on a SQL cursor, it is not really possible to rewind that cursor (as long as the PDO_SCROLLABLE_CURSOR is a ugly hack) so the ``SimpleCollection`` is a non scrollable, fire and forget iterator. This means it is fast, light but it is not possible to fetch results twice from it. This is where ``Collection`` class enters the scene. This collection type keeps the fetched results in memory. This can lead to a huge memory consumption but also make possible to develop some useful features:
-
-  * rewindable iterator
-  * collection filters
-
-By default, map classes use ``Collection`` instances to ensure backward compatibility with Pomm 1.0 projects. This can be changed by overloading the ``createCollectionFromStatement()`` method of your map class::
-
-    public function createCollectionFromStatement(\PDOStatement $stmt)
-    {
-        return new \Pomm\Object\SimpleCollection($stmt, $this);
-    }
-
-This method allows developers to create their own collection classes. There are no interface to implement but it is advised to inherit from ``SimpleCollection``.
-
 Collection filters
 ------------------
 
-Pomm's ``Collection`` class can register filters. Filters are just functions that are executed after values were fetched from the database and before the object is hydrated with them (pre hydration filters). These filters take the array of fetched values as parameter. They return an array with values which are then given to the next filter and so on. After all filters are being executed, the values are hydrated in entity instance related the map the collection comes from. 
+Pomm's ``Collection`` class can register filters. Filters are just functions that are executed after values were fetched from the database and before the object is hydrated with them (pre hydration filters). These filters take the array of fetched values as parameter. They return an array with values which are then given to the next filter and so on. After all filters have been executed, the values are hydrated in entity instance related the map the collection comes from.
 
 ::
 
@@ -1037,62 +1000,18 @@ Pomm's ``Collection`` class can register filters. Filters are just functions tha
 
 The code above register a filter that create an extra field in our result set. Every time a result is fetched, this anonymous function will be triggered and the resulting values will be hydrated in the entity.
 
-Collection filters can also be used to create pseudo-relations between entity classes. Imagine we have to retrieve a post with its author. It would be nice if we could fetch selected fields of the author instead of a raw database object.
-
-::
-
-    public function getPostWithAuthor($slug)
-    {
-        $author_map = $this->connection->getMapFor('\MyDb\MySchema\Author');
-
-        $sql = "SELECT %s, %s FROM %s p JOIN %s a ON p.author_id = a.id WHERE p.slug = ?";
-
-        $sql = sprintf(
-            $sql,
-            $this->formatFieldsWithAlias('getSelectFields', 'p'),
-            $author_map->formatFieldsWithAlias('getRemoteSelectFields', 'a'),
-            $this->getTableName(),
-            $author_map->getTableName()
-        );
-
-        return $this->query($sql, array($slug))
-            ->registerFilter(array($author_map, 'createFromForeign'))
-            ->current();
-    }
-
-The example above shows the use of a special field getter method: *getRemoteSelectFields*. The issued query is::
-
-    SELECT
-      "p.field1" AS "field1",
-      "p.field2" AS "field2",
-      ...
-      "p.fieldN" AS "fieldN",
-      "a.field1" AS "{author}.field1",
-      "a.field2" AS "{author}.field2",
-      ....
-    FROM
-      post p
-        JOIN author a ON p.author_id = a.id
-    WHERE
-      p.slug = ?
-
-After the query is sent, a filter is registered to the collection, the ``AuthorMap::createFromForeign`` method. This callable takes all the ``{author}`` fields of each row, delete them from the result set and hydrate an ``Author`` entity with their values under a 'author' key.   ::
-
-    $post = $post_map->getPostWithAuthor($slug);
-    $post->getAuthor(); // returns a Author instance.
-
 Pagers
 ======
 
 Pager query methods
 -------------------
 
-``BaseObjectMap`` instances provide 2 methods that will grant you with a ``Pager`` class. ``paginateQuery()`` and the handy ``paginateFindWhere()``. It adds the correct subset limitation at the end of you query. Of course, it assumes you do not specify any LIMIT nor OFFSET sql clauses in your query. 
+``BaseObjectMap`` instances provide 2 methods that will grant you with a ``Pager`` class. ``paginateQuery()`` and the handy ``paginateFindWhere()``. It adds the correct subset limitation at the end of you query. Of course, it assumes you do not specify any LIMIT nor OFFSET sql clauses in your query.
 
-The ``paginateFindWhere()`` method acts pretty much like the ``findWhere()`` method (see `Built-in finders`_) which it uses internally. This means the condition can be either a string or a ``Pomm\Query\Where`` instance (see `AND OR: The Where class`_)::
+The ``paginateFindWhere()`` method acts pretty much like the ``findWhere()`` method (see `Built-in finders`_) which it uses internally. This means the condition can be either a string or a ``Pomm\Query\Where`` instance (see `AND, OR: The Where class`_)::
 
   $pager = $student_map
-    ->paginateFindWhere('age < ? OR gender = ?', array(19, 'F'), 'ORDER BY score ASC', 25, 4);
+    ->paginateFindWhere('age < $* OR gender = $*', array(19, 'F'), 'ORDER BY score ASC', 25, 4);
 
 The example below ask Pomm to retrieve the fourth page of students that match some condition with 25 results per page.
 
@@ -1144,17 +1063,16 @@ The entities are stored in a particular database. This is why only connections t
 
   $map = $database()
     ->getConnection()
-    ->getMapFor('College\School\Student'); 
-  
+    ->getMapFor('College\School\Student');
 
-It is possible to force the creation of a new Connection using the `createConnection()` method call but the `getConnection()` is preferred since it creates automatically a new connection if none exist, it returns the current one otherwise.
+It is possible to force the creation of a new Connection using the ``createConnection()`` method call but since it creates automatically a new connection if none exist, the ``getConnection()`` is preferred as it returns the current one.
 
 Identity mappers
 ----------------
 
 Connections are also the way to tell the map classes to use or not an ``IdentityMapper``. An identity mapper is an index kept by the connection and shared amongst the map instances. This index ensures that when an object is retrieved twice from the database, the same ``Object`` instance will be returned. This is a very powerful (and dangerous) feature. There are two ways to declare an identity mapper to your connections:
  * in the ``Database`` parameters. All the connections created for this database will use the given ``IdentityMapper`` class.
- * when instanciating the connection through the ``createConnection()`` call. This enforces the parameter given to the ``Database`` class if any. 
+ * when instanciating the connection through the ``createConnection()`` call. This enforces the parameter given to the ``Database`` class if any.
 
  ::
 
@@ -1184,17 +1102,20 @@ Standard transactions
 
 By default, connections are in auto-commit mode which means every change in the database is committed on the fly. Connections offer the way to enter in a transaction mode::
 
-  $cnx = $service->getDatabase()
-    ->createConnection();
-  $cnx->begin();
-  try {
-    # do things here
-    $cnx->commit();
-  } catch (Pomm\Exception\Exception $e) {
-    $cnx->rollback();
+  $connection = $service->getDatabase()->createConnection();
+  $connection->begin();
+
+  try
+  {
+      # do things here
+      $connection->commit();
+  }
+  catch (Pomm\Exception\Exception $e)
+  {
+      $connection->rollback();
   }
 
-The transaction type is determined by ``ISOLATION LEVEL`` you set in your connection's parameters (see `Database class and isolation level`_) 
+The transaction type is determined by ``ISOLATION LEVEL`` you set in your connection's parameters (see `Database class and configuration`_)
 
 Isolation level must be one of ``Pomm\Connection\Connection::ISOLATION_READ_COMMITTED``, ``ISOLATION_READ_REPEATABLE`` or ``ISOLATION_SERIALIZABLE``. Check your Postgresql version for the available levels. Starting from pg 9.1, what was called ``SERIALIZABLE`` is called ``READ_REPEATABLE`` and ``SERIALIZABLE`` is a race for the first transaction to COMMIT. This means if the transaction fails, you may just try again until it works. Check the `postgresql documentation <http://www.postgresql.org/docs/9.1/static/transaction-iso.html>`_ about transactions for details.
 
@@ -1203,77 +1124,28 @@ Partial transactions and savepoints
 
 Sometime, you may need to split transactions into parts and be able to perform partial rollback. Postgresql lets you use save points in your transaction::
 
-  $cnx->begin();
-  try {
-    # do things here
-  } catch (Pomm\Exception\Exception $e) {
-    // The whole transaction is rolled back
-    $cnx->rollback(); 
-    exit;
-  }
-  $cnx->setSavepoint('A');
-  try {
-    # do other things
-  } catch (Pomm\Exception\Exception $e) {
-  // only statments after savepoint A are rolled back
-    $cnx->rollback('A'); 
-  }
-  $cnx->commit();
-
-Query filter chain
-==================
-
-LoggerFilterChain
------------------
-The Connection class also holds and the heart of Pomm's query system: the ``QueryFilterChain``. The filter chain is an ordered stack of filters which can be executed. As the first filter is executed it can call the following filter. The code before the next filter call will be executed before and the code placed after will be run after. 
-This mechanism aims at wrapping the query system with tools like loggers or event systems. It is also possible to bypass completely the query execution as long as you return a ``PDOStatement`` instance.
-
-::
-
-  $database = new Pomm\Connection\Database(array('dsn' => 'pgsql://user/database'));
-  $logger = new Pomm\Tools\Logger();
-
-  $connection = $database->createConnection();
-  $connection->registerFilter(new Pomm\FilterChain\LoggerFilter($logger));
-
-  $students = $connection
-    ->getMapFor('MyDb\School\Student')
-    ->findWhere('age > ?', array(18), 'ORDER BY level DESC');
-
-  $logger->getLogs() 
-  /* Array( 
-       "1327047962.9422" => Array(
-         'sql'       => 'SELECT ... FROM school.student WHERE age > ? ORDER BY level DESC', 
-         'params'    => array(18), 
-         'duration'  => 0.003079,
-         'results'   => 23
-       ))
-   */
-
-Writing a Filter
-----------------
-Writing a filter is very easy, it just must implement the ``FilterInterface``.
-
-::
-
-  class MyFilter implements \Pomm\Filter\FilterInterface
+  $connection->begin();
+  try
   {
-      public function execute(\Pomm\Filter\QueryFilterChain $query_filter_chain)
-      {
-          // Do something before the query is executed
-
-          // Call the next filter
-          // If you do not, the query will never be executed. 
-          // Be sure to return a PDOStatement or throw an Exception.
-          $stmt = $query_filter_chain->executeNext($query_filter_chain);
-
-          // Do something after the query is executed
-  
-          return $stmt;
-      }
+      # do things here
   }
-
-You can register as many filters as you want but keep in mind filters are executed for every single query so it may slow down dramatically your application. 
+  catch (Pomm\Exception\Exception $e)
+  {
+      // The whole transaction is rolled back
+      $connection->rollback();
+      throw $e;
+  }
+  $connection->setSavepoint('A');
+  try
+  {
+      # do other things
+  }
+  catch (Pomm\Exception\Exception $e)
+  {
+      // only statments after savepoint A are rolled back
+      $connection->rollback('A');
+  }
+  $connection->commit();
 
 *****
 Tools
@@ -1282,22 +1154,22 @@ Tools
 Map generation tools
 ====================
 
-Pomm comes with handy tools to generate map classes that reflect what is in your database. 
+Pomm comes with handy tools to generate map classes that reflect what is in your database.
 
 Database Inspector
 ------------------
 
-The database inspector class proposes methods to scavenge structure informations in the database. It is used by the Map generators and you can use it in your own scripts. 
+The database inspector class proposes methods to scavenge structure informations in the database. It is used by the Map generators and you can use it in your own scripts.
 
 CreateBaseMapTool
 -----------------
 
-This class is the main generator class. 
+This class is the main generator class.
 
  * It inspects the database for the given table / view.
  * It creates the directory structure for your namespaces.
  * It generates the BaseMap file from the structure detected in the database.
- * It generates empty entity and map files if they do not exist.
+ * It generates according empty entity and map files if they do not exist.
 
 This class accepts the following parameters:
 
@@ -1312,13 +1184,13 @@ This class accepts the following parameters:
 
 **table** or **oid**
 
-If you give both, the oid has precedence over the name. 
+If you give both, the oid has precedence over the name.
 
 **prefix_dir**
 
 This is the root directory from which the directory tree will be built. The directory by default respects the PSR-0 standard to allow autoloading according to namespaces but you can change it.
 
-**schema** 
+**schema**
 The database schema name where the table or view is located.
 
 **namespace**
@@ -1349,7 +1221,7 @@ The schema scanning tool takes a schema name as parameter and then launches Crea
 Most of these parameters are sent to the ``CreateBaseMapTool`` as is. The only different parameter is
 
 **exclude**
-An array of tables/views to ignore. 
+An array of tables/views to ignore.
 
 Here is a sample of code to generate map classes from all the tables/views in a database schema::
 
@@ -1370,7 +1242,7 @@ Here is a sample of code to generate map classes from all the tables/views in a 
 
   $scan->execute();
 
-This will parse the postgresql's schema named *transfo* to scan it for tables and views. Then it will generate automatically the *BaseMap* files with the class structure and if map files or entity files do not exist, will create them. By default, with the code above, the following tree structure will be created from the directory this code is invoked::
+This will parse the Postgresql's schema named *transfo* to scan it for tables and views. Then it will generate automatically the *BaseMap* files with the class structure and if map files or entity files do not exist, will create them. By default, with the code above, the following tree structure will be created from the directory this code is invoked::
 
     /prefix/dir/MyDb
     └── Transfo
