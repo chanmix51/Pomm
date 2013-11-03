@@ -5,6 +5,9 @@ POMM: The PHP Object Model Manager for Postgresql
 .. image:: https://secure.travis-ci.org/chanmix51/Pomm.png?branch=master
    :target: http://travis-ci.org/#!/chanmix51/Pomm
 
+.. image:: https://scrutinizer-ci.com/g/chanmix51/Pomm/badges/quality-score.png?s=5766ac7091629c3af205bbcca8623bd2e8cfe85e
+   :target: https://scrutinizer-ci.com/g/chanmix51/Pomm/
+
 Note
 ****
 
