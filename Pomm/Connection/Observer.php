@@ -59,7 +59,7 @@ class Observer
             throw new PommException(sprintf("Event name cannot be empty."));
         }
 
-        $name = \pg_escape_identifier($this->connection->getHandler(), $name);
+        $name = $this->connection->escapeIdentifier($name);
         $this->connection->executeAnonymousQuery(sprintf("LISTEN %s", $name));
         $this->name = $name;
 
