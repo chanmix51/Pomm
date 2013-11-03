@@ -582,6 +582,11 @@ class ConverterEntityMap extends BaseObjectMap
         $result = pg_fetch_assoc($this->connection
             ->executeAnonymousQuery($sql));
 
+        if ($result === false)
+        {
+            return false;
+        }
+
         return $result['nspname'];
     }
 
