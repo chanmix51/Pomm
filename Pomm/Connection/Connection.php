@@ -564,6 +564,6 @@ class Connection implements LoggerAwareInterface
             return \pg_escape_literal($this->getHandler(), $var);
         }
 
-        return \pg_escape_string($this->getHandler(), $var);
+        return sprintf("'%s'", \pg_escape_string($this->getHandler(), $var));
     }
 }
