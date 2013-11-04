@@ -534,13 +534,18 @@ class Connection implements LoggerAwareInterface
      * Escape database object's names. This is different from value escaping
      * since objects names are surrounded by double quotes.
      *
-     * @access protected
+     * @access public
      * @param String $name The string to be escaped.
      * @return String the escaped string.
      */
-    protected function escapeIdentifier($name)
+    public function escapeIdentifier($name)
     {
-        return \pg_escape_identifier($this->getHandler(), $name);
+        if (function_exists('pg_escape_identifier'))
+        {
+            return \pg_escape_identifier($this->getHandler(), $name);
+        }
+
+        return sprintf('"%s"', str_replace('"', '""', $name));
     }
 
     /**
@@ -548,12 +553,17 @@ class Connection implements LoggerAwareInterface
      *
      * Escape a text value.
      *
-     * @access protected
+     * @access public
      * @param String The string to be escaped
      * @return String the escaped string.
      */
-    protected function escapeLiteral($var)
+    public function escapeLiteral($var)
     {
-        return \pg_escape_literal($this->getHandler(), $var);
+        if (function_exists('pg_escape_literal'))
+        {
+            return \pg_escape_literal($this->getHandler(), $var);
+        }
+
+        return sprintf("'%s'", \pg_escape_string($this->getHandler(), $var));
     }
 }

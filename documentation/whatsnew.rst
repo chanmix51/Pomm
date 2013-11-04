@@ -63,7 +63,7 @@ If you are used to the previous versions of Pomm, one of the only change you wil
 
     SELECT field1, field2 FROM my_table WHERE field2 IN (?, ?, ?) AND field1 BETWEEN ? AND ? ;
 
-Use of generic placeholder is nice but using the question mark as placeholder is not a good choice with Postgres since it is used in may operators and can cause collisions.
+Use of generic placeholder is nice but using the question mark as placeholder is not a good choice with Postgresql since it is used in many operators and can cause collisions.
 
 The native PHP's pgsql lib, uses the `$n` form as placeholder. It ovoid collisions with operators but this is a positional parameter form::
 
@@ -75,8 +75,8 @@ When looking at the query above, it is easy to understand positional parameters 
 
 If you are upgrading from previous version of Pomm, you will have to migrate your existing queries so they use `$*` instead of `?`. Of course, this is also needed for your queries using the `Where` class::
 
-    $where = \Pomm\Query\Where::createWhereIn('field2', array($val3, $val4, $val5))
-        ->andWhere('field1 BETWEEN $* AND $*', array($val1, $val2));
+    $where = \Pomm\Query\Where::createWhereIn('field2', array($val1, $val2, $val3))
+        ->andWhere('field1 BETWEEN $* AND $*', array($val4, $val5));
 
 
 Binary type full support
@@ -110,7 +110,7 @@ Of course, previous releases of Pomm were using prepared queries to escape value
     $prepared_stmt = $connection->createPreparedQuery('UPDATE my_table SET field1 = $* WHERE field1 BETWEEN $* AND $* AND field2 IN ($*, $*, $*)');
     $prepared_stmt->execute($values);
 
-This is useful when processing large amount of data that need to be built prior to insertion as this means thousand times the same query. Using this mechanism, Pomm 1.2 also check every query you issue and **check if has need been prepared already**. If true, the prepared statement is reused otherwise a prepared statement is created and stored in the connection. This results in better performances without the programmer to worry about escaping and, more generally, prepared statements.
+This is useful when processing large amount of data that need to be built prior to insertion as this means thousand times the same query. Using this mechanism, Pomm 1.2 also checks every query you issue and **checks if has not been prepared already**. If true, the prepared statement is reused otherwise a prepared statement is created and stored in the connection. This results in better performances without the programmer to worry about escaping and, more generally, about prepared statements.
 
 ::
 
@@ -134,27 +134,40 @@ This will issue the following query::
 Migrating from 1.1 to 1.2
 =========================
 
+Blocking points
+===============
+
 Postgresql 8.4 end of life
-==========================
+--------------------------
 
 Support of the version 8.4 of Postgresql has been dropped. Pomm 1.2 only works with Postgresql 9.x.
 
+Filter Chain
+------------
+
+The filter chain used to hook code before or after queries has been removed as it was too expensive -- from a performance point of view -- than useful. In the end, it was only needed to hook the logger (see below for the logger).
+
+
 SQL queries
-===========
+-----------
 
 The new query system uses `$*` instead of `?` as values placeholder in prepared queries. This must be changed either in your raw SQL queries or queries that use the `Where` condition builder.
 
-Collections
+Soft points
 ===========
+
+Collections
+-----------
 
 Collection system has been simplified, there is no more `SimpleCollection`, the only class is a `Collection` providing scrollable cursor and filters. Filters method has been simplified, the clumsy `unregisterFilter()` method has been dropped in favor of a more general `clearFilters()` one.
 
-Filter Chain
-============
-
-The filter chain used to hook code before or after queries has been removed as it was too expensive -- from a performance point of view -- than useful. In the end, it was only needed to hook the logger.
-
 Logger
-======
+------
 
 With the filter chain re worked, the logger part has been replaced by a more generic support of any PSR-3 compliant logger (ie Monolog).
+
+Remote fields methods
+---------------------
+
+``getRemoteSelectFields()`` and ``createFromForeign()`` methods have been removed from the ``BaseObjectMap`` class.
+
