@@ -1,3 +1,21 @@
+=== 1.2-RC2
+
+ * Updated documentation and whatsnew
+ * Code cleanup (#113 from Sukei/master)
+ * Escaping methods fallback for PHP 5.3
+ * Prepared statements factory (#111 from Sukei/connection-query)
+ * Fixed tests on pg9.1.
+ * Added ext-pgsql as requirement for composer.
+ * psr/log to follow 1.* (#109 from Sukei/composer-log)
+ * Support of PSR-3 logger interface
+ * Prepared statement now owns a Connection instance.
+ * Renamed Escape type to RawString.
+ * Added createPreparedQuery method in Connection.
+ * BaseObjectMap paginateQuery use pdo methods (closes #107)
+ * Fixed connection string bug (close #105)
+ * Multiple objects creation with single INSERT.
+ * Added Observer for pg LISTEN/NOTIFY support.
+
 === 1.2-RC1
 
  * New Escape type.
