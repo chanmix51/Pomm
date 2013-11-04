@@ -273,7 +273,6 @@ class Connection implements LoggerAwareInterface
         return $this;
     }
 
-
     /**
      * setSavepoint
      *

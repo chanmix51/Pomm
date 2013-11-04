@@ -1,4 +1,5 @@
 <?php
+
 namespace Pomm\Converter;
 
 use \Pomm\Converter\ConverterInterface;
@@ -57,7 +58,6 @@ class PgEntity implements ConverterInterface
         }
 
         return sprintf("ROW(%s)%s", join(',', $this->map->convertToPg($fields)), is_null($type) ? '' : sprintf('::%s', $type));
-
     }
 
     /**

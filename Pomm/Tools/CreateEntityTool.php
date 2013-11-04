@@ -30,7 +30,6 @@ class CreateEntityTool extends CreateFileTool
      * * schema (default public)
      * @see Pomm\Tools\BaseTool
      */
-
     protected function configure()
     {
         parent::configure();

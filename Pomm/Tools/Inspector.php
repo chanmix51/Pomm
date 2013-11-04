@@ -220,7 +220,6 @@ SQL;
         return $result;
     }
 
-
     /**
      * getTablesInSchema
      *

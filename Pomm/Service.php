@@ -17,9 +17,7 @@ use Pomm\Exception\Exception;
  */
 class Service
 {
-
     protected $databases = array();
-
 
     /**
      * __construct
@@ -29,7 +27,6 @@ class Service
      * @param Array $databases parameters
      * @return void
      */
-
     public function __construct(Array $databases = array())
     {
         foreach ($databases as $name => $parameters)
@@ -48,7 +45,6 @@ class Service
      * @param Database $database the database instance
      * @return void
      */
-
     public function setDatabase($name, Database $database)
     {
         $this->databases[$name] = $database;
@@ -83,7 +79,7 @@ class Service
 
     /**
      * createConnection
-     * Shortcut to get a connection from a database. 
+     * Shortcut to get a connection from a database.
      *
      * @param string the database name
      * @return \Pomm\Connection\Connection
