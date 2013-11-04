@@ -1,4 +1,5 @@
 <?php
+
 namespace Pomm\Tools;
 
 use Pomm\Tools\ParameterHolder;

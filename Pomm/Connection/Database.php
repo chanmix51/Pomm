@@ -1,4 +1,5 @@
 <?php
+
 namespace Pomm\Connection;
 
 use Pomm\Exception\Exception as PommException;
@@ -17,7 +18,6 @@ use Pomm\Converter;
 class Database
 {
     protected $parameter_holder = array();
-    protected $_handler;
     protected $converters = array();
     protected $handled_types = array();
     protected $connection;
@@ -43,7 +43,6 @@ class Database
         $this->parameter_holder = new ParameterHolder($parameters);
         $this->initialize();
     }
-
 
     /**
      * processDsn
@@ -99,7 +98,6 @@ class Database
         $this->parameter_holder->setParameter('port', $port);
         $this->parameter_holder->setParameter('database', $database);
     }
-
 
     /**
      * initialize
@@ -255,7 +253,6 @@ class Database
      *
      * @access protected
      */
-
     protected function registerBaseConverters()
     {
         $this->registerConverter('Array', new Converter\PgArray($this), array());

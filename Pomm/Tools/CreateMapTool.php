@@ -2,10 +2,8 @@
 
 namespace Pomm\Tools;
 
-
 /**
  * Pomm\Tools\CreateMapTool - Create a Map class
- *
  *
  * @uses Pomm\Tools\BaseTool
  * @package Pomm
@@ -30,7 +28,6 @@ class CreateMapTool extends CreateFileTool
      *
      * @see BaseTool
      */
-
     protected function configure()
     {
         parent::configure();

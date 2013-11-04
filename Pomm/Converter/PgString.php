@@ -1,4 +1,5 @@
 <?php
+
 namespace Pomm\Converter;
 
 use Pomm\Converter\ConverterInterface;
