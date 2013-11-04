@@ -1,4 +1,5 @@
 <?php
+
 namespace Pomm\Tools;
 
 use Pomm\Exception\ToolException;
@@ -81,7 +82,7 @@ abstract class CreateFileTool extends BaseTool
     }
 
     /**
-     * saveFile 
+     * saveFile
      *
      * Save the file.
      *

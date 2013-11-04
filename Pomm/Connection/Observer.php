@@ -1,4 +1,5 @@
 <?php
+
 namespace Pomm\Connection;
 
 use Pomm\Exception\Exception as PommException;
@@ -6,7 +7,7 @@ use Pomm\Exception\Exception as PommException;
 /**
  * Observer
  *
- * This class can listen to NOTIFY events sent by another process trough the 
+ * This class can listen to NOTIFY events sent by another process trough the
  * server.
  *
  * @package Pomm
@@ -14,7 +15,7 @@ use Pomm\Exception\Exception as PommException;
  * @copyright 2011 - 2013 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
- **/
+ */
 class Observer
 {
     protected $name;
@@ -30,7 +31,6 @@ class Observer
     {
         $this->connection = $connection;
     }
-
 
     /**
      * __destruct

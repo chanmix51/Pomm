@@ -1,4 +1,5 @@
 <?php
+
 namespace Pomm\Object;
 
 use \Pomm\Exception\Exception;
@@ -527,7 +528,6 @@ abstract class BaseObjectMap
         {
             $updates[] = sprintf("%s = %s", $this->connection->escapeIdentifier($field), $value);
         }
-
 
         $sql = sprintf("UPDATE %s SET %s WHERE %s RETURNING %s;",
             $this->object_name,
