@@ -437,7 +437,7 @@ class Connection implements LoggerAwareInterface
 
         if ($this->hasQuery($signature) === false)
         {
-            $query = new PreparedQuery($this, $sql);
+            $query = $this->createPreparedQuery($sql);
             $this->queries[$query->getName()] = $query;
         }
 
