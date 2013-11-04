@@ -633,8 +633,9 @@ abstract class BaseObjectMap
         }
 
         $fields = call_user_func(array($this, $field_method), $table_alias);
+        $connection = $this->connection;
 
-        return join(', ', array_map(function($name, $table_alias) { return sprintf("%s AS %s", $name, $this->connection->escapeIdentifier($table_alias)); }, $fields, array_keys($fields)));
+        return join(', ', array_map(function($name, $table_alias) use ($connection) { return sprintf("%s AS %s", $name, $connection->escapeIdentifier($table_alias)); }, $fields, array_keys($fields)));
     }
 
     /**
