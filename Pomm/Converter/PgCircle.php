@@ -1,4 +1,5 @@
 <?php
+
 namespace Pomm\Converter;
 
 use Pomm\Converter\ConverterInterface;
@@ -49,7 +50,6 @@ class PgCircle implements ConverterInterface
 
             throw new Exception(sprintf("Cannot parse circle data '%s'.", $data));
         }
-
 
         return new Circle($this->point_converter->fromPg($elts[0]), $elts[1]);
     }

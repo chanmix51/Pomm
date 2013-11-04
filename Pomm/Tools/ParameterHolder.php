@@ -34,7 +34,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
      *
      * @param String $name
      * @param String $value
-     * */
+     */
     public function setParameter($name, $value)
     {
         $this->parameters[$name] = $value;
@@ -47,7 +47,7 @@ class ParameterHolder implements \ArrayAccess, \Iterator
      *
      * @param String $name
      * @return Boolean
-     * */
+     */
     public function hasParameter($name)
     {
         return array_key_exists($name, $this->parameters);

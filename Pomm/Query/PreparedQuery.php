@@ -1,4 +1,5 @@
 <?php
+
 namespace Pomm\Query;
 
 use \Pomm\Connection\Connection;

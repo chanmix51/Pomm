@@ -28,7 +28,6 @@ interface IdentityMapperInterface
      */
     public function getInstance(BaseObject $object, array $pk_fields);
 
-
     /**
      * clear
      *

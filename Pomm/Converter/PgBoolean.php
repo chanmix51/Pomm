@@ -14,7 +14,6 @@ use Pomm\Exception\Exception;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-
 class PgBoolean implements ConverterInterface
 {
     /**

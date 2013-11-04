@@ -23,7 +23,6 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     const EXIST    = 1;
     const MODIFIED = 2;
 
-
     protected $fields = array();
     protected $status = self::NONE;
 
@@ -41,6 +40,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
             $this->hydrate($values);
         }
     }
+
     /**
      * get
      *

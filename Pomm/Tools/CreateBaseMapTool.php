@@ -8,7 +8,6 @@ use Pomm\Tools\Inspector;
 /**
  * Pomm\Tools\CreateBaseMapTool - Create a BaseMap class from the database.
  *
- *
  * @uses Pomm\Tools\BaseTool
  * @package Pomm
  * @version $id$
@@ -125,7 +124,6 @@ class CreateBaseMapTool extends CreateFileTool
             $fields_definition = $this->generateFieldsDefinition($this->inspector->getTableFieldsInformation($this->options['oid']));
             $parent_call = "";
         }
-
 
         $php = <<<EOD
 <?php

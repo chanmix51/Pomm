@@ -13,7 +13,6 @@ namespace Pomm\Type;
  */
 class Circle
 {
-
     public $center;
     public $radius;
 
