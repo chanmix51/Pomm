@@ -195,7 +195,12 @@ abstract class BaseObjectMap
         }
 
         $fields = array_keys($pg_values[1]);
-        $sql = sprintf('INSERT INTO %s (%s) VALUES %s RETURNING %s;', $this->object_name, join(',', array_map(function($val) { return sprintf('"%s"', $val); }, $fields)), join(',', array_map(function ($tuple) { return sprintf("(%s)", join(', ', array_values($tuple))); }, $pg_values)), $this->formatFieldsWithAlias('getSelectFields'));
+        $sql = sprintf('INSERT INTO %s (%s) VALUES %s RETURNING %s;',
+            $this->object_name,
+            join(',', array_map(array($this->connection, 'escapeIdentifier'), $fields)),
+            join(',', array_map(function ($tuple) { return sprintf("(%s)", join(', ', array_values($tuple))); }, $pg_values)),
+            $this->formatFieldsWithAlias('getSelectFields')
+        );
 
         return $this->query($sql);
     }
@@ -423,10 +428,11 @@ abstract class BaseObjectMap
     {
         $where = $this->createSqlAndFrom($pk);
         $converted_values = $this->convertToPg($values);
+        $connection = $this->connection;
 
         $sql  = sprintf("UPDATE %s SET %s WHERE %s RETURNING %s",
             $this->getTableName(),
-            join(', ', array_map(function($key, $value) { return sprintf("\"%s\" = %s", $key, $value); }, array_keys($converted_values), $converted_values)),
+            join(', ', array_map(function($key, $value) use ($connection) { return sprintf("%s = %s", $connection->escapeIdentifier($key), $value); }, array_keys($converted_values), $converted_values)),
             (string) $where,
             $this->formatFieldsWithAlias('getSelectFields')
         );
@@ -466,13 +472,13 @@ abstract class BaseObjectMap
         if ($object->_getStatus() & BaseObject::EXIST)
         {
             $sql = sprintf('UPDATE %s SET %s WHERE %s RETURNING %s;', $this->object_name, $this->parseForUpdate($object), $this->createSqlAndFrom($object->get($this->getPrimaryKey())), $this->formatFieldsWithAlias('getSelectFields'));
-
             $collection = $this->query($sql, array_values($object->get($this->getPrimaryKey())));
         }
         else
         {
+            $connection = $this->connection;
             $pg_values = $this->convertToPg($object->getFields());
-            $sql = sprintf('INSERT INTO %s (%s) VALUES (%s) RETURNING %s;', $this->object_name, join(',', array_map(function($val) { return sprintf('"%s"', $val); }, array_keys($pg_values))), join(',', array_values($pg_values)), $this->formatFieldsWithAlias('getSelectFields'));
+            $sql = sprintf('INSERT INTO %s (%s) VALUES (%s) RETURNING %s;', $this->object_name, join(',', array_map(function($val) use ($connection) { return $connection->escapeIdentifier($val); }, array_keys($pg_values))), join(',', array_values($pg_values)), $this->formatFieldsWithAlias('getSelectFields'));
 
             $collection = $this->query($sql, array());
         }
@@ -519,7 +525,7 @@ abstract class BaseObjectMap
         $updates = array();
         foreach($this->convertToPg($values) as $field => $value)
         {
-            $updates[] = sprintf("\"%s\" = %s", $field, $value);
+            $updates[] = sprintf("%s = %s", $this->connection->escapeIdentifier($field), $value);
         }
 
 
@@ -604,7 +610,7 @@ abstract class BaseObjectMap
 
         foreach ($this->field_definitions as $name => $type)
         {
-            $fields[$name] = sprintf("%s\"%s\"", $alias, $name);
+            $fields[$name] = sprintf("%s%s", $alias, $this->connection->escapeIdentifier($name));
         }
 
         return $fields;
@@ -627,8 +633,9 @@ abstract class BaseObjectMap
         }
 
         $fields = call_user_func(array($this, $field_method), $table_alias);
+        $connection = $this->connection;
 
-        return join(', ', array_map(function($name, $table_alias) { return sprintf("%s AS \"%s\"", $name, $table_alias); }, $fields, array_keys($fields)));
+        return join(', ', array_map(function($name, $table_alias) use ($connection) { return sprintf("%s AS %s", $name, $connection->escapeIdentifier($table_alias)); }, $fields, array_keys($fields)));
     }
 
     /**
@@ -863,7 +870,7 @@ abstract class BaseObjectMap
         foreach ($this->convertToPg($object->getFields()) as $field_name => $field_value)
         {
             if (array_key_exists($field_name, array_flip($this->getPrimaryKey()))) continue;
-            $tmp[] = sprintf('"%s"=%s', $field_name, $field_value);
+            $tmp[] = sprintf("%s=%s", $this->connection->escapeIdentifier($field_name), $field_value);
         }
 
         return implode(',', $tmp);
