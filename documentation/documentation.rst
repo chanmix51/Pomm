@@ -573,6 +573,23 @@ Sometimes, you might want to create temporary tables. A map class can create its
 
 You can create methods to change the table structure, add or drop columns etc. This is what it is done by example in the converter test script.
 
+Creating entities
+-----------------
+
+Map instances are entities builder, it is possible to create entities and save them in the same move::
+
+$entity = $map->createObject(array('field1' => $value1, ...)); // This build an entity instance.
+$entity = $map->createAndSaveObject(array('field1' => $value1, ...)); // This build and save an entity.
+$collection = $map->createAndSaveObjects(array(array('field1' => $value01, ...), array('field1' => $value11, ...))); // Save entities and return a collection.
+
+These methods are useful to push new data in the database but sometimes, data collected from the interface are not enough to save a database entity. This is the case when some values rely on Postgresql functions. The ``RawString`` type allow programmers to pass unescaped strings to the database::
+
+$entity = $map->createAndSaveObject(array('field' => new \Pomm\Type\RawString('my_pg_function(...)')));
+
+This will issue an insert statement like::
+
+    INSERT INTO some_table (field) VALUES (my_pg_function(...)) RETURNING ...
+
 Querying the database
 =====================
 
