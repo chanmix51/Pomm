@@ -46,7 +46,7 @@ Database expected parameters are:
  * dsn (string, mandatory): Connection string (see `DSN`_).
  * name (string, optional, default: physical database name): Logical database name that is used as primary namespace for PHP entity object.
  * configuration (array, optional, see `Connection configuration`_ below): Client configuration for each connection.
- * isolation (string, optional, default: ``ISOLATION_READ_COMMITTED``, see `Standard transaction`_): isolation level used in transactions.
+ * isolation (string, optional, default: ``ISOLATION_READ_COMMITTED``, see `Standard transactions`_): isolation level used in transactions.
  * identity_mapper (string, optional, default: ``Smart``, see `Identity mappers`_ below): default identity mapper class name for connections.
 
 There are several ways to declare databases to the service class. Either you use the constructor passing an array "name" => "connection parameters" or you can use the ``setDatabase()`` method of the service class.::
