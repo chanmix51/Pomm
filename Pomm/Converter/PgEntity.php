@@ -38,12 +38,12 @@ class PgEntity implements ConverterInterface
 
         if (!is_object($data))
         {
-            throw new Exception(sprintf("'%s' converter toPG() method expects argument to be a '%s' instance ('%s given).", get_class($this), $class_name, gettype($data)));
+            throw new Exception(sprintf("'%s' converter toPG() method expects argument to be a '%s' instance ('%s' given).", get_class($this), $class_name, gettype($data)));
         }
 
         if (! $data instanceof $class_name)
         {
-            throw new Exception(sprintf("'%s' converter toPG() method expects argument to be a '%s' instance ('%s given).", get_class($this), $class_name, get_class($data)));
+            throw new Exception(sprintf("'%s' converter toPG() method expects argument to be a '%s' instance ('%s' given).", get_class($this), $class_name, get_class($data)));
         }
 
         if (! $data instanceof \Pomm\Object\BaseObject)
@@ -52,12 +52,13 @@ class PgEntity implements ConverterInterface
         }
 
         $fields = array();
-        foreach ($this->map->getFieldDefinitions() as $field_name => $field_type)
+
+        foreach ($this->map->getRowStructure()->getFieldNames() as $field_name)
         {
             $fields[$field_name] = $data->has($field_name) ? $data[$field_name] : null;
         }
 
-        return sprintf("ROW(%s)%s", join(',', $this->map->convertToPg($fields)), is_null($type) ? '' : sprintf('::%s', $type));
+        return $this->map->getConverter()->toPg($fields);
     }
 
     /**
@@ -65,21 +66,6 @@ class PgEntity implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
-        $elts = str_getcsv(trim($data, '()'));
-
-        $fields = array();
-        foreach ($this->map->getFieldDefinitions() as $field_name => $pg_type)
-        {
-            $fields[$field_name] = stripcslashes(array_shift($elts));
-        }
-
-        if (count($elts) > 0)
-        {
-            $fields['_extra'] = $elts;
-        }
-
-        $object = $this->map->createObjectFromPg($fields);
-
-        return $object;
+        return $this->map->makeObjectFromPg($this->map->getConverter()->fromPg($data, $type));
     }
 }

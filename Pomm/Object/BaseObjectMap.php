@@ -6,7 +6,8 @@ use \Pomm\Exception\Exception;
 use \Pomm\Exception\SqlException;
 use \Pomm\Query\Where;
 use \Pomm\Connection\Connection;
-use \Pomm\Type as Type;
+use \Pomm\Type;
+use \Pomm\Converter\PgRow;
 
 /**
  * BaseObjectMap
@@ -28,9 +29,10 @@ abstract class BaseObjectMap
     protected $connection;
     protected $object_class;
     protected $object_name;
-    protected $field_definitions = array();
+    protected $row_structure;
     protected $virtual_fields = array();
     protected $pk_fields = array();
+    protected $converter;
 
     /**
      * initialize
@@ -57,6 +59,7 @@ abstract class BaseObjectMap
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
+        $this->row_structure = new RowStructure();
         $this->initialize();
 
         if (is_null($this->connection))
@@ -67,10 +70,12 @@ abstract class BaseObjectMap
         {
             throw new Exception(sprintf('Missing object_class after initializing db map "%s".', get_class($this)));
         }
-        if (count($this->field_definitions) == 0)
+        if (!$this->row_structure instanceOf RowStructure or count($this->row_structure->getFieldNames()) == 0)
         {
             throw new Exception(sprintf('No fields after initializing db map "%s", don\'t you prefer anonymous objects ?', get_class($this)));
         }
+
+        $this->converter = new PgRow($this->connection->getDatabase(), $this->row_structure);
     }
 
     /**
@@ -101,15 +106,27 @@ abstract class BaseObjectMap
     }
 
     /**
-     * getFieldDefinitions
+     * getRowStructure
      *
-     * Return the field definitions of the current model.
+     * Returns the underlying row structure
      *
-     * @return Array    Types associated with each field.
+     * @return RowStructure
      */
-    public function getFieldDefinitions()
+    public function getRowStructure()
     {
-        return $this->field_definitions;
+        return $this->row_structure;
+    }
+
+    /**
+     * getConverter
+     *
+     * Returns the according PgRow
+     *
+     * @return PgRow
+     */
+    public function getConverter()
+    {
+        return $this->converter;
     }
 
     /**
@@ -125,19 +142,6 @@ abstract class BaseObjectMap
     }
 
     /**
-     * hasField
-     *
-     * Does this class have the given field.
-     *
-     * @param  String $field Fields name.
-     * @return Boolean
-     */
-    public function hasField($field)
-    {
-        return array_key_exists($field, $this->field_definitions);
-    }
-
-    /**
      * addField
      *
      * Add a new field definition.
@@ -145,16 +149,14 @@ abstract class BaseObjectMap
      * @access protected
      * @param string $name
      * @param string $type Type must be associated with a converter
+     * @return BaseObjectMap
      * @see Database::registerConverter()
      */
     protected function addField($name, $type)
     {
-        if (array_key_exists($name, $this->field_definitions))
-        {
-            throw new Exception(sprintf('Field "%s" already set in class "%s".', $name, get_class($this)));
-        }
+        $this->row_structure->addField($name, $type);
 
-        $this->field_definitions[$name] = $type;
+        return $this;
     }
 
     /**
@@ -165,11 +167,14 @@ abstract class BaseObjectMap
      * @access protected
      * @param string $name
      * @param string $type Type must be associated with a converter
+     * @return BaseObjectMap
      * @see Database::registerConverter()
      */
     protected function addVirtualField($name, $type)
     {
         $this->virtual_fields[$name] = $type;
+
+        return $this;
     }
 
     /**
@@ -249,7 +254,11 @@ abstract class BaseObjectMap
      */
     public function createObjectFromPg(Array $values)
     {
-        $values = $this->convertFromPg($values);
+        return $this->makeObjectFromPg($this->convertFromPg($values));
+    }
+
+    public function makeObjectFromPg(Array $values)
+    {
         $object = $this->createObject($values);
         $object->_setStatus(BaseObject::EXIST);
 
@@ -264,7 +273,7 @@ abstract class BaseObjectMap
     /**
      * doQuery
      *
-     * Execute the filterChain.
+     * Send the query to the prepared statement system.
      *
      * @param String  $sql    SQL statement.
      * @param Array  $values Optional parameters for the prepared query.
@@ -608,7 +617,7 @@ abstract class BaseObjectMap
         $fields = array();
         $alias  = is_null($alias) ? '' : $alias.".";
 
-        foreach ($this->field_definitions as $name => $type)
+        foreach ($this->row_structure->getFieldNames() as $name)
         {
             $fields[$name] = sprintf("%s%s", $alias, $this->connection->escapeIdentifier($name));
         }
@@ -667,54 +676,7 @@ abstract class BaseObjectMap
      */
     public function convertToPg(Array $values)
     {
-        $out_values = array();
-
-        foreach ($this->field_definitions as $field_name => $pg_type)
-        {
-            if (!array_key_exists($field_name, $values))
-            {
-                continue;
-            }
-
-            if (is_null($values[$field_name]))
-            {
-                $out_values[$field_name] = 'NULL';
-                continue;
-            }
-
-            if ($values[$field_name] instanceOf \Pomm\Type\RawString)
-            {
-                $out_values[$field_name] = (string) $values[$field_name];
-                continue;
-            }
-
-            if (preg_match('/([a-z0-9_\.-]+)(\[\])?/i', $pg_type, $matchs))
-            {
-                if (count($matchs) > 2)
-                {
-                    $converter = $this->connection
-                        ->getDatabase()
-                        ->getConverterFor('Array')
-                        ;
-                }
-                else
-                {
-                    $converter = $this->connection
-                        ->getDatabase()
-                        ->getConverterForType($pg_type)
-                        ;
-                }
-
-                $out_values[$field_name] = $converter
-                    ->toPg($values[$field_name], $matchs[1]);
-            }
-            else
-            {
-                throw new Exception(sprintf('Error, bad type expression "%s".', $pg_type));
-            }
-        }
-
-        return $out_values;
+        return $this->converter->convertToPg($values);
     }
 
     /**
@@ -727,54 +689,9 @@ abstract class BaseObjectMap
      */
     public function convertFromPg(Array $values)
     {
-        $out_values = array();
-        foreach ($values as $name => $value)
-        {
-            if (is_null($value))
-            {
-                $out_values[$name] = null;
-                continue;
-            }
+        $this->converter->setVirtualFields($this->virtual_fields);
 
-            $pg_type = array_key_exists($name, $this->field_definitions) ? $this->field_definitions[$name] : null;
-
-            if (is_null($pg_type))
-            {
-                $pg_type = array_key_exists($name, $this->virtual_fields) ? $this->virtual_fields[$name] : null;
-                if (is_null($pg_type))
-                {
-                    $out_values[$name] = $value;
-                    continue;
-                }
-            }
-
-            if (preg_match('/([a-z0-9_\.-]+)(\[\])?/i', $pg_type, $matchs))
-            {
-                if (count($matchs) > 2)
-                {
-                    $converter = $this->connection
-                        ->getDatabase()
-                        ->getConverterFor('Array')
-                        ;
-                }
-                else
-                {
-                    $converter = $this->connection
-                        ->getDatabase()
-                        ->getConverterForType($pg_type)
-                        ;
-                }
-
-                $out_values[$name] = $converter
-                    ->fromPg($values[$name], $matchs[1]);
-            }
-            else
-            {
-                throw new Exception(sprintf('Error, bad type expression "%s".', $pg_type));
-            }
-        }
-
-        return $out_values;
+        return $this->converter->convertFromPg($values);
     }
 
     /**
@@ -870,6 +787,7 @@ abstract class BaseObjectMap
         foreach ($this->convertToPg($object->getFields()) as $field_name => $field_value)
         {
             if (array_key_exists($field_name, array_flip($this->getPrimaryKey()))) continue;
+
             $tmp[] = sprintf("%s=%s", $this->connection->escapeIdentifier($field_name), $field_value);
         }
 

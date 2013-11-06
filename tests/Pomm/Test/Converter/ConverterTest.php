@@ -468,6 +468,25 @@ _;
         }
     }
 
+
+    /**
+     * @depends testInteger
+     */
+    public function testRowConverter()
+    {
+        static::$cv_map->alterComposite();
+
+        $entity = static::$cv_map->findAll()->current();
+
+        $test_address = array('place' => '11, impasse juton', 'postal_code' => '44000', 'city' => 'Nantes');
+        $entity['a_composite'] = $test_address;
+        $entity['arr_composite'] = array($test_address, array('place' => 'Middle of nowhere', 'postal_code' => '56590', 'city' => 'Groix'));
+        static::$cv_map->updateOne($entity, array('a_composite', 'arr_composite'));
+
+        $this->assertEquals($test_address, $entity['a_composite'], "Row is unchanged.");
+        $this->assertEquals($test_address, $entity['arr_composite'][0], "Array of rows is unchanged.");
+    }
+
     /**
      * @depends testInteger
      **/
@@ -480,7 +499,7 @@ _;
 
         $this->assertTrue(is_int($super_entity['id']), "'id' has been generated.");
         $this->assertTrue(is_array($super_entity['cv_entities']), "'cv_entities' is an array.");
-        $this->assertInstanceOf('Pomm\Test\Converter\ConverterEntity', $super_entity['cv_entities'][0], "'cv_entities' is a ConverterEntity instance.");
+        $this->assertInstanceOf('Pomm\Test\Converter\ConverterEntity', $super_entity['cv_entities'][0], "'cv_entities' is an array with first value as ConverterEntity instance.");
         $this->assertEquals(1, $super_entity['cv_entities'][0]->get('id'), "'id' is 1.");
         $this->assertEquals(array(1.0, 1.1, null, 1.3), $super_entity['cv_entities'][0]->get('arr_fl'), "'arr_fl' of 'cv_entities' is preserved.");
 
@@ -510,7 +529,7 @@ _;
         $collection = $ts_extended_entity_map->findAll();
         $ts_extended_entity = $collection->current();
 
-        $this->assertInstanceOf('\Pomm\Test\Converter\TsEntity', $ts_extended_entity['p1'], "'p1' is a \\DateTime instance.");
+        $this->assertInstanceOf('\Pomm\Test\Converter\TsEntity', $ts_extended_entity['p1'], "'p1' is a TsEntity instance.");
         $this->assertEquals('2000-02-29', $ts_extended_entity['p1']['p1']->format('Y-m-d'), 'Timestamp is preserved.');
 
         foreach (array('1999-12-31 23:59:59.999999', '2005-01-29 23:01:58.000000') AS $key => $ts)
@@ -692,6 +711,16 @@ class ConverterEntityMap extends BaseObjectMap
 
         $this->alterTable(array('some_int4range' => 'int4range', 'some_int8range' => 'int8range', 'some_numrange' => 'numrange', 'arr_numrange' => 'numrange[]'));
     }
+
+    public function alterComposite()
+    {
+        $this->connection->executeAnonymousQuery("CREATE TYPE address AS (place TEXT, postal_code CHAR(5), city varchar)");
+        $this->alterTable(array('a_composite' => 'address', 'arr_composite' => 'address[]'));
+
+        $this->connection->getDatabase()
+            ->registerConverter('Address', new Converter\PgRow($this->connection->getDatabase(), new \Pomm\Object\RowStructure(array('place' => 'text', 'postal_code' => 'char', 'city' => 'varchar'))), array('pomm_test.address', 'address'));
+    }
+
 }
 
 class ConverterEntity extends BaseObject
