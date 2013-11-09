@@ -5,25 +5,57 @@ namespace Pomm\Converter;
 use \Pomm\Converter\ConverterInterface;
 use \Pomm\Object\RowStructure;
 use \Pomm\Connection\Database;
+use \Pomm\Exception\Exception as PommException;
 
+/**
+ * Pomm\Converter\PgRow - Row converter
+ *
+ * @package Pomm
+ * @version $id$
+ * @copyright 2011 - 2013 Grégoire HUBERT
+ * @author Grégoire HUBERT <hubert.greg@gmail.com>
+ * @license X11 {@link http://opensource.org/licenses/mit-license.php}
+ */
 class PgRow implements ConverterInterface
 {
     protected $database;
     protected $row_structure;
     protected $virtual_fields;
 
+    /**
+     * __construct
+     *
+     * @param Database $database
+     * @param RowStructure $structure
+     */
     public function __construct(Database $database, RowStructure $structure)
     {
         $this->database = $database;
         $this->row_structure = $structure;
     }
 
+    /**
+     * setVirtualFields
+     *
+     * This allows to add extra fields and types to the row fixed structure.
+     *
+     * @param Array $virtual_fields
+     */
     public function setVirtualFields(Array $virtual_fields)
     {
         $this->virtual_fields = $virtual_fields;
     }
 
-    public function convertToPg($values)
+    /**
+     * convertToPg
+     *
+     * Call the according converters on a set of values.
+     * This method is used internally by BaseObjectMap class.
+     *
+     * @param Array $values
+     * @return Array $values converter values
+     */
+    public function convertToPg(Array $values)
     {
         $out_values = array();
 
@@ -62,18 +94,30 @@ class PgRow implements ConverterInterface
             }
             else
             {
-                throw new Exception(sprintf('Error, bad type expression "%s".', $pg_type));
+                throw new PommException(sprintf('Error, bad type expression "%s".', $pg_type));
             }
         }
 
         return $out_values;
     }
 
-    public function toPg($values, $type = null)
+    /**
+     * @see ConverterInterface
+     */
+    public function toPg($data, $type = null)
     {
-        return sprintf("ROW(%s)%s", join(',', $this->convertToPg($values)), is_null($type) ? '' : sprintf('::%s', $type));
+        return sprintf("ROW(%s)%s", join(',', $this->convertToPg($data)), is_null($type) ? '' : sprintf('::%s', $type));
     }
 
+    /**
+     * convertFromPg
+     *
+     * call the fromPg conveters on a set of values.
+     * This method is used internally by BaseObjectMap class.
+     *
+     * @param Array $values
+     * @return Array $values converter values
+     */
     public function convertFromPg(Array $values)
     {
         $out_values = array();
@@ -114,13 +158,16 @@ class PgRow implements ConverterInterface
             }
             else
             {
-                throw new Exception(sprintf('Error, bad type expression "%s".', $pg_type));
+                throw new PommException(sprintf('Error, bad type expression "%s".', $pg_type));
             }
         }
 
         return $out_values;
     }
 
+    /**
+     * @see ConverterInterface
+     */
     public function fromPg($data, $type = null)
     {
             $elts = str_getcsv(trim($data, '()'));

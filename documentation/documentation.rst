@@ -185,14 +185,55 @@ In case your database uses ``DOMAIN`` types, you can associate them with an alre
 
 In the example above, the database contains a domain ``email_address`` which is a subtype of ``varchar`` so it is associated with the built-in converter ``String``.
 
-**Note** ``registerTypeForConverter`` and ``registerConverter`` methods implement the fluid interface so you can chain calls.
+.. note:: ``registerTypeForConverter`` and ``registerConverter`` methods implement the fluid interface so you can chain calls.
 
-Custom types and converters
----------------------------
+Composite types
+---------------
 
-Composite types are particularly useful to store complex set of data. In fact, with Postgresql, defining a table automatically defines the corresponding type. Hydrating type instances with Postgresql values are the work of your custom converters. Let's take an example: electrical transformers. Electrical transformers are composed by at least two wiring, an input one (named primary) and an output one (named secondary) but it can be more of them. A transformer winding is defined by the voltage it is supposed to have and the maximum current it can stands.   ::
+Composite types are particularly useful to store complex set of data and store them as they were objects::
 
-  -- SQL
+    CREATE TYPE postal_address AS (place text, postal_code char(5), city varchar, cedex char);
+    
+    CREATE TABLE customer (
+        customer_id uuid PRIMARY KEY,
+        ...,
+        billing_address postal_address NOT NULL CHECK
+            ((billing_address).place IS NOT NULL AND (billing_address).city IS NOT NULL AND (billing_address).postal_code IS NOT NULL)
+
+If such types exist in your database, they must be registered so Pomm can convert them to an according array using the ``PgRow`` converter::
+
+    $database->registerConverter(
+        'PostalAddress',
+        new \Pomm\Type\PgRow(
+            $database,
+            new \Pomm\Object\RowStructure(array('place' => 'text', 'postal_code' => 'char', 'city' => 'varchar', 'cedex' => 'char')),
+            array('public.postal_address')
+            ));
+
+This way, the composite types can be used as is in the map classes::
+
+    protected function intitialize()
+    {
+        parent::intialize();
+
+        $this->addField('customer_id', 'uuid')
+            ...
+            ->addField('billing_address' => 'public.postal_address')
+            ...
+            ;
+
+This will store, in a field named ``billing_address`` an array formatted with the given attributes. It is important to understand they must be used like fixed arrays, this means all keys must be filled even if the value is NULL to save the entity::
+
+    $entity['billing_address'] = array('place' => 'some_place', 'postal_code' => '44000', 'city' => 'Nantes');
+    $map->saveOne($entity);
+
+This will throw an exception since the ``cedex`` key is missing.
+
+Writing your own types
+----------------------
+
+PgRow converter is a generic converter to map with composite types. It is also possible to map them to real types of your own. Let's take an example: electrical transformers. Electrical transformers are composed by at least two wirings, an input one (named primary) and an output one (named secondary) but it can be more of them. A transformer winding is defined by the voltage it is supposed to have and the maximum current it can stands.   ::
+
   CREATE TYPE winding_power AS (
       voltage numeric(4,1),
       current numeric(5,3)
@@ -611,7 +652,8 @@ The main goal of the map classes is to provide a layer between a database and en
 
 As illustrated above, the ``saveOne()`` method saves an entity whatever it is an update or an insert. It is important to know that the internal state (see `Life cycle`_) of the entity is used to determine if the object exists or not and choose between the ``INSERT`` or the ``UPDATE`` statement.
 Whatever is used, the whole structure is saved every time this method is called. In order just to update some fields, use the ``updateOne()`` method.
-Note that if the table related to this entity sets default values (like ``created_at`` field by example) they will be **automatically hydrated in the entity**.
+
+.. warning:: If the table related to this entity sets default values (like ``created_at`` field by example) they will be **automatically hydrated in the entity**.
 
 ::
 
@@ -676,7 +718,7 @@ findAll
     table_name
   ORDER BY created_at DESC LIMIT 5
 
-**note** If you are just interested by the suffix to paginate your queries, have a look at `Pagers_`.
+.. note:: If you are just interested by the suffix to paginate your queries, have a look at `Pagers_`.
 
 findWhere
 ---------
@@ -735,7 +777,7 @@ Of course, this is not very useful, because the date is very likely to be a para
 
 All queries are prepared, this might increase the performance but it certainly increases the security. Passing the argument using the question mark makes it automatically to be escaped by the database and avoid SQL-injection attacks. If a suffix is passed, it is appended to the query **as is**. The suffix is intended to allow developers specifying the sorting order of a subset. As the query is prepared, a multiple query injection type attack is not directly possible but be careful if the values sent directly from an untrusted source.
 
-**Note** The DateTime PHP instances can be passed as is, they will be converted into string internally.
+.. note:: The DateTime PHP instances can be passed as is, they will be converted into string internally.
 
 AND, OR: The Where class
 ------------------------
@@ -812,7 +854,7 @@ The following example show how to modify the fields for a table containing user 
     $employee->has('password'); // false
     $employee->get('gravatar'); // 6c3e76d8b31679442f089cd3e7edb48a
 
-Note the example above show the use of a Postgresql's function to calculate the gravatar field. It is obviously possible to use all Postgresql operators and functions in the fields, which makes this feature a very powerful ally.
+.. note:: The example above shows the use of a Postgresql's function to calculate the gravatar field. It is obviously possible to use all Postgresql operators and functions in the fields, which makes this feature a very powerful ally.
 
 Building custom queries
 -----------------------
@@ -1101,9 +1143,7 @@ Schema less entities
 
 Entities do not know anything about the structure of the tables, views etc. They are just flexible typed containers for data. They use PHP magic methods to simulate getters and setters on data they own (see `Living with entities`_ below). This is very powerful because entities can be accessed like arrays and still benefits from method overloads.
 
-..
-
-    Note that entities do not know anything about their primary key either.
+.. note:: Entities do not know anything about their primary key either.
 
 Living with entities
 ====================
@@ -1136,7 +1176,7 @@ The abstract parent ``BaseObject`` uses magic getters and setters to dynamically
   $entity->clear('pika');
   $entity->has('pika'); // false
 
-Note that ``get()`` can take an array with multiple attributes::
+.. note:: ``get()`` can take an array with multiple attributes::
 
   $entity->set('pika', 'chu');
   $entity->set('plop', true);

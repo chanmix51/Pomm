@@ -1,797 +1,321 @@
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta name="generator" content="Docutils 0.7: http://docutils.sourceforge.net/">
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.8.1: http://docutils.sourceforge.net/" />
 <title>Pomm Documentation</title>
 <style type="text/css">
 
 /*
- * basic.css
- * ~~~~~~~~~
- *
- * Sphinx stylesheet -- basic theme.
- *
- * :copyright: Copyright 2007-2010 by the Sphinx team, see AUTHORS.
- * :license: BSD, see LICENSE for details.
- *
- */
+:Author: David Goodger (goodger@python.org)
+:Id: $Id: html4css1.css 7056 2011-06-17 10:50:48Z milde $
+:Copyright: This stylesheet has been placed in the public domain.
 
-/* -- main layout ----------------------------------------------------------- */
+Default cascading style sheet for the HTML output of Docutils.
 
-div.clearer {
-    clear: both;
-}
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
 
-/* -- relbar ---------------------------------------------------------------- */
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
 
-div.related {
-    width: 100%;
-    font-size: 90%;
-}
-
-div.related h3 {
-    display: none;
-}
-
-div.related ul {
-    margin: 0;
-    padding: 0 0 0 10px;
-    list-style: none;
-}
-
-div.related li {
-    display: inline;
-}
-
-div.related li.right {
-    float: right;
-    margin-right: 5px;
-}
-
-/* -- sidebar --------------------------------------------------------------- */
-
-div.sphinxsidebarwrapper {
-    padding: 10px 5px 0 10px;
-}
-
-div.sphinxsidebar {
-    float: left;
-    width: 230px;
-    margin-left: -100%;
-    font-size: 90%;
-}
-
-div.sphinxsidebar ul {
-    list-style: none;
-}
-
-div.sphinxsidebar ul ul,
-div.sphinxsidebar ul.want-points {
-    margin-left: 20px;
-    list-style: square;
-}
-
-div.sphinxsidebar ul ul {
-    margin-top: 0;
-    margin-bottom: 0;
-}
-
-div.sphinxsidebar form {
-    margin-top: 10px;
-}
-
-div.sphinxsidebar input {
-    border: 1px solid #98dbcc;
-    font-family: sans-serif;
-    font-size: 1em;
-}
-
-img {
-    border: 0;
-}
-
-/* -- search page ----------------------------------------------------------- */
-
-ul.search {
-    margin: 10px 0 0 20px;
-    padding: 0;
-}
-
-ul.search li {
-    padding: 5px 0 5px 20px;
-    background-image: url(file.png);
-    background-repeat: no-repeat;
-    background-position: 0 7px;
-}
-
-ul.search li a {
-    font-weight: bold;
-}
-
-ul.search li div.context {
-    color: #888;
-    margin: 2px 0 0 30px;
-    text-align: left;
-}
-
-ul.keywordmatches li.goodmatch a {
-    font-weight: bold;
-}
-
-/* -- index page ------------------------------------------------------------ */
-
-table.contentstable {
-    width: 90%;
-}
-
-table.contentstable p.biglink {
-    line-height: 150%;
-}
-
-a.biglink {
-    font-size: 1.3em;
-}
-
-span.linkdescr {
-    font-style: italic;
-    padding-top: 5px;
-    font-size: 90%;
-}
-
-/* -- general index --------------------------------------------------------- */
-
-table.indextable {
-    width: 100%;
-}
-
-table.indextable td {
-    text-align: left;
-    vertical-align: top;
-}
-
-table.indextable dl, table.indextable dd {
-    margin-top: 0;
-    margin-bottom: 0;
-}
-
-table.indextable tr.pcap {
-    height: 10px;
-}
-
-table.indextable tr.cap {
-    margin-top: 10px;
-    background-color: #f2f2f2;
-}
-
-img.toggler {
-    margin-right: 3px;
-    margin-top: 3px;
-    cursor: pointer;
-}
-
-div.modindex-jumpbox {
-    border-top: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
-    margin: 1em 0 1em 0;
-    padding: 0.4em;
-}
-
-div.genindex-jumpbox {
-    border-top: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
-    margin: 1em 0 1em 0;
-    padding: 0.4em;
-}
-
-/* -- general body styles --------------------------------------------------- */
-
-a.headerlink {
-    visibility: hidden;
-}
-
-h1:hover > a.headerlink,
-h2:hover > a.headerlink,
-h3:hover > a.headerlink,
-h4:hover > a.headerlink,
-h5:hover > a.headerlink,
-h6:hover > a.headerlink,
-dt:hover > a.headerlink {
-    visibility: visible;
-}
-
-div.body p.caption {
-    text-align: inherit;
-}
-
-div.body td {
-    text-align: left;
-}
-
-.field-list ul {
-    padding-left: 1em;
-}
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
 
 .first {
-    margin-top: 0 !important;
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+object[type="image/svg+xml"], object[type="application/x-shockwave-flash"] {
+  overflow: hidden;
 }
 
-p.rubric {
-    margin-top: 30px;
-    font-weight: bold;
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin: 0 0 0.5em 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left, .figure.align-left, object.align-left {
+  clear: left ;
+  float: left ;
+  margin-right: 1em }
+
+img.align-right, .figure.align-right, object.align-right {
+  clear: right ;
+  float: right ;
+  margin-left: 1em }
+
+img.align-center, .figure.align-center, object.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .align-left {
-    text-align: left;
-}
+  text-align: left }
 
 .align-center {
-    clear: both;
-    text-align: center;
-}
+  clear: both ;
+  text-align: center }
 
 .align-right {
-    text-align: right;
-}
+  text-align: right }
 
-/* -- sidebars -------------------------------------------------------------- */
+/* reset inner alignment in figures */
+div.align-right {
+  text-align: inherit }
 
-div.sidebar {
-    margin: 0 0 0.5em 1em;
-    border: 1px solid #ddb;
-    padding: 7px 7px 0 7px;
-    background-color: #ffe;
-    width: 40%;
-    float: right;
-}
+/* div.align-center * { */
+/*   text-align: left } */
 
-p.sidebar-title {
-    font-weight: bold;
-}
-
-/* -- topics ---------------------------------------------------------------- */
-
-div.topic {
-    border: 1px solid #ccc;
-    padding: 7px 7px 0 7px;
-    margin: 10px 0 10px 0;
-}
-
-p.topic-title {
-    font-size: 1.1em;
-    font-weight: bold;
-    margin-top: 10px;
-}
-
-/* -- admonitions ----------------------------------------------------------- */
-
-div.admonition {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    padding: 7px;
-}
-
-div.admonition dt {
-    font-weight: bold;
-}
-
-div.admonition dl {
-    margin-bottom: 0;
-}
-
-p.admonition-title {
-    margin: 0px 10px 5px 0px;
-    font-weight: bold;
-}
-
-div.body p.centered {
-    text-align: center;
-    margin-top: 25px;
-}
-
-/* -- tables ---------------------------------------------------------------- */
-
-table.docutils {
-    border: 0;
-    border-collapse: collapse;
-}
-
-table.docutils td, table.docutils th {
-    padding: 1px 8px 1px 5px;
-    border-top: 0;
-    border-left: 0;
-    border-right: 0;
-    border-bottom: 1px solid #aaa;
-}
-
-table.field-list td, table.field-list th {
-    border: 0 !important;
-}
-
-table.footnote td, table.footnote th {
-    border: 0 !important;
-}
-
-th {
-    text-align: left;
-    padding-right: 5px;
-}
-
-table.citation {
-    border-left: solid 1px gray;
-    margin-left: 1px;
-}
-
-table.citation td {
-    border-bottom: none;
-}
-
-/* -- other body styles ----------------------------------------------------- */
+ol.simple, ul.simple {
+  margin-bottom: 1em }
 
 ol.arabic {
-    list-style: decimal;
-}
+  list-style: decimal }
 
 ol.loweralpha {
-    list-style: lower-alpha;
-}
+  list-style: lower-alpha }
 
 ol.upperalpha {
-    list-style: upper-alpha;
-}
+  list-style: upper-alpha }
 
 ol.lowerroman {
-    list-style: lower-roman;
-}
+  list-style: lower-roman }
 
 ol.upperroman {
-    list-style: upper-roman;
-}
+  list-style: upper-roman }
 
-dl {
-    margin-bottom: 15px;
-}
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
 
-dd p {
-    margin-top: 0px;
-}
+p.caption {
+  font-style: italic }
 
-dd ul, dd table {
-    margin-bottom: 10px;
-}
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
 
-dd {
-    margin-top: 3px;
-    margin-bottom: 10px;
-    margin-left: 30px;
-}
+p.label {
+  white-space: nowrap }
 
-dt:target, .highlighted {
-    background-color: #fbe54e;
-}
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
 
-dl.glossary dt {
-    font-weight: bold;
-    font-size: 1.1em;
-}
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
 
-.field-list ul {
-    margin: 0;
-    padding-left: 1em;
-}
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
 
-.field-list p {
-    margin: 0;
-}
+p.topic-title {
+  font-weight: bold }
 
-.refcount {
-    color: #060;
-}
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font: inherit }
 
-.optional {
-    font-size: 1.3em;
-}
+pre.literal-block, pre.doctest-block, pre.math {
+  margin-left: 2em ;
+  margin-right: 2em }
 
-.versionmodified {
-    font-style: italic;
-}
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
 
-.system-message {
-    background-color: #fda;
-    padding: 5px;
-    border: 3px solid red;
-}
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
 
-.footnote:target  {
-    background-color: #ffa
-}
+span.interpreted {
+  font-family: sans-serif }
 
-.line-block {
-    display: block;
-    margin-top: 1em;
-    margin-bottom: 1em;
-}
+span.option {
+  white-space: nowrap }
 
-.line-block .line-block {
-    margin-top: 0;
-    margin-bottom: 0;
-    margin-left: 1.5em;
-}
+span.pre {
+  white-space: pre }
 
-.guilabel, .menuselection {
-    font-family: sans-serif;
-}
+span.problematic {
+  color: red }
 
-.accelerator {
-    text-decoration: underline;
-}
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
 
-.classifier {
-    font-style: oblique;
-}
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
 
-/* -- code displays --------------------------------------------------------- */
+table.docinfo {
+  margin: 2em 4em }
 
-pre {
-    overflow: auto;
-}
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
 
-td.linenos pre {
-    padding: 5px 0px;
-    border: 0;
-    background-color: transparent;
-    color: #aaa;
-}
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
 
-table.highlighttable {
-    margin-left: 0.5em;
-}
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
 
-table.highlighttable td {
-    padding: 0 0.5em 0 0.5em;
-}
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
 
-tt.descname {
-    background-color: transparent;
-    font-weight: bold;
-    font-size: 1.2em;
-}
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
 
-tt.descclassname {
-    background-color: transparent;
-}
-
-tt.xref, a tt {
-    background-color: transparent;
-    font-weight: bold;
-}
-
-h1 tt, h2 tt, h3 tt, h4 tt, h5 tt, h6 tt {
-    background-color: transparent;
-}
-
-.viewcode-link {
-    float: right;
-}
-
-.viewcode-back {
-    float: right;
-    font-family: sans-serif;
-}
-
-div.viewcode-block:target {
-    margin: -1px -10px;
-    padding: 0 10px;
-}
-
-/* -- math display ---------------------------------------------------------- */
-
-img.math {
-    vertical-align: middle;
-}
-
-div.body div.math p {
-    text-align: center;
-}
-
-span.eqno {
-    float: right;
-}
-
-/* -- printout stylesheet --------------------------------------------------- */
-
-@media print {
-    div.document,
-    div.documentwrapper,
-    div.bodywrapper {
-        margin: 0 !important;
-        width: 100%;
-    }
-
-    div.sphinxsidebar,
-    div.related,
-    div.footer,
-    #top-link {
-        display: none;
-    }
-}
-
-</style>
-<style type="text/css">
-
-/*
- * nature.css_t
- * ~~~~~~~~~~~~
- *
- * Sphinx stylesheet -- nature theme.
- *
- * :copyright: Copyright 2007-2010 by the Sphinx team, see AUTHORS.
- * :license: BSD, see LICENSE for details.
- *
- */
- 
-/* -- page layout ----------------------------------------------------------- */
- 
-body {
-    font-family: Arial, sans-serif;
-    font-size: 100%;
-    /*background-color: #111;*/
-    color: #555;
-    margin: 0;
-    padding: 0;
-}
-
-div.documentwrapper {
-    float: left;
-    width: 100%;
-}
-
-div.bodywrapper {
-    margin: 0 0 0 230px;
-}
-
-hr {
-    border: 1px solid #B1B4B6;
-}
- 
-div.document {
-    background-color: #eee;
-}
- 
-div.body {
-    background-color: #ffffff;
-    color: #3E4349;
-    padding: 0 30px 30px 30px;
-    font-size: 0.9em;
-}
- 
-div.footer {
-    color: #555;
-    width: 100%;
-    padding: 13px 0;
-    text-align: center;
-    font-size: 75%;
-}
- 
-div.footer a {
-    color: #444;
-    text-decoration: underline;
-}
- 
-div.related {
-    background-color: #6BA81E;
-    line-height: 32px;
-    color: #fff;
-    text-shadow: 0px 1px 0 #444;
-    font-size: 0.9em;
-}
- 
-div.related a {
-    color: #E2F3CC;
-}
- 
-div.sphinxsidebar {
-    font-size: 0.75em;
-    line-height: 1.5em;
-}
-
-div.sphinxsidebarwrapper{
-    padding: 20px 0;
-}
- 
-div.sphinxsidebar h3,
-div.sphinxsidebar h4 {
-    font-family: Arial, sans-serif;
-    color: #222;
-    font-size: 1.2em;
-    font-weight: normal;
-    margin: 0;
-    padding: 5px 10px;
-    background-color: #ddd;
-    text-shadow: 1px 1px 0 white
-}
-
-div.sphinxsidebar h4{
-    font-size: 1.1em;
-}
- 
-div.sphinxsidebar h3 a {
-    color: #444;
-}
- 
- 
-div.sphinxsidebar p {
-    color: #888;
-    padding: 5px 20px;
-}
- 
-div.sphinxsidebar p.topless {
-}
- 
-div.sphinxsidebar ul {
-    margin: 10px 20px;
-    padding: 0;
-    color: #000;
-}
- 
-div.sphinxsidebar a {
-    color: #444;
-}
- 
-div.sphinxsidebar input {
-    border: 1px solid #ccc;
-    font-family: sans-serif;
-    font-size: 1em;
-}
-
-div.sphinxsidebar input[type=text]{
-    margin-left: 20px;
-}
- 
-/* -- body styles ----------------------------------------------------------- */
- 
-a {
-    color: #005B81;
-    text-decoration: none;
-}
- 
-a:hover {
-    color: #E32E00;
-    text-decoration: underline;
-}
- 
-div.body h1,
-div.body h2,
-div.body h3,
-div.body h4,
-div.body h5,
-div.body h6 {
-    font-family: Arial, sans-serif;
-    background-color: #BED4EB;
-    font-weight: normal;
-    color: #212224;
-    margin: 30px 0px 10px 0px;
-    padding: 5px 0 5px 10px;
-    text-shadow: 0px 1px 0 white
-}
- 
-div.body h1 { border-top: 20px solid white; margin-top: 0; font-size: 200%; }
-div.body h2 { font-size: 150%; background-color: #C8D5E3; }
-div.body h3 { font-size: 120%; background-color: #D8DEE3; }
-div.body h4 { font-size: 110%; background-color: #D8DEE3; }
-div.body h5 { font-size: 100%; background-color: #D8DEE3; }
-div.body h6 { font-size: 100%; background-color: #D8DEE3; }
- 
-a.headerlink {
-    color: #c60f0f;
-    font-size: 0.8em;
-    padding: 0 4px 0 4px;
-    text-decoration: none;
-}
- 
-a.headerlink:hover {
-    background-color: #c60f0f;
-    color: white;
-}
- 
-div.body p, div.body dd, div.body li {
-    line-height: 1.5em;
-}
- 
-div.admonition p.admonition-title + p {
-    display: inline;
-}
-
-div.highlight{
-    background-color: white;
-}
-
-div.note {
-    background-color: #eee;
-    border: 1px solid #ccc;
-}
- 
-div.seealso {
-    background-color: #ffc;
-    border: 1px solid #ff6;
-}
- 
-div.topic {
-    background-color: #eee;
-}
- 
-div.warning {
-    background-color: #ffe4e4;
-    border: 1px solid #f66;
-}
- 
-p.admonition-title {
-    display: inline;
-}
- 
-p.admonition-title:after {
-    content: ":";
-}
- 
-pre {
-    padding: 10px;
-    background-color: White;
-    color: #222;
-    line-height: 1.2em;
-    border: 1px solid #C6C9CB;
-    font-size: 1.1em;
-    margin: 1.5em 0 1.5em 0;
-    -webkit-box-shadow: 1px 1px 1px #d8d8d8;
-    -moz-box-shadow: 1px 1px 1px #d8d8d8;
-}
- 
-tt {
-    background-color: #ecf0f3;
-    color: #222;
-    /* padding: 1px 2px; */
-    font-size: 1.1em;
-    font-family: monospace;
-}
-
-.viewcode-back {
-    font-family: Arial, sans-serif;
-}
-
-div.viewcode-block:target {
-    background-color: #f4debf;
-    border-top: 1px solid #ac9;
-    border-bottom: 1px solid #ac9;
-}
-
-p {
-	margin: 0;
-}
-
-ul li dd {
-	margin-top: 0;
-}
-
-ul li dl {
-	margin-bottom: 0;
-}
-
-li dl dd {
-	margin-bottom: 0;
-}
-
-dd ul {
-	padding-left: 0;
-}
-
-li dd ul {
-	margin-bottom: 0;
-}
+ul.auto-toc {
+  list-style-type: none }
 
 </style>
 </head>
 <body>
 <div class="document" id="pomm-documentation">
- <div class="body">
 <h1 class="title">Pomm Documentation</h1>
-
 
 <div class="contents topic" id="contents">
 <p class="topic-title first">Contents</p>
@@ -812,94 +336,95 @@ li dd ul {
 </li>
 <li><a class="reference internal" href="#converters-and-types" id="id14">Converters and types</a><ul>
 <li><a class="reference internal" href="#domains" id="id15">Domains</a></li>
-<li><a class="reference internal" href="#custom-types-and-converters" id="id16">Custom types and converters</a></li>
-<li><a class="reference internal" href="#writing-your-own-converters" id="id17">Writing your own converters</a></li>
-<li><a class="reference internal" href="#entity-converter" id="id18">Entity converter</a></li>
-<li><a class="reference internal" href="#spawning-connections" id="id19">Spawning connections</a></li>
+<li><a class="reference internal" href="#composite-types" id="id16">Composite types</a></li>
+<li><a class="reference internal" href="#writing-your-own-types" id="id17">Writing your own types</a></li>
+<li><a class="reference internal" href="#writing-your-own-converters" id="id18">Writing your own converters</a></li>
+<li><a class="reference internal" href="#entity-converter" id="id19">Entity converter</a></li>
+<li><a class="reference internal" href="#spawning-connections" id="id20">Spawning connections</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#connections" id="id20">Connections</a><ul>
-<li><a class="reference internal" href="#id1" id="id21">Overview</a><ul>
-<li><a class="reference internal" href="#map-classes-provider" id="id22">Map classes provider</a></li>
-<li><a class="reference internal" href="#identity-mappers" id="id23">Identity mappers</a></li>
+<li><a class="reference internal" href="#connections" id="id21">Connections</a><ul>
+<li><a class="reference internal" href="#id1" id="id22">Overview</a><ul>
+<li><a class="reference internal" href="#map-classes-provider" id="id23">Map classes provider</a></li>
+<li><a class="reference internal" href="#identity-mappers" id="id24">Identity mappers</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#transactions" id="id24">Transactions</a><ul>
-<li><a class="reference internal" href="#standard-transactions" id="id25">Standard transactions</a></li>
-<li><a class="reference internal" href="#partial-transactions-and-savepoints" id="id26">Partial transactions and savepoints</a></li>
+<li><a class="reference internal" href="#transactions" id="id25">Transactions</a><ul>
+<li><a class="reference internal" href="#standard-transactions" id="id26">Standard transactions</a></li>
+<li><a class="reference internal" href="#partial-transactions-and-savepoints" id="id27">Partial transactions and savepoints</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#prepared-statements" id="id27">Prepared statements</a></li>
-<li><a class="reference internal" href="#notifications-and-observers" id="id28">Notifications and observers</a><ul>
-<li><a class="reference internal" href="#observers" id="id29">Observers</a></li>
-<li><a class="reference internal" href="#sending-a-notification" id="id30">Sending a notification</a></li>
+<li><a class="reference internal" href="#prepared-statements" id="id28">Prepared statements</a></li>
+<li><a class="reference internal" href="#notifications-and-observers" id="id29">Notifications and observers</a><ul>
+<li><a class="reference internal" href="#observers" id="id30">Observers</a></li>
+<li><a class="reference internal" href="#sending-a-notification" id="id31">Sending a notification</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#logging" id="id31">Logging</a></li>
+<li><a class="reference internal" href="#logging" id="id32">Logging</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#map-classes" id="id32">Map classes</a><ul>
-<li><a class="reference internal" href="#id2" id="id33">Overview</a></li>
-<li><a class="reference internal" href="#structure" id="id34">Structure</a><ul>
-<li><a class="reference internal" href="#introspected-tables" id="id35">Introspected tables</a></li>
-<li><a class="reference internal" href="#arrays" id="id36">Arrays</a></li>
-<li><a class="reference internal" href="#temporary-tables" id="id37">Temporary tables</a></li>
-<li><a class="reference internal" href="#creating-entities" id="id38">Creating entities</a></li>
+<li><a class="reference internal" href="#map-classes" id="id33">Map classes</a><ul>
+<li><a class="reference internal" href="#id2" id="id34">Overview</a></li>
+<li><a class="reference internal" href="#structure" id="id35">Structure</a><ul>
+<li><a class="reference internal" href="#introspected-tables" id="id36">Introspected tables</a></li>
+<li><a class="reference internal" href="#arrays" id="id37">Arrays</a></li>
+<li><a class="reference internal" href="#temporary-tables" id="id38">Temporary tables</a></li>
+<li><a class="reference internal" href="#creating-entities" id="id39">Creating entities</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#querying-the-database" id="id39">Querying the database</a><ul>
-<li><a class="reference internal" href="#create-update-drop" id="id40">Create, update, drop</a></li>
-<li><a class="reference internal" href="#built-in-finders" id="id41">Built-in finders</a></li>
-<li><a class="reference internal" href="#findall" id="id42">findAll</a></li>
-<li><a class="reference internal" href="#findwhere" id="id43">findWhere</a></li>
-<li><a class="reference internal" href="#and-or-the-where-class" id="id44">AND, OR: The Where class</a></li>
-<li><a class="reference internal" href="#fields-methods" id="id45">Fields methods</a></li>
-<li><a class="reference internal" href="#building-custom-queries" id="id46">Building custom queries</a></li>
-<li><a class="reference internal" href="#fields-formatters" id="id47">Fields formatters</a></li>
-<li><a class="reference internal" href="#complex-queries" id="id48">Complex queries</a></li>
-<li><a class="reference internal" href="#virtual-fields" id="id49">Virtual fields</a></li>
+<li><a class="reference internal" href="#querying-the-database" id="id40">Querying the database</a><ul>
+<li><a class="reference internal" href="#create-update-drop" id="id41">Create, update, drop</a></li>
+<li><a class="reference internal" href="#built-in-finders" id="id42">Built-in finders</a></li>
+<li><a class="reference internal" href="#findall" id="id43">findAll</a></li>
+<li><a class="reference internal" href="#findwhere" id="id44">findWhere</a></li>
+<li><a class="reference internal" href="#and-or-the-where-class" id="id45">AND, OR: The Where class</a></li>
+<li><a class="reference internal" href="#fields-methods" id="id46">Fields methods</a></li>
+<li><a class="reference internal" href="#building-custom-queries" id="id47">Building custom queries</a></li>
+<li><a class="reference internal" href="#fields-formatters" id="id48">Fields formatters</a></li>
+<li><a class="reference internal" href="#complex-queries" id="id49">Complex queries</a></li>
+<li><a class="reference internal" href="#virtual-fields" id="id50">Virtual fields</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#collections" id="id50">Collections</a><ul>
-<li><a class="reference internal" href="#fetching-results" id="id51">Fetching results</a></li>
-<li><a class="reference internal" href="#collection-filters" id="id52">Collection filters</a></li>
+<li><a class="reference internal" href="#collections" id="id51">Collections</a><ul>
+<li><a class="reference internal" href="#fetching-results" id="id52">Fetching results</a></li>
+<li><a class="reference internal" href="#collection-filters" id="id53">Collection filters</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#pagers" id="id53">Pagers</a><ul>
-<li><a class="reference internal" href="#pager-query-methods" id="id54">Pager query methods</a></li>
-<li><a class="reference internal" href="#displaying-a-pager" id="id55">Displaying a pager</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#entities" id="id56">Entities</a><ul>
-<li><a class="reference internal" href="#id3" id="id57">Overview</a><ul>
-<li><a class="reference internal" href="#what-is-an-entity-class" id="id58">What is an Entity class ?</a></li>
-<li><a class="reference internal" href="#data-source-agnostic" id="id59">Data source agnostic</a></li>
-<li><a class="reference internal" href="#schema-less-entities" id="id60">Schema less entities</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#living-with-entities" id="id61">Living with entities</a><ul>
-<li><a class="reference internal" href="#creator" id="id62">Creator</a></li>
-<li><a class="reference internal" href="#accessors-and-mutators" id="id63">Accessors and mutators</a></li>
-<li><a class="reference internal" href="#interfaces-and-overloads" id="id64">Interfaces and overloads</a></li>
-<li><a class="reference internal" href="#extending-entities" id="id65">Extending entities</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#entities-and-database" id="id66">Entities and database</a><ul>
-<li><a class="reference internal" href="#import-and-export" id="id67">Import and export</a></li>
-<li><a class="reference internal" href="#life-cycle" id="id68">Life cycle</a></li>
+<li><a class="reference internal" href="#pagers" id="id54">Pagers</a><ul>
+<li><a class="reference internal" href="#pager-query-methods" id="id55">Pager query methods</a></li>
+<li><a class="reference internal" href="#displaying-a-pager" id="id56">Displaying a pager</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#tools" id="id69">Tools</a><ul>
-<li><a class="reference internal" href="#map-generation-tools" id="id70">Map generation tools</a><ul>
-<li><a class="reference internal" href="#database-inspector" id="id71">Database Inspector</a></li>
-<li><a class="reference internal" href="#createbasemaptool" id="id72">CreateBaseMapTool</a></li>
-<li><a class="reference internal" href="#scanschematool" id="id73">ScanSchemaTool</a></li>
+<li><a class="reference internal" href="#entities" id="id57">Entities</a><ul>
+<li><a class="reference internal" href="#id3" id="id58">Overview</a><ul>
+<li><a class="reference internal" href="#what-is-an-entity-class" id="id59">What is an Entity class ?</a></li>
+<li><a class="reference internal" href="#data-source-agnostic" id="id60">Data source agnostic</a></li>
+<li><a class="reference internal" href="#schema-less-entities" id="id61">Schema less entities</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#living-with-entities" id="id62">Living with entities</a><ul>
+<li><a class="reference internal" href="#creator" id="id63">Creator</a></li>
+<li><a class="reference internal" href="#accessors-and-mutators" id="id64">Accessors and mutators</a></li>
+<li><a class="reference internal" href="#interfaces-and-overloads" id="id65">Interfaces and overloads</a></li>
+<li><a class="reference internal" href="#extending-entities" id="id66">Extending entities</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#entities-and-database" id="id67">Entities and database</a><ul>
+<li><a class="reference internal" href="#import-and-export" id="id68">Import and export</a></li>
+<li><a class="reference internal" href="#life-cycle" id="id69">Life cycle</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tools" id="id70">Tools</a><ul>
+<li><a class="reference internal" href="#map-generation-tools" id="id71">Map generation tools</a><ul>
+<li><a class="reference internal" href="#database-inspector" id="id72">Database Inspector</a></li>
+<li><a class="reference internal" href="#createbasemaptool" id="id73">CreateBaseMapTool</a></li>
+<li><a class="reference internal" href="#scanschematool" id="id74">ScanSchemaTool</a></li>
 </ul>
 </li>
 </ul>
@@ -936,9 +461,10 @@ li dd ul {
 </ul>
 </blockquote>
 <p>It is either possible to instance <cite>Database</cite> class alone or use the <cite>Service</cite> class to do so. The simplest way to get a database instance is:</p>
-<pre class="literal-block">$database = new Pomm\Connection\Database(array(
+<pre class="literal-block">
+$database = new Pomm\Connection\Database(array(
     'name' =&gt; 'database_name',
-    'dsn' =&gt; 'pgsql://user:pass@host:port/db_name'
+    'dsn' =&gt; 'pgsql://user:pass&#64;host:port/db_name'
     ));
 </pre>
 <p>Database expected parameters are:</p>
@@ -951,15 +477,16 @@ li dd ul {
 <li>identity_mapper (string, optional, default: <tt class="docutils literal">Smart</tt>, see <a class="reference internal" href="#identity-mappers">Identity mappers</a> below): default identity mapper class name for connections.</li>
 </ul>
 </blockquote>
-<p>There are several ways to declare databases to the service class. Either you use the constructor passing an array "name" =&gt; "connection parameters" or you can use the <tt class="docutils literal">setDatabase()</tt> method of the service class.:</p>
-<pre class="literal-block"># The two examples below are equivalent
+<p>There are several ways to declare databases to the service class. Either you use the constructor passing an array &quot;name&quot; =&gt; &quot;connection parameters&quot; or you can use the <tt class="docutils literal">setDatabase()</tt> method of the service class.:</p>
+<pre class="literal-block">
+# The two examples below are equivalent
 # Using the constructor
 $service = new Pomm\Service(array(
   'db_one' =&gt; array(
-    'dsn' =&gt; 'pgsql://user:pass@host:port/db_a'
+    'dsn' =&gt; 'pgsql://user:pass&#64;host:port/db_a'
   ),
   'db_two' =&gt; array(
-    'dsn'   =&gt; 'pgsql://otheruser:hispass@!/path/to/socket/directory!/db_b',
+    'dsn'   =&gt; 'pgsql://otheruser:hispass&#64;!/path/to/socket/directory!/db_b',
     'class' =&gt; 'App\MyDb',
     'identity_mapper' =&gt; 'App\MyIdentityMapper',
     'name'  =&gt; 'my_db'
@@ -969,10 +496,10 @@ $service = new Pomm\Service(array(
 # Using the setDatabase method
 $service = new Pomm\Service();
 $service-&gt;setDatabase('db_one', new Pomm\Connection\Database(array(
-  'dsn' =&gt; 'pgsql://user:pass@host:port/db_a'
+  'dsn' =&gt; 'pgsql://user:pass&#64;host:port/db_a'
 )));
 $service-&gt;setDatabase('db_two', new App\MyDb(array(
-  'dsn' =&gt; 'pgsql://otheruser:hispass@!/path/to/socket/directory!/db_b',
+  'dsn' =&gt; 'pgsql://otheruser:hispass&#64;!/path/to/socket/directory!/db_b',
   'identity_mapper' =&gt; 'App\MyIdentityMapper',
   'name'  =&gt; 'my_db'
 )));
@@ -987,11 +514,11 @@ $service-&gt;setDatabase('db_two', new App\MyDb(array(
 <li><strong>socket connection</strong></li>
 <li><tt class="docutils literal"><span class="pre">pgsql://user/database</span></tt> Connect <em>user</em> to the db <em>database</em> without password through the Unix socket system.</li>
 <li><tt class="docutils literal"><span class="pre">pgsql://user:pass/database</span></tt> The same but with password.</li>
-<li><tt class="docutils literal"><span class="pre">pgsql://user:pass@!/path/to/socket!/database</span></tt> When the socket is not in the default directory, it is possible to specify it in the host part of the DSN. Note it is surrounded by '!' and there are NO ending /. Using the «!» as delimiter assumes there are no «!» in your socket's path. But you don't have «!» in your socket's path do you ?</li>
-<li><tt class="docutils literal"><span class="pre">pgsql://user@!/path/to/socket!:port/database</span></tt> Postgresql's listening socket's names are the same as TCP ports. If different than default socket, specify it in the port part.</li>
+<li><tt class="docutils literal"><span class="pre">pgsql://user:pass&#64;!/path/to/socket!/database</span></tt> When the socket is not in the default directory, it is possible to specify it in the host part of the DSN. Note it is surrounded by '!' and there are NO ending /. Using the «!» as delimiter assumes there are no «!» in your socket's path. But you don't have «!» in your socket's path do you ?</li>
+<li><tt class="docutils literal"><span class="pre">pgsql://user&#64;!/path/to/socket!:port/database</span></tt> Postgresql's listening socket's names are the same as TCP ports. If different than default socket, specify it in the port part.</li>
 <li><strong>TCP connection</strong></li>
-<li><tt class="docutils literal"><span class="pre">pgsql://user@host/database</span></tt> Connect <em>user</em> to the db <em>database</em> on host <em>host</em> using TCP/IP.</li>
-<li><tt class="docutils literal"><span class="pre">pgsql://user:pass@host:port/database</span></tt> The same but with password and TCP port specified.</li>
+<li><tt class="docutils literal"><span class="pre">pgsql://user&#64;host/database</span></tt> Connect <em>user</em> to the db <em>database</em> on host <em>host</em> using TCP/IP.</li>
+<li><tt class="docutils literal"><span class="pre">pgsql://user:pass&#64;host:port/database</span></tt> The same but with password and TCP port specified.</li>
 </ul>
 </blockquote>
 </div>
@@ -1052,7 +579,8 @@ $service-&gt;setDatabase('db_two', new App\MyDb(array(
 </dd>
 </dl>
 <p>Postgresql contribs come with handy extra data type (like HStore, a key =&gt; value array and LTree a materialized path data type). If you use these types in your database you have to register the according converters from your database instance:</p>
-<pre class="literal-block">$database-&gt;registerConverter('HStore', new Pomm\Converter\PgHStore(), array('public.hstore'));
+<pre class="literal-block">
+$database-&gt;registerConverter('HStore', new Pomm\Converter\PgHStore(), array('public.hstore'));
 </pre>
 <dl class="docutils">
 <dt>Arguments to instantiate a <tt class="docutils literal">Converter</tt> are the following:</dt>
@@ -1068,7 +596,8 @@ $service-&gt;setDatabase('db_two', new App\MyDb(array(
 <div class="section" id="creating-your-own-database-class">
 <h3><a class="toc-backref" href="#id13">Creating your own Database class</a></h3>
 <p>If your database has a lot of custom types, it is a good idea to create your own <tt class="docutils literal">Database</tt> class.:</p>
-<pre class="literal-block">class MyDatabase extends Pomm\Connection\Database
+<pre class="literal-block">
+class MyDatabase extends Pomm\Connection\Database
 {
   protected function initialize()
   {
@@ -1093,23 +622,69 @@ $service-&gt;setDatabase('db_two', new App\MyDb(array(
 <div class="section" id="domains">
 <h3><a class="toc-backref" href="#id15">Domains</a></h3>
 <p>In case your database uses <tt class="docutils literal">DOMAIN</tt> types, you can associate them with an already registered converter. The <tt class="docutils literal">registerTypeForConverter()</tt> method stands for that.:</p>
-<pre class="literal-block">$database
+<pre class="literal-block">
+$database
   -&gt;registerTypeForConverter('public.email_address', 'String');
 </pre>
 <p>In the example above, the database contains a domain <tt class="docutils literal">email_address</tt> which is a subtype of <tt class="docutils literal">varchar</tt> so it is associated with the built-in converter <tt class="docutils literal">String</tt>.</p>
-<p><strong>Note</strong> <tt class="docutils literal">registerTypeForConverter</tt> and <tt class="docutils literal">registerConverter</tt> methods implement the fluid interface so you can chain calls.</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last"><tt class="docutils literal">registerTypeForConverter</tt> and <tt class="docutils literal">registerConverter</tt> methods implement the fluid interface so you can chain calls.</p>
 </div>
-<div class="section" id="custom-types-and-converters">
-<h3><a class="toc-backref" href="#id16">Custom types and converters</a></h3>
-<p>Composite types are particularly useful to store complex set of data. In fact, with Postgresql, defining a table automatically defines the corresponding type. Hydrating type instances with Postgresql values are the work of your custom converters. Let's take an example: electrical transformers. Electrical transformers are composed by at least two wiring, an input one (named primary) and an output one (named secondary) but it can be more of them. A transformer winding is defined by the voltage it is supposed to have and the maximum current it can stands.</p>
-<pre class="literal-block">-- SQL
+</div>
+<div class="section" id="composite-types">
+<h3><a class="toc-backref" href="#id16">Composite types</a></h3>
+<p>Composite types are particularly useful to store complex set of data and store them as they were objects:</p>
+<pre class="literal-block">
+CREATE TYPE postal_address AS (place text, postal_code char(5), city varchar, cedex char);
+
+CREATE TABLE customer (
+    customer_id uuid PRIMARY KEY,
+    ...,
+    billing_address postal_address NOT NULL CHECK
+        ((billing_address).place IS NOT NULL AND (billing_address).city IS NOT NULL AND (billing_address).postal_code IS NOT NULL)
+</pre>
+<p>If such types exist in your database, they must be registered so Pomm can convert them to an according array using the <tt class="docutils literal">PgRow</tt> converter:</p>
+<pre class="literal-block">
+$database-&gt;registerConverter(
+    'PostalAddress',
+    new \Pomm\Type\PgRow(
+        $database,
+        new \Pomm\Object\RowStructure(array('place' =&gt; 'text', 'postal_code' =&gt; 'char', 'city' =&gt; 'varchar', 'cedex' =&gt; 'char')),
+        array('public.postal_address')
+        ));
+</pre>
+<p>This way, the composite types can be used as is in the map classes:</p>
+<pre class="literal-block">
+protected function intitialize()
+{
+    parent::intialize();
+
+    $this-&gt;addField('customer_id', 'uuid')
+        ...
+        -&gt;addField('billing_address' =&gt; 'public.postal_address')
+        ...
+        ;
+</pre>
+<p>This will store, in a field named <tt class="docutils literal">billing_address</tt> an array formatted with the given attributes. It is important to understand they must be used like fixed arrays, this means all keys must be filled even if the value is NULL to save the entity:</p>
+<pre class="literal-block">
+$entity['billing_address'] = array('place' =&gt; 'some_place', 'postal_code' =&gt; '44000', 'city' =&gt; 'Nantes');
+$map-&gt;saveOne($entity);
+</pre>
+<p>This will throw an exception since the <tt class="docutils literal">cedex</tt> key is missing.</p>
+</div>
+<div class="section" id="writing-your-own-types">
+<h3><a class="toc-backref" href="#id17">Writing your own types</a></h3>
+<p>PgRow converter is a generic converter to map with composite types. It is also possible to map them to real types of your own. Let's take an example: electrical transformers. Electrical transformers are composed by at least two wirings, an input one (named primary) and an output one (named secondary) but it can be more of them. A transformer winding is defined by the voltage it is supposed to have and the maximum current it can stands.</p>
+<pre class="literal-block">
 CREATE TYPE winding_power AS (
     voltage numeric(4,1),
     current numeric(5,3)
 );
 </pre>
 <p>Tables containing a field with this type will return a tuple. A good way to manipulate that kind of data would be to create a <tt class="docutils literal">WindingPower</tt> type class:</p>
-<pre class="literal-block">&lt;?php
+<pre class="literal-block">
+&lt;?php
 
 namespace Model\Pomm\Type;
 
@@ -1127,7 +702,7 @@ class WindingPower
 </pre>
 </div>
 <div class="section" id="writing-your-own-converters">
-<h3><a class="toc-backref" href="#id17">Writing your own converters</a></h3>
+<h3><a class="toc-backref" href="#id18">Writing your own converters</a></h3>
 <dl class="docutils">
 <dt>All converters must implement the <tt class="docutils literal">Pomm\Converter\ConverterInterface</tt>. This interface makes converters to have two methods:</dt>
 <dd><ul class="first last simple">
@@ -1137,7 +712,8 @@ class WindingPower
 </dd>
 </dl>
 <p>Here is the converter for the <tt class="docutils literal">WindingPower</tt> type mentioned above:</p>
-<pre class="literal-block">&lt;?php
+<pre class="literal-block">
+&lt;?php
 
 namespace Model\Pomm\Converter;
 
@@ -1148,7 +724,7 @@ class WindingPower implements ConverterInterface
 {
     public function fromPg($data, $type = null)
     {
-        $data = trim($data, "()");
+        $data = trim($data, &quot;()&quot;);
         $values = preg_split('/,/', $data);
 
         return new WindingPowerType($values[0], $values[1]);
@@ -1156,21 +732,22 @@ class WindingPower implements ConverterInterface
 
     public function toPg($data, $type = null)
     {
-        return sprintf("winding_power '(%4.1f,%4.3f)'", $data-&gt;voltage, $data-&gt;current);
+        return sprintf(&quot;winding_power '(%4.1f,%4.3f)'&quot;, $data-&gt;voltage, $data-&gt;current);
     }
 }
 </pre>
 <p>It is advised not to hard-code the name of the class type so other developers may extend it and use theirs.</p>
 </div>
 <div class="section" id="entity-converter">
-<h3><a class="toc-backref" href="#id18">Entity converter</a></h3>
+<h3><a class="toc-backref" href="#id19">Entity converter</a></h3>
 <p>In Postgresql, creating a table means creating a new type with the table's fields definition. Hence, it is possible to use that data type in other tables or use them as objects in your SQL queries. Pomm proposes a special converter to do so: the <tt class="docutils literal">PgEntity</tt> converter. Passing the table data type name and the associated entity class name will grant you with embedded entities.</p>
-<pre class="literal-block">$database
+<pre class="literal-block">
+$database
   -&gt;registerConverter('MyEntity', new \Pomm\Converter\PgEntity($my_entity_map), array('my_schema.my_entity));
 </pre>
 </div>
 <div class="section" id="spawning-connections">
-<h3><a class="toc-backref" href="#id19">Spawning connections</a></h3>
+<h3><a class="toc-backref" href="#id20">Spawning connections</a></h3>
 <p>Database instances are also connections provider trough two methods:</p>
 <blockquote>
 <ul class="simple">
@@ -1179,15 +756,16 @@ class WindingPower implements ConverterInterface
 </ul>
 </blockquote>
 <p>It is important to understand that connections hold a lot of context (entity caching trough the mapper, prepared statements etc.), enforce the creation of a new connection set up a new bare context. The most common way to get a connection is:</p>
-<pre class="literal-block">$connection = $database-&gt;getConnection();
+<pre class="literal-block">
+$connection = $database-&gt;getConnection();
 </pre>
 </div>
 </div>
 </div>
 <div class="section" id="connections">
-<h1><a class="toc-backref" href="#id20">Connections</a></h1>
+<h1><a class="toc-backref" href="#id21">Connections</a></h1>
 <div class="section" id="id1">
-<h2><a class="toc-backref" href="#id21">Overview</a></h2>
+<h2><a class="toc-backref" href="#id22">Overview</a></h2>
 <dl class="docutils">
 <dt>A connection represents a link to the database. It owns several responsibilities:</dt>
 <dd><ul class="first last simple">
@@ -1202,13 +780,14 @@ class WindingPower implements ConverterInterface
 </dl>
 <p>Connections are lazy. This means unless a communication is needed with the database server, no sessions are open.</p>
 <div class="section" id="map-classes-provider">
-<h3><a class="toc-backref" href="#id22">Map classes provider</a></h3>
+<h3><a class="toc-backref" href="#id23">Map classes provider</a></h3>
 <p>Connections are a pool of map instances. This way, a connection will always provide the same instance for the same map class:</p>
-<pre class="literal-block">$student_map = $connection-&gt;getMapFor('College\School\Student');
+<pre class="literal-block">
+$student_map = $connection-&gt;getMapFor('College\School\Student');
 </pre>
 </div>
 <div class="section" id="identity-mappers">
-<h3><a class="toc-backref" href="#id23">Identity mappers</a></h3>
+<h3><a class="toc-backref" href="#id24">Identity mappers</a></h3>
 <p>Connections are also the way to tell the map classes to use or not an <tt class="docutils literal">IdentityMapper</tt>. An identity mapper is an index kept by the connection and shared amongst the map instances. This index ensures that when an object is retrieved twice from the database, the same <tt class="docutils literal">Object</tt> instance will be returned. This is a very powerful (and dangerous) feature.</p>
 <dl class="docutils">
 <dt>There are two ways to declare an identity mapper to your connections:</dt>
@@ -1216,7 +795,8 @@ class WindingPower implements ConverterInterface
 <li>in the <tt class="docutils literal">Database</tt> parameters. All the connections created for this database will use the given <tt class="docutils literal">IdentityMapper</tt> class.</li>
 <li>when instanciating the connection through the <tt class="docutils literal">createConnection()</tt> call. This enforces the parameter given to the <tt class="docutils literal">Database</tt> class if any.</li>
 </ul>
-<pre class="last literal-block">$map = $database()
+<pre class="last literal-block">
+$map = $database()
   -&gt;createConnection(new \Pomm\Identity\IdentityMapperSmart())
   -&gt;getMapFor('College\School\Student');
 
@@ -1239,11 +819,12 @@ echo $student2-&gt;getName();    // plop
 </div>
 </div>
 <div class="section" id="transactions">
-<h2><a class="toc-backref" href="#id24">Transactions</a></h2>
+<h2><a class="toc-backref" href="#id25">Transactions</a></h2>
 <div class="section" id="standard-transactions">
-<h3><a class="toc-backref" href="#id25">Standard transactions</a></h3>
+<h3><a class="toc-backref" href="#id26">Standard transactions</a></h3>
 <p>By default, connections are in auto-commit mode which means every change in the database is committed on the fly. Connections offer the way to enter in transaction mode:</p>
-<pre class="literal-block">$connection-&gt;begin();
+<pre class="literal-block">
+$connection-&gt;begin();
 
 try
 {
@@ -1259,9 +840,10 @@ catch (Pomm\Exception\Exception $e)
 <p>Isolation level must be one of <tt class="docutils literal"><span class="pre">Pomm\Connection\Connection::ISOLATION_READ_COMMITTED</span></tt>, <tt class="docutils literal">ISOLATION_READ_REPEATABLE</tt> or <tt class="docutils literal">ISOLATION_SERIALIZABLE</tt>. Check your Postgresql version for the available levels. Starting from pg 9.1, what was called <tt class="docutils literal">SERIALIZABLE</tt> is called <tt class="docutils literal">READ_REPEATABLE</tt> and <tt class="docutils literal">SERIALIZABLE</tt> is a race for the first transaction to COMMIT. This means if the transaction fails, you may just try again until it works. Check the <a class="reference external" href="http://www.Postgresql.org/docs/9.1/static/transaction-iso.html">Postgresql documentation</a> about transactions for details.</p>
 </div>
 <div class="section" id="partial-transactions-and-savepoints">
-<h3><a class="toc-backref" href="#id26">Partial transactions and savepoints</a></h3>
+<h3><a class="toc-backref" href="#id27">Partial transactions and savepoints</a></h3>
 <p>Sometime, you may need to split transactions into parts and be able to perform partial rollback. Postgresql lets you use save points in your transaction:</p>
-<pre class="literal-block">$connection-&gt;begin();
+<pre class="literal-block">
+$connection-&gt;begin();
 try
 {
     # do things here
@@ -1287,9 +869,10 @@ $connection-&gt;commit();
 </div>
 </div>
 <div class="section" id="prepared-statements">
-<h2><a class="toc-backref" href="#id27">Prepared statements</a></h2>
+<h2><a class="toc-backref" href="#id28">Prepared statements</a></h2>
 <p>Connections are a pool of prepared statements. Every time a query is sent to the server, it is prepared, executed and stored until the connection is shut down. This way, if a query is issued a second time, the statement does not need to be parsed again. It is somehow possible to use them directly:</p>
-<pre class="literal-block">$sql = "SELECT field1, ..., fieldX FROM some_table WHERE a_field &gt; $* AND another_field @&gt; $*;"
+<pre class="literal-block">
+$sql = &quot;SELECT field1, ..., fieldX FROM some_table WHERE a_field &gt; $* AND another_field &#64;&gt; $*;&quot;
 $query = $connection-&gt;createPreparedQuery($sql);
 
 $collection_1 = $query-&gt;execute(array($value01, $value02));
@@ -1298,7 +881,7 @@ $collection_2 = $query-&gt;execute(array($value11, $value12));
 <p>Note the placeholder for values to be escaped is the symbol <tt class="docutils literal">$*</tt>. This is different from what is to be used with PHP pgsql library and also different from PDO placeholders. The problem with PHP native pgsql library is the placeholders are in the form <tt class="docutils literal">$n</tt> where n is the position. Using positional parameters is a pain when building queries because the position of the parameters you may add is not known. PDO's placeholders is the <tt class="docutils literal">?</tt>. This conflicts with some operators in Postgresql. If you migrate from an existing project to Pomm, queries must be checked to be compliant with the <tt class="docutils literal">$*</tt> placeholder.</p>
 </div>
 <div class="section" id="notifications-and-observers">
-<h2><a class="toc-backref" href="#id28">Notifications and observers</a></h2>
+<h2><a class="toc-backref" href="#id29">Notifications and observers</a></h2>
 <dl class="docutils">
 <dt>Aside the transaction engine, Postgresql proposes an asynchronous messaging system. To benefit from this useful feature, Pomm's connection let the possibility to spawn observers and to trigger events using the following methods:</dt>
 <dd><ul class="first last simple">
@@ -1308,9 +891,10 @@ $collection_2 = $query-&gt;execute(array($value11, $value12));
 </dd>
 </dl>
 <div class="section" id="observers">
-<h3><a class="toc-backref" href="#id29">Observers</a></h3>
+<h3><a class="toc-backref" href="#id30">Observers</a></h3>
 <p><tt class="docutils literal">createObserver()</tt> returns an <tt class="docutils literal">Observer</tt> instance. This instance can listen to a given event and return the payload if any when an event is triggered:</p>
-<pre class="literal-block">$observer = $connection
+<pre class="literal-block">
+$observer = $connection
     -&gt;createObserver()
     -&gt;listen('an_event');
 
@@ -1323,22 +907,23 @@ $payload = $data['payload']; // payload if any
 </pre>
 </div>
 <div class="section" id="sending-a-notification">
-<h3><a class="toc-backref" href="#id30">Sending a notification</a></h3>
+<h3><a class="toc-backref" href="#id31">Sending a notification</a></h3>
 <p>To trigger a notification to observers, use the <tt class="docutils literal">notify()</tt> method:</p>
-<pre class="literal-block">$connection-&gt;notify('an_event', 'a payload');
+<pre class="literal-block">
+$connection-&gt;notify('an_event', 'a payload');
 </pre>
 </div>
 </div>
 <div class="section" id="logging">
-<h2><a class="toc-backref" href="#id31">Logging</a></h2>
+<h2><a class="toc-backref" href="#id32">Logging</a></h2>
 <p>Connections can register any logger class that implements <tt class="docutils literal">\Psr\Logger\LoggerInterface</tt> using the <tt class="docutils literal">setLogger()</tt> method.</p>
 <p>All exceptions will be logged using <tt class="docutils literal">ERROR</tt> level. Connecting problems will issue a <tt class="docutils literal">ALERT</tt> level log message.</p>
 </div>
 </div>
 <div class="section" id="map-classes">
-<h1><a class="toc-backref" href="#id32">Map classes</a></h1>
+<h1><a class="toc-backref" href="#id33">Map classes</a></h1>
 <div class="section" id="id2">
-<h2><a class="toc-backref" href="#id33">Overview</a></h2>
+<h2><a class="toc-backref" href="#id34">Overview</a></h2>
 <dl class="docutils">
 <dt>Map classes are the central point of Pomm because</dt>
 <dd><ul class="first last simple">
@@ -1362,9 +947,9 @@ $payload = $data['payload']; // payload if any
 <p><tt class="docutils literal">BaseYourEntityMap</tt> can be skipped but since Pomm proposes automatic code generation, this file can be regenerated over and over without you to loose precious custom code. This is why this file owns the data structure read from the database. If you create a map file that does not rely on automatic generation, it has not not to use a BaseMap file.</p>
 </div>
 <div class="section" id="structure">
-<h2><a class="toc-backref" href="#id34">Structure</a></h2>
+<h2><a class="toc-backref" href="#id35">Structure</a></h2>
 <div class="section" id="introspected-tables">
-<h3><a class="toc-backref" href="#id35">Introspected tables</a></h3>
+<h3><a class="toc-backref" href="#id36">Introspected tables</a></h3>
 <dl class="docutils">
 <dt>When Map classes are instantiated, the method <tt class="docutils literal">initialize</tt> is triggered. This method is responsible of setting various structural elements:</dt>
 <dd><ul class="first last simple">
@@ -1377,7 +962,8 @@ $payload = $data['payload']; // payload if any
 </dl>
 <p>If the table is stored in a special database schema, it must appear in the <tt class="docutils literal">object_name</tt> attribute. If you do not use schemas, Postgresql will store everything in the public schema. You do not have to specify it in the <tt class="docutils literal">object_name</tt> attribute but it will be used in the class namespace. As <tt class="docutils literal">public</tt> is also a reserved keyword of PHP, the namespace for the public schema is <tt class="docutils literal">PublicSchema</tt>.</p>
 <p>Let's say we have the following table <tt class="docutils literal">student</tt> in the <tt class="docutils literal">public</tt> schema of the database <tt class="docutils literal">college</tt>:</p>
-<pre class="literal-block">+-------------+-------------------------------+
+<pre class="literal-block">
++-------------+-------------------------------+
 |   Column    |            Type               |
 +=============+===============================+
 |  reference  | character(10)                 |
@@ -1394,7 +980,8 @@ $payload = $data['payload']; // payload if any
 +-------------+-------------------------------+
 </pre>
 <p>The last field <tt class="docutils literal">exam_dates</tt> is an array of timestamps (see <a class="reference internal" href="#arrays">Arrays</a> below). The corresponding PHP structure will be:</p>
-<pre class="literal-block">&lt;?php
+<pre class="literal-block">
+&lt;?php
 
  namespace College\PublicSchema\Base;
 
@@ -1420,7 +1007,8 @@ $payload = $data['payload']; // payload if any
  }
 </pre>
 <p>All generated map classes use PHP namespace. This namespace is composed by the database name and the database schema the table is located in. If database name is not supplied to the <tt class="docutils literal">Database</tt> constructor (see <a class="reference internal" href="#database-class-and-configuration">Database class and configuration</a>), the real database name is used. If by example, the previous table were in the <tt class="docutils literal">school</tt> database schema, the following lines would change:</p>
-<pre class="literal-block">&lt;?php
+<pre class="literal-block">
+&lt;?php
 
  namespace College\School\Base;
  ...
@@ -1429,17 +1017,19 @@ $payload = $data['payload']; // payload if any
 </pre>
 </div>
 <div class="section" id="arrays">
-<h3><a class="toc-backref" href="#id36">Arrays</a></h3>
+<h3><a class="toc-backref" href="#id37">Arrays</a></h3>
 <p>Postgresql supports arrays. An array can contain several data all from the same type. Pomm of course supports this feature using the <tt class="docutils literal">[]</tt> notation after the converter declaration:</p>
-<pre class="literal-block">$this-&gt;addField('authors', 'varchar[]');   // Array of strings
+<pre class="literal-block">
+$this-&gt;addField('authors', 'varchar[]');   // Array of strings
 $this-&gt;addField('locations', 'point[]');   // Array of points
 </pre>
 <p>The converter system handles that and the entities will be hydrated with an array of the according type depending on the given converter.</p>
 </div>
 <div class="section" id="temporary-tables">
-<h3><a class="toc-backref" href="#id37">Temporary tables</a></h3>
+<h3><a class="toc-backref" href="#id38">Temporary tables</a></h3>
 <p>Sometimes, you might want to create temporary tables. A map class can create its own table, modify it and destroy it. Let's imagine we have to create a temporary tables for students and their average scores in each discipline. The following map class could do the job:</p>
-<pre class="literal-block">&lt;?php
+<pre class="literal-block">
+&lt;?php
 
 namespace College\School;
 
@@ -1462,14 +1052,14 @@ class AverageStudentScoreMap extends BaseObjectMap
 
     public function createTable()
     {
-      $sql = "CREATE TEMPORARY TABLE %s (reference VARCHAR PRIMARY KEY, ...
+      $sql = &quot;CREATE TEMPORARY TABLE %s (reference VARCHAR PRIMARY KEY, ...
 
       $this-&gt;query(sprintf($sql, $this-&gt;getTableName()), array());
     }
 
     public function dropTable()
     {
-      $sql = "DROP TABLE %s CASCADE";
+      $sql = &quot;DROP TABLE %s CASCADE&quot;;
 
       $this-&gt;query(sprintf($sql, $this-&gt;getTableName()), array());
     }
@@ -1478,26 +1068,30 @@ class AverageStudentScoreMap extends BaseObjectMap
 <p>You can create methods to change the table structure, add or drop columns etc. This is what it is done by example in the converter test script.</p>
 </div>
 <div class="section" id="creating-entities">
-<h3><a class="toc-backref" href="#id38">Creating entities</a></h3>
+<h3><a class="toc-backref" href="#id39">Creating entities</a></h3>
 <p>Map instances are entities builder, it is possible to create entities and save them in the same move:</p>
-<pre class="literal-block">$entity = $map-&gt;createObject(array('field1' =&gt; $value1, ...)); // This build an entity instance.
+<pre class="literal-block">
+$entity = $map-&gt;createObject(array('field1' =&gt; $value1, ...)); // This build an entity instance.
 $entity = $map-&gt;createAndSaveObject(array('field1' =&gt; $value1, ...)); // This build and save an entity.
 $collection = $map-&gt;createAndSaveObjects(array(array('field1' =&gt; $value01, ...), array('field1' =&gt; $value11, ...))); // Save entities and return a collection.
 </pre>
 <p>These methods are useful to push new data in the database but sometimes, data collected from the interface are not enough to save a database entity. This is the case when some values rely on Postgresql functions. The <tt class="docutils literal">RawString</tt> type allow programmers to pass unescaped strings to the database:</p>
-<pre class="literal-block">$entity = $map-&gt;createAndSaveObject(array('field' =&gt; new \Pomm\Type\RawString('my_pg_function(...)')));
+<pre class="literal-block">
+$entity = $map-&gt;createAndSaveObject(array('field' =&gt; new \Pomm\Type\RawString('my_pg_function(...)')));
 </pre>
 <p>This will issue an insert statement like:</p>
-<pre class="literal-block">INSERT INTO some_table (field) VALUES (my_pg_function(...)) RETURNING ...
+<pre class="literal-block">
+INSERT INTO some_table (field) VALUES (my_pg_function(...)) RETURNING ...
 </pre>
 </div>
 </div>
 <div class="section" id="querying-the-database">
-<h2><a class="toc-backref" href="#id39">Querying the database</a></h2>
+<h2><a class="toc-backref" href="#id40">Querying the database</a></h2>
 <div class="section" id="create-update-drop">
-<h3><a class="toc-backref" href="#id40">Create, update, drop</a></h3>
+<h3><a class="toc-backref" href="#id41">Create, update, drop</a></h3>
 <p>The main goal of the map classes is to provide a layer between a database and entities. They provide programmers with basic tools to save, update and delete entities trough <tt class="docutils literal">saveOne()</tt>, <tt class="docutils literal">updateOne()</tt> and <tt class="docutils literal">deleteOne()</tt> methods.</p>
-<pre class="literal-block">$entity = $map-&gt;createObject(array('pika' =&gt; 'chu', 'plop' =&gt; false));
+<pre class="literal-block">
+$entity = $map-&gt;createObject(array('pika' =&gt; 'chu', 'plop' =&gt; false));
 
 $map-&gt;saveOne($entity);     // INSERT
 
@@ -1507,9 +1101,13 @@ $entity-&gt;setPlop(true);
 $map-&gt;saveOne($entity);     // UPDATE
 </pre>
 <p>As illustrated above, the <tt class="docutils literal">saveOne()</tt> method saves an entity whatever it is an update or an insert. It is important to know that the internal state (see <a class="reference internal" href="#life-cycle">Life cycle</a>) of the entity is used to determine if the object exists or not and choose between the <tt class="docutils literal">INSERT</tt> or the <tt class="docutils literal">UPDATE</tt> statement.
-Whatever is used, the whole structure is saved every time this method is called. In order just to update some fields, use the <tt class="docutils literal">updateOne()</tt> method.
-Note that if the table related to this entity sets default values (like <tt class="docutils literal">created_at</tt> field by example) they will be <strong>automatically hydrated in the entity</strong>.</p>
-<pre class="literal-block">$entity-&gt;setPika('chu');
+Whatever is used, the whole structure is saved every time this method is called. In order just to update some fields, use the <tt class="docutils literal">updateOne()</tt> method.</p>
+<div class="warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If the table related to this entity sets default values (like <tt class="docutils literal">created_at</tt> field by example) they will be <strong>automatically hydrated in the entity</strong>.</p>
+</div>
+<pre class="literal-block">
+$entity-&gt;setPika('chu');
 $entity-&gt;setPlop(false);
 
 $map-&gt;updateOne($entity, array('pika')); // UPDATE ... set pika='...'
@@ -1518,7 +1116,8 @@ $map-&gt;getPika();            // chu
 $map-&gt;getPlop();            // true
 </pre>
 <p>In the example above, two fields are set and only one is updated. The result of this is the second field to be <strong>replaced with the value from the database</strong>.</p>
-<pre class="literal-block">$map-&gt;deleteOne($entity);
+<pre class="literal-block">
+$map-&gt;deleteOne($entity);
 
 $entity-&gt;isNew();           // false
 $entity-&gt;isModified();        // false
@@ -1526,9 +1125,10 @@ $entity-&gt;isModified();        // false
 <p>The <tt class="docutils literal">deleteOne()</tt> method is pretty straightforward. Like the other modifiers, it hydrates the entity with the deleted row from the database in case there are to be used elsewhere.</p>
 </div>
 <div class="section" id="built-in-finders">
-<h3><a class="toc-backref" href="#id41">Built-in finders</a></h3>
+<h3><a class="toc-backref" href="#id42">Built-in finders</a></h3>
 <p>The first time the base map classes are generated, the map classes and the entity classes will be also created. Using the example with student, the empty map file should look like this:</p>
-<pre class="literal-block">&lt;?php
+<pre class="literal-block">
+&lt;?php
 namespace College\School;
 
 use College\School\Base\StudentMap as BaseStudentMap;
@@ -1551,29 +1151,34 @@ class StudentMap extends BaseStudentMap
 <p>Finders return either a <tt class="docutils literal">Collection</tt> instance virtually containing all entities returned by the query (see <a class="reference internal" href="#collections">Collections</a>) or just a related model entity instance (like <tt class="docutils literal">findByPK</tt>).</p>
 </div>
 <div class="section" id="findall">
-<h3><a class="toc-backref" href="#id42">findAll</a></h3>
+<h3><a class="toc-backref" href="#id43">findAll</a></h3>
 <p><tt class="docutils literal">findAll</tt> is the simplest query that can be issued on a database set, it returns all the tuples of the set. This method takes a query suffix as optional argument. This is useful for query modifiers like <tt class="docutils literal">LIMIT ... OFFSET</tt> or <tt class="docutils literal">ORDER BY</tt>.</p>
-<pre class="literal-block">$map-&gt;findAll('ORDER BY created_at DESC LIMIT 5');
+<pre class="literal-block">
+$map-&gt;findAll('ORDER BY created_at DESC LIMIT 5');
 
 // corresponding query
 SELECT
-  "field1" AS "field1",
+  &quot;field1&quot; AS &quot;field1&quot;,
   ...
 FROM
   table_name
 ORDER BY created_at DESC LIMIT 5
 </pre>
-<p><strong>note</strong> If you are just interested by the suffix to paginate your queries, have a look at <cite>Pagers_</cite>.</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you are just interested by the suffix to paginate your queries, have a look at <cite>Pagers_</cite>.</p>
+</div>
 </div>
 <div class="section" id="findwhere">
-<h3><a class="toc-backref" href="#id43">findWhere</a></h3>
+<h3><a class="toc-backref" href="#id44">findWhere</a></h3>
 <p>The simplest way to create a query with Pomm is to use the <tt class="docutils literal">findWhere()</tt> method.</p>
 <dl class="docutils">
 <dt>findWhere($where, $values, $suffix)</dt>
 <dd>returns a set of entities based on the given where clause. This clause can be a string or a <tt class="docutils literal">Where</tt> instance.</dd>
 </dl>
 <p>It is possible to use it directly because we are in a Map class hence Pomm knows what table and fields to use in the query.</p>
-<pre class="literal-block">/* SELECT
+<pre class="literal-block">
+/* SELECT
      reference,
      first_name,
      last_name,
@@ -1587,10 +1192,11 @@ ORDER BY created_at DESC LIMIT 5
 */
 
 // don't do that !
-$students = $this-&gt;findWhere("birthdate &gt; '1980-01-01' AND first_name ILIKE '%an%'");
+$students = $this-&gt;findWhere(&quot;birthdate &gt; '1980-01-01' AND first_name ILIKE '%an%'&quot;);
 </pre>
 <p>Of course, this is not very useful, because the date is very likely to be a parameter. A finder <tt class="docutils literal">getYoungerThan</tt> would be:</p>
-<pre class="literal-block">public function getYoungerThan(DateTime $date)
+<pre class="literal-block">
+public function getYoungerThan(DateTime $date)
 {
 /* SELECT
      reference,
@@ -1608,42 +1214,49 @@ $students = $this-&gt;findWhere("birthdate &gt; '1980-01-01' AND first_name ILIK
    LIMIT 10
 */
 
-  return $this-&gt;findWhere("birthdate &gt; $* AND first_name ILIKE $*",
+  return $this-&gt;findWhere(&quot;birthdate &gt; $* AND first_name ILIKE $*&quot;,
       array($date, '%an%'),
       'ORDER BY birthdate DESC LIMIT 10'
       );
 }
 </pre>
 <p>All queries are prepared, this might increase the performance but it certainly increases the security. Passing the argument using the question mark makes it automatically to be escaped by the database and avoid SQL-injection attacks. If a suffix is passed, it is appended to the query <strong>as is</strong>. The suffix is intended to allow developers specifying the sorting order of a subset. As the query is prepared, a multiple query injection type attack is not directly possible but be careful if the values sent directly from an untrusted source.</p>
-<p><strong>Note</strong> The DateTime PHP instances can be passed as is, they will be converted into string internally.</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">The DateTime PHP instances can be passed as is, they will be converted into string internally.</p>
+</div>
 </div>
 <div class="section" id="and-or-the-where-class">
-<h3><a class="toc-backref" href="#id44">AND, OR: The Where class</a></h3>
+<h3><a class="toc-backref" href="#id45">AND, OR: The Where class</a></h3>
 <p>Sometimes, it is not possible to know in advance what will be the clauses of your query because it depends on variable factors. The <tt class="docutils literal">Where</tt> class chains logical statements:</p>
-<pre class="literal-block">public function getYoungerThan(DateTime $date, $needle)
+<pre class="literal-block">
+public function getYoungerThan(DateTime $date, $needle)
 {
-  $where = new Pomm\Query\Where("birthdate &gt; $*", array($date));
+  $where = new Pomm\Query\Where(&quot;birthdate &gt; $*&quot;, array($date));
   $where-&gt;andWhere('first_name ILIKE $*', array(sprintf('%%%s%%', $needle)));
 
   return $this-&gt;findWhere($where, null, 'ORDER BY birthdate DESC LIMIT 10');
 }
 </pre>
 <p>The <tt class="docutils literal">Where</tt> class has two very handy methods: <tt class="docutils literal">andWhere</tt> and <tt class="docutils literal">orWhere</tt> which can take string or another <tt class="docutils literal">Where</tt> instance as argument. All methods return a <tt class="docutils literal">Where</tt> instance so it is possible to chain the calls. The example above can be rewritten this way:</p>
-<pre class="literal-block">public function getYoungerThan(DateTime $date, $needle)
+<pre class="literal-block">
+public function getYoungerThan(DateTime $date, $needle)
 {
-  $where = Pomm\Query\Where::create("birthdate &gt; $*", array($date))
+  $where = Pomm\Query\Where::create(&quot;birthdate &gt; $*&quot;, array($date))
       -&gt;andWhere('first_name ILIKE $*', array(sprintf('%%%s%%', $needle)))
 
   return $this-&gt;findWhere($where, null, 'ORDER BY birthdate DESC LIMIT 10');
 }
 </pre>
 <p>Because the <tt class="docutils literal">WHERE something IN <span class="pre">(...)</span></tt> clause needs to declare as many '$*' as given parameters, it has its own constructor:</p>
-<pre class="literal-block">// WHERE (station_id, line_no) IN ((1, 1), (1, 3), ... );
+<pre class="literal-block">
+// WHERE (station_id, line_no) IN ((1, 1), (1, 3), ... );
 
-$this-&gt;findWhere(Pomm\Query\Where::createWhereIn("(station_id, line_no)", array(array(1, 1), array(1, 3)))
+$this-&gt;findWhere(Pomm\Query\Where::createWhereIn(&quot;(station_id, line_no)&quot;, array(array(1, 1), array(1, 3)))
 </pre>
 <p>The <tt class="docutils literal">Where</tt> instances can be combined together with respect of the logical precedence:</p>
-<pre class="literal-block">$where1 = new Pomm\Query\Where('pika = $*', array('chu'));
+<pre class="literal-block">
+$where1 = new Pomm\Query\Where('pika = $*', array('chu'));
 $where2 = new Pomm\Query\Where('age &lt; $*', array(18));
 
 $where1-&gt;orWhere($where2);
@@ -1653,7 +1266,7 @@ echo $where1; // (pika = $* OR age &lt; $*) AND other_id IN ($*,$*,$*,$*,$*,$*)
 </pre>
 </div>
 <div class="section" id="fields-methods">
-<h3><a class="toc-backref" href="#id45">Fields methods</a></h3>
+<h3><a class="toc-backref" href="#id46">Fields methods</a></h3>
 <p>A very useful property of SQL sets is that they are extendibles. It possible to add a new field or remove an existing one in a SELECT very easily. All the generic finders described above use the following methods to know what fields to retrieve from queries:</p>
 <ul class="simple">
 <li><tt class="docutils literal">getFields</tt></li>
@@ -1664,31 +1277,36 @@ echo $where1; // (pika = $* OR age &lt; $*) AND other_id IN ($*,$*,$*,$*,$*,$*)
 <p><strong>getSelectFields($alias)</strong> is used by all the finders by also by the update, delete and insert methods in their <tt class="docutils literal">RETURNING</tt> clause. Overloading this one will change their behavior also.</p>
 <p><strong>getGroupByFields($alias)</strong> is to be used in <tt class="docutils literal">GROUP BY</tt> clauses. Note that Postgresql &gt;= 9.1 does not enforce grouping all the fields present in the select as soon as they are grouped by primary key. So this method is to be used only when using Postgres 9.0.</p>
 <p>The following example show how to modify the fields for a table containing user informations:</p>
-<pre class="literal-block">public function getSelectFields($alias = null)
+<pre class="literal-block">
+public function getSelectFields($alias = null)
 {
     $fields = parent::getSelectFields($alias);
-    $alias = is_null($alias) ? $alias."." : '';
+    $alias = is_null($alias) ? $alias.&quot;.&quot; : '';
 
     // We do never retrieve password informations
     unset($fields['password']);
 
     // Add gravatar id in the select
-    $fields['gravatar'] = sprintf("md5(%s.email_address)", $alias);
+    $fields['gravatar'] = sprintf(&quot;md5(%s.email_address)&quot;, $alias);
 
     return $fields;
 }
 
 // elsewhere in the code
-$employee = $employee_map-&gt;findByPk(array('email' =&gt; 'pika.chu@gmail.com'));
+$employee = $employee_map-&gt;findByPk(array('email' =&gt; 'pika.chu&#64;gmail.com'));
 $employee-&gt;has('password'); // false
 $employee-&gt;get('gravatar'); // 6c3e76d8b31679442f089cd3e7edb48a
 </pre>
-<p>Note the example above show the use of a Postgresql's function to calculate the gravatar field. It is obviously possible to use all Postgresql operators and functions in the fields, which makes this feature a very powerful ally.</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">The example above shows the use of a Postgresql's function to calculate the gravatar field. It is obviously possible to use all Postgresql operators and functions in the fields, which makes this feature a very powerful ally.</p>
+</div>
 </div>
 <div class="section" id="building-custom-queries">
-<h3><a class="toc-backref" href="#id46">Building custom queries</a></h3>
+<h3><a class="toc-backref" href="#id47">Building custom queries</a></h3>
 <p>Even if generic finders may fulfill 90% of developers needs, it is possible to define your own finders using SQL. The generic structures of the SQL with Pomm follow the principle described below:</p>
-<pre class="literal-block">   SELECT
+<pre class="literal-block">
+   SELECT
      :table_fields
    FROM
      :table_name
@@ -1701,7 +1319,7 @@ $employee-&gt;get('gravatar'); // 6c3e76d8b31679442f089cd3e7edb48a
 </pre>
 </div>
 <div class="section" id="fields-formatters">
-<h3><a class="toc-backref" href="#id47">Fields formatters</a></h3>
+<h3><a class="toc-backref" href="#id48">Fields formatters</a></h3>
 <p>Field getters return an array of fields. This array has to be processed to get a string of fields usable in a SQL query. This is the role of the fields formatters methods:</p>
 <blockquote>
 <ul class="simple">
@@ -1710,10 +1328,11 @@ $employee-&gt;get('gravatar'); // 6c3e76d8b31679442f089cd3e7edb48a
 </ul>
 </blockquote>
 <p>These methods call the fields getter given as <em>method_name</em> and return the formatted list of fields:</p>
-<pre class="literal-block">$where = new \Pomm\Query\Where::create("age &lt; $*", array(18))
+<pre class="literal-block">
+$where = new \Pomm\Query\Where::create(&quot;age &lt; $*&quot;, array(18))
     -&gt;andWhere('main_teacher_id = $*', array(1));
 
-$sql = "SELECT :table_fields FROM :table_name WHERE :conditions";
+$sql = &quot;SELECT :table_fields FROM :table_name WHERE :conditions&quot;;
 
 $sql = strtr($sql, array(
     ':table_fields' =&gt; $this-&gt;formatFieldsWithAlias('getSelectFields', 'my_table'),
@@ -1724,9 +1343,10 @@ $sql = strtr($sql, array(
 return $this-&gt;query-&gt;($sql, $where-&gt;getValues());
 </pre>
 <p>This will perform the following query:</p>
-<pre class="literal-block">SELECT
-  "my_table.field1" AS "field1",
-  "my_table.field2" AS "field2",
+<pre class="literal-block">
+SELECT
+  &quot;my_table.field1&quot; AS &quot;field1&quot;,
+  &quot;my_table.field2&quot; AS &quot;field2&quot;,
   ...
 FROM
   a_table my_table
@@ -1736,9 +1356,10 @@ WHERE
 <p>with parameter 1 = 18 and parameter 2 = 1.</p>
 </div>
 <div class="section" id="complex-queries">
-<h3><a class="toc-backref" href="#id48">Complex queries</a></h3>
+<h3><a class="toc-backref" href="#id49">Complex queries</a></h3>
 <p>The example above is roughly what is coded in <tt class="docutils literal">findWhere</tt>.In real life, it is very likely one needs to join several database tables and their fields. Pomm makes it easy to get other map files from within any other map class.</p>
-<pre class="literal-block">// MyDatabase\Blog\PostMap Class
+<pre class="literal-block">
+// MyDatabase\Blog\PostMap Class
 public function getBlogPostsWithCommentCount(Pomm\Query\Where $where)
 {
   $comment_map = $this-&gt;connection-&gt;getMapFor('\MyDatabase\Blog\Comment');
@@ -1746,7 +1367,7 @@ public function getBlogPostsWithCommentCount(Pomm\Query\Where $where)
   $sql = &lt;&lt;&lt;_
   SELECT
     :post_fields,
-    COUNT(c.id) as "comment_count"
+    COUNT(c.id) as &quot;comment_count&quot;
   FROM
     :post_table p
       LEFT JOIN :comment_table c ON
@@ -1769,27 +1390,30 @@ public function getBlogPostsWithCommentCount(Pomm\Query\Where $where)
 }
 </pre>
 <p>The <tt class="docutils literal">query()</tt> method is available for custom queries. It takes 2 parameters, the SQL statement and an optional array of values to be escaped. Keep in mind, the number of values must match the '$*' Occurrences in the query.</p>
-<p>Whatever the data fetched, Pomm will hydrate objects according to what is in structure definition of map class. <strong>Entities do not know about their structure</strong> they just contain data and methods. The entity instances returned here will have this extra field "comment_count" exactly as it would be a normal field. Of course, when updating, this field will be ignored and will not cause an error.</p>
+<p>Whatever the data fetched, Pomm will hydrate objects according to what is in structure definition of map class. <strong>Entities do not know about their structure</strong> they just contain data and methods. The entity instances returned here will have this extra field &quot;comment_count&quot; exactly as it would be a normal field. Of course, when updating, this field will be ignored and will not cause an error.</p>
 </div>
 <div class="section" id="virtual-fields">
-<h3><a class="toc-backref" href="#id49">Virtual fields</a></h3>
-<p>Adding new fields in the SELECT trough the fields getter methods do not make them mapped to any known type hence not converted with the converter system. It is possible to assign these now "virtual fields" a converter.</p>
-<pre class="literal-block">// Map a field added in getSelectFields to then Interval converter.
+<h3><a class="toc-backref" href="#id50">Virtual fields</a></h3>
+<p>Adding new fields in the SELECT trough the fields getter methods do not make them mapped to any known type hence not converted with the converter system. It is possible to assign these now &quot;virtual fields&quot; a converter.</p>
+<pre class="literal-block">
+// Map a field added in getSelectFields to then Interval converter.
 $this-&gt;addVirtualField('created_since', 'Interval');
 </pre>
 <p>This feature is interesting since SQL queries can fetch objects directly:</p>
-<pre class="literal-block">SELECT author, array_agg(post) AS posts FROM author JOIN post ON post.author_id = author.id GROUP BY author...;
+<pre class="literal-block">
+SELECT author, array_agg(post) AS posts FROM author JOIN post ON post.author_id = author.id GROUP BY author...;
 
 +----+-------------------+-------------------------------------
 | id |       name        |                  posts
 +----+-------------------+-------------------------------------
-|  1 | john doe          | "{('post 1', 1, 'some content'),(
+|  1 | john doe          | &quot;{('post 1', 1, 'some content'),(
 +----+-------------------+-------------------------------------
-|  2 | Edgar             | "{('other post', 2, 'Other content'),
+|  2 | Edgar             | &quot;{('other post', 2, 'Other content'),
 +----+-------------------+-------------------------------------
 </pre>
 <p>Using an entity converter will make an entity instance fetched directly from the database. The example below creates a relationship between the author and the post tables getting all the posts from one author in an array of Post instances:</p>
-<pre class="literal-block">// YourDb\SchemaName\AuthorMap
+<pre class="literal-block">
+// YourDb\SchemaName\AuthorMap
 
 public function getOneWithPosts($author_name)
 {
@@ -1825,15 +1449,16 @@ public function getOneWithPosts($author_name)
 </div>
 </div>
 <div class="section" id="collections">
-<h2><a class="toc-backref" href="#id50">Collections</a></h2>
+<h2><a class="toc-backref" href="#id51">Collections</a></h2>
 <div class="section" id="fetching-results">
-<h3><a class="toc-backref" href="#id51">Fetching results</a></h3>
+<h3><a class="toc-backref" href="#id52">Fetching results</a></h3>
 <p>The <tt class="docutils literal">query()</tt> method return a <tt class="docutils literal">Collection</tt> instance that holds the PDOStatement with the results. The <tt class="docutils literal">Collection</tt> class implements the <tt class="docutils literal">Countable</tt> and <tt class="docutils literal">Iterator</tt> interfaces so they can be traversed using a <tt class="docutils literal">foreach</tt> PHP statement to retrieve the results:</p>
-<pre class="literal-block">printf("Your search returned '%d' results.", $collection-&gt;count());
+<pre class="literal-block">
+printf(&quot;Your search returned '%d' results.&quot;, $collection-&gt;count());
 
 foreach($collection as $blog_post)
 {
-  printf("Blog post '%s' posted on '%s' by '%s'.",
+  printf(&quot;Blog post '%s' posted on '%s' by '%s'.&quot;,
       $blog_post['title'],
       $blog_post['created_at']-&gt;format('Y-m-d'),
       $blog_post['author']
@@ -1841,7 +1466,8 @@ foreach($collection as $blog_post)
 }
 </pre>
 <p>Any particular result in a collection can be reached knowing the result's index. It is possible using the <tt class="docutils literal">has()</tt> and <tt class="docutils literal">get()</tt> methods:</p>
-<pre class="literal-block"># Get an object from the collection at a given index
+<pre class="literal-block">
+# Get an object from the collection at a given index
 # or create a new one if index does not exist
 $object = $collection-&gt;has($index) ?  $collection-&gt;get($index) : new Object();
 </pre>
@@ -1860,9 +1486,10 @@ $object = $collection-&gt;has($index) ?  $collection-&gt;get($index) : new Objec
 </dl>
 </div>
 <div class="section" id="collection-filters">
-<h3><a class="toc-backref" href="#id52">Collection filters</a></h3>
+<h3><a class="toc-backref" href="#id53">Collection filters</a></h3>
 <p>Pomm's <tt class="docutils literal">Collection</tt> class can register filters. Filters are just functions that are executed after values were fetched from the database and before the object is hydrated with them (pre hydration filters). These filters take the array of fetched values as parameter. They return an array with values which are then given to the next filter and so on. After all filters have been executed, the values are hydrated in entity instance related the map the collection comes from.</p>
-<pre class="literal-block">$collection = $this-&gt;query($sql, $values);
+<pre class="literal-block">
+$collection = $this-&gt;query($sql, $values);
 
 $collection-&gt;registerFilter(function($values) {
     $values['good_pika'] = $values['pika'] == 'chu' ? 'Good' : 'Try again';
@@ -1874,40 +1501,42 @@ $collection-&gt;registerFilter(function($values) {
 </div>
 </div>
 <div class="section" id="pagers">
-<h2><a class="toc-backref" href="#id53">Pagers</a></h2>
+<h2><a class="toc-backref" href="#id54">Pagers</a></h2>
 <div class="section" id="pager-query-methods">
-<h3><a class="toc-backref" href="#id54">Pager query methods</a></h3>
+<h3><a class="toc-backref" href="#id55">Pager query methods</a></h3>
 <p><tt class="docutils literal">BaseObjectMap</tt> instances provide 2 methods that will grant programmers with a <tt class="docutils literal">Pager</tt> class. <tt class="docutils literal">paginateQuery()</tt> and the handy <tt class="docutils literal">paginateFindWhere()</tt>. It adds the correct subset limitation at the end of queries. Of course, it assumes no LIMIT nor OFFSET sql clauses are already present in the given query.</p>
 <p>The <tt class="docutils literal">paginateFindWhere()</tt> method acts pretty much like the <tt class="docutils literal">findWhere()</tt> method (see <a class="reference internal" href="#built-in-finders">Built-in finders</a>) which it uses internally. This means the condition can be either a string or a <tt class="docutils literal">Pomm\Query\Where</tt> instance (see <a class="reference internal" href="#and-or-the-where-class">AND, OR: The Where class</a>):</p>
-<pre class="literal-block">$pager = $student_map
+<pre class="literal-block">
+$pager = $student_map
   -&gt;paginateFindWhere('age &lt; $* OR gender = $*', array(19, 'F'), 'ORDER BY score ASC', 25, 4);
 </pre>
 <p>The example below ask Pomm to retrieve the fourth page of students that match some condition with 25 results per page.</p>
 <p>The <tt class="docutils literal">paginateQuery()</tt> acts like the <tt class="docutils literal">query()</tt> method but it requires 2 SQL queries: the one that returns results and the one that counts the total number of rows that first query would return without paging.</p>
 </div>
 <div class="section" id="displaying-a-pager">
-<h3><a class="toc-backref" href="#id55">Displaying a pager</a></h3>
+<h3><a class="toc-backref" href="#id56">Displaying a pager</a></h3>
 <p><tt class="docutils literal">Pager</tt> instances come with methods to display basic page informations like page count, current page, first result row etc. Here is an example of how to display a page in a twig template:</p>
-<pre class="literal-block">&lt;ul&gt;
+<pre class="literal-block">
+&lt;ul&gt;
   {% for student in pager.getCollection() %}
     &lt;li&gt;{{ student }}&lt;/li&gt;
   {% endfor %}
 &lt;/ul&gt;
 {% if pager.getLastPage() &gt; 1 %}
-&lt;div class="pager"&gt;&lt;p&gt;
-&lt;a href="{{ app.url_generator.generate('news') }}"&gt;First&lt;/a&gt;
+&lt;div class=&quot;pager&quot;&gt;&lt;p&gt;
+&lt;a href=&quot;{{ app.url_generator.generate('news') }}&quot;&gt;First&lt;/a&gt;
 {% if pager.isPreviousPage() %}
-&lt;a href="{{ app.url_generator.generate('news', {'page': pager.getPage - 1}) }}"&gt;Previous&lt;/a&gt;
+&lt;a href=&quot;{{ app.url_generator.generate('news', {'page': pager.getPage - 1}) }}&quot;&gt;Previous&lt;/a&gt;
 {% else %}
 Previous
 {% endif %}
 News {{ pager.getResultMin() }} to {{ pager.getResultMax() }}
 {% if pager.isNextPage() %}
-&lt;a href="{{ app.url_generator.generate('news', {'page': pager.getPage + 1} ) }}"&gt;Next&lt;/a&gt;
+&lt;a href=&quot;{{ app.url_generator.generate('news', {'page': pager.getPage + 1} ) }}&quot;&gt;Next&lt;/a&gt;
 {% else %}
 Next
 {% endif %}
-&lt;a href="{{ app.url_generator.generate('news', {'page': pager.getLastPage} ) }}"&gt;Last&lt;/a&gt;
+&lt;a href=&quot;{{ app.url_generator.generate('news', {'page': pager.getLastPage} ) }}&quot;&gt;Last&lt;/a&gt;
 &lt;/p&gt;&lt;/div&gt;
 {% endif %}
 </pre>
@@ -1915,14 +1544,15 @@ Next
 </div>
 </div>
 <div class="section" id="entities">
-<h1><a class="toc-backref" href="#id56">Entities</a></h1>
+<h1><a class="toc-backref" href="#id57">Entities</a></h1>
 <div class="section" id="id3">
-<h2><a class="toc-backref" href="#id57">Overview</a></h2>
+<h2><a class="toc-backref" href="#id58">Overview</a></h2>
 <div class="section" id="what-is-an-entity-class">
-<h3><a class="toc-backref" href="#id58">What is an Entity class ?</a></h3>
+<h3><a class="toc-backref" href="#id59">What is an Entity class ?</a></h3>
 <p>Entities are what programmers use in the end of the process. They are an object oriented implementation of the data retrieved from the database. Most of the time, these PHP classes are automatically generated by the introspection tool (see <a class="reference internal" href="#createbasemaptool">CreateBaseMapTool</a>) but you can write your own classes by hand. They just have to extends the <tt class="docutils literal">Pomm\Object\BaseObject</tt> class to know about status (see <a class="reference internal" href="#life-cycle">Life cycle</a>). Important things to know about entities are <strong>they are schema less</strong> and <strong>they are data source agnostic</strong>.</p>
 <p>By default, entities lie in the same directory than their map classes and de facto share the same namespace but this is only a convention.</p>
-<pre class="literal-block">&lt;?php
+<pre class="literal-block">
+&lt;?php
 
 namespace Database\Schema;
 
@@ -1935,33 +1565,37 @@ class MyEntity extends BaseObject
 </pre>
 </div>
 <div class="section" id="data-source-agnostic">
-<h3><a class="toc-backref" href="#id59">Data source agnostic</a></h3>
+<h3><a class="toc-backref" href="#id60">Data source agnostic</a></h3>
 <p>Entities do not know anything about database in general. This means they do not know how to save, retrieve or update themselves (see <a class="reference internal" href="#map-classes">Map classes</a> for that). <tt class="docutils literal">BaseObject</tt> children can be used to store data from web services, NoSQL database etc. They use the <tt class="docutils literal">hydrate()</tt> method to get data and accessors to read / write data from them (see <a class="reference internal" href="#living-with-entities">Living with entities</a> below).</p>
 </div>
 <div class="section" id="schema-less-entities">
-<h3><a class="toc-backref" href="#id60">Schema less entities</a></h3>
+<h3><a class="toc-backref" href="#id61">Schema less entities</a></h3>
 <p>Entities do not know anything about the structure of the tables, views etc. They are just flexible typed containers for data. They use PHP magic methods to simulate getters and setters on data they own (see <a class="reference internal" href="#living-with-entities">Living with entities</a> below). This is very powerful because entities can be accessed like arrays and still benefits from method overloads.</p>
-<!--  -->
-<blockquote>
-Note that entities do not know anything about their primary key either.</blockquote>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">Entities do not know anything about their primary key either.</p>
+</div>
 </div>
 </div>
 <div class="section" id="living-with-entities">
-<h2><a class="toc-backref" href="#id61">Living with entities</a></h2>
+<h2><a class="toc-backref" href="#id62">Living with entities</a></h2>
 <div class="section" id="creator">
-<h3><a class="toc-backref" href="#id62">Creator</a></h3>
+<h3><a class="toc-backref" href="#id63">Creator</a></h3>
 <p>There are several ways to create entities.</p>
-<pre class="literal-block">$entity = new Database\Schema\MyEntity();
+<pre class="literal-block">
+$entity = new Database\Schema\MyEntity();
 </pre>
 <p>It is possible to directly specify values to the constructor:</p>
-<pre class="literal-block">$entity = new Database\Schema\MyEntity(array('value1' =&gt; $value1, ... ));
+<pre class="literal-block">
+$entity = new Database\Schema\MyEntity(array('value1' =&gt; $value1, ... ));
 </pre>
 <p>Entity's according map class also proposes methods to create entities (see <a class="reference internal" href="#map-classes">Map classes</a>).</p>
 </div>
 <div class="section" id="accessors-and-mutators">
-<h3><a class="toc-backref" href="#id63">Accessors and mutators</a></h3>
+<h3><a class="toc-backref" href="#id64">Accessors and mutators</a></h3>
 <p>The abstract parent <tt class="docutils literal">BaseObject</tt> uses magic getters and setters to dynamically build the according methods. Internally, all values are stored in an array. The methods <tt class="docutils literal">set()</tt> and <tt class="docutils literal">get()</tt> are the interface to this array:</p>
-<pre class="literal-block">$entity = new Database\Schema\MyEntity();
+<pre class="literal-block">
+$entity = new Database\Schema\MyEntity();
 $entity-&gt;has('pika'); // false
 $entity-&gt;set('pika', 'chu');
 $entity-&gt;has('pika'); // true
@@ -1969,18 +1603,23 @@ $entity-&gt;get('pika'); // chu
 $entity-&gt;clear('pika');
 $entity-&gt;has('pika'); // false
 </pre>
-<p>Note that <tt class="docutils literal">get()</tt> can take an array with multiple attributes:</p>
-<pre class="literal-block">$entity-&gt;set('pika', 'chu');
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p><tt class="docutils literal">get()</tt> can take an array with multiple attributes:</p>
+<pre class="literal-block">
+$entity-&gt;set('pika', 'chu');
 $entity-&gt;set('plop', true);
-
-$entity-&gt;get(array('pika', 'plop')); // returns array('pika' =&gt; 'chu', 'plop' =&gt; true);
 </pre>
+<p class="last">$entity-&gt;get(array('pika', 'plop')); // returns array('pika' =&gt; 'chu', 'plop' =&gt; true);</p>
+</div>
 <p><tt class="docutils literal">get()</tt>, <tt class="docutils literal">clear()</tt> and <tt class="docutils literal">set()</tt> are <strong>generic accessors</strong>. They are used internally and cannot be overloaded. Use <strong>virtual accessors</strong> instead:</p>
-<pre class="literal-block">$entity = new Database\Schema\MyEntity(array('pika' =&gt; 'chu'));
+<pre class="literal-block">
+$entity = new Database\Schema\MyEntity(array('pika' =&gt; 'chu'));
 $entity-&gt;getPika();      // chu
 </pre>
 <p>They are called virtual because they do not exist by default but <tt class="docutils literal">BaseObject</tt> implements the <tt class="docutils literal">__call()</tt> method to trap accessors calls using the <tt class="docutils literal">get()</tt> and <tt class="docutils literal">set()</tt> generic methods. Of course, they can be overloaded:</p>
-<pre class="literal-block">// in the Entity class
+<pre class="literal-block">
+// in the Entity class
 public function getPika()
 {
   return strtoupper($this-&gt;get('pika'));
@@ -1993,9 +1632,10 @@ $entity-&gt;getPika();     // CHU
 <p>Since the methods <tt class="docutils literal">set()</tt> and <tt class="docutils literal">get()</tt> cannot be overloaded, they will always return raw values stored in the entity container. They are used to bypass overloading methods.</p>
 </div>
 <div class="section" id="interfaces-and-overloads">
-<h3><a class="toc-backref" href="#id64">Interfaces and overloads</a></h3>
+<h3><a class="toc-backref" href="#id65">Interfaces and overloads</a></h3>
 <p>Entities implement PHP's <tt class="docutils literal">ArrayAccess</tt> interface to use the accessors if any. This means programmers can have easy access to entity's data in templates without bypassing accessors:</p>
-<pre class="literal-block">// in the Entity class
+<pre class="literal-block">
+// in the Entity class
 public function getPika()
 {
   return strtoupper($this-&gt;get('pika'));
@@ -2013,17 +1653,19 @@ $entity-&gt;get('pika');   // chu
 <p>This is particularly useful when exposing entities data in interfaced or template system.</p>
 </div>
 <div class="section" id="extending-entities">
-<h3><a class="toc-backref" href="#id65">Extending entities</a></h3>
+<h3><a class="toc-backref" href="#id66">Extending entities</a></h3>
 <blockquote>
 <p>It is possible to extend entities providing new accessors. If by example there is an entity with a weight in grams and you would like to have a getter that returns it in ounces:</p>
-<pre class="literal-block">public function getWeightInOunce()
+<pre class="literal-block">
+public function getWeightInOunce()
 {
   return round($this-&gt;getWeight() * 0.0352739619, 2);
 }
 </pre>
 </blockquote>
 <p>In templates, it is possible to directly benefit from this getter while using the entity as an array:</p>
-<pre class="literal-block">// in PHP
+<pre class="literal-block">
+// in PHP
 &lt;?php echo $thing['weight_in_ounce'] ?&gt;
 
 // with Twig
@@ -2032,14 +1674,14 @@ $entity-&gt;get('pika');   // chu
 </div>
 </div>
 <div class="section" id="entities-and-database">
-<h2><a class="toc-backref" href="#id66">Entities and database</a></h2>
+<h2><a class="toc-backref" href="#id67">Entities and database</a></h2>
 <div class="section" id="import-and-export">
-<h3><a class="toc-backref" href="#id67">Import and export</a></h3>
+<h3><a class="toc-backref" href="#id68">Import and export</a></h3>
 <p><tt class="docutils literal">Pomm</tt> proposes several mechanisms to import or export entities data as array. The <tt class="docutils literal">hydrate()</tt> method takes an array and merge it with the entity's internal values. Be aware PHP associative arrays keys are case sensitive while Postgresql's field names are not. If some sort of conversion is required, the <tt class="docutils literal">convert()</tt> method will help. You can overload the <tt class="docutils literal">convert()</tt> method to create a more specific conversion (if you use web services data provider by example) but you cannot overload the <tt class="docutils literal">hydrate()</tt> method.</p>
 <p><tt class="docutils literal">export</tt> will dump entity's internal data without regard to getters.</p>
 </div>
 <div class="section" id="life-cycle">
-<h3><a class="toc-backref" href="#id68">Life cycle</a></h3>
+<h3><a class="toc-backref" href="#id69">Life cycle</a></h3>
 <p>Entities also propose mechanisms to check what state are their data compared to the data source. There are 2 states which present 4 possible combinations:</p>
 <dl class="docutils">
 <dt><strong>EXIST</strong></dt>
@@ -2048,7 +1690,8 @@ $entity-&gt;get('pika');   // chu
 <dd>This instance has been modified with mutators since hydration.</dd>
 </dl>
 <p>So, of course, an entity can be in both states EXIST and MODIFIED or NONE of them. The <tt class="docutils literal">BaseObject</tt> class grants programmers with several methods to check this internal state: <tt class="docutils literal">isNew()</tt>, <tt class="docutils literal">isModified()</tt> or you can directly access the <tt class="docutils literal">_state</tt> attribute from within class definition:</p>
-<pre class="literal-block">$entity = $map-&gt;createObject();
+<pre class="literal-block">
+$entity = $map-&gt;createObject();
 $entity-&gt;isNew();           // true
 $entity-&gt;isModified();      // false
 $entity-&gt;setPika('chu');
@@ -2059,16 +1702,16 @@ $entity-&gt;isModified();      // true
 </div>
 </div>
 <div class="section" id="tools">
-<h1><a class="toc-backref" href="#id69">Tools</a></h1>
+<h1><a class="toc-backref" href="#id70">Tools</a></h1>
 <div class="section" id="map-generation-tools">
-<h2><a class="toc-backref" href="#id70">Map generation tools</a></h2>
+<h2><a class="toc-backref" href="#id71">Map generation tools</a></h2>
 <p>Pomm comes with handy tools to generate map classes that reflect what is in your database.</p>
 <div class="section" id="database-inspector">
-<h3><a class="toc-backref" href="#id71">Database Inspector</a></h3>
+<h3><a class="toc-backref" href="#id72">Database Inspector</a></h3>
 <p>The database inspector class proposes methods to scavenge structure informations in the database. It is used by the Map generators and you can use it in your own scripts.</p>
 </div>
 <div class="section" id="createbasemaptool">
-<h3><a class="toc-backref" href="#id72">CreateBaseMapTool</a></h3>
+<h3><a class="toc-backref" href="#id73">CreateBaseMapTool</a></h3>
 <p>This class is the main generator class.</p>
 <blockquote>
 <ul class="simple">
@@ -2081,14 +1724,14 @@ $entity-&gt;isModified();      // true
 <p>This class accepts the following parameters:</p>
 <blockquote>
 <ul class="simple">
-<li>"database" a PommConnectionDatabase instance (mandatory).</li>
-<li>"table" or "oid" (mandatory)</li>
-<li>"prefix_dir" Where to generate the tree on the disk (mandatory).</li>
-<li>"schema" (default to 'public').</li>
-<li>"parent_namespace" When inheritance is found, override the default namespace for parent.</li>
-<li>"namespace" (default to '%dbname%%schema%') The namespace placeholder.</li>
-<li>"extends" (default to PommObjectBaseObjectMap).</li>
-<li>"class_name" The corresponding entity class. (default camel cased table's name).</li>
+<li>&quot;database&quot; a PommConnectionDatabase instance (mandatory).</li>
+<li>&quot;table&quot; or &quot;oid&quot; (mandatory)</li>
+<li>&quot;prefix_dir&quot; Where to generate the tree on the disk (mandatory).</li>
+<li>&quot;schema&quot; (default to 'public').</li>
+<li>&quot;parent_namespace&quot; When inheritance is found, override the default namespace for parent.</li>
+<li>&quot;namespace&quot; (default to '%dbname%%schema%') The namespace placeholder.</li>
+<li>&quot;extends&quot; (default to PommObjectBaseObjectMap).</li>
+<li>&quot;class_name&quot; The corresponding entity class. (default camel cased table's name).</li>
 </ul>
 </blockquote>
 <p><strong>table</strong> or <strong>oid</strong></p>
@@ -2107,29 +1750,30 @@ By default, the generated base class extends <tt class="docutils literal">\Pomm\
 In case of generating map class for a view, it may be a good idea to tell Pomm that entities fetched by this map are something else than it thinks. This makes possible to have different views of the same table fetching the same entities from them.</p>
 </div>
 <div class="section" id="scanschematool">
-<h3><a class="toc-backref" href="#id73">ScanSchemaTool</a></h3>
+<h3><a class="toc-backref" href="#id74">ScanSchemaTool</a></h3>
 <p>The schema scanning tool takes a schema name as parameter and then launches CreateBaseMapTool for each table / view it finds in it. The expected parameters are the following:</p>
 <blockquote>
 <ul class="simple">
-<li>"database" a PommConnectionDatabase instance (mandatory).</li>
-<li>"prefix_dir" Where to generate the tree on the disk (mandatory).</li>
-<li>"schema" (default to 'public').</li>
-<li>"namespace" (default to '%dbname%%schema%') The namespace placeholder.</li>
-<li>"extends" (default to PommObjectBaseObjectMap).</li>
-<li>"parent_namespace" When inheritance is found, override the default namespace for parent.</li>
-<li>"exclude" (optional) an array of tables/views not to generate files from.</li>
+<li>&quot;database&quot; a PommConnectionDatabase instance (mandatory).</li>
+<li>&quot;prefix_dir&quot; Where to generate the tree on the disk (mandatory).</li>
+<li>&quot;schema&quot; (default to 'public').</li>
+<li>&quot;namespace&quot; (default to '%dbname%%schema%') The namespace placeholder.</li>
+<li>&quot;extends&quot; (default to PommObjectBaseObjectMap).</li>
+<li>&quot;parent_namespace&quot; When inheritance is found, override the default namespace for parent.</li>
+<li>&quot;exclude&quot; (optional) an array of tables/views not to generate files from.</li>
 </ul>
 </blockquote>
 <p>Most of these parameters are sent to the <tt class="docutils literal">CreateBaseMapTool</tt> as is. The only different parameter is</p>
 <p><strong>exclude</strong>
 An array of tables/views to ignore.</p>
 <p>Here is a sample of code to generate map classes from all the tables/views in a database schema:</p>
-<pre class="literal-block">&lt;?php
+<pre class="literal-block">
+&lt;?php
 
 require __DIR__.'/vendor/pomm/test/autoload.php';
 
 $database = new Pomm\Connection\Database(array(
-        'dsn'  =&gt; 'pgsql://nss_user:nss_password@localhost/nss_db',
+        'dsn'  =&gt; 'pgsql://nss_user:nss_password&#64;localhost/nss_db',
         'name' =&gt; 'my_db'
         ));
 
@@ -2142,7 +1786,8 @@ $scan = new Pomm\Tools\ScanSchemaTool(array(
 $scan-&gt;execute();
 </pre>
 <p>This will parse the Postgresql's schema named <em>transfo</em> to scan it for tables and views. Then it will generate automatically the <em>BaseMap</em> files with the class structure and if map files or entity files do not exist, will create them. By default, with the code above, the following tree structure will be created from the directory this code is invoked:</p>
-<pre class="literal-block">/prefix/dir/MyDb
+<pre class="literal-block">
+/prefix/dir/MyDb
 └── Transfo
  &nbsp;&nbsp; ├── Base
  &nbsp;&nbsp; │&nbsp;&nbsp; └── TransformerMap.php
@@ -2152,10 +1797,12 @@ $scan-&gt;execute();
 </div>
 </div>
 </div>
- </div>
+</div>
+<div class="footer">
+<hr class="footer" />
+Generated on: 2013-11-09.
+Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
 
 </div>
-
-
-
-</body></html>
+</body>
+</html>
