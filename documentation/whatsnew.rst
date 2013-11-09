@@ -128,7 +128,12 @@ This will issue the following query::
 
     INSERT INTO entity (key1, key2) VALUES ('value1', my_pg_function(...));
 
-**Be aware** sending untrusted data in a `RawString` type **will** lead to SQL injection. So using this improperly is asking for troubles.
+.. warning:: sending untrusted data in a `RawString` type **will** lead to SQL injection. So using this improperly is asking for troubles.
+
+Row type
+--------
+
+Composite types were supported from Pomm 1.0 but it was necessary to create a type and a converter for them which could be a hassle. PgRow converts composite types into PHP arrays. It is easy to extend this converter to create your own PHP equivalent classes to Postgresql composite structures or just use it as is if this fits your needs.
 
 =========================
 Migrating from 1.1 to 1.2
