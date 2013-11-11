@@ -17,7 +17,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $where = Where::createWhereIn('B', array(1, 2, 3));
         $this->assertInstanceOf('Pomm\Query\Where', $where,  'Where::create() returns a Where instance.');
         $this->assertTrue($where->hasElement(), 'Where instance has element.');
-        $this->assertEquals('B IN (?, ?, ?)', (string) $where, "String where is 'B IN (?, ?, ?)'.");
+        $this->assertEquals('B IN ($*, $*, $*)', (string) $where, "String where is 'B IN ($*, $*, $*)'.");
         $this->assertEquals(array(1,2,3), $where->getValues(), 'Where values are "[1,2,3]".');
 
         $where = Where::create();
@@ -26,7 +26,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $where->getValues(), 'And no values.');
 
         $where = Where::createWhereIn('(C, D)', array(array('pika', 1), array('chu', 2)));
-        $this->assertEquals('(C, D) IN ((?, ?), (?, ?))', (string) $where, "String where is '(C, D) IN ((?, ?), (?, ?))'.");
+        $this->assertEquals('(C, D) IN (($*, $*), ($*, $*))', (string) $where, "String where is '(C, D) IN (($*, $*), ($*, $*))'.");
         $this->assertEquals(array('pika', 1, 'chu', 2), $where->getValues(), 'Where values are "[pika, 1, chu, 2]".');
         return $where;
     }

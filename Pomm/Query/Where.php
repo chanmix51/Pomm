@@ -60,7 +60,7 @@ class Where
                     }
                     else
                     {
-                        $escaped_values[] = '?';
+                        $escaped_values[] = '$*';
                     }
                 }
 
