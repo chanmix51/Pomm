@@ -141,6 +141,6 @@ class PreparedQuery
      */
     private function escapePlaceHolders($sql)
     {
-        return preg_replace_callback('/ \$\*/', function ($sub) { static $nb = 0; return sprintf(" $%d", ++$nb); }, $sql );
+        return preg_replace_callback('/\$\*/', function ($sub) { static $nb = 0; return sprintf("$%d", ++$nb); }, $sql );
     }
 }
