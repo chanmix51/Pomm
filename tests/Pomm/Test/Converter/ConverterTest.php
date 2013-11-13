@@ -714,8 +714,8 @@ class ConverterEntityMap extends BaseObjectMap
 
     public function alterComposite()
     {
-        $this->connection->executeAnonymousQuery("CREATE TYPE address AS (place TEXT, postal_code CHAR(5), city varchar)");
-        $this->alterTable(array('a_composite' => 'address', 'arr_composite' => 'address[]'));
+        $this->connection->executeAnonymousQuery("CREATE TYPE pomm_test.address AS (place TEXT, postal_code CHAR(5), city varchar)");
+        $this->alterTable(array('a_composite' => 'pomm_test.address', 'arr_composite' => 'pomm_test.address[]'));
 
         $this->connection->getDatabase()
             ->registerConverter('Address', new Converter\PgRow($this->connection->getDatabase(), new \Pomm\Object\RowStructure(array('place' => 'text', 'postal_code' => 'char', 'city' => 'varchar'))), array('pomm_test.address', 'address'));

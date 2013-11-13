@@ -57,7 +57,7 @@ class PreparedQuery
             $this->connection->throwConnectionException(sprintf("Could not prepare statement «%s».", $sql), LogLevel::ERROR);
         }
 
-        $this->connection->log(LogLevel::INFO, sprintf("Prepared query '%s' => START -- %s -- END", $this->name, $sql));
+        $this->connection->log(LogLevel::INFO, sprintf("Prepared query '%s' => -- %s --", $this->name, $sql));
     }
 
     /**
