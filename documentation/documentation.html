@@ -337,9 +337,9 @@ ul.auto-toc {
 <li><a class="reference internal" href="#converters-and-types" id="id14">Converters and types</a><ul>
 <li><a class="reference internal" href="#domains" id="id15">Domains</a></li>
 <li><a class="reference internal" href="#composite-types" id="id16">Composite types</a></li>
-<li><a class="reference internal" href="#writing-your-own-types" id="id17">Writing your own types</a></li>
-<li><a class="reference internal" href="#writing-your-own-converters" id="id18">Writing your own converters</a></li>
-<li><a class="reference internal" href="#entity-converter" id="id19">Entity converter</a></li>
+<li><a class="reference internal" href="#writing-custom-types" id="id17">Writing custom types</a></li>
+<li><a class="reference internal" href="#entity-converter" id="id18">Entity converter</a></li>
+<li><a class="reference internal" href="#writing-your-own-converters" id="id19">Writing your own converters</a></li>
 <li><a class="reference internal" href="#spawning-connections" id="id20">Spawning connections</a></li>
 </ul>
 </li>
@@ -648,11 +648,12 @@ CREATE TABLE customer (
 <pre class="literal-block">
 $database-&gt;registerConverter(
     'PostalAddress',
-    new \Pomm\Type\PgRow(
+    new \Pomm\Converter\PgRow(
         $database,
-        new \Pomm\Object\RowStructure(array('place' =&gt; 'text', 'postal_code' =&gt; 'char', 'city' =&gt; 'varchar', 'cedex' =&gt; 'char')),
-        array('public.postal_address')
-        ));
+        new \Pomm\Object\RowStructure(array('place' =&gt; 'text', 'postal_code' =&gt; 'char', 'city' =&gt; 'varchar', 'cedex' =&gt; 'char'))
+        ),
+    array('public.postal_address')
+    ;
 </pre>
 <p>This way, the composite types can be used as is in the map classes:</p>
 <pre class="literal-block">
@@ -662,7 +663,7 @@ protected function intitialize()
 
     $this-&gt;addField('customer_id', 'uuid')
         ...
-        -&gt;addField('billing_address' =&gt; 'public.postal_address')
+        -&gt;addField('billing_address', 'public.postal_address')
         ...
         ;
 </pre>
@@ -673,36 +674,50 @@ $map-&gt;saveOne($entity);
 </pre>
 <p>This will throw an exception since the <tt class="docutils literal">cedex</tt> key is missing.</p>
 </div>
-<div class="section" id="writing-your-own-types">
-<h3><a class="toc-backref" href="#id17">Writing your own types</a></h3>
-<p>PgRow converter is a generic converter to map with composite types. It is also possible to map them to real types of your own. Let's take an example: electrical transformers. Electrical transformers are composed by at least two wirings, an input one (named primary) and an output one (named secondary) but it can be more of them. A transformer winding is defined by the voltage it is supposed to have and the maximum current it can stands.</p>
+<div class="section" id="writing-custom-types">
+<h3><a class="toc-backref" href="#id17">Writing custom types</a></h3>
+<p>One solution to prevent the problem presented above is to use objects instead of arrays. The converter accepts a third argument <tt class="docutils literal">class_name</tt> that will spawn an instance from the array if set:</p>
 <pre class="literal-block">
-CREATE TYPE winding_power AS (
-    voltage numeric(4,1),
-    current numeric(5,3)
-);
+$database-&gt;registerConverter(
+    'PostalAddress',
+    new \Pomm\Converter\PgRow(
+        $database,
+        new \Pomm\Object\RowStructure(array('place' =&gt; 'text', 'postal_code' =&gt; 'char', 'city' =&gt; 'varchar', 'cedex' =&gt; 'char')),
+        '\Namespace\Of\Type\Address' // &lt;- provide a class name here
+        ),
+    array('public.postal_address')
+    ;
 </pre>
-<p>Tables containing a field with this type will return a tuple. A good way to manipulate that kind of data would be to create a <tt class="docutils literal">WindingPower</tt> type class:</p>
+<p>The <tt class="docutils literal">Address</tt> class is simplistic, since it must be a fixed typed class, it may just extends <tt class="docutils literal">\Pomm\Type\Composite</tt> and declare attributes as public:</p>
 <pre class="literal-block">
-&lt;?php
-
-namespace Model\Pomm\Type;
-
-class WindingPower
+class Address extends \Pomm\Type\Composite
 {
-    public $voltage;
-    public $current;
-
-    public function __construct($voltage, $current)
-    {
-        $this-&gt;voltage = $voltage;
-        $this-&gt;current = $current;
-    }
+    public $place;
+    public $postal_code;
+    public $city;
+    public $cedex;
 }
+</pre>
+<div class="warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">It is important that the attibutes be public so the values can easily be extracted into an array during the conversion process. Protected and private attributes will be ignored by the converter.</p>
+</div>
+<p>This type can directly be used with the entities:</p>
+<pre class="literal-block">
+$entity['billing_address'] = new \Namespace\Of\Type\Address(array('place' =&gt; 'some_place', 'postal_code' =&gt; '44000', 'city' =&gt; 'Nantes'));
+</pre>
+<p>This is useful in many ways, one of them being the ability to code proper accessors for the composite type instance.</p>
+</div>
+<div class="section" id="entity-converter">
+<h3><a class="toc-backref" href="#id18">Entity converter</a></h3>
+<p>In Postgresql, creating a table means creating a new type with the table's fields definition. Hence, it is possible to use that data type in other tables or use them as objects in your SQL queries. Pomm proposes a special converter to do so: the <tt class="docutils literal">PgEntity</tt> converter. Passing the table data type name and the associated entity class name will grant you with embedded entities.</p>
+<pre class="literal-block">
+$database
+  -&gt;registerConverter('MyEntity', new \Pomm\Converter\PgEntity($my_entity_map), array('my_schema.my_entity));
 </pre>
 </div>
 <div class="section" id="writing-your-own-converters">
-<h3><a class="toc-backref" href="#id18">Writing your own converters</a></h3>
+<h3><a class="toc-backref" href="#id19">Writing your own converters</a></h3>
 <dl class="docutils">
 <dt>All converters must implement the <tt class="docutils literal">Pomm\Converter\ConverterInterface</tt>. This interface makes converters to have two methods:</dt>
 <dd><ul class="first last simple">
@@ -711,40 +726,6 @@ class WindingPower
 </ul>
 </dd>
 </dl>
-<p>Here is the converter for the <tt class="docutils literal">WindingPower</tt> type mentioned above:</p>
-<pre class="literal-block">
-&lt;?php
-
-namespace Model\Pomm\Converter;
-
-use Pomm\Converter\ConverterInterface;
-use Model\Pomm\Type\WindingPower as WindingPowerType;
-
-class WindingPower implements ConverterInterface
-{
-    public function fromPg($data, $type = null)
-    {
-        $data = trim($data, &quot;()&quot;);
-        $values = preg_split('/,/', $data);
-
-        return new WindingPowerType($values[0], $values[1]);
-    }
-
-    public function toPg($data, $type = null)
-    {
-        return sprintf(&quot;winding_power '(%4.1f,%4.3f)'&quot;, $data-&gt;voltage, $data-&gt;current);
-    }
-}
-</pre>
-<p>It is advised not to hard-code the name of the class type so other developers may extend it and use theirs.</p>
-</div>
-<div class="section" id="entity-converter">
-<h3><a class="toc-backref" href="#id19">Entity converter</a></h3>
-<p>In Postgresql, creating a table means creating a new type with the table's fields definition. Hence, it is possible to use that data type in other tables or use them as objects in your SQL queries. Pomm proposes a special converter to do so: the <tt class="docutils literal">PgEntity</tt> converter. Passing the table data type name and the associated entity class name will grant you with embedded entities.</p>
-<pre class="literal-block">
-$database
-  -&gt;registerConverter('MyEntity', new \Pomm\Converter\PgEntity($my_entity_map), array('my_schema.my_entity));
-</pre>
 </div>
 <div class="section" id="spawning-connections">
 <h3><a class="toc-backref" href="#id20">Spawning connections</a></h3>
@@ -1800,7 +1781,7 @@ $scan-&gt;execute();
 </div>
 <div class="footer">
 <hr class="footer" />
-Generated on: 2013-11-09.
+Generated on: 2013-11-13.
 Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
 
 </div>

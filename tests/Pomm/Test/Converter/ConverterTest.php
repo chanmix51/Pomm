@@ -853,4 +853,6 @@ class AddressType extends \Pomm\Type\Composite
     public $postal_code;
     public $city;
     public $cedex;
+
+    protected $something = 'pika';
 }

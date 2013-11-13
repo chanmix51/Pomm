@@ -204,11 +204,12 @@ If such types exist in your database, they must be registered so Pomm can conver
 
     $database->registerConverter(
         'PostalAddress',
-        new \Pomm\Type\PgRow(
+        new \Pomm\Converter\PgRow(
             $database,
-            new \Pomm\Object\RowStructure(array('place' => 'text', 'postal_code' => 'char', 'city' => 'varchar', 'cedex' => 'char')),
-            array('public.postal_address')
-            ));
+            new \Pomm\Object\RowStructure(array('place' => 'text', 'postal_code' => 'char', 'city' => 'varchar', 'cedex' => 'char'))
+            ),
+        array('public.postal_address')
+        ;
 
 This way, the composite types can be used as is in the map classes::
 
@@ -218,7 +219,7 @@ This way, the composite types can be used as is in the map classes::
 
         $this->addField('customer_id', 'uuid')
             ...
-            ->addField('billing_address' => 'public.postal_address')
+            ->addField('billing_address', 'public.postal_address')
             ...
             ;
 
@@ -229,67 +230,38 @@ This will store, in a field named ``billing_address`` an array formatted with th
 
 This will throw an exception since the ``cedex`` key is missing.
 
-Writing your own types
-----------------------
+Writing custom types
+--------------------
 
-PgRow converter is a generic converter to map with composite types. It is also possible to map them to real types of your own. Let's take an example: electrical transformers. Electrical transformers are composed by at least two wirings, an input one (named primary) and an output one (named secondary) but it can be more of them. A transformer winding is defined by the voltage it is supposed to have and the maximum current it can stands.   ::
+One solution to prevent the problem presented above is to use objects instead of arrays. The converter accepts a third argument ``class_name`` that will spawn an instance from the array if set::
 
-  CREATE TYPE winding_power AS (
-      voltage numeric(4,1),
-      current numeric(5,3)
-  );
+    $database->registerConverter(
+        'PostalAddress',
+        new \Pomm\Converter\PgRow(
+            $database,
+            new \Pomm\Object\RowStructure(array('place' => 'text', 'postal_code' => 'char', 'city' => 'varchar', 'cedex' => 'char')),
+            '\Namespace\Of\Type\Address' // <- provide a class name here
+            ),
+        array('public.postal_address')
+        ;
 
-Tables containing a field with this type will return a tuple. A good way to manipulate that kind of data would be to create a ``WindingPower`` type class::
+The ``Address`` class is simplistic, since it must be a fixed typed class, it may just extends ``\Pomm\Type\Composite`` and declare attributes as public::
 
-  <?php
+    class Address extends \Pomm\Type\Composite
+    {
+        public $place;
+        public $postal_code;
+        public $city;
+        public $cedex;
+    }
 
-  namespace Model\Pomm\Type;
+.. warning:: It is important that the attibutes be public so the values can easily be extracted into an array during the conversion process. Protected and private attributes will be ignored by the converter.
 
-  class WindingPower
-  {
-      public $voltage;
-      public $current;
+This type can directly be used with the entities::
 
-      public function __construct($voltage, $current)
-      {
-          $this->voltage = $voltage;
-          $this->current = $current;
-      }
-  }
+    $entity['billing_address'] = new \Namespace\Of\Type\Address(array('place' => 'some_place', 'postal_code' => '44000', 'city' => 'Nantes'));
 
-Writing your own converters
----------------------------
-
-All converters must implement the ``Pomm\Converter\ConverterInterface``. This interface makes converters to have two methods:
- * ``fromPg($data, $type)``: converts string data fetched from a Postgresql result to a PHP representation.
- * ``toPg($data, $type)``: converts PHP data representation to a string that will be used in a SQL query.
-
-Here is the converter for the ``WindingPower`` type mentioned above::
-
-  <?php
-
-  namespace Model\Pomm\Converter;
-
-  use Pomm\Converter\ConverterInterface;
-  use Model\Pomm\Type\WindingPower as WindingPowerType;
-
-  class WindingPower implements ConverterInterface
-  {
-      public function fromPg($data, $type = null)
-      {
-          $data = trim($data, "()");
-          $values = preg_split('/,/', $data);
-
-          return new WindingPowerType($values[0], $values[1]);
-      }
-
-      public function toPg($data, $type = null)
-      {
-          return sprintf("winding_power '(%4.1f,%4.3f)'", $data->voltage, $data->current);
-      }
-  }
-
-It is advised not to hard-code the name of the class type so other developers may extend it and use theirs.
+This is useful in many ways, one of them being the ability to code proper accessors for the composite type instance.
 
 Entity converter
 ----------------
@@ -300,6 +272,13 @@ In Postgresql, creating a table means creating a new type with the table's field
 
     $database
       ->registerConverter('MyEntity', new \Pomm\Converter\PgEntity($my_entity_map), array('my_schema.my_entity));
+
+Writing your own converters
+---------------------------
+
+All converters must implement the ``Pomm\Converter\ConverterInterface``. This interface makes converters to have two methods:
+ * ``fromPg($data, $type)``: converts string data fetched from a Postgresql result to a PHP representation.
+ * ``toPg($data, $type)``: converts PHP data representation to a string that will be used in a SQL query.
 
 Spawning connections
 --------------------
