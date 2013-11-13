@@ -609,20 +609,34 @@ abstract class BaseObjectMap
      *
      * Get the list of field names.
      *
+     * @final
      * @param String $alias the table alias in the query
      * @return Array
      */
-    public function getFields($alias = null)
+    final public function getFields($alias = null)
     {
         $fields = array();
-        $alias  = is_null($alias) ? '' : $alias.".";
 
         foreach ($this->row_structure->getFieldNames() as $name)
         {
-            $fields[$name] = sprintf("%s%s", $alias, $this->connection->escapeIdentifier($name));
+            $fields[$name] = $this->aliasField($this->connection->escapeIdentifier($name), $alias);
         }
 
         return $fields;
+    }
+
+    /**
+     * aliasField
+     *
+     * Output alias.field if alias is provided.
+     *
+     * @param String $field
+     * @param String $alias
+     * @return String
+     */
+    public function aliasField($field, $alias)
+    {
+        return sprintf("%s%s", $alias != null ? $alias."." : "", $field);
     }
 
     /**

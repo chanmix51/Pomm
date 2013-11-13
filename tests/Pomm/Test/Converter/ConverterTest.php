@@ -189,14 +189,6 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Tests are volontarily simplistic, read below:
-     *
-     * pg bytea escaping with PHP :
-     * https://bugs.php.net/bug.php?id=59831&thanks=6
-     *
-     * I don't know why PHP seems to strip some chars from bytea when fetching 
-     * results on some large objects wich makes fail tests (See issue #31).
-     *
      * @depends testInteger
      **/
     public function testBinary()
