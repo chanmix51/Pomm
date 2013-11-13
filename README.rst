@@ -8,20 +8,26 @@ POMM: The PHP Object Model Manager for Postgresql
 .. image:: https://scrutinizer-ci.com/g/chanmix51/Pomm/badges/quality-score.png?s=5766ac7091629c3af205bbcca8623bd2e8cfe85e
    :target: https://scrutinizer-ci.com/g/chanmix51/Pomm/
 
+.. image:: https://poser.pugx.org/Pomm/Pomm/version.png
+   :target: https://poser.pugx.org/
+
+.. image:: https://poser.pugx.org/Pomm/Pomm/d/total.png
+   :target: https://packagist.org/packages/pomm/pomm
+
 Note
 ****
 
-This branch is still in Release Candidate state which means it might contain bugs or the documentation might be incomplete or inaccurate. **Testers welcome** Feel free to open bugs or talk with us on #pomm channel on freenode.
+This branch is still in Release Candidate state which means it might contain bugs or the documentation might be incomplete or inaccurate. **Testers welcome** Feel free to open bugs or talk with us on #pomm channel on freenode. Although one might use the version 1.1 in production, if you are starting a new project right now, this new version is probably the best one to go with.
 
 What is Pomm ?
 **************
-**Pomm** is a *lightweight*, *fast*, *efficient* and *powerful* PHP object manager for the Postgresql relational database. **Pomm is not an ORM**, it is more like an object manager over PHP's Postgresql interface implementing the `identity map <http://en.wikipedia.org/wiki/Identity_map>`_ design pattern and proposing convenient functionalities. Dropping the abstraction layer makes programmers able to take advantage of most of Postgresql's awesome features.
+**Pomm** is a *lightweight*, *fast*, *efficient* and *powerful* PHP object manager for the Postgresql relational database. **Pomm is not an ORM**, it is more like an object oriented framework for Postgresql in PHP implementing the `identity map <http://en.wikipedia.org/wiki/Identity_map>`_ design pattern and proposing convenient functionalities. Dropping the abstraction layer makes programmers able to take advantage of most of Postgresql's awesome features.
 
 Pomm works with PHP 5.3 and Postgresql 9.0 and above.
 
 You can reach
 
-* `documentation <http://pomm.coolkeums.org/documentation/manual>`_
+* `documentation <http://pomm.coolkeums.org/documentation/manual-1.2>`_
 * `code examples <http://pomm.coolkeums.org/documentation/examples>`_
 * `mailing list <https://groups.google.com/forum/#!forum/pommproject>`_
 
@@ -47,21 +53,15 @@ SQL queries, virtual fields, finders and pagers
 ***********************************************
 Of course 80% of the queries of a web applications are like ``SELECT * FROM my_table WHERE ...``  So there is a method for that. You can configure what you do want in the select fields in case you would like to add your classes extra properties. You can even use them with the converter system with extra fields adding them as virtual fields. For the more complicated queries, SQL is the way to go. You can use all the awesome `operators <http://www.postgresql.org/docs/8.4/static/functions.html>`_, `full text search <http://www.postgresql.org/docs/8.4/static/textsearch.html>`_, `window functions <http://www.postgresql.org/docs/8.4/static/tutorial-window.html>`_, `CTEs and recursive queries <http://www.postgresql.org/docs/8.4/static/queries-with.html>`_, (add your preferred feature here).
 
-Collection filters and query filters
-************************************
-When retrieving data from the database trough a ``Collection`` object, it is possible to register PHP anonymous functions as filters before objects are hydrated. This is very powerful as you can create foreign objects or code you own filters.
-
-Queries are also made in a Filter Chain design pattern. You can add your own filters to place code before and/or after each query.
-
 A Where clause builder
 **********************
 Sometimes, you want to create a ``WHERE`` clause dynamically. Pomm proposes a Where class to let you ``AND`` and/or ``OR`` your conditions passing the values as argument each time for escaping. There is even a ``WhereIn`` method with an array of values as parameter.
 
 Security and debugging tools
 ****************************
-All queries are prepared, the values you give as argument are automatically escaped by the server. Furthermore, the converter system ensures there is no type enforcing.
+All queries are prepared and pooled so they are re used if you send twice the same query with different parameters. The values passed as argument are automatically escaped by the server. Furthermore, the converter system ensures there is no type enforcing.
 
-To be sure everything is fine, you can register the ``LoggerFilter`` to your connection so you will keep track of every query with statistics like the time it took, the number of results returned etc.
+Pomm 1.2 can uses any PSR-3 compatible logger (ie `Monolog <https://github.com/Seldaek/monolog>`).
 
 
 =====================
@@ -81,13 +81,19 @@ Using `composer <http://packagist.org/>`_ installer and autoloader is probably t
     }
   }
 
-Invoking ``composer.phar`` will automagically download Pomm, install it in a ``vendor`` directory and set up the according autoloader. Check out `this tutorial <http://www.coolkeums.org/en/article/a-gentle-introduction-to-pomm.html>`_  for step by step explanation.
+Invoking ``composer.phar`` will automagically download Pomm, install it in a ``vendor`` directory and set up the according autoloader.
 
 Using Pomm with a PHP framework
 *******************************
 
 * Silex `PommServiceProvider <https://github.com/chanmix51/PommServiceProvider>`_
 * Symfony2 `PommBundle <https://github.com/chanmix51/PommBundle>`_
+
+With Silex, it is possible to bootstrap a kitchen sink using this `gist <https://gist.github.com/chanmix51/3402026>`, in an empty directory just issue the command::
+
+    wget -O - 'https://gist.github.com/chanmix51/3402026/raw/3cf2125316687be6d3ab076e66f291b68b422ce7/create-pomm-silex.sh' | bash
+
+And follow the instructions.
 
 ===========================
 How to contribute to Pomm ?
