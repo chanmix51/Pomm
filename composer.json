@@ -12,5 +12,10 @@
         "psr/log": "~1.0"
     },
     "autoload": { "psr-0": { "Pomm": "." } },
-    "minimum-stability": "RC"
+    "minimum-stability": "RC",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.2-dev"
+        }
+    }
 }
