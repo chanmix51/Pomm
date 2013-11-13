@@ -21,17 +21,20 @@ class PgRow implements ConverterInterface
     protected $database;
     protected $row_structure;
     protected $virtual_fields;
+    protected $class_name;
 
     /**
      * __construct
      *
      * @param Database $database
      * @param RowStructure $structure
+     * @param String class_name
      */
-    public function __construct(Database $database, RowStructure $structure)
+    public function __construct(Database $database, RowStructure $structure, $class_name = null)
     {
         $this->database = $database;
         $this->row_structure = $structure;
+        $this->class_name = $class_name;
     }
 
     /**
@@ -106,6 +109,16 @@ class PgRow implements ConverterInterface
      */
     public function toPg($data, $type = null)
     {
+        if ($this->class_name != null)
+        {
+            if (! $data instanceOf $this->class_name)
+            {
+                throw new PommException(sprintf("This converter deals with '%s' instances ('%' given).", $this->class_name, get_type($data)));
+            }
+
+            $data = (Array) $data;
+        }
+
         return sprintf("ROW(%s)%s", join(',', $this->convertToPg($data)), is_null($type) ? '' : sprintf('::%s', $type));
     }
 
@@ -170,19 +183,28 @@ class PgRow implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
-            $elts = str_getcsv(trim($data, '()'));
+        $elts = str_getcsv(trim($data, '()'));
 
-            $values = array();
-            foreach ($this->row_structure->getFieldNames() as $field_name)
-            {
-                $values[$field_name] = stripcslashes(array_shift($elts));
-            }
+        $values = array();
+        foreach ($this->row_structure->getFieldNames() as $field_name)
+        {
+            $values[$field_name] = stripcslashes(array_shift($elts));
+        }
 
-            if (count($elts) > 0)
-            {
-                $values['_extra'] = $elts;
-            }
+        if (count($elts) > 0)
+        {
+            $values['_extra'] = $elts;
+        }
 
-            return $this->convertFromPg($values);
+        $values = $this->convertFromPg($values);
+
+        if ($this->class_name != null)
+        {
+            $class = $this->class_name;
+
+            return new $class($values);
+        }
+
+        return $values;
     }
 }

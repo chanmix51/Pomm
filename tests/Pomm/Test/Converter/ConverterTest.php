@@ -470,13 +470,14 @@ _;
 
         $entity = static::$cv_map->findAll()->current();
 
-        $test_address = array('place' => '11, impasse juton', 'postal_code' => '44000', 'city' => 'Nantes');
+        $test_address = new AddressType(array('place' => '11, impasse juton', 'postal_code' => '44000', 'city' => 'Nantes'));
         $entity['a_composite'] = $test_address;
-        $entity['arr_composite'] = array($test_address, array('place' => 'Middle of nowhere', 'postal_code' => '56590', 'city' => 'Groix'));
+        $entity['arr_composite'] = array($test_address, new AddressType(array('place' => 'Middle of nowhere', 'postal_code' => '56590', 'city' => 'Groix')));
         static::$cv_map->updateOne($entity, array('a_composite', 'arr_composite'));
 
-        $this->assertEquals($test_address, $entity['a_composite'], "Row is unchanged.");
-        $this->assertEquals($test_address, $entity['arr_composite'][0], "Array of rows is unchanged.");
+        $this->assertTrue($entity['a_composite'] instanceOf \Pomm\Test\Converter\AddressType, "Composite data is an object.");
+        $this->assertEquals((array) $test_address, (array) $entity['a_composite'], "Row is unchanged.");
+        $this->assertEquals((array) $test_address, (array) $entity['arr_composite'][0], "Array of rows is unchanged.");
     }
 
     /**
@@ -710,7 +711,14 @@ class ConverterEntityMap extends BaseObjectMap
         $this->alterTable(array('a_composite' => 'pomm_test.address', 'arr_composite' => 'pomm_test.address[]'));
 
         $this->connection->getDatabase()
-            ->registerConverter('Address', new Converter\PgRow($this->connection->getDatabase(), new \Pomm\Object\RowStructure(array('place' => 'text', 'postal_code' => 'char', 'city' => 'varchar'))), array('pomm_test.address', 'address'));
+            ->registerConverter(
+                'Address', 
+                new Converter\PgRow(
+                    $this->connection->getDatabase(),
+                    new \Pomm\Object\RowStructure(array('place' => 'text', 'postal_code' => 'char', 'city' => 'varchar')),
+                    '\Pomm\Test\Converter\AddressType'
+                ),
+                array('pomm_test.address', 'address'));
     }
 
 }
@@ -837,4 +845,12 @@ SQL;
 
 class TsOverExtendedEntity extends BaseObject 
 {
+}
+
+class AddressType extends \Pomm\Type\Composite
+{
+    public $place;
+    public $postal_code;
+    public $city;
+    public $cedex;
 }
