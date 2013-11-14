@@ -134,7 +134,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         static::$cv_map->alterDate();
         $entity = static::$cv_map->findAll()->current();
         $values = array(
-            'some_ts' => '2012-06-20 18:34:16.640044',
+            'some_ts' => '2012-06-20 18:34:16.640044+10',
             'some_intv' => '37 years 3 months 7 days 2 hours 14 minutes 46 seconds',
             'arr_ts' => array('2015-06-08 03:54:08.880287', '1994-12-16 21:23:50.224208', '1941-02-18 17:29:52.216309')
         );
@@ -143,7 +143,8 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         static::$cv_map->saveOne($entity);
 
         $this->assertInstanceOf('\DateTime', $entity['some_ts'], "'some_ts' is a \DateTime instance.");
-        $this->assertEquals( '2012-06-20 18:34:16.640044', $entity['some_ts']->format('Y-m-d H:i:s.u'), "Timestamp is preserved.");
+        $entity['some_ts']->setTimeZone(new \DateTimeZone('Etc/GMT0'));
+        $this->assertEquals( '2012-06-20 08:34:16.640044+00:00', $entity['some_ts']->format('Y-m-d H:i:s.uP'), "Timestamp is preserved.");
         $this->assertInstanceOf('\DateInterval', $entity['some_intv'], "'some_intv' is a \DateInterval instance.");
         $this->assertEquals('37 years 3 mons 7 days 02:14:46', $entity['some_intv']->format("%y years %m mons %d days %H:%i:%s"), "'some_intv' is '37 years 3 mons 7 days 02:14:46'.");
         $this->assertEquals(3, count($entity['arr_ts']), "'arr_ts' is an array of 3 elements.");
@@ -609,7 +610,7 @@ class ConverterEntityMap extends BaseObjectMap
 
     public function alterDate()
     {
-        $this->alterTable(array('some_ts' => 'timestamp', 'some_intv' => 'interval', 'arr_ts' => 'timestamp[]'));
+        $this->alterTable(array('some_ts' => 'timestamptz', 'some_intv' => 'interval', 'arr_ts' => 'timestamp[]'));
     }
 
     public function alterBool()

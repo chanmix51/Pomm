@@ -33,6 +33,6 @@ class PgTimestamp implements ConverterInterface
             $data = new \DateTime($data);
         }
 
-        return sprintf("%s '%s'", $type, $data->format('Y-m-d H:i:s.u'));
+        return sprintf("%s '%s'", $type, $data->format('Y-m-d H:i:s.uP'));
     }
 }

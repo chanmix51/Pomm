@@ -259,7 +259,7 @@ class Database
         $this->registerConverter('Boolean', new Converter\PgBoolean(), array('bool'));
         $this->registerConverter('Number', new Converter\PgNumber(), array('int2', 'int4', 'int8', 'numeric', 'float4', 'float8'));
         $this->registerConverter('String', new Converter\PgString(), array('varchar', 'char', 'text', 'uuid', 'tsvector', 'xml', 'bpchar', 'json', 'name'));
-        $this->registerConverter('Timestamp', new Converter\PgTimestamp(), array('timestamp', 'date', 'time'));
+        $this->registerConverter('Timestamp', new Converter\PgTimestamp(), array('timestamp', 'date', 'time', 'timestamptz'));
         $this->registerConverter('Interval', new Converter\PgIntervalISO8601(), array('interval'));
         $this->registerConverter('Binary', new Converter\PgBytea(), array('bytea'));
         $this->registerConverter('NumberRange', new Converter\PgNumberRange(), array('int4range', 'int8range', 'numrange'));
