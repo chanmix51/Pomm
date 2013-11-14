@@ -97,12 +97,14 @@ class PreparedQuery
      */
     public function execute(Array $values = array())
     {
-        $res = pg_execute($this->connection->getHandler(), $this->name, $this->prepareValues($values));
+        $res = @pg_execute($this->connection->getHandler(), $this->name, $this->prepareValues($values));
 
         if ($res === false)
         {
             $this->connection->throwConnectionException(sprintf("Error while executing prepared statement '%s'.", $this->getName()), LogLevel::ERROR);
         }
+
+        $this->connection->log(LogLevel::DEBUG, sprintf("Execute '%s' (%d results) with values (%s).", $this->name, @pg_num_rows($res), print_r($values, true)));
 
         return $res;
     }
