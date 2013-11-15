@@ -111,7 +111,6 @@ class PreparedQuery
      * prepareValues
      *
      * Process the values for the query so they are understandable by Postgres.
-     * There is a big #TODO here as Postgresql date format can be set in the server configuration.
      *
      * @access private
      * @param  Array    $values Query parameters
@@ -123,7 +122,7 @@ class PreparedQuery
         {
             if ($value instanceof \DateTime)
             {
-                $values[$index] = $value->format('Y-m-d H:i:s.u');
+                $values[$index] = $value->format('Y-m-d H:i:s.uP');
             }
         }
 
