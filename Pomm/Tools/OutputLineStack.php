@@ -2,8 +2,6 @@
 
 namespace Pomm\Tools;
 
-use Pomm\Exception\ToolException;
-
 /**
  * Pomm\Tools\OutputLineStack
  *

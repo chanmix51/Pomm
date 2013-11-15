@@ -2,8 +2,7 @@
 
 namespace Pomm\Converter;
 
-use Pomm\Converter\ConverterInterface;
-use Pomm\Exception\Exception;
+use Pomm\Exception\Exception as PommException;
 
 /**
  * Pomm\Converter\PgIntervalISO8601 - ISO8601 interval converter
@@ -32,7 +31,7 @@ class PgIntervalISO8601 extends PgInterval
         }
         catch (\Exception $e)
         {
-            throw new Exception(sprintf("Data '%s' is not an ISO8601 interval representation.", $data));
+            throw new PommException(sprintf("Data '%s' is not an ISO8601 interval representation.", $data));
         }
     }
 }

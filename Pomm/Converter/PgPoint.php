@@ -3,8 +3,7 @@
 namespace Pomm\Converter;
 
 use Pomm\Converter\ConverterInterface;
-use Pomm\Type\Point;
-use Pomm\Exception\Exception;
+use Pomm\Exception\PommException;
 
 /**
  * Pomm\Converter\PgPoint - Geometric Point converter
@@ -41,7 +40,7 @@ class PgPoint implements ConverterInterface
                 return null;
             }
 
-            throw new Exception(sprintf("Bad point representation '%s' (asked type '%s').", $data, $type));
+            throw new PommException(sprintf("Bad point representation '%s' (asked type '%s').", $data, $type));
         }
 
         list($x, $y) = preg_split("/,/", trim($data, "()"));
@@ -65,7 +64,7 @@ class PgPoint implements ConverterInterface
                 $type = get_class($data);
             }
 
-            throw new Exception(sprintf("Converter PgPoint needs data to be an instance of Pomm\\Type\\Point ('%s' given).", $type));
+            throw new PommException(sprintf("Converter PgPoint needs data to be an instance of Pomm\\Type\\Point ('%s' given).", $type));
         }
 
         return sprintf("point(%.9e, %.9e)", $data->x, $data->y);

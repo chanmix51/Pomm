@@ -2,9 +2,7 @@
 
 namespace Pomm\Connection;
 
-use Pomm\Exception\Exception as PommException;
 use Pomm\Exception\ConnectionException;
-use Pomm\Exception\SqlException;
 use Pomm\Connection\Database;
 use Pomm\Identity\IdentityMapperInterface;
 use Pomm\Object\BaseObjectMap;

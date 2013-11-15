@@ -3,8 +3,6 @@
 namespace Pomm\Converter;
 
 use Pomm\Converter\ConverterInterface;
-use Pomm\Type\Point;
-use Pomm\Type\Lseg;
 use Pomm\Exception\Exception;
 
 /**

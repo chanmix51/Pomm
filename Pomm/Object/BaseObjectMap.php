@@ -3,10 +3,8 @@
 namespace Pomm\Object;
 
 use \Pomm\Exception\Exception;
-use \Pomm\Exception\SqlException;
 use \Pomm\Query\Where;
 use \Pomm\Connection\Connection;
-use \Pomm\Type;
 use \Pomm\Converter\PgRow;
 
 /**
@@ -15,10 +13,8 @@ use \Pomm\Converter\PgRow;
  * @abstract
  * @package Pomm
  * @uses Pomm\Exception\Exception
- * @uses Pomm\Exception\SqlException
  * @uses Pomm\Query\Where
  * @uses Pomm\Connection\Connection
- * @uses Pomm\Type
  * @version $id$
  * @copyright 2011-2013 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
@@ -794,7 +790,7 @@ abstract class BaseObjectMap
      * @param  BaseObject $object
      * @return String
      */
-    protected function parseForUpdate($object)
+    protected function parseForUpdate(BaseObject $object)
     {
         $tmp = array();
 

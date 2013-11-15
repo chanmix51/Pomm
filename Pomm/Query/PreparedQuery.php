@@ -3,14 +3,12 @@
 namespace Pomm\Query;
 
 use \Pomm\Connection\Connection;
-use \Pomm\Exception\ConnectionException;
 use \Psr\Log\LogLevel;
 
 /**
  * Pomm\Query\PreparedQuery
  *
  * @package Pomm
- * @uses Pomm\Exception\ConnectionException
  * @version $id$
  * @copyright 2013 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
@@ -143,6 +141,6 @@ class PreparedQuery
      */
     private function escapePlaceHolders($sql)
     {
-        return preg_replace_callback('/\$\*/', function ($sub) { static $nb = 0; return sprintf("$%d", ++$nb); }, $sql );
+        return preg_replace_callback('/\$\*/', function () { static $nb = 0; return sprintf("$%d", ++$nb); }, $sql );
     }
 }

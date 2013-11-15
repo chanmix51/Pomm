@@ -2,14 +2,11 @@
 
 namespace Pomm\Object;
 
-use \Pomm\Exception\Exception;
-
 /**
  * Pager
  *
  * @package Pomm
  * @version $id$
- * @uses Pomm\Exception\Exception
  * @copyright 2011 - 2013 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license MIT/X11 {@link http://opensource.org/licenses/mit-license.php}
