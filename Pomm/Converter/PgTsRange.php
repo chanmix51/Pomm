@@ -4,6 +4,7 @@ namespace Pomm\Converter;
 
 use Pomm\Converter\ConverterInterface;
 use Pomm\Exception\Exception;
+use Pomm\Type\RangeType;
 
 /**
  * Pomm\Converter\PgTsRange - Timestamp range converter
@@ -43,7 +44,10 @@ class PgTsRange implements ConverterInterface
             throw new Exception(sprintf("Bad timestamp range representation '%s' (asked type '%s').", $data, $type));
         }
 
-        return new $this->class_name(new \DateTime($matchs[2]), new \DateTime($matchs[3]), $matchs[1] === '[', $matchs[4] === ']');
+        $options = $matchs[1] === '(' ? RangeType::EXCL_START : RangeType::INCL_BOUNDS;
+        $options += $matchs[4] === ')' ? RangeType::EXCL_END : RangeType::INCL_BOUNDS;
+
+        return new $this->class_name(new \DateTime($matchs[2]), new \DateTime($matchs[3]), $options);
     }
 
     /**
@@ -56,6 +60,6 @@ class PgTsRange implements ConverterInterface
             throw new Exception(sprintf("PgTsRange converter expects 'TsRange' data to convert. '%s' given.", gettype($data)));
         }
 
-        return sprintf("%s '%s\"%s\", \"%s\"%s'", $type, $data->start_included ? '[' : '(', $data->start->format('Y-m-d H:i:s.u'), $data->end->format('Y-m-d H:i:s.u'), $data->end_included ? ']' : ')');
+        return sprintf("%s '%s\"%s\", \"%s\"%s'", $type, $data->options & RangeType::EXCL_START ? '(' : '[', $data->start->format('Y-m-d H:i:s.u'), $data->end->format('Y-m-d H:i:s.u'), $data->options & RangeType::EXCL_END ? ')' : ']');
     }
 }

@@ -4,6 +4,7 @@ namespace Pomm\Converter;
 
 use Pomm\Converter\ConverterInterface;
 use Pomm\Exception\Exception;
+use Pomm\Type\RangeType;
 
 /**
  * Pomm\Converter\PgNumberRange - Number range converter
@@ -43,7 +44,10 @@ class PgNumberRange implements ConverterInterface
             throw new Exception(sprintf("Bad number range representation '%s' (asked type '%s').", $data, $type));
         }
 
-        return new $this->class_name($matchs[2] + 0, $matchs[3] + 0, $matchs[1] === '[', $matchs[4] === ']');
+        $options = $matchs[1] === '(' ? RangeType::EXCL_START : RangeType::INCL_BOUNDS;
+        $options += $matchs[4] === ')' ? RangeType::EXCL_END : RangeType::INCL_BOUNDS;
+
+        return new $this->class_name($matchs[2] + 0, $matchs[3] + 0, $options);
     }
 
     /**
@@ -56,6 +60,6 @@ class PgNumberRange implements ConverterInterface
             throw new Exception(sprintf("PgNumberRange converter expects 'NumberRange' data to convert. '%s' given.", gettype($data)));
         }
 
-        return sprintf("%s '%s%s, %s%s'", $type, $data->start_included ? '[' : '(', $data->start + 0, $data->end + 0, $data->end_included ? ']' : ')');
+        return sprintf("%s '%s%s, %s%s'", $type, $data->options & RangeType::EXCL_START ? '(' : '[', $data->start + 0, $data->end + 0, $data->options & RangeType::EXCL_END ? ')' : ']');
     }
 }

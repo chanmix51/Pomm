@@ -176,3 +176,7 @@ Remote fields methods
 
 ``getRemoteSelectFields()`` and ``createFromForeign()`` methods have been removed from the ``BaseObjectMap`` class.
 
+Range types
+-----------
+
+Range types ``TsRange`` and ``NumberRange`` constructor's signature has changed. 

@@ -6,8 +6,10 @@ use Pomm\Connection\Database;
 use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
 use Pomm\Exception\Exception;
+use Pomm\Exception\SqlException;
 use Pomm\Converter;
 use Pomm\Type;
+use Pomm\Type\RangeType;
 
 class ConverterTest extends \PHPUnit_Framework_TestCase
 {
@@ -407,13 +409,14 @@ _;
         }
 
         $entity = static::$cv_map->findAll()->current();
-        $value = new Type\TsRange(new \DateTime('2012-08-20'), new \DateTime('2012-09-01'), true);
+        $value = new Type\TsRange(new \DateTime('2012-08-20'), new \DateTime('2012-09-01'), RangeType::EXCL_START);
         $entity['some_tsrange'] = $value;
 
         static::$cv_map->updateOne($entity, array('some_tsrange'));
 
         $this->assertInstanceOf('\Pomm\Type\TsRange', $entity['some_tsrange'], "'some_tsrange' is a 'TsRange' type.");
         $this->assertEquals($value->start->format('U'), $entity['some_tsrange']->start->format('U'), "Timestamps are equal.");
+        $this->assertEquals($value->options, RangeType::EXCL_START, 'Start bound is excluded.');
 
         $entity['arr_tsrange'] = array($value, new Type\TsRange(new \DateTime('2012-12-21'), new \DateTime('2012-12-21 12:21:59')));
 
@@ -422,6 +425,7 @@ _;
         $this->assertEquals(2, count($entity['arr_tsrange']), "There are 2 elements in the array.");
         $this->assertInstanceOf('\Pomm\Type\TsRange', $entity['arr_tsrange'][1], "'arr_tsrange' element 1 is a 'TsRange' type.");
         $this->assertEquals(44519, $entity['arr_tsrange'][1]->end->format('U') - $entity['arr_tsrange'][1]->start->format('U'), "Range is preserved.");
+        $this->assertEquals(RangeType::INCL_BOUNDS, $entity['arr_tsrange'][1]->options, 'Bounds are preserved.');
 
         return $entity;
     }
@@ -440,16 +444,16 @@ _;
 
         $entity = static::$cv_map->findAll()->current();
 
-        $entity['some_int4range'] = new Type\NumberRange(-5, 45, true, false);
+        $entity['some_int4range'] = new Type\NumberRange(-5, 45, RangeType::EXCL_END);
         $entity['some_int8range'] = new Type\NumberRange(4452940833, 4553946490);
-        $entity['some_numrange']  = new Type\NumberRange(29.76607095, 30.44125206, false, false);
-        $entity['arr_numrange']   = array(new Type\NumberRange(1.1, 1.2), new Type\NumberRange(2.2, 2.4, true, false), new Type\NumberRange(3.3, 3.6, false, false));
+        $entity['some_numrange']  = new Type\NumberRange(29.76607095, 30.44125206, RangeType::EXCL_BOTH);
+        $entity['arr_numrange']   = array(new Type\NumberRange(1.1, 1.2), new Type\NumberRange(2.2, 2.4, RangeType::EXCL_START), new Type\NumberRange(3.3, 3.6, RangeType::EXCL_BOTH));
 
         static::$cv_map->updateOne($entity, array('some_int8range', 'some_int4range', 'some_numrange', 'arr_numrange'));
 
-        $this->assertEquals(new Type\NumberRange(-5, 45, true, false), $entity['some_int4range'], "Int4range is ok.");
-        $this->assertEquals(new Type\NumberRange(4452940834, 4553946490, true), $entity->getSomeInt8range(), "Int8range is ok.");
-        $this->assertEquals(new Type\NumberRange(29.76607095, 30.44125206, false, false), $entity['some_numrange'], "Numrange is ok.");
+        $this->assertEquals(new Type\NumberRange(-5, 45, RangeType::EXCL_END), $entity['some_int4range'], "Int4range is ok.");
+        $this->assertEquals(new Type\NumberRange(4452940833, 4553946491, RangeType::EXCL_END), $entity->getSomeInt8range(), "Int8range is ok.");
+        $this->assertEquals(new Type\NumberRange(29.76607095, 30.44125206, RangeType::EXCL_BOTH), $entity['some_numrange'], "Numrange is ok.");
         $this->assertTrue(is_array($entity['arr_numrange']), "'arr_numrange' is an array.");
 
         for($x = 1; $x <= count($entity['arr_numrange']); $x++)
@@ -574,13 +578,17 @@ class ConverterEntityMap extends BaseObjectMap
             foreach($fields as $field => $type)
             {
                 $sql = sprintf("ALTER TABLE %s ADD COLUMN %s %s", $this->getTableName(), $field, $type);
-                $this->connection->executeAnonymousQuery($sql);
+                if ($ret = $this->connection->executeAnonymousQuery($sql) === false)
+                {
+                    throw new SqlException($ret, $sql);
+                }
+
                 $this->addField($field, strtok($type, '('));
             }
 
             $this->connection->commit();
         }
-        catch(Exception $e)
+        catch(SqlException $e)
         {
             $this->connection->rollback();
 
