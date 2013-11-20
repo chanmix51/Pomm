@@ -43,7 +43,10 @@ class PgTsRange implements ConverterInterface
             throw new Exception(sprintf("Bad timestamp range representation '%s' (asked type '%s').", $data, $type));
         }
 
-        return new $this->class_name(new \DateTime($matchs[2]), new \DateTime($matchs[3]), $matchs[1] === '[', $matchs[4] === ']');
+        return new $this->class_name(new \DateTime($matchs[2]), new \DateTime($matchs[3]), array(
+            'start' => $matchs[1] === '[',
+            'end'   => $matchs[4] === ']',
+        ));
     }
 
     /**

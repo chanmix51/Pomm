@@ -43,7 +43,10 @@ class PgNumberRange implements ConverterInterface
             throw new Exception(sprintf("Bad number range representation '%s' (asked type '%s').", $data, $type));
         }
 
-        return new $this->class_name($matchs[2] + 0, $matchs[3] + 0, $matchs[1] === '[', $matchs[4] === ']');
+        return new $this->class_name($matchs[2] + 0, $matchs[3] + 0, array(
+            'start' => $matchs[1] === '[',
+            'end'   => $matchs[4] === ']',
+        ));
     }
 
     /**
