@@ -22,12 +22,12 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
 
         static::$connection = $database->createConnection();
 
-        if (isset($GLOBALS['dev']) && $GLOBALS['dev'] == 'true') 
+        if (isset($GLOBALS['dev']) && $GLOBALS['dev'] == 'true')
         {
             static::$logger = new \Pomm\Tools\Logger();
 
             static::$connection->registerFilter(new \Pomm\FilterChain\LoggerFilter(static::$logger));
-        } 
+        }
 
         static::$connection->begin();
         try
@@ -229,7 +229,7 @@ _;
         static::$cv_map->alterPoint();
         $entity = static::$cv_map->findAll()->current();
         $values = array(
-            'some_point' => new Type\Point(47.21262, -1.55516), 
+            'some_point' => new Type\Point(47.21262, -1.55516),
             'arr_point' => array(new Type\Point(6.431264, 3.424915), new Type\Point(-33.969043, 151.187225))
         );
 
@@ -407,7 +407,9 @@ _;
         }
 
         $entity = static::$cv_map->findAll()->current();
-        $value = new Type\TsRange(new \DateTime('2012-08-20'), new \DateTime('2012-09-01'), true);
+        $value = new Type\TsRange(new \DateTime('2012-08-20'), new \DateTime('2012-09-01'), array(
+            'end' => Type\Range::END_EXCL,
+        ));
         $entity['some_tsrange'] = $value;
 
         static::$cv_map->updateOne($entity, array('some_tsrange'));
@@ -415,7 +417,10 @@ _;
         $this->assertInstanceOf('\Pomm\Type\TsRange', $entity['some_tsrange'], "'some_tsrange' is a 'TsRange' type.");
         $this->assertEquals($value->start->format('U'), $entity['some_tsrange']->start->format('U'), "Timestamps are equal.");
 
-        $entity['arr_tsrange'] = array($value, new Type\TsRange(new \DateTime('2012-12-21'), new \DateTime('2012-12-21 12:21:59')));
+        $entity['arr_tsrange'] = array($value, new Type\TsRange(new \DateTime('2012-12-21'), new \DateTime('2012-12-21 12:21:59'), array(
+            'start' => Type\Range::START_EXCL,
+            'end'   => Type\Range::END_EXCL,
+        )));
 
         static::$cv_map->updateOne($entity, array('some_tsrange', 'arr_tsrange'));
 
@@ -440,16 +445,40 @@ _;
 
         $entity = static::$cv_map->findAll()->current();
 
-        $entity['some_int4range'] = new Type\NumberRange(-5, 45, true, false);
-        $entity['some_int8range'] = new Type\NumberRange(4452940833, 4553946490);
-        $entity['some_numrange']  = new Type\NumberRange(29.76607095, 30.44125206, false, false);
-        $entity['arr_numrange']   = array(new Type\NumberRange(1.1, 1.2), new Type\NumberRange(2.2, 2.4, true, false), new Type\NumberRange(3.3, 3.6, false, false));
+        $entity['some_int4range'] = new Type\NumberRange(-5, 45, array(
+            'end' => Type\Range::END_EXCL,
+        ));
+        $entity['some_int8range'] = new Type\NumberRange(4452940833, 4553946490, array(
+            'start' => Type\Range::START_EXCL,
+            'end'   => Type\Range::END_EXCL,
+        ));
+        $entity['some_numrange']  = new Type\NumberRange(29.76607095, 30.44125206, array(
+            'start' => Type\Range::START_EXCL,
+            'end'   => Type\Range::END_EXCL,
+        ));
+        $entity['arr_numrange']   = array(
+            new Type\NumberRange(1.1, 1.2),
+            new Type\NumberRange(2.2, 2.4, array(
+                'end' => Type\Range::END_EXCL,
+            )),
+            new Type\NumberRange(3.3, 3.6, array(
+                'start' => Type\Range::START_EXCL,
+                'end'   => Type\Range::END_EXCL,
+            )
+        ));
 
         static::$cv_map->updateOne($entity, array('some_int8range', 'some_int4range', 'some_numrange', 'arr_numrange'));
 
-        $this->assertEquals(new Type\NumberRange(-5, 45, true, false), $entity['some_int4range'], "Int4range is ok.");
-        $this->assertEquals(new Type\NumberRange(4452940834, 4553946490, true), $entity->getSomeInt8range(), "Int8range is ok.");
-        $this->assertEquals(new Type\NumberRange(29.76607095, 30.44125206, false, false), $entity['some_numrange'], "Numrange is ok.");
+        $this->assertEquals(new Type\NumberRange(-5, 45, array(
+            'end' => Type\Range::END_EXCL,
+        )), $entity['some_int4range'], "Int4range is ok.");
+        $this->assertEquals(new Type\NumberRange(4452940834, 4553946490, array(
+            'end' => Type\Range::END_EXCL,
+        )), $entity->getSomeInt8range(), "Int8range is ok.");
+        $this->assertEquals(new Type\NumberRange(29.76607095, 30.44125206, array(
+            'start' => Type\Range::START_EXCL,
+            'end'   => Type\Range::END_EXCL,
+        )), $entity['some_numrange'], "Numrange is ok.");
         $this->assertTrue(is_array($entity['arr_numrange']), "'arr_numrange' is an array.");
 
         for($x = 1; $x <= count($entity['arr_numrange']); $x++)
@@ -713,7 +742,7 @@ class ConverterEntityMap extends BaseObjectMap
 
         $this->connection->getDatabase()
             ->registerConverter(
-                'Address', 
+                'Address',
                 new Converter\PgRow(
                     $this->connection->getDatabase(),
                     new \Pomm\Object\RowStructure(array('place' => 'text', 'postal_code' => 'char', 'city' => 'varchar')),
@@ -787,7 +816,7 @@ class TsExtendedEntityMap extends BaseObjectMap
     {
         $this->object_class = '\Pomm\Test\Converter\TsExtendedEntity';
         $this->object_name  = <<<SQL
-( VALUES 
+( VALUES
   ( ROW('2000-02-29'::timestamp)::pomm_test.ts_entity, ARRAY[ROW('1999-12-31 23:59:59.999999'::timestamp)::pomm_test.ts_entity, ROW('2005-01-29 23:01:58'::timestamp)::pomm_test.ts_entity]::pomm_test.ts_entity[] ),
   ( ROW('2004-02-29'::timestamp)::pomm_test.ts_entity, ARRAY[ROW('1989-12-31 23:59:59.999999'::timestamp)::pomm_test.ts_entity, ROW('2005-01-29 23:01:58'::timestamp)::pomm_test.ts_entity]::pomm_test.ts_entity[] )
 ) ts_extended_entity (p1, p2)
@@ -821,7 +850,7 @@ class TsOverExtendedEntityMap extends BaseObjectMap
     {
         $this->object_class = '\Pomm\Test\Converter\TsOverExtendedEntity';
         $this->object_name  = <<<SQL
-( VALUES 
+( VALUES
   ( ROW(ROW('2000-02-29'::timestamp)::pomm_test.ts_entity, ARRAY[ROW('1999-12-31 23:59:59.999999'::timestamp)::pomm_test.ts_entity, ROW('2005-01-29 23:01:58'::timestamp)::pomm_test.ts_entity]::pomm_test.ts_entity[] )::pomm_test.ts_extended_entity, ARRAY[ROW(ROW('2004-02-29'::timestamp)::pomm_test.ts_entity, ARRAY[ROW('1989-12-31 23:59:59.999999'::timestamp)::pomm_test.ts_entity, ROW('2005-01-29 23:01:58'::timestamp)::pomm_test.ts_entity]::pomm_test.ts_entity[])::pomm_test.ts_extended_entity]::pomm_test.ts_extended_entity[] )
 ) ts_over_extended_entity (p1, p2)
 SQL;
@@ -844,7 +873,7 @@ SQL;
     }
 }
 
-class TsOverExtendedEntity extends BaseObject 
+class TsOverExtendedEntity extends BaseObject
 {
 }
 
