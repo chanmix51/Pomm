@@ -116,9 +116,9 @@ class PreparedQuery
      * @param  Array    $values Query parameters
      * @return Array
      */
-    private function prepareValues($values)
+    private function prepareValues(array $values)
     {
-        foreach (new \ArrayIterator($values) as $index => $value)
+        foreach ($values as $index => $value)
         {
             if ($value instanceof \DateTime)
             {
