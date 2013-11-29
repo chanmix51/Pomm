@@ -22,16 +22,9 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
     {
         $database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
 
-        static::$connection = $database->createConnection();
-
-        if (isset($GLOBALS['dev']) && $GLOBALS['dev'] == 'true') 
-        {
-            static::$logger = new \Pomm\Tools\Logger();
-
-            static::$connection->registerFilter(new \Pomm\FilterChain\LoggerFilter(static::$logger));
-        } 
-
+        static::$connection = $database->getConnection();
         static::$connection->begin();
+
         try
         {
             $sql = 'CREATE SCHEMA pomm_test';

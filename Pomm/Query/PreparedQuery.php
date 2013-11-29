@@ -59,19 +59,6 @@ class PreparedQuery
     }
 
     /**
-     * __destruct
-     *
-     * Deallocate the prepared query.
-     *
-     * @access public
-     */
-    public function __destruct()
-    {
-        $this->connection->log(LogLevel::INFO, sprintf("Freeing query '%s'.", $this->getName()));
-        @pg_query($this->connection->getHandler(), sprintf("DEALLOCATE \"%s\"", $this->getName()));
-    }
-
-    /**
      * getName
      *
      * Return the query name.
