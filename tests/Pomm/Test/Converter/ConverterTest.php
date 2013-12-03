@@ -49,8 +49,6 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
     {
         $sql = 'DROP SCHEMA pomm_test CASCADE';
         static::$connection->executeAnonymousQuery($sql);
-
-        !is_null(static::$logger) && print_r(static::$logger);
     }
 
     public function testInteger()

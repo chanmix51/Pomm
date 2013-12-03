@@ -16,8 +16,9 @@ use \Psr\Log\LogLevel;
  */
 class PreparedQuery
 {
-    private $connection;
-    private $stmt;
+    protected $connection;
+    protected $stmt;
+    private $active = false;
     private $name;
 
     /**
@@ -56,6 +57,7 @@ class PreparedQuery
         }
 
         $this->connection->log(LogLevel::INFO, sprintf("Prepared query '%s' => -- %s --", $this->name, $sql));
+        $this->active = true;
     }
 
     /**
@@ -82,6 +84,11 @@ class PreparedQuery
      */
     public function execute(Array $values = array())
     {
+        if ($this->active === false)
+        {
+            $this->connection->throwConnectionException(sprintf("Cannot execute inactive statement '%s'.", $this->getName()), LogLevel::ERROR);
+        }
+
         $res = @pg_execute($this->connection->getHandler(), $this->name, $this->prepareValues($values));
 
         if ($res === false)
@@ -92,6 +99,39 @@ class PreparedQuery
         $this->connection->log(LogLevel::DEBUG, sprintf("Execute '%s' (%d results) with values (%s).", $this->name, @pg_num_rows($res), print_r($values, true)));
 
         return $res;
+    }
+
+    /**
+     * deallocate
+     *
+     * Deallocate the statement in the database.
+     *
+     * @access public
+     * @return PreparedQuery
+     */
+    public function deallocate()
+    {
+        $res = @pg_execute($this->connection->getHandler(), sprintf("DEALLOCATE %s", $this->connection->escapeIdentifier($this->getName())));
+        if ($res === false)
+        {
+            $this->connection->throwConnectionException(sprintf("Could not deallocate statement «%s».", $this->getName()), LogLevel::ERROR);
+        }
+
+        $this->active = false;
+
+        return $this;
+    }
+
+    /**
+     * getActive
+     *
+     * Return true if the statement is active, false othewise
+     *
+     * @return Bool
+     */
+    public function getActive()
+    {
+        return $this->active;
     }
 
     /**
