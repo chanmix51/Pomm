@@ -185,3 +185,8 @@ Range types
 -----------
 
 Range types ``TsRange`` and ``NumberRange`` constructor's signature has changed.
+
+JSON type
+---------
+
+There is a new JSON converter that uses PHP's json_encode function. Hence, json strings are converter into PHP arrays.

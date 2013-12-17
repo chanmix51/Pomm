@@ -101,10 +101,11 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
 
         if (static::$cv_map->alterJson() !== false)
         {
-            $entity['some_json'] = json_encode(array('plop' => array('pika' => 'chu', 'lot of' => array(1, 2, 3, 4, 5))));
+            $some_json = array('pika' => 'chu', 'lot of' => array(1, 2, 3, 4, 5));
+            $entity['some_json'] = $some_json;
             static::$cv_map->updateOne($entity, array('some_json'));
 
-            $this->assertEquals('{"plop":{"pika":"chu","lot of":[1,2,3,4,5]}}', $entity['some_json'], "Json type is kept unchanged.");
+            $this->assertEquals($some_json, $entity['some_json'], "Json type is kept unchanged.");
         }
         else
         {
