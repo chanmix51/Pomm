@@ -3,7 +3,6 @@
 namespace Pomm\Converter;
 
 use Pomm\Converter\ConverterInterface;
-use Pomm\Exception\Exception as PommException;
 
 /**
  * Pomm\Converter\PgJSON -- JSON converter
@@ -37,21 +36,6 @@ class PgJSON implements ConverterInterface
      */
     public function toPg($data, $type = null)
     {
-        if ($this->output_type === static::OUTPUT_ARRAYS)
-        {
-            if (!is_array($data))
-            {
-                throw new PommException(sprintf("Json converter 'toPg()' with OUTPUT_ARRAYS expects data to be array. '%s' given.", gettype($data)));
-            }
-        }
-        else
-        {
-            if (!(is_object($data) or $data instanceOf \StdClass))
-            {
-                throw new PommException(sprintf("Json converter 'toPg()' with OUTPUT_OBJECTS expecte data to be instance of StdClass, '%s' given", get_class($data)));
-            }
-        }
-
         $data = json_encode($data);
         $type = is_null($type) ? '' : sprintf("%s ", $type);
         $data = sprintf("%s'%s'",  $type, $data);
