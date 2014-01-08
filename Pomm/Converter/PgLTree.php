@@ -28,6 +28,6 @@ class PgLTree implements ConverterInterface
      */
     public function toPg($data, $type = null)
     {
-        return sprintf("'%s'::ltree", join('.', $data));
+        return sprintf("'%s'::ltree", \pg_escape_string(join('.', $data)));
     }
 }
