@@ -27,6 +27,9 @@ class PgLTree implements ConverterInterface
      */
     public function toPg($data, $type = null)
     {
-        return sprintf("'%s'::ltree", join('.', $data));
+        $data = join('.', $data);
+        $data = str_replace("'", "''", $data);
+        $data = str_replace("\\", "\\\\", $data);
+        return sprintf("'%s'::ltree", $data);
     }
 }
