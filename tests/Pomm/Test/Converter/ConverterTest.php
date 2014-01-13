@@ -84,7 +84,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
     {
         static::$cv_map->alterText();
         $entity = static::$cv_map->findAll()->current();
-        $values = array('some_char' => 'abcdefghij', 'some_varchar' => '1234567890 abcdefghij', 'some_text' => 'Lorem Ipsum', 'arr_varchar' => array('pika', '{"a","b b \'c"}'), 'not_null_string' => 'something');
+        $values = array('some_char' => 'abcdefghij', 'some_varchar' => '1234567890 abcdefghij', 'some_text' => 'Lorem Ipsum', 'arr_varchar' => array('pika', '{"a","b \\\\"b \'c"}'), 'not_null_string' => 'something');
 
         $entity->hydrate($values);
         static::$cv_map->updateOne($entity, array_keys($values));
@@ -92,7 +92,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('abcdefghij', $entity['some_char'], "Chars are ok.");
         $this->assertEquals('1234567890 abcdefghij', $entity['some_varchar'], "Varchars are ok.");
         $this->assertEquals('Lorem Ipsum', $entity['some_text'], "Text is ok.");
-        $this->assertEquals(array('pika', '{"a","b b \'c"}'), $entity['arr_varchar'], "Varchar arrays are ok.");
+        $this->assertEquals(array('pika', '{"a","b \\"b \'c"}'), $entity['arr_varchar'], "Varchar arrays are ok.");
 
         $entity['some_char'] = 'a        b';
         $entity['some_varchar'] = '&"\'-- =+_-;\\?,{}[]()';

@@ -16,7 +16,7 @@ class ScanSchemaToolTest extends \PHPUnit_Framework_TestCase
 
         static::$tmp_dir = isset($GLOBALS['tmp_dir']) ? $GLOBALS['tmp_dir'] : DIRECTORY_SEPARATOR.'tmp';
 
-        if (!is_dir(static::$tmp_dir)) 
+        if (!is_dir(static::$tmp_dir))
         {
             throw new Exception(sprintf("Directory '%s' does not exist.", static::$tmp_dir));
         }
