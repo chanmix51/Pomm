@@ -101,11 +101,13 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
 
         if (static::$cv_map->alterJson() !== false)
         {
-            $some_json = array('pika' => 'chu', 'lot of' => array(1, 2, 3, 4, 5));
+            $some_json = array('pika' => 'chu', 'lot of' => array(1, 2, 3, 4, 5), 'weird chain' => 'foo\'s as "fool"');
             $entity['some_json'] = $some_json;
-            static::$cv_map->updateOne($entity, array('some_json'));
+            $entity['arr_json'] = array($some_json, $some_json);
+            static::$cv_map->updateOne($entity, array('some_json', 'arr_json'));
 
             $this->assertEquals($some_json, $entity['some_json'], "Json type is kept unchanged.");
+            $this->assertEquals(array($some_json, $some_json), $entity['arr_json'], "Array of Json types is kept unchanged.");
         }
         else
         {
@@ -223,7 +225,7 @@ _;
         static::$cv_map->alterPoint();
         $entity = static::$cv_map->findAll()->current();
         $values = array(
-            'some_point' => new Type\Point(47.21262, -1.55516), 
+            'some_point' => new Type\Point(47.21262, -1.55516),
             'arr_point' => array(new Type\Point(6.431264, 3.424915), new Type\Point(-33.969043, 151.187225))
         );
 
@@ -693,7 +695,7 @@ class ConverterEntityMap extends BaseObjectMap
             return false;
         }
 
-        $this->alterTable(array('some_json' => 'json'));
+        $this->alterTable(array('some_json' => 'json', 'arr_json' => 'json[]'));
     }
 
     public function alterNumberRange()
@@ -713,7 +715,7 @@ class ConverterEntityMap extends BaseObjectMap
 
         $this->connection->getDatabase()
             ->registerConverter(
-                'Address', 
+                'Address',
                 new Converter\PgRow(
                     $this->connection->getDatabase(),
                     new \Pomm\Object\RowStructure(array('place' => 'text', 'postal_code' => 'char', 'city' => 'varchar')),
@@ -787,7 +789,7 @@ class TsExtendedEntityMap extends BaseObjectMap
     {
         $this->object_class = '\Pomm\Test\Converter\TsExtendedEntity';
         $this->object_name  = <<<SQL
-( VALUES 
+( VALUES
   ( ROW('2000-02-29'::timestamp)::pomm_test.ts_entity, ARRAY[ROW('1999-12-31 23:59:59.999999'::timestamp)::pomm_test.ts_entity, ROW('2005-01-29 23:01:58'::timestamp)::pomm_test.ts_entity]::pomm_test.ts_entity[] ),
   ( ROW('2004-02-29'::timestamp)::pomm_test.ts_entity, ARRAY[ROW('1989-12-31 23:59:59.999999'::timestamp)::pomm_test.ts_entity, ROW('2005-01-29 23:01:58'::timestamp)::pomm_test.ts_entity]::pomm_test.ts_entity[] )
 ) ts_extended_entity (p1, p2)
@@ -821,7 +823,7 @@ class TsOverExtendedEntityMap extends BaseObjectMap
     {
         $this->object_class = '\Pomm\Test\Converter\TsOverExtendedEntity';
         $this->object_name  = <<<SQL
-( VALUES 
+( VALUES
   ( ROW(ROW('2000-02-29'::timestamp)::pomm_test.ts_entity, ARRAY[ROW('1999-12-31 23:59:59.999999'::timestamp)::pomm_test.ts_entity, ROW('2005-01-29 23:01:58'::timestamp)::pomm_test.ts_entity]::pomm_test.ts_entity[] )::pomm_test.ts_extended_entity, ARRAY[ROW(ROW('2004-02-29'::timestamp)::pomm_test.ts_entity, ARRAY[ROW('1989-12-31 23:59:59.999999'::timestamp)::pomm_test.ts_entity, ROW('2005-01-29 23:01:58'::timestamp)::pomm_test.ts_entity]::pomm_test.ts_entity[])::pomm_test.ts_extended_entity]::pomm_test.ts_extended_entity[] )
 ) ts_over_extended_entity (p1, p2)
 SQL;
@@ -844,7 +846,7 @@ SQL;
     }
 }
 
-class TsOverExtendedEntity extends BaseObject 
+class TsOverExtendedEntity extends BaseObject
 {
 }
 

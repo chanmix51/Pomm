@@ -36,7 +36,7 @@ class PgJSON implements ConverterInterface
      */
     public function toPg($data, $type = null)
     {
-        $data = json_encode($data);
+        $data = pg_escape_string(json_encode($data));
         $type = is_null($type) ? '' : sprintf("%s ", $type);
         $data = sprintf("%s'%s'",  $type, $data);
 
