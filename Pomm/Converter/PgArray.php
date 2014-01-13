@@ -46,7 +46,7 @@ class PgArray implements ConverterInterface
                 ->getConverterForType($type);
 
             return array_map(function($val) use ($converter, $type) {
-                    return $val !== "NULL" ? $converter->fromPg(str_replace(['\\\\', '\\"'], ['\\', '"'], $val), $type) : null;
+                    return $val !== "NULL" ? $converter->fromPg(str_replace(array('\\\\', '\\"'), array('\\', '"'), $val), $type) : null;
                 }, str_getcsv(trim($data, "{}")));
         }
         else
