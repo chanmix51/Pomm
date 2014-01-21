@@ -1,3 +1,10 @@
+=== 1.2.0
+
+ * Fixe an issue with the PgArray converter (#123).
+ * Security issue with the LTree converter(#122)
+ * Added PgJSON converter.
+ * Prepared statements can be deallocated manually.
+
 === 1.2-RC3
 
  * Refactored range types and converters.
