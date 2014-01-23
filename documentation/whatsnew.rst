@@ -112,8 +112,8 @@ This is useful when processing large amount of data that need to be built prior 
 
 ::
 
-    $results = $map->findWhere('age > ?', array($age1)); New prepared statement
-    $results = $map->findWhere('age > ?', array($age2)); Automatic re-use of the previous prepared statement
+    $results = $map->findWhere('age > $*', array($age1)); New prepared statement
+    $results = $map->findWhere('age > $*', array($age2)); Automatic re-use of the previous prepared statement
 
 Raw type
 --------
