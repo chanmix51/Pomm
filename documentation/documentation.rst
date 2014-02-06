@@ -209,7 +209,7 @@ If such types exist in your database, they must be registered so Pomm can conver
             new \Pomm\Object\RowStructure(array('place' => 'text', 'postal_code' => 'char', 'city' => 'varchar', 'cedex' => 'char'))
             ),
         array('public.postal_address')
-        ;
+        );
 
 This way, the composite types can be used as is in the map classes::
 
