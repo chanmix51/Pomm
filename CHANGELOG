@@ -1,3 +1,8 @@
+=== 1.1.5
+
+ * Fixes an issue with the PgArray converter (from sukei/1.2)
+ * [security] string escaping in LTree converter (from sukei/1.2)
+
 === 1.1.4
 
  * Fixed a bug where empty strings could be saved as NULL (#103 from eMerzh/empty_text)

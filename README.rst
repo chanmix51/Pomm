@@ -77,7 +77,7 @@ Using `composer <http://packagist.org/>`_ installer and autoloader is probably t
 
   {
   "require": {
-      "pomm/pomm": "master-dev"
+      "pomm/pomm": "1.1.*"
     }
   }
 
