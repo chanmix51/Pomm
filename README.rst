@@ -2,7 +2,7 @@
 POMM: The PHP Object Model Manager for Postgresql
 =================================================
 
-.. image:: https://secure.travis-ci.org/chanmix51/Pomm.png?branch=master
+.. image:: https://secure.travis-ci.org/chanmix51/Pomm.png?branch=1.2
    :target: http://travis-ci.org/#!/chanmix51/Pomm
 
 .. image:: https://scrutinizer-ci.com/g/chanmix51/Pomm/badges/quality-score.png?s=5766ac7091629c3af205bbcca8623bd2e8cfe85e
@@ -42,7 +42,7 @@ Using `composer <http://packagist.org/>`_ installer and autoloader is probably t
 
   {
   "require": {
-      "pomm/pomm": "master-dev"
+      "pomm/pomm": "1.2.*"
     }
   }
 
@@ -69,7 +69,7 @@ That's very easy with github:
 * Send feedback to `@PommProject <https://twitter.com/#!/PommProject>`_ on twitter or by mail at <hubert DOT greg AT gmail DOT com>
 * Report bugs (very appreciated)
 * Fork and PR (very very appreciated)
-* Send vacuum tubes to the author (actual preferred are russians 6Φ12Π, 6Ж43Π, 6Ж38Π, 6C19Π)
+* Send vacuum tubes to the author (actual preferred are russians 6Π21C (6P21S) and 6Π30B (6P30B))
 
 Running tests
 *************
