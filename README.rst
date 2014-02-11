@@ -2,26 +2,17 @@
 POMM: The PHP Object Model Manager for Postgresql
 =================================================
 
-.. image:: https://secure.travis-ci.org/chanmix51/Pomm.png?branch=master
-   :target: http://travis-ci.org/#!/chanmix51/Pomm
+Development branch
+******************
 
-.. image:: https://scrutinizer-ci.com/g/chanmix51/Pomm/badges/quality-score.png?s=5766ac7091629c3af205bbcca8623bd2e8cfe85e
-   :target: https://scrutinizer-ci.com/g/chanmix51/Pomm/
-
-.. image:: https://poser.pugx.org/Pomm/Pomm/version.png
-   :target: https://poser.pugx.org/
-
-.. image:: https://poser.pugx.org/Pomm/Pomm/d/total.png
-   :target: https://packagist.org/packages/pomm/pomm
-
-This branch is the latest stable branch of Pomm.
+This branch is the development branch of Pomm. It contains experimental undocumented code and might be broken or unstable. Use it for testing or hacking purposes only. If you intend to use Pomm in production, use the `latest stable branch <https://github.com/chanmix51/Pomm/tree/1.2>`_.
 
 What is Pomm ?
 **************
 
 Pomm is an open source Postgresql access framework for PHP. It is not an ORM, it is an Object Model Manager. Pomm offers an alternative approach than ORM to using database in object oriented web developments. `Read more here <http://www.pomm-project.org/about>`_.
 
-Pomm 1.2 works with PHP 5.3 and Postgresql 9.0 and above.
+Pomm devel works with PHP 5.4 and Postgresql 9.0 and above.
 
 You can reach
 
