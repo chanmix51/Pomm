@@ -13,6 +13,5 @@ script: phpunit --configuration tests/phpunit.travis.xml
 
 branches:
   except:
-    - master
-    - "1.0"
-    - "rid_of_pdo"
+    - "1.1"
+    - "1.2"
