@@ -12,6 +12,6 @@
         "psr/log": "~1.0"
     },
     "autoload": { "psr-0": { "Pomm": "." } },
-    "minimum-stability": "dev",
+    "minimum-stability": "dev"
     }
 }
