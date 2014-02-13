@@ -2,8 +2,6 @@
 
 namespace Pomm\Object;
 
-use \Pomm\Exception\Exception as PommException;
-
 /**
  * RowStructure
  *
@@ -39,11 +37,6 @@ class RowStructure
      */
     public function addField($name, $type)
     {
-        if ($this->hasField($name))
-        {
-            throw new PommException(sprintf('Field "%s" already set in class "%s".', $name, get_class($this)));
-        }
-
         $this->field_definitions[$name] = $type;
     }
 
