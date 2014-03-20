@@ -215,7 +215,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
             return $val;
         };
 
-        return array_map($array_recurse, $this->fields);
+        return array_map($array_recurse, $this->getIterator()->getArrayCopy());
     }
 
     /**
@@ -375,6 +375,19 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      */
     public function getIterator()
     {
-        return new \ArrayIterator($this->fields);
+        $custom_methods = array_filter(get_class_methods(get_class($this)), function($val) { return preg_match('/^has[A-Z]/', $val); });
+        $custom_fields = array();
+
+        foreach($custom_methods as $method)
+        {
+            if (call_user_func(array($this, $method)) === true)
+            {
+                preg_match('/^has([A-Z].*)/', $method, $matchs);
+                $field = Inflector::underscore($matchs[1]);
+                $custom_fields[$field] = $this[$matchs[1]];
+            }
+        }
+
+        return new \ArrayIterator(array_merge($this->fields, $custom_fields));
     }
 }

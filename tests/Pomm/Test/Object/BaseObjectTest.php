@@ -10,23 +10,29 @@ class BaseObjectTest extends \PHPUnit_Framework_TestCase
     public function testExtract()
     {
         $values = array('pika' => 'chu', 'plop' => null, 'always_true' => true, 'some_in' => 1);
+        $expected = array_merge($values, array('plop' => true, 'something' => 'something'));
         $entity = new Entity($values);
 
-        $this->assertEquals($values, $entity->extract(), "Extract preserves scalars.");
+        $output = $entity->extract();
+        $this->assertTrue(array_key_exists('something', $output), "Custom accessors with 'has' are used.");
+        $this->assertTrue(!array_key_exists('nothing', $output), "Custom accessors without 'has' are ignored.");
+        $this->assertEquals($expected['something'], $output['something'], "Custom accessors are preserved.");
+        $this->assertEquals($expected, $output, "Extract preserves scalars.");
 
         $entity->set('re_values', $values);
-        $values['re_values'] = $values;
-        $this->assertEquals($values, $entity->extract(), "Extract preserves arrays.");
+        $expected['re_values'] = $values;
+        $this->assertEquals($expected, $entity->extract(), "Extract preserves arrays.");
 
         $sub_values = array('sub_key' => 'sub_value', 'sub_array' => array(1, 2, 3, 4));
+        $sub_expected = array_merge($sub_values, array('plop' => true, 'something' => 'something'));
         $sub_entity = new Entity($sub_values);
         $entity->set('sub_entity', $sub_entity);
-        $values['sub_entity'] = $sub_values;
-        $this->assertEquals($values, $entity->extract(), "Extract also sub entities.");
+        $expected['sub_entity'] = $sub_expected;
+        $this->assertEquals($expected, $entity->extract(), "Extract also sub entities.");
 
-        $values['sub_entities_arr'] = array($sub_values, $sub_values, $sub_values);
+        $expected['sub_entities_arr'] = array($sub_expected, $sub_expected, $sub_expected);
         $entity->set('sub_entities_arr', array($sub_entity, $sub_entity, $sub_entity));
-        $this->assertEquals($values, $entity->extract(), "Extract also arrays of sub entities.");
+        $this->assertEquals($expected, $entity->extract(), "Extract also arrays of sub entities.");
     }
 
     public function getEntities()
@@ -43,25 +49,26 @@ class BaseObjectTest extends \PHPUnit_Framework_TestCase
      **/
     public function testMutators(Entity $entity_tpl, Array $values)
     {
+        $expected = array_merge($values, array('something' => 'something', 'plop' => true));
         $entity = clone $entity_tpl;
         $entity->set('unknown', 'pikachu');
         $this->assertEquals('pikachu', $entity->get('unknown'), "Unknown key is 'pikachu'.");
-        $this->assertEquals(array_merge($values, array('unknown' => 'pikachu')), $entity->extract(), 'Unknown key is appended.');
+        $this->assertEquals(array_merge($expected, array('unknown' => 'pikachu')), $entity->extract(), 'Unknown key is appended.');
 
         $entity = clone $entity_tpl;
         $entity['unknown'] = 'pikachu';
         $this->assertEquals('pikachu', $entity->get('unknown'), "Array access mutator.");
-        $this->assertEquals(array_merge($values, array('unknown' => 'pikachu')), $entity->extract(), 'Unknown key is appended.');
+        $this->assertEquals(array_merge($expected, array('unknown' => 'pikachu')), $entity->extract(), 'Unknown key is appended.');
 
         $entity = clone $entity_tpl;
         $entity->unknown = 'pikachu';
         $this->assertEquals('pikachu', $entity->get('unknown'), "Direct attribute mutator.");
-        $this->assertEquals(array_merge($values, array('unknown' => 'pikachu')), $entity->extract(), 'Unknown key is appended.');
+        $this->assertEquals(array_merge($expected, array('unknown' => 'pikachu')), $entity->extract(), 'Unknown key is appended.');
 
         $entity = clone $entity_tpl;
         $entity->setUnknown('pikachu');
         $this->assertEquals('pikachu', $entity->get('unknown'), "Setter function.");
-        $this->assertEquals(array_merge($values, array('unknown' => 'pikachu')), $entity->extract(), 'Unknown key is appended.');
+        $this->assertEquals(array_merge($expected, array('unknown' => 'pikachu')), $entity->extract(), 'Unknown key is appended.');
 
         $entity['array'] = array(1);
         $entity->add('array', 2);
@@ -143,5 +150,20 @@ class Entity extends BaseObject
     public function hasPlop()
     {
         return true;
+    }
+
+    public function getSomething()
+    {
+        return 'something';
+    }
+
+    public function hasSomething()
+    {
+        return true;
+    }
+
+    public function getNothing()
+    {
+        return 'nothing';
     }
 }
