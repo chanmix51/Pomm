@@ -42,7 +42,7 @@ class PgCircle implements ConverterInterface
 
         if (count($elts) !== 2)
         {
-            if ($data === null or $data === '')
+            if ($data === null || $data === '')
             {
                 return null;
             }

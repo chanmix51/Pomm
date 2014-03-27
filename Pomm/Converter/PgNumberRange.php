@@ -36,7 +36,7 @@ class PgNumberRange implements ConverterInterface
     {
         if (!preg_match('/([\[\(])(-?[0-9\.]+),-?([0-9\.]+)([\]\)])/', $data, $matchs))
         {
-            if ($data === null or $data === '')
+            if ($data === null || $data === '')
             {
                 return null;
             }

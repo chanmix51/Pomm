@@ -168,7 +168,7 @@ class Connection implements LoggerAwareInterface
         $class = trim($class, '\\');
         $class_name = $class.'Map';
 
-        if ($force === true or !array_key_exists($class, $this->maps))
+        if ($force === true || !array_key_exists($class, $this->maps))
         {
             $this->maps[$class] = new $class_name($this);
         }

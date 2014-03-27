@@ -40,7 +40,7 @@ class PgArray implements ConverterInterface
 
         if ($data === '') return null;
 
-        if ($data !== "{NULL}" and $data !== "{}")
+        if ($data !== "{NULL}" && $data !== "{}")
         {
             $converter = $this->database
                 ->getConverterForType($type);

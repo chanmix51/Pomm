@@ -35,7 +35,7 @@ class PgPoint implements ConverterInterface
     {
         if (!preg_match('/([0-9e\-+\.]+,[0-9e\-+\.]+)/', $data))
         {
-            if ($data === null or $data === '')
+            if ($data === null || $data === '')
             {
                 return null;
             }

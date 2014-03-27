@@ -20,7 +20,7 @@ class PgIntervalISO8601 extends PgInterval
      */
     public function fromPg($data, $type = null)
     {
-        if ($data === null or $data === '')
+        if ($data === null || $data === '')
         {
             return null;
         }

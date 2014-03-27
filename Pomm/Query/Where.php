@@ -124,7 +124,7 @@ class Where
      */
     public function isEmpty()
     {
-        return (is_null($this->element) and count($this->stack) == 0);
+        return (is_null($this->element) && count($this->stack) == 0);
     }
 
     /**
