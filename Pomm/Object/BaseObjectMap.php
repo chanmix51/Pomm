@@ -66,7 +66,7 @@ abstract class BaseObjectMap
         {
             throw new Exception(sprintf('Missing object_class after initializing db map "%s".', get_class($this)));
         }
-        if (!$this->row_structure instanceOf RowStructure or count($this->row_structure->getFieldNames()) == 0)
+        if (!$this->row_structure instanceOf RowStructure || count($this->row_structure->getFieldNames()) == 0)
         {
             throw new Exception(sprintf('No fields after initializing db map "%s", don\'t you prefer anonymous objects ?', get_class($this)));
         }

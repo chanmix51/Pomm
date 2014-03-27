@@ -34,7 +34,7 @@ class PgInterval implements ConverterInterface
                 ));
         }
 
-        if ($data === null or $data === '')
+        if ($data === null || $data === '')
         {
             return null;
         }

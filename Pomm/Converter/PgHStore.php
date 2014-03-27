@@ -21,11 +21,11 @@ class PgHStore implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
-        if ($data === 'NULL' or $data === '') return null;
+        if ($data === 'NULL' || $data === '') return null;
 
         @eval(sprintf("\$hstore = array(%s);", $data));
 
-        if (!(isset($hstore) and is_array($hstore)))
+        if (!(isset($hstore) && is_array($hstore)))
         {
             throw new PommException(sprintf("Could not parse hstore string '%s' to array.", $data));
         }

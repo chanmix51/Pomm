@@ -23,7 +23,7 @@ class PgBoolean implements ConverterInterface
     {
         if (!preg_match('/(t|f)/', $data))
         {
-            if ($data === null or $data === '')
+            if ($data === null || $data === '')
             {
                 return null;
             }
