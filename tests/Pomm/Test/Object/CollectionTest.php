@@ -89,9 +89,11 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
             $val1[] = $entity;
         }
 
+        $this->assertCount(10, $collection);
+
         foreach($collection as $index => $entity)
         {
-            $this->assertTrue($val1[$key] !== $entity, "Iterating twice on a Collection returns the same results");
+            $this->assertTrue($val1[$index] !== $entity, "Iterating twice on a Collection returns the same results");
         }
     }
 
@@ -116,7 +118,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
         foreach ($collection as $index => $entity)
         {
-            $this->assertTrue($entity['id'] = ($index + 1) * 2, "Check filter");
+            $this->assertTrue($entity['id'] == ($index + 1) * 2, "Check filter");
         }
     }
 }
