@@ -109,7 +109,7 @@ class Collection implements \Iterator, \Countable
      */
     public function rewind()
     {
-        $this->index = 0;
+        $this->position = 0;
     }
 
     /**
