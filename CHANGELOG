@@ -1,3 +1,9 @@
+=== 1.2.1
+
+ * Fix Pomm\Object\Collection::rewind() (#130)
+ * Replaced "or" and "and" by || and &&
+ * Cannot override field definition (#127)
+
 === 1.2.0
 
  * Fixe an issue with the PgArray converter (#123).
