@@ -91,7 +91,7 @@ class CreateBaseMapTool extends CreateFileTool
         $std_namespace = $this->getNamespace();
         $namespace       = $std_namespace.'\\Base';
         $class_name  = $this->options['class_name'];
-        $table_name  = sprintf("%s.%s", $this->options['schema'], $this->options['table']);
+        $table_name  = sprintf('%s.%s', $this->options['database']->getConnection()->escapeIdentifier($this->options['schema']), $this->options['database']->getConnection()->escapeIdentifier($this->options['table']));
         $extends     = $this->options['extends'];
         $primary_key = join(', ', $this->inspector->getTablePrimaryKey($this->options['oid']));
         $map_name   =  sprintf("%sMap", $class_name);

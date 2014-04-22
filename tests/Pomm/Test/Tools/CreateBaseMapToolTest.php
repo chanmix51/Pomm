@@ -109,7 +109,7 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
             $root_dir.'/ChuMap.php',
         ), array(
             'namespace' => '%dbname%\%schema%Prod',
-            'parent_namespace' => '\%dbname%\%schema%',
+            'parent_namespace' => '%dbname%\%schema%',
         ));
     }
 }
