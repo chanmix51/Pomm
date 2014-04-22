@@ -11,7 +11,7 @@ abstract class PikaMap extends BaseObjectMap
     {
 
         $this->object_class =  'TestDb\PommTest\Pika';
-        $this->object_name  =  'pomm_test.pika';
+        $this->object_name  =  '"pomm_test"."pika"';
 
         $this->addField('id', 'int4');
         $this->addField('some_char', 'bpchar');
