@@ -130,6 +130,8 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     public final function hydrate(Array $values)
     {
         $this->fields = array_merge($this->fields, $values);
+
+        return $this;
     }
 
     /**
@@ -147,7 +149,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
             $tmp[strtolower($key)] = $value;
         }
 
-        $this->hydrate($tmp);
+        return $this->hydrate($tmp);
     }
 
     /**

@@ -7,6 +7,24 @@ use Pomm\Tools\Inflector;
 
 class BaseObjectTest extends \PHPUnit_Framework_TestCase
 {
+    public function testHydrate()
+    {
+        $values = array('pika' => 'chu', 'plop' => null, 'always_true' => true, 'some_in' => 1);
+        $entity1 = new Entity($values);
+        $entity2 = new Entity();
+        $entity2->hydrate(array())->hydrate($values);
+
+        $this->assertTrue($entity1->has('pika'), 'pika attribute exists.');
+        $this->assertEquals($entity1->get('pika'), 'chu', 'scalar string is set.');
+        $this->assertTrue($entity1->has('plop'), 'Plop attribute exists.');
+        $this->assertNull($entity1->get('plop'), 'plop is null.');
+        $this->assertTrue($entity1->has('always_true'), 'always_true attribute exists.');
+        $this->assertTrue($entity1->get('always_true') === true, 'boolean is set.');
+        $this->assertTrue($entity1->has('some_in'), 'some_in attribute exists.');
+        $this->assertEquals($entity1->get('some_in'), 1, 'scalar integer is set.');
+        $this->assertTrue($entity1 == $entity2, 'Both objects have same attributes.');
+    }
+
     public function testExtract()
     {
         $values = array('pika' => 'chu', 'plop' => null, 'always_true' => true, 'some_in' => 1);
@@ -31,7 +49,7 @@ class BaseObjectTest extends \PHPUnit_Framework_TestCase
 
     public function getEntities()
     {
-        $data = array('first' => 1, 'second' => 2, 'third' => 'plop', 'fourth' => array('one', 'two', 'three'), 'fifth' => '2012-06-18 14:42:07.123456');
+        $data = array('null' => null, 'true' => true, 'first' => 1, 'second' => 2, 'third' => 'plop', 'fourth' => array('one', 'two', 'three'), 'fifth' => '2012-06-18 14:42:07.123456');
         return array(
             array(new Entity(), array()),
             array(new Entity($data), $data)
