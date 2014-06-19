@@ -35,4 +35,3 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Pomm\Connection\Database', $database, "Database is an instance.");
     }
 }
-

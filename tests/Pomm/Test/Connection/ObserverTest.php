@@ -22,27 +22,20 @@ class ObserverTest extends \PHPUnit_Framework_TestCase
         $observer = $connection1->createObserver()
             ->listen("plop");
 
-        for ($i = 0; $i < 10; $i++)
-        {
-            if ($i % 3 === 0)
-            {
+        for ($i = 0; $i < 10; $i++) {
+            if ($i % 3 === 0) {
                 $connection2->notify('plop', "data $i");
-            }
-            else
-            {
+            } else {
                 $connection2->notify('other event');
             }
 
             sleep(1);
             $data = $observer->getNotification();
 
-            if ($i % 3 === 0)
-            {
+            if ($i % 3 === 0) {
                 $this->assertTrue(is_array($data), "Iteration '$i', returned data is an array.");
                 $this->assertEquals("data $i", $data['payload'], "Iteration '$i', the payload is correct.");
-            }
-            else
-            {
+            } else {
                 $this->assertFalse($data);
             }
         }
@@ -52,4 +45,3 @@ class ObserverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("", $data['payload'], 'When no payload, return an empty string.');
     }
 }
-

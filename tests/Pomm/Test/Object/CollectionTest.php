@@ -9,7 +9,6 @@ use Pomm\Object\Collection;
 use Pomm\Exception\Exception;
 use Pomm\Query\Where;
 
-
 class CollectionTest extends \PHPUnit_Framework_TestCase
 {
     protected static $map;
@@ -56,8 +55,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     public function testResult(Collection $collection)
     {
         $n = 1;
-        foreach($collection as $entity) 
-        {
+        foreach ($collection as $entity) {
             $this->assertEquals($n++, $entity['id'], sprintf("We have id '%d'.", $n - 1));
         }
 
@@ -84,15 +82,13 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     {
         $val1 = $val2 = array();
 
-        foreach($collection as $entity)
-        {
+        foreach ($collection as $entity) {
             $val1[] = $entity;
         }
 
         $this->assertCount(10, $collection);
 
-        foreach($collection as $index => $entity)
-        {
+        foreach ($collection as $index => $entity) {
             $this->assertTrue($val1[$index] !== $entity, "Iterating twice on a Collection returns the same results");
         }
     }
@@ -114,10 +110,11 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
      **/
     public function testFilters(Collection $collection)
     {
-        $collection->registerFilter(function($values) { return array_map(function($val) { return $val * 2; }, $values); });
+        $collection->registerFilter(function($values) { return array_map(function($val) { return $val * 2;
+        }, $values);
+        });
 
-        foreach ($collection as $index => $entity)
-        {
+        foreach ($collection as $index => $entity) {
             $this->assertTrue($entity['id'] == ($index + 1) * 2, "Check filter");
         }
     }

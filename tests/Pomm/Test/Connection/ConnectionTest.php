@@ -64,13 +64,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, pg_fetch_result($stmt, 0), "We have 2 results.");
 
         static::$connection->begin();
-        try
-        {
+        try {
             static::$connection->rollback('useless'); //fail the current transaction
             $this->fail("Rollback to unknown savepoint must raise an exception.");
-        }
-        catch (\Pomm\Exception\ConnectionException $e)
-        {
+        } catch (\Pomm\Exception\ConnectionException $e) {
             $this->assertTrue(true, "Error in transaction raises an exception.");
         }
 
