@@ -134,7 +134,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('\DateTime', $entity['some_ts'], "'some_ts' is a \DateTime instance.");
         $entity['some_ts']->setTimeZone(new \DateTimeZone('Etc/GMT0'));
-        $this->assertEquals( '2012-06-20 08:34:16.640044+00:00', $entity['some_ts']->format('Y-m-d H:i:s.uP'), "Timestamp is preserved.");
+        $this->assertEquals('2012-06-20 08:34:16.640044+00:00', $entity['some_ts']->format('Y-m-d H:i:s.uP'), "Timestamp is preserved.");
         $this->assertInstanceOf('\DateInterval', $entity['some_intv'], "'some_intv' is a \DateInterval instance.");
         $this->assertEquals('37 years 3 mons 7 days 02:14:46', $entity['some_intv']->format("%y years %m mons %d days %H:%i:%s"), "'some_intv' is '37 years 3 mons 7 days 02:14:46'.");
         $this->assertEquals(3, count($entity['arr_ts']), "'arr_ts' is an array of 3 elements.");
@@ -322,7 +322,7 @@ _;
     /**
      * @depends testInteger
      **/
-    function testHStore()
+    public function testHStore()
     {
         if (static::$cv_map->alterHStore() === false) {
             $this->markTestSkipped("HStore extension could not be found in Postgres, tests skipped.");

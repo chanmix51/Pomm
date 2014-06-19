@@ -110,9 +110,16 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
      **/
     public function testFilters(Collection $collection)
     {
-        $collection->registerFilter(function($values) { return array_map(function($val) { return $val * 2;
-        }, $values);
-        });
+        $collection->registerFilter(
+            function ($values) {
+                return array_map(
+                    function ($val) {
+                        return $val * 2;
+                    },
+                    $values
+                );
+            }
+        );
 
         foreach ($collection as $index => $entity) {
             $this->assertTrue($entity['id'] == ($index + 1) * 2, "Check filter");

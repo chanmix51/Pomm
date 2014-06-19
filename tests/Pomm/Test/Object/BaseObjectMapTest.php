@@ -232,7 +232,7 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(5, $ordered_res->count(), "5 results.");
         foreach ($ordered_res as $index => $result) {
-            $this->assertEquals( 5 - $index, $result['id'], "Names are the other way than ids.");
+            $this->assertEquals(5 - $index, $result['id'], "Names are the other way than ids.");
         }
 
         $this->assertEquals(3, $limited_res->count(), "We have 3 results.");
@@ -304,7 +304,7 @@ class BaseEntityMap extends BaseObjectMap
 
         $this->changeToNoPrimaryKey();
 
-        $sql = sprintf('ALTER TABLE %s ADD COLUMN name varchar NOT NULL', $this->getTableName());;
+        $sql = sprintf('ALTER TABLE %s ADD COLUMN name varchar NOT NULL', $this->getTableName());
         $this->connection->executeAnonymousQuery($sql);
 
         $sql = sprintf('ALTER TABLE %s ADD PRIMARY KEY (id, name)', $this->getTableName());
@@ -316,7 +316,7 @@ class BaseEntityMap extends BaseObjectMap
 
     public function changeToNoPrimaryKey()
     {
-        $sql = sprintf('ALTER TABLE %s DROP CONSTRAINT base_entity_pkey', $this->getTableName());;
+        $sql = sprintf('ALTER TABLE %s DROP CONSTRAINT base_entity_pkey', $this->getTableName());
         $this->connection->executeAnonymousQuery($sql);
     }
 
