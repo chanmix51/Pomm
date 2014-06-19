@@ -40,10 +40,8 @@ class PgCircle implements ConverterInterface
         $data = trim($data, '<>');
         $elts = preg_split('/[,\s]*(\([^\)]+\))[,\s]*|[,\s]+/', $data, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
-        if (count($elts) !== 2)
-        {
-            if ($data === null || $data === '')
-            {
+        if (count($elts) !== 2) {
+            if ($data === null || $data === '') {
                 return null;
             }
 
@@ -58,21 +56,18 @@ class PgCircle implements ConverterInterface
      */
     public function toPg($data, $type = null)
     {
-        if (! $data instanceof $this->class_name)
-        {
-            if (!is_object($data))
-            {
+        if (! $data instanceof $this->class_name) {
+            if (!is_object($data)) {
                 $type = gettype($data);
-            }
-            else
-            {
+            } else {
                 $type = get_class($data);
             }
 
             throw new Exception(sprintf("Converter PgCircle needs data to be an instance of '%s' ('%s' given).", $this->class_name, $type));
         }
 
-        return sprintf("circle(%s, %s)",
+        return sprintf(
+            "circle(%s, %s)",
             $this->point_converter->toPg($data->center),
             $data->radius
         );

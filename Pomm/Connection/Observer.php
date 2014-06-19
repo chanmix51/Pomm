@@ -39,8 +39,7 @@ class Observer
      */
     public function __destruct()
     {
-        if ($this->isListening())
-        {
+        if ($this->isListening()) {
             $this->unlisten();
         }
     }
@@ -54,8 +53,7 @@ class Observer
      */
     public function listen($name)
     {
-        if (empty($name))
-        {
+        if (empty($name)) {
             throw new PommException(sprintf("Event name cannot be empty."));
         }
 
@@ -103,8 +101,7 @@ class Observer
      */
     public function getNotification()
     {
-        if ($this->isListening() === false)
-        {
+        if ($this->isListening() === false) {
             throw new PommException(sprintf("The observer is not listening."));
         }
 

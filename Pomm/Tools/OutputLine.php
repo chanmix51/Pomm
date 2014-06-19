@@ -63,13 +63,17 @@ class OutputLine
      */
     public function getFormattedLevel()
     {
-        switch($this->level)
-        {
-        case 1: return "DEBUG";
-        case 2: return "INFO";
-        case 4: return "WARNING";
-        case 8: return "ERROR";
-        case 16: return "CRITICAL";
+        switch($this->level) {
+            case 1:
+                return "DEBUG";
+            case 2:
+                return "INFO";
+            case 4:
+                return "WARNING";
+            case 8:
+                return "ERROR";
+            case 16:
+                return "CRITICAL";
         }
     }
 }

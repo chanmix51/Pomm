@@ -9,19 +9,19 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testConstructors()
     {
         $where = Where::create('A', array('1'));
-        $this->assertInstanceOf('Pomm\Query\Where', $where,  'Where::create() returns a Where instance.');
+        $this->assertInstanceOf('Pomm\Query\Where', $where, 'Where::create() returns a Where instance.');
         $this->assertTrue($where->hasElement(), 'Where instance has element.');
         $this->assertEquals('A', (string) $where, "String where is 'A'.");
         $this->assertEquals(array(1), $where->getValues(), 'Where values are "[1]".');
 
         $where = Where::createWhereIn('B', array(1, 2, 3));
-        $this->assertInstanceOf('Pomm\Query\Where', $where,  'Where::create() returns a Where instance.');
+        $this->assertInstanceOf('Pomm\Query\Where', $where, 'Where::create() returns a Where instance.');
         $this->assertTrue($where->hasElement(), 'Where instance has element.');
         $this->assertEquals('B IN ($*, $*, $*)', (string) $where, "String where is 'B IN ($*, $*, $*)'.");
         $this->assertEquals(array(1,2,3), $where->getValues(), 'Where values are "[1,2,3]".');
 
         $where = Where::create();
-        $this->assertInstanceOf('Pomm\Query\Where', $where,  'Where::create() returns a Where instance');
+        $this->assertInstanceOf('Pomm\Query\Where', $where, 'Where::create() returns a Where instance');
         $this->assertFalse($where->hasElement(), 'Where instance has no elements.');
         $this->assertEquals(array(), $where->getValues(), 'And no values.');
 
@@ -74,4 +74,3 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->checkToString($where, '((A AND B AND C) OR D OR NOT E OR ((A OR B OR C) AND D AND NOT E))', array(1, 2, 3, 4, 5, 1, 2, 3, 4, 5));
     }
 }
-

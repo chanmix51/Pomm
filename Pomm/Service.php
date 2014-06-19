@@ -29,8 +29,7 @@ class Service
      */
     public function __construct(Array $databases = array())
     {
-        foreach ($databases as $name => $parameters)
-        {
+        foreach ($databases as $name => $parameters) {
             $db_class = isset($parameters['class']) ? $parameters['class'] : 'Pomm\Connection\Database';
             $this->setDatabase($name, new $db_class($parameters));
         }
@@ -60,17 +59,14 @@ class Service
      */
     public function getDatabase($name = null)
     {
-        if (is_null($name))
-        {
-            if (count($this->databases) == 0)
-            {
+        if (is_null($name)) {
+            if (count($this->databases) == 0) {
                 throw new Exception(sprintf('No database registered.'));
             }
 
             return reset($this->databases);
         }
-        if (array_key_exists($name, $this->databases))
-        {
+        if (array_key_exists($name, $this->databases)) {
             return $this->databases[$name];
         }
 

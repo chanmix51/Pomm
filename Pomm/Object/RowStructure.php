@@ -45,7 +45,7 @@ class RowStructure
      *
      * Return an array of all field names
      *
-     * @return Array 
+     * @return Array
      */
     public function getFieldNames()
     {

@@ -17,8 +17,8 @@ use Pomm\Tools\ParameterHolder;
  */
 abstract class BaseTool
 {
-    protected $options;
-    protected $output_stack;
+    protected $soptions;
+    protected $outputStack;
 
     /**
      * __construct
@@ -29,7 +29,9 @@ abstract class BaseTool
     final public function __construct(Array $options = array())
     {
         $this->options = new ParameterHolder($options);
-        $this->output_stack = new OutputLineStack($this->options->hasParameter('output_level') ? $this->options->getParameter('output_level') : OutputLine::LEVEL_ALL);
+        $this->outputStack = new OutputLineStack(
+            $this->options->hasParameter('output_level') ? $this->options->getParameter('output_level') : OutputLine::LEVEL_ALL
+        );
 
         $this->configure();
     }
@@ -43,7 +45,7 @@ abstract class BaseTool
      * @abstract
      * @access protected
      */
-    protected abstract function configure();
+    abstract protected function configure();
 
     /**
      * execute
@@ -62,6 +64,6 @@ abstract class BaseTool
      */
     public function getOutputStack()
     {
-        return $this->output_stack;
+        return $this->outputStack;
     }
 }

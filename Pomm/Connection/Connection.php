@@ -54,24 +54,25 @@ class Connection implements LoggerAwareInterface
         $this->parameter_holder = $database->getParameterHolder();
 
         $this->parameter_holder->setDefaultValue('isolation', self::ISOLATION_READ_COMMITTED);
-        $this->parameter_holder->mustBeOneOf('isolation',
-            array(self::ISOLATION_READ_COMMITTED, self::ISOLATION_SERIALIZABLE, self::ISOLATION_READ_REPEATABLE)
+        $this->parameter_holder->mustBeOneOf(
+            'isolation',
+            array(
+                self::ISOLATION_READ_COMMITTED,
+                self::ISOLATION_SERIALIZABLE,
+                self::ISOLATION_READ_REPEATABLE
+            )
         );
 
         $this->isolation = $this->parameter_holder['isolation'];
         $this->parameter_holder->setDefaultValue('identity_mapper', false);
 
-        if (is_null($mapper))
-        {
-            if ($this->parameter_holder['identity_mapper'] !== false)
-            {
+        if (is_null($mapper)) {
+            if ($this->parameter_holder['identity_mapper'] !== false) {
                 $identity_class = $this->parameter_holder['identity_mapper'] === true ? 'Pomm\Identity\IdentityMapperSmart' : $this->parameter_holder['identity_mapper'];
 
                 $this->identity_mapper = new $identity_class();
             }
-        }
-        else
-        {
+        } else {
             $this->identity_mapper = $mapper;
         }
     }
@@ -87,37 +88,31 @@ class Connection implements LoggerAwareInterface
     {
         $connect_parameters = array(sprintf("user=%s dbname=%s", $this->parameter_holder['user'], $this->parameter_holder['database']));
 
-        if ($this->parameter_holder['host'] !== '')
-        {
+        if ($this->parameter_holder['host'] !== '') {
             $connect_parameters[] = sprintf('host=%s', $this->parameter_holder['host']);
         }
 
-        if ($this->parameter_holder['port'] !== '')
-        {
+        if ($this->parameter_holder['port'] !== '') {
             $connect_parameters[] = sprintf('port=%s', $this->parameter_holder['port']);
         }
 
-        if ($this->parameter_holder['pass'] !== '')
-        {
+        if ($this->parameter_holder['pass'] !== '') {
             $connect_parameters[] = sprintf('password=%s', addslashes($this->parameter_holder['pass']));
         }
 
         $this->handler = pg_connect(join(' ', $connect_parameters), \PGSQL_CONNECT_FORCE_NEW);
 
-        if ($this->handler === false)
-        {
+        if ($this->handler === false) {
             $this->throwConnectionException(sprintf("Error connecting to the database with dsn '%s'.", join(' ', $connect_parameters)), LogLevel::ALERT);
         }
 
         $sql = '';
 
-        foreach ($this->database->getConfiguration() as $setting => $value)
-        {
+        foreach ($this->database->getConfiguration() as $setting => $value) {
             $sql .= sprintf("SET %s = \"%s\";", $setting, $value);
         }
 
-        if (pg_query($this->handler, $sql) === false)
-        {
+        if (pg_query($this->handler, $sql) === false) {
             $this->throwConnectionException(sprintf("Error while applying settings '%s'.", $sql), LogLevel::CRITICAL);
         }
     }
@@ -144,8 +139,7 @@ class Connection implements LoggerAwareInterface
      */
     public function getHandler()
     {
-        if (!isset($this->handler))
-        {
+        if (!isset($this->handler)) {
             $this->launch();
         }
 
@@ -168,8 +162,7 @@ class Connection implements LoggerAwareInterface
         $class = trim($class, '\\');
         $class_name = $class.'Map';
 
-        if ($force === true || !array_key_exists($class, $this->maps))
-        {
+        if ($force === true || !array_key_exists($class, $this->maps)) {
             $this->maps[$class] = new $class_name($this);
         }
 
@@ -215,8 +208,7 @@ class Connection implements LoggerAwareInterface
      */
     public function begin()
     {
-        if ($this->executeAnonymousQuery(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->isolation)) === false)
-        {
+        if ($this->executeAnonymousQuery(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->isolation)) === false) {
             $this->throwConnectionException(sprintf("Cannot begin transaction (isolation level '%s').", $this->isolation), LogLevel::ERROR);
         }
 
@@ -233,8 +225,7 @@ class Connection implements LoggerAwareInterface
      */
     public function commit()
     {
-        if ($this->executeAnonymousQuery('COMMIT TRANSACTION') === false)
-        {
+        if ($this->executeAnonymousQuery('COMMIT TRANSACTION') === false) {
             $this->throwConnectionException(sprintf("Cannot commit transaction (isolation level '%s').", $this->isolation), LogLevel::ERROR);
         }
 
@@ -254,17 +245,13 @@ class Connection implements LoggerAwareInterface
      */
     public function rollback($name = null)
     {
-        if (is_null($name))
-        {
+        if (is_null($name)) {
             $ret = $this->executeAnonymousQuery('ROLLBACK TRANSACTION');
-        }
-        else
-        {
+        } else {
             $ret = $this->executeAnonymousQuery(sprintf("ROLLBACK TO SAVEPOINT %s", $this->escapeIdentifier($name)));
         }
 
-        if ($ret === false)
-        {
+        if ($ret === false) {
             $this->throwConnectionException(sprintf("Cannot rollback transaction (isolation level '%s').", $this->isolation), LogLevel::ERROR);
         }
 
@@ -282,8 +269,7 @@ class Connection implements LoggerAwareInterface
      */
     public function setSavepoint($name)
     {
-        if ($this->executeAnonymousQuery(sprintf("SAVEPOINT %s", $this->escapeIdentifier($name))) === false)
-        {
+        if ($this->executeAnonymousQuery(sprintf("SAVEPOINT %s", $this->escapeIdentifier($name))) === false) {
             throw new ConnectionException(sprintf("Cannot set savepoint '%s'.", $name), LogLevel::ERROR);
         }
 
@@ -301,8 +287,7 @@ class Connection implements LoggerAwareInterface
      */
     public function releaseSavepoint($name)
     {
-        if ($this->executeAnonymousQuery(sprintf("RELEASE SAVEPOINT %s", $this->escapeIdentifier($name))) === false)
-        {
+        if ($this->executeAnonymousQuery(sprintf("RELEASE SAVEPOINT %s", $this->escapeIdentifier($name))) === false) {
             throw new ConnectionException(sprintf("Cannot release savepoint named '%s'.", $name), LogLevel::ERROR);
         }
 
@@ -364,17 +349,13 @@ class Connection implements LoggerAwareInterface
     {
         $name = $this->escapeIdentifier($name);
 
-        if (empty($payload))
-        {
+        if (empty($payload)) {
             $ret = $this->executeAnonymousQuery(sprintf("NOTIFY %s", $name));
-        }
-        else
-        {
-            $ret = $this->executeAnonymousQuery(sprintf("NOTIFY %s, %s", $name,  $this->escapeLiteral($payload)));
+        } else {
+            $ret = $this->executeAnonymousQuery(sprintf("NOTIFY %s, %s", $name, $this->escapeLiteral($payload)));
         }
 
-        if ($ret === false)
-        {
+        if ($ret === false) {
             $this->throwConnectionException(sprintf("Could not notify '%s' event.", $name), LogLevel::ERROR);
         }
     }
@@ -432,8 +413,7 @@ class Connection implements LoggerAwareInterface
     {
         $signature = PreparedQuery::getSignatureFor($sql);
 
-        if ($this->hasQuery($signature) === false)
-        {
+        if ($this->hasQuery($signature) === false) {
             $query = $this->createPreparedQuery($sql);
             $this->queries[$query->getName()] = $query;
         }
@@ -501,8 +481,7 @@ class Connection implements LoggerAwareInterface
      */
     public function log($level, $message, Array $env = array())
     {
-        if (isset($this->logger))
-        {
+        if (isset($this->logger)) {
             $this->logger->log($level, $message, $env + array('connection' => $this));
         }
 
@@ -541,8 +520,7 @@ class Connection implements LoggerAwareInterface
      */
     public function escapeIdentifier($name)
     {
-        if (function_exists('pg_escape_identifier'))
-        {
+        if (function_exists('pg_escape_identifier')) {
             return \pg_escape_identifier($this->getHandler(), $name);
         }
 
@@ -560,8 +538,7 @@ class Connection implements LoggerAwareInterface
      */
     public function escapeLiteral($var)
     {
-        if (function_exists('pg_escape_literal'))
-        {
+        if (function_exists('pg_escape_literal')) {
             return \pg_escape_literal($this->getHandler(), $var);
         }
 

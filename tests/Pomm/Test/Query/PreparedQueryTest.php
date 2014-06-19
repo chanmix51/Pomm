@@ -38,13 +38,10 @@ class PreparedQueryTest extends \PHPUnit_Framework_TestCase
         $query->deallocate();
         $this->assertFalse($query->getActive(), 'Query is active');
 
-        try
-        {
+        try {
             $query->execute(array());
             $this->assertFalse(true, 'Query should throw an exception when inactive');
-        }
-        catch(PommException $e)
-        {
+        } catch (PommException $e) {
             $this->assertTrue(true, "When inactive, an executed query throws an Exception.");
         }
     }

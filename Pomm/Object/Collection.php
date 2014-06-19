@@ -58,19 +58,16 @@ class Collection implements \Iterator, \Countable
     {
         $values = pg_fetch_assoc($this->result_resource, $index);
 
-        if ($values === false)
+        if ($values === false) {
             return false;
+        }
 
-        foreach ($this->filters as $index => $filter)
-        {
+        foreach ($this->filters as $index => $filter) {
             $values = call_user_func($filter, $values);
 
-            if ($values === false)
-            {
+            if ($values === false) {
                 throw new Exception(sprintf("Filter %d returned an error.", $index));
-            }
-            elseif(! is_array($values))
-            {
+            } elseif (! is_array($values)) {
                 throw new Exception(sprintf("Filter %d did not return an array.", $index));
             }
         }
@@ -239,8 +236,7 @@ class Collection implements \Iterator, \Countable
         $name = is_null($name) ? $this->object_map->getObjectClass() : $name;
         $results = array();
 
-        foreach ($this as $result)
-        {
+        foreach ($this as $result) {
             $results[] = $result->extract();
         }
 
@@ -250,14 +246,13 @@ class Collection implements \Iterator, \Countable
     /**
      * registerFilter
      *
-     * Register a new callable filter. All filters MUST return an associative 
+     * Register a new callable filter. All filters MUST return an associative
      * array with field name as key.
      * @param Callable $callable the filter.
      */
     public function registerFilter($callable)
     {
-        if (!is_callable($callable))
-        {
+        if (!is_callable($callable)) {
             throw new Exception(sprintf("Given filter is not a callable (type '%s').", gettype($callable)));
         }
 

@@ -20,8 +20,7 @@ class PgNumber implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
-        if ($data === null || $data === '')
-        {
+        if ($data === null || $data === '') {
             return null;
         }
 
