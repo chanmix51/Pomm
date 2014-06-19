@@ -55,38 +55,31 @@ class Database
     {
         $dsn = $this->parameter_holder['dsn'];
 
-        if (!preg_match('#([a-z]+)://([^:@]+)(?::([^@]+))?(?:@([\w\.-]+|!/.+[^/]!)(?::(\w+))?)?/(.+)#', $dsn, $matchs))
-        {
+        if (!preg_match('#([a-z]+)://([^:@]+)(?::([^@]+))?(?:@([\w\.-]+|!/.+[^/]!)(?::(\w+))?)?/(.+)#', $dsn, $matchs)) {
             throw new PommException(sprintf('Could not parse DSN "%s".', $dsn));
         }
 
 
-        if ($matchs[1] == null)
-        {
+        if ($matchs[1] == null) {
             throw new PommException(sprintf('No protocol information in dsn "%s".', $dsn));
         }
         $adapter = $matchs[1];
 
-        if ($matchs[2] == null)
-        {
+        if ($matchs[2] == null) {
             throw PommException(sprintf('No user information in dsn "%s".', $dsn));
         }
         $user = $matchs[2];
         $pass = $matchs[3];
 
-        if (preg_match('/!(.*)!/', $matchs[4], $host_matchs))
-        {
+        if (preg_match('/!(.*)!/', $matchs[4], $host_matchs)) {
             $host = $host_matchs[1];
-        }
-        else
-        {
+        } else {
             $host = $matchs[4];
         }
 
         $port = $matchs[5];
 
-        if ($matchs[6] == null)
-        {
+        if ($matchs[6] == null) {
             throw new PommException(sprintf('No database name in dsn "%s".', $dsn));
         }
         $database = $matchs[6];
@@ -142,8 +135,7 @@ class Database
      */
     public function getConnection()
     {
-        if (is_null($this->connection))
-        {
+        if (is_null($this->connection)) {
             return $this->createConnection();
         }
 
@@ -164,8 +156,7 @@ class Database
     {
         $this->converters[$name] = $converter;
 
-        foreach ($pg_types as $type)
-        {
+        foreach ($pg_types as $type) {
             $this->handled_types[$type] = $name;
         }
 
@@ -198,16 +189,12 @@ class Database
      */
     public function getConverterForType($pg_type)
     {
-        if (isset($this->handled_types[$pg_type]))
-        {
+        if (isset($this->handled_types[$pg_type])) {
             $converter_name = $this->handled_types[$pg_type];
 
-            if (isset($this->converters[$converter_name]))
-            {
+            if (isset($this->converters[$converter_name])) {
                 return $this->converters[$converter_name];
-            }
-            else
-            {
+            } else {
                 throw new PommException(sprintf("Pg type '%s' is associated with converter '%s' but converter is not registered.", $pg_type, $converter_name));
             }
         }

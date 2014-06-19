@@ -44,7 +44,7 @@ class CreateEntityTool extends CreateFileTool
     {
         $content = $this->generateMapFile();
         $path = sprintf("%s/%s.php", $this->getDestinationPath(), $this->options['class']);
-        $this->output_stack->add(sprintf("Create empty Entity class file '%s'.", $path), OutputLine::LEVEL_INFO);
+        $this->outputStack->add(sprintf("Create empty Entity class file '%s'.", $path), OutputLine::LEVEL_INFO);
         $this->saveFile($path, $content);
     }
 

@@ -40,11 +40,23 @@ class Inspector
      */
     public function getTableOid($schema, $table)
     {
-        $sql = sprintf("SELECT c.oid FROM pg_catalog.pg_class c LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = '%s' AND c.relname ~ '^(%s)$';", $schema, $table);
+        $sql = <<<SQL
+SELECT 
+    c.oid 
+FROM 
+    pg_catalog.pg_class c 
+LEFT JOIN 
+    pg_catalog.pg_namespace n ON n.oid = c.relnamespace 
+WHERE 
+    n.nspname = '%s' 
+AND 
+    c.relname ~ '^(%s)$'
+SQL;
+
+        $sql = sprintf($sql, $schema, $table);
         $oid = pg_fetch_result(pg_query($this->connection->getHandler(), $sql), 'oid');
 
-        if ($oid === FALSE)
-        {
+        if ($oid === false) {
             throw new Exception(sprintf("Could not find table or view '%s' in postgres schema '%s'.", $table, $schema));
         }
 
@@ -76,21 +88,30 @@ WHERE
     c.relname ~ ANY(ARRAY[%s]::varchar[])
 SQL;
 
-        $result_handler = pg_query($this->connection->getHandler(), sprintf(
-            $sql,
-            $schema,
-            join(', ', array_map(function($val) { return sprintf("'^(%s)$'", $val); }, $names))
-        ));
+        $result_handler = pg_query(
+            $this->connection->getHandler(),
+            sprintf(
+                $sql,
+                $schema,
+                join(
+                    ', ',
+                    array_map(
+                        function ($val) {
+                            return sprintf("'^(%s)$'", $val);
+                        },
+                        $names
+                    )
+                )
+            )
+        );
 
-        if ($result_handler === false)
-        {
+        if ($result_handler === false) {
             throw new ToolException(sprintf("Could not query the database."));
         }
 
         $tables = array();
 
-        while($row = pg_fetch_assoc($result_handler))
-        {
+        while ($row = pg_fetch_assoc($result_handler)) {
             $tables[$row['table_name']] = $row['oid'];
         }
 
@@ -112,8 +133,7 @@ SQL;
 
         $information = pg_fetch_assoc($result_handler);
 
-        if ($information === FALSE)
-        {
+        if ($information === false) {
             throw new Exception(sprintf("Could not find any objects in table pg_class for oid='%d'.", $oid));
         }
 
@@ -135,7 +155,12 @@ SQL;
         $pkey = pg_fetch_assoc($result_handler);
 
         $pkey = preg_split('/, /', trim($pkey['pkey'], '["{}]'));
-        array_walk($pkey, function(&$value) { $value = sprintf("'%s'", $value); });
+        array_walk(
+            $pkey,
+            function (&$value) {
+                $value = sprintf("'%s'", $value);
+            }
+        );
 
         return $pkey;
     }
@@ -188,8 +213,7 @@ SQL;
 
         $result_handler = pg_query($this->connection->getHandler(), $sql);
         $attributes = array();
-        while ($class = pg_fetch_assoc($result_handler))
-        {
+        while ($class = pg_fetch_assoc($result_handler)) {
             $attributes[] = array('attname' => $class['attname'], 'format_type' => $class['type_namespace'] == 'pg_catalog' ? $class['type'] : sprintf("%s.%s", $class['type_namespace'], $class['type']));
         }
 
@@ -199,7 +223,7 @@ SQL;
     /**
      * getTableParent
      *
-     * Return the oid of the parent table if any, FALSE is returned if there
+     * Return the oid of the parent table if any, false is returned if there
      * are no parent or if there are several parents.
      *
      * @param Integer $oid
@@ -210,9 +234,8 @@ SQL;
         $sql = sprintf("SELECT pa.inhparent FROM pg_catalog.pg_inherits pa WHERE pa.inhrelid = %d", $oid);
         $result_handler = pg_query($this->connection->getHandler(), $sql);
 
-        if (pg_num_rows($result_handler) <> 1)
-        {
-            return FALSE;
+        if (pg_num_rows($result_handler) <> 1) {
+            return false;
         }
 
         $result = pg_fetch_result($result_handler, 'inhparent');
@@ -235,8 +258,7 @@ SQL;
 
         $tables = array();
         $result_handler = pg_query($this->connection->getHandler(), $sql);
-        while ($oid = pg_fetch_assoc($result_handler))
-        {
+        while ($oid = pg_fetch_assoc($result_handler)) {
             $tables[] = $oid['oid'];
         }
 
@@ -259,8 +281,7 @@ SQL;
         $result_handler = pg_query($this->connection->getHandler(), $sql);
         $sources = array();
 
-        while ($source = pg_fetch_assoc($result_handler))
-        {
+        while ($source = pg_fetch_assoc($result_handler)) {
             $sources[] = $source;
         }
 

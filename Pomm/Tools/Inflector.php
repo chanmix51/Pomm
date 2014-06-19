@@ -22,7 +22,13 @@ class Inflector
      */
     public static function camelize($id)
     {
-        return preg_replace_callback('/(^|_|\.)+(.)/', function ($match) { return ('.' === $match[1] ? '_' : '').strtoupper($match[2]); }, $id);
+        return preg_replace_callback(
+            '/(^|_|\.)+(.)/',
+            function ($match) {
+                return ('.' === $match[1] ? '_' : '').strtoupper($match[2]);
+            },
+            $id
+        );
     }
 
     /**

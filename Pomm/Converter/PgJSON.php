@@ -38,7 +38,7 @@ class PgJSON implements ConverterInterface
     {
         $data = pg_escape_string(json_encode($data));
         $type = is_null($type) ? '' : sprintf("%s ", $type);
-        $data = sprintf("%s'%s'",  $type, $data);
+        $data = sprintf("%s'%s'", $type, $data);
 
         return $data;
     }
@@ -51,4 +51,3 @@ class PgJSON implements ConverterInterface
         return json_decode($data, $this->output_type);
     }
 }
-

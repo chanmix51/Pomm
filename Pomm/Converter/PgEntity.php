@@ -36,25 +36,21 @@ class PgEntity implements ConverterInterface
     {
         $class_name = $this->map->getObjectClass();
 
-        if (!is_object($data))
-        {
+        if (!is_object($data)) {
             throw new Exception(sprintf("'%s' converter toPG() method expects argument to be a '%s' instance ('%s' given).", get_class($this), $class_name, gettype($data)));
         }
 
-        if (! $data instanceof $class_name)
-        {
+        if (! $data instanceof $class_name) {
             throw new Exception(sprintf("'%s' converter toPG() method expects argument to be a '%s' instance ('%s' given).", get_class($this), $class_name, get_class($data)));
         }
 
-        if (! $data instanceof \Pomm\Object\BaseObject)
-        {
+        if (! $data instanceof \Pomm\Object\BaseObject) {
             throw new Exception(sprintf("'%s' converter needs '%s' to be children of Pomm\\Object\\BaseObject.", get_class($this), get_class($data)));
         }
 
         $fields = array();
 
-        foreach ($this->map->getRowStructure()->getFieldNames() as $field_name)
-        {
+        foreach ($this->map->getRowStructure()->getFieldNames() as $field_name) {
             $fields[$field_name] = $data->has($field_name) ? $data[$field_name] : null;
         }
 

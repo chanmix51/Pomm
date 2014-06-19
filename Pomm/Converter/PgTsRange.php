@@ -34,10 +34,8 @@ class PgTsRange implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
-        if (!preg_match('/([\[\(])"([0-9 :-]+)","([0-9 :-]+)"([\]\)])/', $data, $matchs))
-        {
-            if ($data === null || $data === '')
-            {
+        if (!preg_match('/([\[\(])"([0-9 :-]+)","([0-9 :-]+)"([\]\)])/', $data, $matchs)) {
+            if ($data === null || $data === '') {
                 return null;
             }
 
@@ -55,8 +53,7 @@ class PgTsRange implements ConverterInterface
      */
     public function toPg($data, $type = null)
     {
-        if (! $data instanceof \Pomm\Type\TsRange )
-        {
+        if (! $data instanceof \Pomm\Type\TsRange) {
             throw new Exception(sprintf("PgTsRange converter expects 'TsRange' data to convert. '%s' given.", gettype($data)));
         }
 

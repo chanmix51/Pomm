@@ -31,7 +31,7 @@ class PreparedQuery
      * @param String $sql Sql query
      * @return String
      */
-    static public function getSignatureFor($sql)
+    public static function getSignatureFor($sql)
     {
         return md5($sql);
     }
@@ -51,8 +51,7 @@ class PreparedQuery
         $this->name = static::getSignatureFor($sql);
         $this->stmt = pg_prepare($this->connection->getHandler(), $this->name, $this->escapePlaceHolders($sql));
 
-        if ($this->stmt === false)
-        {
+        if ($this->stmt === false) {
             $this->connection->throwConnectionException(sprintf("Could not prepare statement «%s».", $sql), LogLevel::ERROR);
         }
 
@@ -84,15 +83,13 @@ class PreparedQuery
      */
     public function execute(Array $values = array())
     {
-        if ($this->active === false)
-        {
+        if ($this->active === false) {
             $this->connection->throwConnectionException(sprintf("Cannot execute inactive statement '%s'.", $this->getName()), LogLevel::ERROR);
         }
 
         $res = @pg_execute($this->connection->getHandler(), $this->name, $this->prepareValues($values));
 
-        if ($res === false)
-        {
+        if ($res === false) {
             $this->connection->throwConnectionException(sprintf("Error while executing prepared statement '%s'.", $this->getName()), LogLevel::ERROR);
         }
 
@@ -112,8 +109,7 @@ class PreparedQuery
     public function deallocate()
     {
         $res = @pg_execute($this->connection->getHandler(), sprintf("DEALLOCATE %s", $this->connection->escapeIdentifier($this->getName())));
-        if ($res === false)
-        {
+        if ($res === false) {
             $this->connection->throwConnectionException(sprintf("Could not deallocate statement «%s».", $this->getName()), LogLevel::ERROR);
         }
 
@@ -145,10 +141,8 @@ class PreparedQuery
      */
     private function prepareValues(array $values)
     {
-        foreach ($values as $index => $value)
-        {
-            if ($value instanceof \DateTime)
-            {
+        foreach ($values as $index => $value) {
+            if ($value instanceof \DateTime) {
                 $values[$index] = $value->format('Y-m-d H:i:s.uP');
             }
         }
@@ -167,6 +161,13 @@ class PreparedQuery
      */
     private function escapePlaceHolders($sql)
     {
-        return preg_replace_callback('/\$\*/', function () { static $nb = 0; return sprintf("$%d", ++$nb); }, $sql );
+        return preg_replace_callback(
+            '/\$\*/',
+            function () {
+                static $nb = 0;
+                return sprintf("$%d", ++$nb);
+            },
+            $sql
+        );
     }
 }

@@ -41,18 +41,15 @@ class CreateBaseMapTool extends CreateFileTool
 
         $this->inspector = new Inspector($this->options['database']->getConnection());
 
-        if (!$this->options->hasParameter('oid'))
-        {
+        if (!$this->options->hasParameter('oid')) {
             $this->options->mustHave('table');
             $this->options['oid'] = $this->inspector->getTableOid($this->options['schema'], $this->options['table']);
-        }
-        else
-        {
+        } else {
             $infos = $this->inspector->getTableInformation($this->options['oid']);
             $this->options['table'] = $infos['table'];
         }
 
-        $this->output_stack->add(sprintf("Table oid '%d' is '%s'.", $this->options['oid'], $this->options['table']));
+        $this->outputStack->add(sprintf("Table oid '%d' is '%s'.", $this->options['oid'], $this->options['table']));
 
         $this->options->setDefaultValue('class_name', Inflector::camelize($this->options['table']));
         $this->options->setDefaultValue('extends', 'BaseObjectMap');
@@ -65,17 +62,16 @@ class CreateBaseMapTool extends CreateFileTool
      */
     public function execute()
     {
-        if (!($this->options['database'] instanceof \Pomm\Connection\Database))
-        {
+        if (!($this->options['database'] instanceof \Pomm\Connection\Database)) {
             throw new \InvalidArgumentException(sprintf('The database must be a "\Pomm\Connection\Database" instance, "%s" given.', get_class($this->options['database'])));
         }
 
         $map_file = $this->generateMapFile();
         $path = sprintf('%s%sBase%s%sMap.php', $this->getDestinationPath(), DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $this->options['class_name']);
-        $this->output_stack->add(sprintf("Generating map file '%s' for table '%s.%s'.", $path, $this->options['schema'], $this->options['table']), OutputLine::LEVEL_INFO);
+        $this->outputStack->add(sprintf("Generating map file '%s' for table '%s.%s'.", $path, $this->options['schema'], $this->options['table']), OutputLine::LEVEL_INFO);
         $this->saveFile($path, $map_file);
 
-        $this->output_stack->add(sprintf("Saving file '%s'.", $path));
+        $this->outputStack->add(sprintf("Saving file '%s'.", $path));
 
         $this->createEmptyFilesIfNotExist();
     }
@@ -96,31 +92,29 @@ class CreateBaseMapTool extends CreateFileTool
         $primary_key = join(', ', $this->inspector->getTablePrimaryKey($this->options['oid']));
         $map_name   =  sprintf("%sMap", $class_name);
 
-        if ($inherits = $this->inspector->getTableParents($this->options['oid']))
-        {
+        if ($inherits = $this->inspector->getTableParents($this->options['oid'])) {
             $parent_table_infos = $this->inspector->getTableInformation($inherits);
 
-            if ($this->options->hasParameter('parent_namespace'))
-            {
+            if ($this->options->hasParameter('parent_namespace')) {
                 $extends = sprintf("\\%s\\%sMap", $this->parseNamespace($this->options['parent_namespace']), Inflector::camelize($parent_table_infos['table']));
-            }
-            else
-            {
-                $extends = sprintf("\\%s\\%sMap",
+            } else {
+                $extends = sprintf(
+                    "\\%s\\%sMap",
                     $this->getNamespace(),
-                    Inflector::camelize($parent_table_infos['table']));
+                    Inflector::camelize($parent_table_infos['table'])
+                );
             }
 
-            $this->output_stack->add(sprintf("Detected inheritance to table '%s'.", $parent_table_infos['table']));
+            $this->outputStack->add(sprintf("Detected inheritance to table '%s'.", $parent_table_infos['table']));
             $fields_definition = $this->generateFieldsDefinition(array_udiff(
                 $this->inspector->getTableFieldsInformation($this->options['oid']),
                 $this->inspector->getTableFieldsInformation($inherits),
-                function($a, $b) { return strcasecmp($a['attname'], $b['attname']); }
+                function ($a, $b) {
+                    return strcasecmp($a['attname'], $b['attname']);
+                }
             ));
             $parent_call = "        parent::initialize();\n";
-        }
-        else
-        {
+        } else {
             $fields_definition = $this->generateFieldsDefinition($this->inspector->getTableFieldsInformation($this->options['oid']));
             $parent_call = "";
         }
@@ -164,16 +158,12 @@ EOD;
     {
         $fields_definition = "";
 
-        foreach ($attributes as $attribute)
-        {
+        foreach ($attributes as $attribute) {
             $field_name = $attribute['attname'];
 
-            if (preg_match('/^([\w]+\.)?_(.+)$/', $attribute['format_type'], $matchs))
-            {
+            if (preg_match('/^([\w]+\.)?_(.+)$/', $attribute['format_type'], $matchs)) {
                 $field_type = sprintf("%s%s[]", $matchs[1], $matchs[2]);
-            }
-            else
-            {
+            } else {
                 $field_type = $attribute['format_type'];
             }
 
@@ -189,39 +179,41 @@ EOD;
      */
     protected function createEmptyFilesIfNotExist()
     {
-       $file = sprintf("%s%s%s.php", $this->getDestinationPath(), DIRECTORY_SEPARATOR, $this->options['class_name']);
-       if (!file_exists($file))
-       {
-           $this->output_stack->add(sprintf("Create Entity class file."));
-           $tool = new CreateEntityTool(array(
-               'prefix_dir' => $this->options['prefix_dir'],
-               'class'      => $this->options['class_name'],
-               'namespace'  => $this->options['namespace'],
-               'schema'     => $this->options['schema'],
-               'database'   => $this->options['database']
-           ));
-           $tool->execute();
-           $this->output_stack->mergeStack($tool->getOutputStack());
-       }
+        $file = sprintf("%s%s%s.php", $this->getDestinationPath(), DIRECTORY_SEPARATOR, $this->options['class_name']);
+        if (!file_exists($file)) {
+            $this->outputStack->add(sprintf("Create Entity class file."));
+            $tool = new CreateEntityTool(
+                array(
+                    'prefix_dir' => $this->options['prefix_dir'],
+                    'class'      => $this->options['class_name'],
+                    'namespace'  => $this->options['namespace'],
+                    'schema'     => $this->options['schema'],
+                    'database'   => $this->options['database']
+                )
+            );
+            $tool->execute();
+            $this->outputStack->mergeStack($tool->getOutputStack());
+        }
 
-       $file = sprintf("%s%s%sMap.php", $this->getDestinationPath(), DIRECTORY_SEPARATOR, $this->options['class_name']);
-       if (!file_exists($file))
-       {
-           $this->output_stack->add(sprintf("Create EntityMap class file."));
-           $tool = new CreateMapTool(array(
-               'prefix_dir' => $this->options['prefix_dir'],
-               'class'      => $this->options['class_name'],
-               'namespace'  => $this->options['namespace'],
-               'schema'     => $this->options['schema'],
-               'database'   => $this->options['database']
-           ));
-           $tool->execute();
-           $this->output_stack->mergeStack($tool->getOutputStack());
-       }
+        $file = sprintf("%s%s%sMap.php", $this->getDestinationPath(), DIRECTORY_SEPARATOR, $this->options['class_name']);
+        if (!file_exists($file)) {
+            $this->outputStack->add(sprintf("Create EntityMap class file."));
+            $tool = new CreateMapTool(
+                array(
+                    'prefix_dir' => $this->options['prefix_dir'],
+                    'class'      => $this->options['class_name'],
+                    'namespace'  => $this->options['namespace'],
+                    'schema'     => $this->options['schema'],
+                    'database'   => $this->options['database']
+                )
+            );
+            $tool->execute();
+            $this->outputStack->mergeStack($tool->getOutputStack());
+        }
     }
 
     public function getOutputLineStack()
     {
-        return $this->output_stack;
+        return $this->outputStack;
     }
 }

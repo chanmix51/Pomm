@@ -28,12 +28,10 @@ class PgBytea implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
-        if ($data === null || $data === '')
-        {
+        if ($data === null || $data === '') {
             return null;
         }
 
         return pg_unescape_bytea($data);
     }
 }
-

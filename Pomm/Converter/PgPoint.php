@@ -33,10 +33,8 @@ class PgPoint implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
-        if (!preg_match('/([0-9e\-+\.]+,[0-9e\-+\.]+)/', $data))
-        {
-            if ($data === null || $data === '')
-            {
+        if (!preg_match('/([0-9e\-+\.]+,[0-9e\-+\.]+)/', $data)) {
+            if ($data === null || $data === '') {
                 return null;
             }
 
@@ -53,14 +51,10 @@ class PgPoint implements ConverterInterface
      */
     public function toPg($data, $type = null)
     {
-        if (! $data instanceof $this->class_name)
-        {
-            if (!is_object($data))
-            {
+        if (! $data instanceof $this->class_name) {
+            if (!is_object($data)) {
                 $type = gettype($data);
-            }
-            else
-            {
+            } else {
                 $type = get_class($data);
             }
 

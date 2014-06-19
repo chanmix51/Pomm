@@ -33,24 +33,22 @@ class PgArray implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
-        if (is_null($type))
-        {
+        if (is_null($type)) {
             throw new Exception(sprintf('Array converter must be given a type.'));
         }
 
-        if ($data === '') return null;
+        if ($data === '') {
+            return null;
+        }
 
-        if ($data !== "{NULL}" && $data !== "{}")
-        {
+        if ($data !== "{NULL}" && $data !== "{}") {
             $converter = $this->database
                 ->getConverterForType($type);
 
-            return array_map(function($val) use ($converter, $type) {
-                    return $val !== "NULL" ? $converter->fromPg(str_replace(array('\\\\', '\\"'), array('\\', '"'), $val), $type) : null;
-                }, str_getcsv(trim($data, "{}")));
-        }
-        else
-        {
+            return array_map(function ($val) use ($converter, $type) {
+                return $val !== "NULL" ? $converter->fromPg(str_replace(array('\\\\', '\\"'), array('\\', '"'), $val), $type) : null;
+            }, str_getcsv(trim($data, "{}")));
+        } else {
             return array();
         }
     }
@@ -60,14 +58,11 @@ class PgArray implements ConverterInterface
      */
     public function toPg($data, $type = null)
     {
-        if (is_null($type))
-        {
+        if (is_null($type)) {
             throw new Exception(sprintf('Array converter must be given a type.'));
         }
-        if (!is_array($data))
-        {
-            if (is_null($data))
-            {
+        if (!is_array($data)) {
+            if (is_null($data)) {
                 return 'NULL';
             }
 
@@ -78,8 +73,7 @@ class PgArray implements ConverterInterface
             ->getConverterForType($type);
 
         return sprintf('ARRAY[%s]::%s[]', join(',', array_map(function ($val) use ($converter, $type) {
-                    return !is_null($val) ? $converter->toPg($val, $type) : 'NULL';
-                }, $data)), $type);
+            return !is_null($val) ? $converter->toPg($val, $type) : 'NULL';
+        }, $data)), $type);
     }
 }
-
