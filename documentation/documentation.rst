@@ -1241,7 +1241,7 @@ Entities also propose mechanisms to check what state are their data compared to 
 **MODIFIED**
   This instance has been modified with mutators since hydration.
 
-So, of course, an entity can be in both states EXIST and MODIFIED or NONE of them. The ``BaseObject`` class grants programmers with several methods to check this internal state: ``isNew()``, ``isModified()`` or you can directly access the ``_state`` attribute from within class definition::
+So, of course, an entity can be in both states EXIST and MODIFIED or NONE of them. The ``BaseObject`` class grants programmers with several methods to check this internal state: ``isNew()``, ``isModified()`` or you can directly access the ``status`` attribute from within class definition::
 
   $entity = $map->createObject();
   $entity->isNew();           // true
