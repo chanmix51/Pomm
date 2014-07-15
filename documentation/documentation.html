@@ -1670,7 +1670,7 @@ public function getWeightInOunce()
 <dt><strong>MODIFIED</strong></dt>
 <dd>This instance has been modified with mutators since hydration.</dd>
 </dl>
-<p>So, of course, an entity can be in both states EXIST and MODIFIED or NONE of them. The <tt class="docutils literal">BaseObject</tt> class grants programmers with several methods to check this internal state: <tt class="docutils literal">isNew()</tt>, <tt class="docutils literal">isModified()</tt> or you can directly access the <tt class="docutils literal">_state</tt> attribute from within class definition:</p>
+<p>So, of course, an entity can be in both states EXIST and MODIFIED or NONE of them. The <tt class="docutils literal">BaseObject</tt> class grants programmers with several methods to check this internal state: <tt class="docutils literal">isNew()</tt>, <tt class="docutils literal">isModified()</tt> or you can directly access the <tt class="docutils literal">status</tt> attribute from within class definition:</p>
 <pre class="literal-block">
 $entity = $map-&gt;createObject();
 $entity-&gt;isNew();           // true
