@@ -137,6 +137,9 @@ class BaseObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(BaseObject::NONE, $entity->_getStatus(), 'No state at begining.');
         $this->assertTrue($entity->isNew(), 'No state means IS NEW.');
         $this->assertFalse($entity->isModified(), 'No modification.');
+        $entity->setPika('plop');
+        $this->assertTrue($entity->isNew(), 'It is still new as not persisted');
+        $this->assertTrue($entity->isModified(), 'Modified.');
         $entity->_setStatus(BaseObject::EXIST); // fake save
         $this->assertEquals(BaseObject::EXIST, $entity->_getStatus(), 'Status is EXIST.');
         $this->assertFalse($entity->isNew(), 'Not new anymore.');
