@@ -323,7 +323,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
      */
     public function isNew()
     {
-        return (boolean) (! $this->status & self::EXIST);
+        return (boolean) !($this->status & self::EXIST);
     }
 
     /**

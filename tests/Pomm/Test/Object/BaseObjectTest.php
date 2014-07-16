@@ -132,8 +132,9 @@ class BaseObjectTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getEntities
      **/
-    public function testStatus(Entity $entity, Array $values)
+    public function testStatus(Entity $entity_tpl, Array $values)
     {
+        $entity = clone $entity_tpl;
         $this->assertEquals(BaseObject::NONE, $entity->_getStatus(), 'No state at begining.');
         $this->assertTrue($entity->isNew(), 'No state means IS NEW.');
         $this->assertFalse($entity->isModified(), 'No modification.');
@@ -147,6 +148,11 @@ class BaseObjectTest extends \PHPUnit_Framework_TestCase
         $entity->_setStatus(BaseObject::EXIST); // fake save
         unset($entity['pika']);
         $this->assertFalse($entity->isNew(), 'Not new anymore.');
+        $this->assertTrue($entity->isModified(), 'Modified.');
+
+        $entity = clone $entity_tpl;
+        $entity->setPika('chu');
+        $this->assertTrue($entity->isNew(), 'Still new');
         $this->assertTrue($entity->isModified(), 'Modified.');
     }
 }
