@@ -34,10 +34,8 @@ class PgNumberRange implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
-        if (!preg_match('/([\[\(])(-?[0-9\.]+),-?([0-9\.]+)([\]\)])/', $data, $matchs))
-        {
-            if ($data === null || $data === '')
-            {
+        if (!preg_match('/([\[\(])(-?[0-9\.]+),-?([0-9\.]+)([\]\)])/', $data, $matchs)) {
+            if ($data === null || $data === '') {
                 return null;
             }
 
@@ -55,8 +53,7 @@ class PgNumberRange implements ConverterInterface
      */
     public function toPg($data, $type = null)
     {
-        if (! $data instanceof \Pomm\Type\NumberRange )
-        {
+        if (! $data instanceof \Pomm\Type\NumberRange) {
             throw new Exception(sprintf("PgNumberRange converter expects 'NumberRange' data to convert. '%s' given.", gettype($data)));
         }
 

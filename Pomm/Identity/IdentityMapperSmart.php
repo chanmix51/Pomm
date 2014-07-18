@@ -21,19 +21,15 @@ class IdentityMapperSmart extends IdentityMapperStrict
      */
     public function getInstance(BaseObject $object, Array $pk_fields)
     {
-        if (count($pk_fields) == 0)
-        {
+        if (count($pk_fields) == 0) {
             return $object;
         }
 
         $index = $this->getSignature($object, $object->get($pk_fields));
 
-        if (array_key_exists($index, $this->mapper))
-        {
+        if (array_key_exists($index, $this->mapper)) {
             $this->mapper[$index]->hydrate(array_merge($object->getFields(), $this->mapper[$index]->getFields()));
-        }
-        else
-        {
+        } else {
             $this->mapper[$index] = $object;
         }
 

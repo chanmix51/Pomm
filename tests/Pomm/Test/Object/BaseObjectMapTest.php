@@ -17,17 +17,14 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
     {
         $database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
 
-        if (isset($GLOBALS['dev']) && $GLOBALS['dev'] == 'true') 
-        {
+        if (isset($GLOBALS['dev']) && $GLOBALS['dev'] == 'true') {
             static::$logger = new \Pomm\Tools\Logger();
 
             static::$map = $database
                 ->createConnection()
                 ->registerFilter(new \Pomm\FilterChain\LoggerFilter(static::$logger))
                 ->getMapFor('Pomm\Test\Object\BaseEntity');
-        } 
-        else 
-        {
+        } else {
             static::$map = $database
                 ->createConnection()
                 ->getMapFor('Pomm\Test\Object\BaseEntity');
@@ -66,7 +63,7 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('plop', $entity['some data'], "'some data' is unchanged.");
         $this->assertFalse($entity['bool_data'], "Bool data has been added.");
 
-        $another_entity = static::$map->createAndSaveObject(Array('some data' => new \Pomm\Type\RawString("lower('MoRe pLoP')")));
+        $another_entity = static::$map->createAndSaveObject(array('some data' => new \Pomm\Type\RawString("lower('MoRe pLoP')")));
         $this->assertTrue((boolean) ($another_entity->_getStatus() & BaseObject::EXIST), "Object now exists in database.");
         $this->assertEquals('more plop', $another_entity['some data'], "'some data' is unchanged.");
 
@@ -151,7 +148,8 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
     public function testQuery(BaseEntity $entity)
     {
         $sql = "SELECT %s FROM %s WHERE plop.id = $*";
-        $sql = sprintf($sql,
+        $sql = sprintf(
+            $sql,
             join(', ', static::$map->getSelectFields('plop')),
             static::$map->getTableName('plop')
         );
@@ -233,9 +231,8 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(5, $raw_res->count(), "5 results.");
 
         $this->assertEquals(5, $ordered_res->count(), "5 results.");
-        foreach ($ordered_res as $index => $result) 
-        {
-            $this->assertEquals( 5 - $index, $result['id'], "Names are the other way than ids.");
+        foreach ($ordered_res as $index => $result) {
+            $this->assertEquals(5 - $index, $result['id'], "Names are the other way than ids.");
         }
 
         $this->assertEquals(3, $limited_res->count(), "We have 3 results.");
@@ -307,7 +304,7 @@ class BaseEntityMap extends BaseObjectMap
 
         $this->changeToNoPrimaryKey();
 
-        $sql = sprintf('ALTER TABLE %s ADD COLUMN name varchar NOT NULL', $this->getTableName());;
+        $sql = sprintf('ALTER TABLE %s ADD COLUMN name varchar NOT NULL', $this->getTableName());
         $this->connection->executeAnonymousQuery($sql);
 
         $sql = sprintf('ALTER TABLE %s ADD PRIMARY KEY (id, name)', $this->getTableName());
@@ -319,7 +316,7 @@ class BaseEntityMap extends BaseObjectMap
 
     public function changeToNoPrimaryKey()
     {
-        $sql = sprintf('ALTER TABLE %s DROP CONSTRAINT base_entity_pkey', $this->getTableName());;
+        $sql = sprintf('ALTER TABLE %s DROP CONSTRAINT base_entity_pkey', $this->getTableName());
         $this->connection->executeAnonymousQuery($sql);
     }
 
@@ -336,4 +333,3 @@ class BaseEntityMap extends BaseObjectMap
 class BaseEntity extends BaseObject
 {
 }
-

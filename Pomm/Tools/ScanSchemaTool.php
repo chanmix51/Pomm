@@ -33,7 +33,7 @@ class ScanSchemaTool extends CreateFileTool
      * * extends            The class the BaseMap should extend
      *                      (default: \Pomm\Object\BaseObjectMap)
      * * exclude            An array of tables/views to skip.
-     * 
+     *
      * @see Pomm\Tools\BaseTool
      */
     protected function configure()
@@ -49,31 +49,28 @@ class ScanSchemaTool extends CreateFileTool
      */
     public function execute()
     {
-        if (!($this->options['database'] instanceof Database))
-        {
+        if (!($this->options['database'] instanceof Database)) {
             throw new \InvalidArgumentException(sprintf('The database must be a "Pomm\Connection\Database" instance, "%s" given.', get_class($this->options['database'])));
         }
 
         $inspector = new Inspector($this->options['database']->getConnection());
 
-        $no_tables = $this->options->hasParameter('exclude') ?  array_flip($inspector->getTablesOids($this->options['schema'], $this->options['exclude'])) : array();
+        $noTables = $this->options->hasParameter('exclude') ?  array_flip($inspector->getTablesOids($this->options['schema'], $this->options['exclude'])) : array();
 
-        foreach ($inspector->getTablesInSchema($this->options['schema']) as $table_oid)
-        {
-            $this->output_stack->add(sprintf("Get table oid '%d'.", $table_oid));
-            if (array_key_exists($table_oid, $no_tables))
-            {
-                $this->output_stack->add(sprintf("Table '%s' (oid %d) excluded.", $no_tables[$table_oid], $table_oid));
+        foreach ($inspector->getTablesInSchema($this->options['schema']) as $tableOid) {
+            $this->outputStack->add(sprintf("Get table oid '%d'.", $tableOid));
+            if (array_key_exists($tableOid, $noTables)) {
+                $this->outputStack->add(sprintf("Table '%s' (oid %d) excluded.", $noTables[$tableOid], $tableOid));
                 continue;
             }
 
-            $this->options['oid'] = $table_oid;
+            $this->options['oid'] = $tableOid;
             $tool = new CreateBaseMapTool($this->options->getParameters());
 
             $tool->execute();
-            $this->output_stack->mergeStack($tool->getOutputStack());
+            $this->outputStack->mergeStack($tool->getOutputStack());
         }
 
-        $this->output_stack->add(sprintf("Finished scanning schema '%s'.", $this->options['schema']), OutputLine::LEVEL_INFO);
+        $this->outputStack->add(sprintf("Finished scanning schema '%s'.", $this->options['schema']), OutputLine::LEVEL_INFO);
     }
 }

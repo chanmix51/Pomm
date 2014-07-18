@@ -47,7 +47,9 @@ abstract class CreateFileTool extends BaseTool
      */
     public function getDestinationPath()
     {
-        return $this->options['prefix_dir'].DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $this->getNamespace());
+        return $this->options['prefix_dir']
+            .DIRECTORY_SEPARATOR
+            .str_replace('\\', DIRECTORY_SEPARATOR, $this->getNamespace());
     }
 
     /**
@@ -76,7 +78,11 @@ abstract class CreateFileTool extends BaseTool
     protected function parseNamespace($string)
     {
         $string = str_replace('%dbname%', Inflector::camelize($this->options['database']->getName()), $string);
-        $string = str_replace('%schema%', $this->options['schema'] == 'public' ? 'PublicSchema' : Inflector::camelize($this->options['schema']), $string);
+        $string = str_replace(
+            '%schema%',
+            $this->options['schema'] == 'public' ? 'PublicSchema' : Inflector::camelize($this->options['schema']),
+            $string
+        );
 
         return $string;
     }
@@ -91,8 +97,7 @@ abstract class CreateFileTool extends BaseTool
      */
     protected function saveFile($path, $content)
     {
-        if (!$this->createDirIfNotExist(dirname($path)))
-        {
+        if (!$this->createDirIfNotExist(dirname($path))) {
             throw new ToolException(sprintf("Could not create directories for file '%s'.", $path));
         }
 
@@ -108,9 +113,8 @@ abstract class CreateFileTool extends BaseTool
      */
     protected function createDirIfNotExist($dir)
     {
-        if (!file_exists($dir))
-        {
-            $this->output_stack->add(sprintf("Create directory '%s'.", $dir));
+        if (!file_exists($dir)) {
+            $this->outputStack->add(sprintf("Create directory '%s'.", $dir));
 
             return @mkdir($dir, 0755, true);
         }

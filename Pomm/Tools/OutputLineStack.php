@@ -51,8 +51,7 @@ class OutputLineStack implements \Iterator, \Countable
      */
     public function addOutputLine(OutputLine $line)
     {
-        if ( $line->getLevel() & $this->level )
-        {
+        if ($line->getLevel() & $this->level) {
             $this->stack[] = $line;
         }
     }
@@ -97,8 +96,7 @@ class OutputLineStack implements \Iterator, \Countable
      */
     public function current()
     {
-        if (is_null($this->iterator))
-        {
+        if (is_null($this->iterator)) {
             $this->next();
         }
 
@@ -122,17 +120,13 @@ class OutputLineStack implements \Iterator, \Countable
      */
     public function next()
     {
-        if (!is_null($this->iterator))
-        {
+        if (!is_null($this->iterator)) {
             $this->iterator++;
-        }
-        else
-        {
+        } else {
             $this->iterator = 0;
         }
 
-        while ($this->valid() && ! ($this->stack[$this->iterator]->getLevel() & $this->level))
-        {
+        while ($this->valid() && ! ($this->stack[$this->iterator]->getLevel() & $this->level)) {
             $this->iterator++;
         }
     }
@@ -144,8 +138,7 @@ class OutputLineStack implements \Iterator, \Countable
      */
     public function valid()
     {
-        if (is_null($this->iterator))
-        {
+        if (is_null($this->iterator)) {
             $this->next();
         }
 

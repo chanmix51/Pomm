@@ -22,7 +22,7 @@ class PgString implements ConverterInterface
     {
         $data = pg_escape_string($data);
         $type = is_null($type) ? '' : sprintf("%s ", $type);
-        $data = sprintf("%s'%s'",  $type, $data);
+        $data = sprintf("%s'%s'", $type, $data);
 
         return $data;
     }

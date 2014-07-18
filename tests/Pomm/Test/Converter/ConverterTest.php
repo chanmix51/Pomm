@@ -25,8 +25,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         static::$connection = $database->getConnection();
         static::$connection->begin();
 
-        try
-        {
+        try {
             $sql = 'CREATE SCHEMA pomm_test';
             static::$connection->executeAnonymousQuery($sql);
 
@@ -36,9 +35,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
             static::$super_cv_map = static::$connection->getMapFor('Pomm\Test\Converter\SuperConverterEntity');
             static::$super_cv_map->createTable(static::$cv_map);
             static::$connection->commit();
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             static::$connection->rollback();
 
             throw $e;
@@ -99,8 +96,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $entity['some_text'], "Empty strings are ok.");
         $this->assertEquals(array(null, '123', null, '', null, 'abc'), $entity['arr_varchar'], "Char arrays can contain nulls and emtpy strings.");
 
-        if (static::$cv_map->alterJson() !== false)
-        {
+        if (static::$cv_map->alterJson() !== false) {
             $some_json = array('pika' => 'chu', 'lot of' => array(1, 2, 3, 4, 5), 'weird chain' => 'foo\'s as "fool"');
             $entity['some_json'] = $some_json;
             $entity['arr_json'] = array($some_json, $some_json);
@@ -108,9 +104,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
 
             $this->assertEquals($some_json, $entity['some_json'], "Json type is kept unchanged.");
             $this->assertEquals(array($some_json, $some_json), $entity['arr_json'], "Array of Json types is kept unchanged.");
-        }
-        else
-        {
+        } else {
             $this->markTestSkipped("Json type is supported since postgresql 9.2. Test skipped.");
         }
 
@@ -140,7 +134,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('\DateTime', $entity['some_ts'], "'some_ts' is a \DateTime instance.");
         $entity['some_ts']->setTimeZone(new \DateTimeZone('Etc/GMT0'));
-        $this->assertEquals( '2012-06-20 08:34:16.640044+00:00', $entity['some_ts']->format('Y-m-d H:i:s.uP'), "Timestamp is preserved.");
+        $this->assertEquals('2012-06-20 08:34:16.640044+00:00', $entity['some_ts']->format('Y-m-d H:i:s.uP'), "Timestamp is preserved.");
         $this->assertInstanceOf('\DateInterval', $entity['some_intv'], "'some_intv' is a \DateInterval instance.");
         $this->assertEquals('37 years 3 mons 7 days 02:14:46', $entity['some_intv']->format("%y years %m mons %d days %H:%i:%s"), "'some_intv' is '37 years 3 mons 7 days 02:14:46'.");
         $this->assertEquals(3, count($entity['arr_ts']), "'arr_ts' is an array of 3 elements.");
@@ -264,8 +258,8 @@ _;
         static::$cv_map->alterCircle();
         $entity = static::$cv_map->findAll()->current();
         $values = array(
-            'some_circle' => new Type\Circle(new Type\Point(0.1234E9,-2), 10),
-            'arr_circle' => array(new Type\Circle(new Type\Point(2,-2), 10), new Type\Circle(new Type\Point(0,0), 1))
+            'some_circle' => new Type\Circle(new Type\Point(0.1234E9, -2), 10),
+            'arr_circle' => array(new Type\Circle(new Type\Point(2, -2), 10), new Type\Circle(new Type\Point(0, 0), 1))
         );
 
         $entity->hydrate($values);
@@ -300,8 +294,8 @@ _;
         static::$cv_map->alterSegment();
         $entity = static::$cv_map->findAll()->current();
         $values = array(
-            'some_lseg' => new Type\Segment(new Type\Point(0.1234E9,-2), new Type\Point(10, -10)),
-            'arr_lseg' => array(new Type\Segment(new Type\Point(2,-2), new Type\Point(0,0)), new Type\Segment(new Type\Point(2,-2), new Type\Point(1000,-1000))),
+            'some_lseg' => new Type\Segment(new Type\Point(0.1234E9, -2), new Type\Point(10, -10)),
+            'arr_lseg' => array(new Type\Segment(new Type\Point(2, -2), new Type\Point(0, 0)), new Type\Segment(new Type\Point(2, -2), new Type\Point(1000, -1000))),
         );
 
         $entity->hydrate($values);
@@ -328,10 +322,9 @@ _;
     /**
      * @depends testInteger
      **/
-    function testHStore()
+    public function testHStore()
     {
-        if (static::$cv_map->alterHStore() === false)
-        {
+        if (static::$cv_map->alterHStore() === false) {
             $this->markTestSkipped("HStore extension could not be found in Postgres, tests skipped.");
 
             return;
@@ -351,8 +344,7 @@ _;
      **/
     public function testLTree()
     {
-        if (static::$cv_map->alterLTree() === false)
-        {
+        if (static::$cv_map->alterLTree() === false) {
             $this->markTestSkipped("Ltree extension could not be found in Postgres, tests skipped.");
 
             return;
@@ -395,8 +387,7 @@ _;
      **/
     public function testTsRange()
     {
-        if (static::$cv_map->alterTsRange() === false)
-        {
+        if (static::$cv_map->alterTsRange() === false) {
             $this->markTestSkipped("tsrange type could not be found, maybe Postgres version < 9.2. Tests skipped.");
 
             return;
@@ -429,8 +420,7 @@ _;
      **/
     public function testNumberRangeConverter()
     {
-        if (static::$cv_map->alterNumberRange() === false)
-        {
+        if (static::$cv_map->alterNumberRange() === false) {
             $this->markTestSkipped("Range types could not be found, maybe Postgres version < 9.2. Tests skipped.");
 
             return;
@@ -450,8 +440,7 @@ _;
         $this->assertEquals(new Type\NumberRange(29.76607095, 30.44125206, RangeType::EXCL_BOTH), $entity['some_numrange'], "Numrange is ok.");
         $this->assertTrue(is_array($entity['arr_numrange']), "'arr_numrange' is an array.");
 
-        for($x = 1; $x <= count($entity['arr_numrange']); $x++)
-        {
+        for ($x = 1; $x <= count($entity['arr_numrange']); $x++) {
             $range = $entity['arr_numrange'][$x - 1];
             $this->assertInstanceOf('\Pomm\Type\NumberRange', $range, "Instance 'NumberRange'.");
             $this->assertEquals((float) $x * 1.1, $range->start, "Range start is ok.");
@@ -474,7 +463,7 @@ _;
         $entity['arr_composite'] = array($test_address, new AddressType(array('place' => 'Middle of nowhere', 'postal_code' => '56590', 'city' => 'Groix')));
         static::$cv_map->updateOne($entity, array('a_composite', 'arr_composite'));
 
-        $this->assertTrue($entity['a_composite'] instanceOf \Pomm\Test\Converter\AddressType, "Composite data is an object.");
+        $this->assertTrue($entity['a_composite'] instanceof \Pomm\Test\Converter\AddressType, "Composite data is an object.");
         $this->assertEquals((array) $test_address, (array) $entity['a_composite'], "Row is unchanged.");
         $this->assertEquals((array) $test_address, (array) $entity['arr_composite'][0], "Array of rows is unchanged.");
     }
@@ -495,7 +484,7 @@ _;
         $this->assertEquals(1, $super_entity['cv_entities'][0]->get('id'), "'id' is 1.");
         $this->assertEquals(array(1.0, 1.1, null, 1.3), $super_entity['cv_entities'][0]->get('arr_fl'), "'arr_fl' of 'cv_entities' is preserved.");
 
-        $new_entity = new ConverterEntity(array('some_point' => new Type\Point(12,-3)));
+        $new_entity = new ConverterEntity(array('some_point' => new Type\Point(12, -3)));
         $super_entity->add('cv_entities', $new_entity);
         static::$super_cv_map->updateOne($super_entity, array('cv_entities'));
 
@@ -524,8 +513,7 @@ _;
         $this->assertInstanceOf('\Pomm\Test\Converter\TsEntity', $ts_extended_entity['p1'], "'p1' is a TsEntity instance.");
         $this->assertEquals('2000-02-29', $ts_extended_entity['p1']['p1']->format('Y-m-d'), 'Timestamp is preserved.');
 
-        foreach (array('1999-12-31 23:59:59.999999', '2005-01-29 23:01:58.000000') AS $key => $ts)
-        {
+        foreach (array('1999-12-31 23:59:59.999999', '2005-01-29 23:01:58.000000') as $key => $ts) {
             $this->assertEquals($ts, $ts_extended_entity['p2'][$key]['p1']->format('Y-m-d H:i:s.u'), 'Timestamp array is preserved.');
         }
 
@@ -567,13 +555,10 @@ class ConverterEntityMap extends BaseObjectMap
     protected function alterTable(Array $fields)
     {
         $this->connection->begin();
-        try
-        {
-            foreach($fields as $field => $type)
-            {
+        try {
+            foreach ($fields as $field => $type) {
                 $sql = sprintf("ALTER TABLE %s ADD COLUMN %s %s", $this->getTableName(), $field, $type);
-                if ($ret = $this->connection->executeAnonymousQuery($sql) === false)
-                {
+                if ($ret = $this->connection->executeAnonymousQuery($sql) === false) {
                     throw new SqlException($ret, $sql);
                 }
 
@@ -581,9 +566,7 @@ class ConverterEntityMap extends BaseObjectMap
             }
 
             $this->connection->commit();
-        }
-        catch(SqlException $e)
-        {
+        } catch (SqlException $e) {
             $this->connection->rollback();
 
             throw $e;
@@ -594,11 +577,12 @@ class ConverterEntityMap extends BaseObjectMap
     {
         $sql = sprintf("SELECT pg_namespace.nspname FROM pg_type JOIN pg_namespace ON pg_type.typnamespace = pg_namespace.oid WHERE typname = '%s'", $type);
 
-        $result = pg_fetch_assoc($this->connection
-            ->executeAnonymousQuery($sql));
+        $result = pg_fetch_assoc(
+            $this->connection
+            ->executeAnonymousQuery($sql)
+        );
 
-        if ($result === false)
-        {
+        if ($result === false) {
             return false;
         }
 
@@ -651,8 +635,7 @@ class ConverterEntityMap extends BaseObjectMap
 
     public function alterHStore()
     {
-        if ($schema = $this->checkType('hstore') === false)
-        {
+        if ($schema = $this->checkType('hstore') === false) {
             return false;
         }
 
@@ -664,8 +647,7 @@ class ConverterEntityMap extends BaseObjectMap
 
     public function alterLTree()
     {
-        if ($schema = $this->checkType('ltree') === false)
-        {
+        if ($schema = $this->checkType('ltree') === false) {
             return false;
         }
 
@@ -677,8 +659,7 @@ class ConverterEntityMap extends BaseObjectMap
 
     public function alterTsRange()
     {
-        if ($schema = $this->checkType('tsrange') === false)
-        {
+        if ($schema = $this->checkType('tsrange') === false) {
             return false;
         }
 
@@ -690,8 +671,7 @@ class ConverterEntityMap extends BaseObjectMap
 
     public function alterJson()
     {
-        if ($schema = $this->checkType('json') === false)
-        {
+        if ($schema = $this->checkType('json') === false) {
             return false;
         }
 
@@ -700,8 +680,7 @@ class ConverterEntityMap extends BaseObjectMap
 
     public function alterNumberRange()
     {
-        if ($schema = $this->checkType('numrange') === false)
-        {
+        if ($schema = $this->checkType('numrange') === false) {
             return false;
         }
 
@@ -721,9 +700,9 @@ class ConverterEntityMap extends BaseObjectMap
                     new \Pomm\Object\RowStructure(array('place' => 'text', 'postal_code' => 'char', 'city' => 'varchar')),
                     '\Pomm\Test\Converter\AddressType'
                 ),
-                array('pomm_test.address', 'address'));
+                array('pomm_test.address', 'address')
+            );
     }
-
 }
 
 class ConverterEntity extends BaseObject

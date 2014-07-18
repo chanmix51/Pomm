@@ -28,8 +28,7 @@ class PgTimestamp implements ConverterInterface
      */
     public function toPg($data, $type = null)
     {
-        if (!$data instanceof \DateTime)
-        {
+        if (!$data instanceof \DateTime) {
             $data = new \DateTime($data);
         }
 

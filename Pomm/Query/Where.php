@@ -49,36 +49,25 @@ class Where
      */
     public static function createWhereIn($element, Array $values)
     {
-        $escape = function ($values) use (&$escape)
-            {
-                $escaped_values = array();
-                foreach($values as $value)
-                {
-                    if (is_array($value))
-                    {
-                        $escaped_values[] = sprintf("(%s)", join(', ', $escape($value)));
-                    }
-                    else
-                    {
-                        $escaped_values[] = '$*';
-                    }
+        $escape = function ($values) use (&$escape) {
+            $escaped_values = array();
+            foreach ($values as $value) {
+                if (is_array($value)) {
+                    $escaped_values[] = sprintf("(%s)", join(', ', $escape($value)));
+                } else {
+                    $escaped_values[] = '$*';
                 }
+            }
+            return $escaped_values;
+        };
 
-                return $escaped_values;
-            };
-
-        $get_values = function($values)
-            {
-                $array = array();
-
-                foreach(new \RecursiveIteratorIterator(new \RecursiveArrayIterator($values)) as $value)
-                {
-                    $array[] = $value;
-                }
-
-                return $array;
-
-            };
+        $get_values = function ($values) {
+            $array = array();
+            foreach (new \RecursiveIteratorIterator(new \RecursiveArrayIterator($values)) as $value) {
+                $array[] = $value;
+            }
+            return $array;
+        };
 
         return new self(sprintf("%s IN (%s)", $element, join(", ", $escape($values))), $get_values($values));
     }
@@ -91,8 +80,7 @@ class Where
      */
     public function __construct($element = null, Array $values = array())
     {
-        if (!is_null($element))
-        {
+        if (!is_null($element)) {
             $this->element = $element;
             $this->values = $values;
 
@@ -154,33 +142,27 @@ class Where
      */
     public function addWhere($element, Array $values, $operator)
     {
-        if (!$element instanceof Where)
-        {
+        if (!$element instanceof Where) {
             $element = new self($element, $values);
         }
 
-        if ($element->isEmpty()) return $this;
-        if ($this->isEmpty())
-        {
+        if ($element->isEmpty()) {
+            return $this;
+        }
+        if ($this->isEmpty()) {
             $this->transmute($element);
 
             return $this;
         }
 
-        if ($this->hasElement())
-        {
+        if ($this->hasElement()) {
             $this->stack = array(new self($this->getElement(), $this->values), $element);
-            $this->element = NULL;
+            $this->element = null;
             $this->values = array();
-        }
-        else
-        {
-            if ($this->operator == $operator)
-            {
+        } else {
+            if ($this->operator == $operator) {
                 $this->stack[] = $element;
-            }
-            else
-            {
+            } else {
                 $this->stack = array(self::create()->setStack($this->stack)->setOperator($this->operator), $element);
             }
         }
@@ -238,12 +220,9 @@ class Where
      */
     public function __toString()
     {
-        if ($this->isEmpty())
-        {
+        if ($this->isEmpty()) {
             return 'true';
-        }
-        else
-        {
+        } else {
             return $this->parse();
         }
     }
@@ -276,14 +255,12 @@ class Where
      */
     protected function parse()
     {
-        if ($this->hasElement())
-        {
+        if ($this->hasElement()) {
             return $this->getElement();
         }
 
         $stack = array();
-        foreach ($this->stack as $offset => $where)
-        {
+        foreach ($this->stack as $offset => $where) {
             $stack[$offset] = $where->parse();
         }
 
@@ -299,18 +276,15 @@ class Where
      */
     public function getValues()
     {
-        if ($this->isEmpty())
-        {
+        if ($this->isEmpty()) {
             return array();
         }
-        if ($this->hasElement())
-        {
+        if ($this->hasElement()) {
             return $this->values;
         }
 
         $values = array();
-        foreach($this->stack as $offset => $where)
-        {
+        foreach ($this->stack as $offset => $where) {
             $values = array_merge($values, $where->getValues());
         }
 

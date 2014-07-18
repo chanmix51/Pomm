@@ -22,7 +22,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
     {
         $map1 = static::$connection->getMapFor('\Pomm\Test\Connection\CnxEntity');
         $map2 = static::$connection->getMapFor('\Pomm\Test\Connection\CnxEntity');
-        $this->assertTrue($map1 instanceOf \Pomm\Test\Connection\CnxEntityMap, 'This is a CnxEntityMap.');
+        $this->assertTrue($map1 instanceof \Pomm\Test\Connection\CnxEntityMap, 'This is a CnxEntityMap.');
         $this->assertTrue($map1 === $map2, "2 calls for the same entity class return the same instance.");
 
         $map3 = static::$connection->getMapFor('Pomm\Test\Connection\CnxEntity');
@@ -32,7 +32,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($map4 !== $map1, "Force respawning the instance.");
 
         $map5 = static::$connection->getMapFor('Pomm\Test\Connection\CnxOtherEntity', true);
-        $this->assertTrue($map5 instanceOf \Pomm\Test\Connection\CnxOtherEntityMap, 'This is a CnxOtherEntityMap.');
+        $this->assertTrue($map5 instanceof \Pomm\Test\Connection\CnxOtherEntityMap, 'This is a CnxOtherEntityMap.');
         $this->assertTrue($map5 !== $map4, "Asking differents classes return different classes.");
     }
 
@@ -64,13 +64,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, pg_fetch_result($stmt, 0), "We have 2 results.");
 
         static::$connection->begin();
-        try
-        {
+        try {
             static::$connection->rollback('useless'); //fail the current transaction
             $this->fail("Rollback to unknown savepoint must raise an exception.");
-        }
-        catch (\Pomm\Exception\ConnectionException $e)
-        {
+        } catch (\Pomm\Exception\ConnectionException $e) {
             $this->assertTrue(true, "Error in transaction raises an exception.");
         }
 

@@ -58,16 +58,13 @@ abstract class BaseObjectMap
         $this->row_structure = new RowStructure();
         $this->initialize();
 
-        if (is_null($this->connection))
-        {
+        if (is_null($this->connection)) {
             throw new Exception(sprintf('Postgresql connection not set after initializing db map "%s".', get_class($this)));
         }
-        if (is_null($this->object_class))
-        {
+        if (is_null($this->object_class)) {
             throw new Exception(sprintf('Missing object_class after initializing db map "%s".', get_class($this)));
         }
-        if (!$this->row_structure instanceOf RowStructure || count($this->row_structure->getFieldNames()) == 0)
-        {
+        if (!$this->row_structure instanceof RowStructure || count($this->row_structure->getFieldNames()) == 0) {
             throw new Exception(sprintf('No fields after initializing db map "%s", don\'t you prefer anonymous objects ?', get_class($this)));
         }
 
@@ -184,23 +181,23 @@ abstract class BaseObjectMap
      */
     public function createAndSaveObjects(Array $values_array)
     {
-        if (count($values_array) == 0)
-        {
+        if (count($values_array) == 0) {
             throw new Exception(sprintf("Empty array passed."));
         }
 
         $pg_values = array();
 
-        foreach($values_array as $values)
-        {
+        foreach ($values_array as $values) {
             $pg_values[] = $this->convertToPg($values);
         }
 
         $fields = array_keys($pg_values[1]);
-        $sql = sprintf('INSERT INTO %s (%s) VALUES %s RETURNING %s;',
+        $sql = sprintf(
+            'INSERT INTO %s (%s) VALUES %s RETURNING %s;',
             $this->object_name,
             join(',', array_map(array($this->connection, 'escapeIdentifier'), $fields)),
-            join(',', array_map(function ($tuple) { return sprintf("(%s)", join(', ', array_values($tuple))); }, $pg_values)),
+            join(',', array_map(function ($tuple) { return sprintf("(%s)", join(', ', array_values($tuple)));
+            }, $pg_values)),
             $this->formatFieldsWithAlias('getSelectFields')
         );
 
@@ -258,8 +255,7 @@ abstract class BaseObjectMap
         $object = $this->createObject($values);
         $object->_setStatus(BaseObject::EXIST);
 
-        if ($identity_map = $this->connection->getIdentityMapper())
-        {
+        if ($identity_map = $this->connection->getIdentityMapper()) {
             $object = $identity_map->getInstance($object, $this->getPrimaryKey());
         }
 
@@ -308,8 +304,7 @@ abstract class BaseObjectMap
      */
     public function paginateQuery($sql, $sql_count, $values, $items_per_page, $page = 1)
     {
-        if ($page < 1)
-        {
+        if ($page < 1) {
             throw new Exception(sprintf("Pagination offset (page) must be >= 1. ([%s] given).", $page));
         }
 
@@ -318,8 +313,7 @@ abstract class BaseObjectMap
         $collection = $this->query($sql, $values);
         $stmt = $this->doQuery($sql_count, $values);
 
-        if (\pg_num_rows($stmt) > 1)
-        {
+        if (\pg_num_rows($stmt) > 1) {
             throw new Exception(sprintf("Count query '%s' return more than one field.", $sql_count));
         }
 
@@ -352,14 +346,10 @@ abstract class BaseObjectMap
      */
     public function findWhere($where, $values = array(), $suffix = null)
     {
-        if (is_object($where))
-        {
-            if ($where instanceof Where)
-            {
+        if (is_object($where)) {
+            if ($where instanceof Where) {
                 $values = $where->getValues();
-            }
-            else
-            {
+            } else {
                 throw new Exception(sprintf("findWhere expects a \\Pomm\\Query\\Where instance, '%s' given.", get_class($where)));
             }
         }
@@ -381,19 +371,16 @@ abstract class BaseObjectMap
      */
     public function paginateFindWhere($where, $values, $suffix, $items_per_page, $page = 1)
     {
-        if (is_object($where))
-        {
-            if ($where instanceof Where)
-            {
+        if (is_object($where)) {
+            if ($where instanceof Where) {
                 $values = $where->getValues();
-            }
-            else
-            {
+            } else {
                 throw new Exception(sprintf("findWhere expects a \\Pomm\\Query\\Where instance, '%s' given.", get_class($where)));
             }
         }
 
-        $sql_count = sprintf("SELECT count(*) FROM %s WHERE %s",
+        $sql_count = sprintf(
+            "SELECT count(*) FROM %s WHERE %s",
             $this->getTableName(),
             (string) $where
         );
@@ -411,8 +398,7 @@ abstract class BaseObjectMap
      */
     public function findByPk(Array $values)
     {
-        if (count(array_diff(array_keys($values), $this->getPrimaryKey())) != 0)
-        {
+        if (count(array_diff(array_keys($values), $this->getPrimaryKey())) != 0) {
             throw new Exception(sprintf('Given values "%s" do not match PK definition "%s" using class "%s".', print_r($values, true), print_r($this->getPrimaryKey(), true), get_class($this)));
         }
 
@@ -436,9 +422,11 @@ abstract class BaseObjectMap
         $converted_values = $this->convertToPg($values);
         $connection = $this->connection;
 
-        $sql  = sprintf("UPDATE %s SET %s WHERE %s RETURNING %s",
+        $sql  = sprintf(
+            "UPDATE %s SET %s WHERE %s RETURNING %s",
             $this->getTableName(),
-            join(', ', array_map(function($key, $value) use ($connection) { return sprintf("%s = %s", $connection->escapeIdentifier($key), $value); }, array_keys($converted_values), $converted_values)),
+            join(', ', array_map(function ($key, $value) use ($connection) { return sprintf("%s = %s", $connection->escapeIdentifier($key), $value);
+            }, array_keys($converted_values), $converted_values)),
             (string) $where,
             $this->formatFieldsWithAlias('getSelectFields')
         );
@@ -475,22 +463,19 @@ abstract class BaseObjectMap
     {
         $this->checkObject($object, sprintf('"%s" class does not know how to save "%s" objects.', get_class($this), get_class($object)));
 
-        if ($object->_getStatus() & BaseObject::EXIST)
-        {
+        if ($object->_getStatus() & BaseObject::EXIST) {
             $sql = sprintf('UPDATE %s SET %s WHERE %s RETURNING %s;', $this->object_name, $this->parseForUpdate($object), $this->createSqlAndFrom($object->get($this->getPrimaryKey())), $this->formatFieldsWithAlias('getSelectFields'));
             $collection = $this->query($sql, array_values($object->get($this->getPrimaryKey())));
-        }
-        else
-        {
+        } else {
             $connection = $this->connection;
             $pg_values = $this->convertToPg($object->getFields());
-            $sql = sprintf('INSERT INTO %s (%s) VALUES (%s) RETURNING %s;', $this->object_name, join(',', array_map(function($val) use ($connection) { return $connection->escapeIdentifier($val); }, array_keys($pg_values))), join(',', array_values($pg_values)), $this->formatFieldsWithAlias('getSelectFields'));
+            $sql = sprintf('INSERT INTO %s (%s) VALUES (%s) RETURNING %s;', $this->object_name, join(',', array_map(function ($val) use ($connection) { return $connection->escapeIdentifier($val);
+            }, array_keys($pg_values))), join(',', array_values($pg_values)), $this->formatFieldsWithAlias('getSelectFields'));
 
             $collection = $this->query($sql, array());
         }
 
-        if ($collection->count())
-        {
+        if ($collection->count()) {
             $object = $collection->current();
         }
 
@@ -512,16 +497,13 @@ abstract class BaseObjectMap
     {
         $this->checkObject($object, sprintf('"%s" class does not know how to update "%s" objects.', get_class($this), get_class($object)));
 
-        if (!$object->_getStatus() & BaseObject::EXIST)
-        {
+        if (!$object->_getStatus() & BaseObject::EXIST) {
             throw new Exception(sprintf("Object class '%s' seems not to exist in the database, try 'saveOne' method instead.", get_class($object)));
         }
 
         $values = array();
-        foreach($fields as $field)
-        {
-            if (array_key_exists($field, array_flip($this->getPrimaryKey())))
-            {
+        foreach ($fields as $field) {
+            if (array_key_exists($field, array_flip($this->getPrimaryKey()))) {
                 throw new Exception(sprintf("Field '%s' to be updated belongs to the primary key of table '%s'. Do that directly with the map class instead of using a BaseObject.", $field, $this->object_name));
             }
 
@@ -529,12 +511,12 @@ abstract class BaseObjectMap
         }
 
         $updates = array();
-        foreach($this->convertToPg($values) as $field => $value)
-        {
+        foreach ($this->convertToPg($values) as $field => $value) {
             $updates[] = sprintf("%s = %s", $this->connection->escapeIdentifier($field), $value);
         }
 
-        $sql = sprintf("UPDATE %s SET %s WHERE %s RETURNING %s;",
+        $sql = sprintf(
+            "UPDATE %s SET %s WHERE %s RETURNING %s;",
             $this->object_name,
             join(', ', $updates),
             $this->createSqlAndFrom($object->get($this->getPrimaryKey())),
@@ -542,8 +524,7 @@ abstract class BaseObjectMap
         );
         $collection = $this->query($sql, array_values($object->get($this->getPrimaryKey())));
 
-        if ($collection->count())
-        {
+        if ($collection->count()) {
             $object = $collection->current();
         }
 
@@ -562,8 +543,7 @@ abstract class BaseObjectMap
     {
         $del_object = $this->deleteByPk($object->get($this->getPrimaryKey()));
 
-        if ($del_object)
-        {
+        if ($del_object) {
             $object = $del_object;
         }
 
@@ -613,8 +593,7 @@ abstract class BaseObjectMap
     {
         $fields = array();
 
-        foreach ($this->row_structure->getFieldNames() as $name)
-        {
+        foreach ($this->row_structure->getFieldNames() as $name) {
             $fields[$name] = $this->aliasField($this->connection->escapeIdentifier($name), $alias);
         }
 
@@ -646,15 +625,15 @@ abstract class BaseObjectMap
      */
     public function formatFieldsWithAlias($field_method, $table_alias = null)
     {
-        if (!method_exists($this, $field_method))
-        {
+        if (!method_exists($this, $field_method)) {
             throw new Exception(sprintf("'%s' method does not exist.", $field_method));
         }
 
         $fields = call_user_func(array($this, $field_method), $table_alias);
         $connection = $this->connection;
 
-        return join(', ', array_map(function($name, $table_alias) use ($connection) { return sprintf("%s AS %s", $name, $connection->escapeIdentifier($table_alias)); }, $fields, array_keys($fields)));
+        return join(', ', array_map(function ($name, $table_alias) use ($connection) { return sprintf("%s AS %s", $name, $connection->escapeIdentifier($table_alias));
+        }, $fields, array_keys($fields)));
     }
 
     /**
@@ -668,8 +647,7 @@ abstract class BaseObjectMap
      */
     public function formatFields($field_method, $table_alias = null)
     {
-        if (!method_exists($this, $field_method))
-        {
+        if (!method_exists($this, $field_method)) {
             throw new Exception(sprintf("'%s' method does not exist.", $field_method));
         }
 
@@ -717,8 +695,7 @@ abstract class BaseObjectMap
      */
     protected function checkObject(BaseObject $object, $message)
     {
-        if (get_class($object) !== trim($this->object_class, "\\"))
-        {
+        if (get_class($object) !== trim($this->object_class, "\\")) {
             throw new Exception(sprintf("check '%s' and '%s'. Context is «%s»", get_class($object), $this->object_class, $message));
         }
     }
@@ -735,8 +712,7 @@ abstract class BaseObjectMap
     protected function createSqlAndFrom($values)
     {
         $where = new Where();
-        foreach ($values as $key => $value)
-        {
+        foreach ($values as $key => $value) {
             $where->andWhere(sprintf('%s = $*', $key), array($value));
         }
 
@@ -773,8 +749,7 @@ abstract class BaseObjectMap
     {
         $sql = sprintf('SELECT %s FROM %s WHERE %s', $this->formatFieldsWithAlias('getSelectFields'), $this->object_name, $where);
 
-        if (!is_null($suffix))
-        {
+        if (!is_null($suffix)) {
             $sql = sprintf("%s %s", $sql, $suffix);
         }
 
@@ -794,9 +769,10 @@ abstract class BaseObjectMap
     {
         $tmp = array();
 
-        foreach ($this->convertToPg($object->getFields()) as $field_name => $field_value)
-        {
-            if (array_key_exists($field_name, array_flip($this->getPrimaryKey()))) continue;
+        foreach ($this->convertToPg($object->getFields()) as $field_name => $field_value) {
+            if (array_key_exists($field_name, array_flip($this->getPrimaryKey()))) {
+                continue;
+            }
 
             $tmp[] = sprintf("%s=%s", $this->connection->escapeIdentifier($field_name), $field_value);
         }

@@ -20,4 +20,3 @@ class ConnectionException extends Exception
         parent::__construct(sprintf("%s. Driver said «%s».", $message, pg_last_error()));
     }
 }
-

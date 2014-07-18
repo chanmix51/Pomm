@@ -21,10 +21,8 @@ class PgBoolean implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
-        if (!preg_match('/(t|f)/', $data))
-        {
-            if ($data === null || $data === '')
-            {
+        if (!preg_match('/(t|f)/', $data)) {
+            if ($data === null || $data === '') {
                 return null;
             }
 

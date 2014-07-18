@@ -62,41 +62,31 @@ class PgRow implements ConverterInterface
     {
         $out_values = array();
 
-        foreach ($this->row_structure->getDefinition() as $field_name => $pg_type)
-        {
-            if (!array_key_exists($field_name, $values))
-            {
+        foreach ($this->row_structure->getDefinition() as $field_name => $pg_type) {
+            if (!array_key_exists($field_name, $values)) {
                 continue;
             }
 
-            if (is_null($values[$field_name]))
-            {
+            if (is_null($values[$field_name])) {
                 $out_values[$field_name] = 'NULL';
                 continue;
             }
 
-            if ($values[$field_name] instanceOf \Pomm\Type\RawString)
-            {
+            if ($values[$field_name] instanceof \Pomm\Type\RawString) {
                 $out_values[$field_name] = (string) $values[$field_name];
                 continue;
             }
 
-            if (preg_match('/([a-z0-9_\.-]+)(\[\])?/i', $pg_type, $matchs))
-            {
-                if (count($matchs) > 2)
-                {
+            if (preg_match('/([a-z0-9_\.-]+)(\[\])?/i', $pg_type, $matchs)) {
+                if (count($matchs) > 2) {
                     $converter = $this->database->getConverterFor('Array');
-                }
-                else
-                {
+                } else {
                     $converter = $this->database->getConverterForType($pg_type);
                 }
 
                 $out_values[$field_name] = $converter
                     ->toPg($values[$field_name], $matchs[1]);
-            }
-            else
-            {
+            } else {
                 throw new PommException(sprintf('Error, bad type expression "%s".', $pg_type));
             }
         }
@@ -109,10 +99,8 @@ class PgRow implements ConverterInterface
      */
     public function toPg($data, $type = null)
     {
-        if ($this->class_name != null)
-        {
-            if (! $data instanceOf $this->class_name)
-            {
+        if ($this->class_name != null) {
+            if (! $data instanceof $this->class_name) {
                 throw new PommException(sprintf("This converter deals with '%s' instances ('%' given).", $this->class_name, get_type($data)));
             }
 
@@ -134,43 +122,33 @@ class PgRow implements ConverterInterface
     public function convertFromPg(Array $values)
     {
         $out_values = array();
-        foreach ($values as $name => $value)
-        {
-            if (is_null($value))
-            {
+        foreach ($values as $name => $value) {
+            if (is_null($value)) {
                 $out_values[$name] = null;
                 continue;
             }
 
             $pg_type = $this->row_structure->hasField($name) ? $this->row_structure->getTypeFor($name) : null;
 
-            if (is_null($pg_type))
-            {
+            if (is_null($pg_type)) {
                 $pg_type = array_key_exists($name, $this->virtual_fields) ? $this->virtual_fields[$name] : null;
 
-                if (is_null($pg_type))
-                {
+                if (is_null($pg_type)) {
                     $out_values[$name] = $value;
                     continue;
                 }
             }
 
-            if (preg_match('/([a-z0-9_\.-]+)(\[\])?/i', $pg_type, $matchs))
-            {
-                if (count($matchs) > 2)
-                {
+            if (preg_match('/([a-z0-9_\.-]+)(\[\])?/i', $pg_type, $matchs)) {
+                if (count($matchs) > 2) {
                     $converter = $this->database->getConverterFor('Array');
-                }
-                else
-                {
+                } else {
                     $converter = $this->database->getConverterForType($pg_type);
                 }
 
                 $out_values[$name] = $converter
                     ->fromPg($values[$name], $matchs[1]);
-            }
-            else
-            {
+            } else {
                 throw new PommException(sprintf('Error, bad type expression "%s".', $pg_type));
             }
         }
@@ -186,20 +164,17 @@ class PgRow implements ConverterInterface
         $elts = str_getcsv(trim($data, '()'));
 
         $values = array();
-        foreach ($this->row_structure->getFieldNames() as $field_name)
-        {
+        foreach ($this->row_structure->getFieldNames() as $field_name) {
             $values[$field_name] = stripcslashes(array_shift($elts));
         }
 
-        if (count($elts) > 0)
-        {
+        if (count($elts) > 0) {
             $values['_extra'] = $elts;
         }
 
         $values = $this->convertFromPg($values);
 
-        if ($this->class_name != null)
-        {
+        if ($this->class_name != null) {
             $class = $this->class_name;
 
             return new $class($values);

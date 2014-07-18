@@ -20,17 +20,13 @@ class PgIntervalISO8601 extends PgInterval
      */
     public function fromPg($data, $type = null)
     {
-        if ($data === null || $data === '')
-        {
+        if ($data === null || $data === '') {
             return null;
         }
 
-        try
-        {
+        try {
             return new \DateInterval($data);
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             throw new PommException(sprintf("Data '%s' is not an ISO8601 interval representation.", $data));
         }
     }
