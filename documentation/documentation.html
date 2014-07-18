@@ -1433,7 +1433,7 @@ public function getOneWithPosts($author_name)
 <h2><a class="toc-backref" href="#id51">Collections</a></h2>
 <div class="section" id="fetching-results">
 <h3><a class="toc-backref" href="#id52">Fetching results</a></h3>
-<p>The <tt class="docutils literal">query()</tt> method return a <tt class="docutils literal">Collection</tt> instance that holds the PDOStatement with the results. The <tt class="docutils literal">Collection</tt> class implements the <tt class="docutils literal">Countable</tt> and <tt class="docutils literal">Iterator</tt> interfaces so they can be traversed using a <tt class="docutils literal">foreach</tt> PHP statement to retrieve the results:</p>
+<p>The <tt class="docutils literal">query()</tt> method return a <tt class="docutils literal">Collection</tt> instance that holds the result resource with the results. The <tt class="docutils literal">Collection</tt> class implements the <tt class="docutils literal">Countable</tt> and <tt class="docutils literal">Iterator</tt> interfaces so they can be traversed using a <tt class="docutils literal">foreach</tt> PHP statement to retrieve the results:</p>
 <pre class="literal-block">
 printf(&quot;Your search returned '%d' results.&quot;, $collection-&gt;count());
 
