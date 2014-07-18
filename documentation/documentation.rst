@@ -993,7 +993,7 @@ Collections
 Fetching results
 ----------------
 
-The ``query()`` method return a ``Collection`` instance that holds the PDOStatement with the results. The ``Collection`` class implements the ``Countable`` and ``Iterator`` interfaces so they can be traversed using a ``foreach`` PHP statement to retrieve the results::
+The ``query()`` method return a ``Collection`` instance that holds the result resource with the results. The ``Collection`` class implements the ``Countable`` and ``Iterator`` interfaces so they can be traversed using a ``foreach`` PHP statement to retrieve the results::
 
   printf("Your search returned '%d' results.", $collection->count());
 
