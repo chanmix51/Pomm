@@ -421,6 +421,29 @@ _;
         $this->assertEquals(44519, $entity['arr_tsrange'][1]->end->format('U') - $entity['arr_tsrange'][1]->start->format('U'), "Range is preserved.");
         $this->assertEquals(RangeType::INCL_BOUNDS, $entity['arr_tsrange'][1]->options, 'Bounds are preserved.');
 
+        $tsRange = new Converter\PgTsRange();
+
+        try {
+            $tsRange->fromPg('["2014-01-01 00:00:00","2015-01-02 00:00:00")');
+            $this->assertTrue(true, "'tsrange' value is valid.");
+        } catch (Exception $expected) {
+            $this->fail('PgTsRange converter failed to load a tsrange value.');
+        }
+
+        try {
+            $tsRange->fromPg('[2014-01-01,2015-01-02)');
+            $this->assertTrue(true, "'daterange' value is valid.");
+        } catch (Exception $expected) {
+            $this->fail('PgTsRange converter failed to load a daterange value.');
+        }
+
+        try {
+            $tsRange->fromPg('["2014-01-01 00:00:00,"2015-01-02 00:00:00")');
+            $this->fail('PgTsRange converter successfully loads a malformed value.');
+        } catch (Exception $expected) {
+            $this->assertTrue(true, "Range is malformed.");
+        }
+
         return $entity;
     }
 

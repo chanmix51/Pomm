@@ -34,7 +34,7 @@ class PgTsRange implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
-        if (!preg_match('/([\[\(])"([0-9 :-]+)","([0-9 :-]+)"([\]\)])/', $data, $matchs))
+        if (!preg_match('/([\[\(])(")?([0-9 :-]+)(?(2)"),(?(2)")([0-9 :-]+)(?(2)")([\]\)])/', $data, $matchs))
         {
             if ($data === null || $data === '')
             {
@@ -45,9 +45,9 @@ class PgTsRange implements ConverterInterface
         }
 
         $options = $matchs[1] === '(' ? RangeType::EXCL_START : RangeType::INCL_BOUNDS;
-        $options += $matchs[4] === ')' ? RangeType::EXCL_END : RangeType::INCL_BOUNDS;
+        $options += $matchs[5] === ')' ? RangeType::EXCL_END : RangeType::INCL_BOUNDS;
 
-        return new $this->class_name(new \DateTime($matchs[2]), new \DateTime($matchs[3]), $options);
+        return new $this->class_name(new \DateTime($matchs[3]), new \DateTime($matchs[4]), $options);
     }
 
     /**
