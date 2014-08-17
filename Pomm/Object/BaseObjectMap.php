@@ -411,11 +411,7 @@ abstract class BaseObjectMap
      */
     public function findByPk(Array $values)
     {
-        if (count(array_diff(array_keys($values), $this->getPrimaryKey())) != 0)
-        {
-            throw new Exception(sprintf('Given values "%s" do not match PK definition "%s" using class "%s".', print_r($values, true), print_r($this->getPrimaryKey(), true), get_class($this)));
-        }
-
+        $this->checkValuesOnPK($values);
         $result = $this->findWhere($this->createSqlAndFrom($values), array_values($values));
 
         return count($result) == 1 ? $result->current() : null;
@@ -432,6 +428,7 @@ abstract class BaseObjectMap
      */
     public function updateByPk(Array $pk, Array $values)
     {
+        $this->checkValuesOnPK($pk);
         $where = $this->createSqlAndFrom($pk);
         $converted_values = $this->convertToPg($values);
         $connection = $this->connection;
@@ -458,6 +455,7 @@ abstract class BaseObjectMap
      */
     public function deleteByPk(Array $pk)
     {
+        $this->checkValuesOnPK($pk);
         $sql = sprintf('DELETE FROM %s WHERE %s RETURNING %s', $this->object_name, $this->createSqlAndFrom($pk), $this->formatFieldsWithAlias('getSelectFields'));
 
         return $this->query($sql, array_values($pk))->current();
@@ -802,5 +800,22 @@ abstract class BaseObjectMap
         }
 
         return implode(',', $tmp);
+    }
+
+    /**
+     * checkValuesOnPK
+     *
+     * Check if values fit with the PK definition.
+     *
+     * @access protectd
+     * @param Array $values
+     * @throw Pomm\Exception
+     */
+    protected function checkValuesOnPK(Array $values)
+    {
+        if (count(array_diff(array_keys($values), $this->getPrimaryKey())) != 0)
+        {
+            throw new Exception(sprintf('Given values "%s" do not match PK definition "%s" using class "%s".', print_r($values, true), print_r($this->getPrimaryKey(), true), get_class($this)));
+        }
     }
 }

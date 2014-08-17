@@ -138,6 +138,20 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
      */
     public function testFindByPK(BaseEntity $entity)
     {
+        try
+        {
+            $test_entity = static::$map->findByPk(array('pika' => $entity['id']));
+            $this->assertTrue(false, 'Not using PK definition throws a Pomm exception (no Exception caught).');
+        }
+        catch(\Pomm\Exception\Exception $e)
+        {
+            $this->assertTrue(true, 'Not using PK definition throws a Pomm exception.');
+        }
+        catch(\Exception $e)
+        {
+            $this->assertTrue(false, 'Not using PK definition throws a Pomm exception (\Exception caught).');
+        }
+
         $test_entity = static::$map->findByPk(array('id' => $entity['id']));
         $this->assertTrue($test_entity == $entity, "Entities have the same values.");
         $this->assertNotSame($entity, $test_entity, "Entities are not the same instance.");
@@ -171,6 +185,20 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
     public function testUpdateByPk(BaseEntity $entity)
     {
         $dt = new \DateTime();
+        try
+        {
+            static::$map->updateByPk(array('pika' => 1), array('ts_data' => $dt, 'bool_data' => false));
+            $this->assertTrue(false, 'Not using PK definition throws a Pomm exception (no Exception caught).');
+        }
+        catch(\Pomm\Exception\Exception $e)
+        {
+            $this->assertTrue(true, 'Not using PK definition throws a Pomm exception.');
+        }
+        catch(\Exception $e)
+        {
+            $this->assertTrue(false, 'Not using PK definition throws a Pomm exception (\Exception caught).');
+        }
+
 
         $entity = static::$map->updateByPk($entity->get(static::$map->getPrimaryKey()), array('ts_data' => $dt, 'bool_data' => false));
 
