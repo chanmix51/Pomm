@@ -42,7 +42,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCollection()
     {
-        $collection = static::$map->findAll();
+        $collection = static::$map->findAll('order by id asc');
 
         $this->assertInstanceOf('\Pomm\Object\Collection', $collection, "findAll returns Collection instance.");
         $this->assertEquals(10, $collection->count(), "With 10 records");
@@ -102,7 +102,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
      **/
     public function testExtract()
     {
-        $collection = static::$map->findWhere('id < $*', array(5));
+        $collection = static::$map->findWhere('id < $*', array(5), 'order by id asc');
 
         $this->assertEquals(array('Pomm\Test\Object\CollectionEntity' => array(array('id' => 1, 'data' => 9), array('id' => 2, 'data' => 8), array('id' => 3, 'data' => 7), array('id' => 4, 'data' => 6))), $collection->extract(), 'Extract is an array of extracts.');
 
@@ -118,28 +118,28 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
         foreach ($collection as $index => $entity)
         {
-            $this->assertTrue($entity['id'] == ($index + 1) * 2, "Check filter");
+            $this->assertTrue($entity['id'] == ($index + 1) * 2, "Check filter.");
         }
+
+        $collection->clearFilters();
     }
 
-    /**
-     * @depends testGetCollection
-     */
-    public function testSlice(Collection $collection)
+    public function testSlice()
     {
+        $collection = static::$map->findWhere('id < $*', array(5), 'order by id asc');
         $data1 = $collection->slice('id');
 
-        $this->assertEquals(10, count($data1), 'data1 has 10 rows.');
+        $this->assertEquals(4, count($data1), 'data1 has 4 rows.');
         $this->assertEquals(1, $data1[0], 'First id is 1.');
-        $this->assertEquals(10, $data1[9], 'Last id is 10.');
+        $this->assertEquals(4, $data1[3], 'Last id is 4.');
 
         $data2 = $collection->slice('id');
 
         $this->assertEquals($data1, $data2, 'Slice is idempotent.');
 
         $data3 = $collection->slice('data');
-        $this->assertEquals(10, count($data3), 'data3 has 10 rows.');
-        $this->assertEquals(0, $data3[9], 'Last id is 0.');
+        $this->assertEquals(4, count($data3), 'data3 has 4 rows.');
+        $this->assertEquals(6, $data3[3], 'Last data is 6.');
 
         try
         {
@@ -154,6 +154,9 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         {
             $this->fail(sprintf("slice on non existent field should throw a PommException ('%s' thrown).", get_class($e)));
         }
+
+        $this->assertEquals(array('Pomm\Test\Object\CollectionEntity' => array(array('id' => 1, 'data' => 9), array('id' => 2, 'data' => 8), array('id' => 3, 'data' => 7), array('id' => 4, 'data' => 6))), $collection->extract(), 'Collection is still iterable.');
+
     }
 }
 
@@ -172,7 +175,7 @@ class CollectionEntityMap extends BaseObjectMap
     public function getSelectFields($alias = null)
     {
         $fields = parent::getSelectFields($alias);
-        $fields['data'] = sprintf("10 - %s", $this->aliasField('id', $alias));
+        $fields['data'] = sprintf("10 - \"%s\"", $this->aliasField('id', $alias));
 
         return $fields;
     }
