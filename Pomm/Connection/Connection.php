@@ -3,6 +3,7 @@
 namespace Pomm\Connection;
 
 use Pomm\Exception\ConnectionException;
+use Pomm\Exception\SqlException;
 use Pomm\Connection\Database;
 use Pomm\Identity\IdentityMapperInterface;
 use Pomm\Object\BaseObjectMap;
@@ -215,9 +216,15 @@ class Connection implements LoggerAwareInterface
      */
     public function begin()
     {
-        if ($this->executeAnonymousQuery(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->isolation)) === false)
+        try
         {
-            $this->throwConnectionException(sprintf("Cannot begin transaction (isolation level '%s').", $this->isolation), LogLevel::ERROR);
+            $this->executeAnonymousQuery(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->isolation));
+        }
+        catch(SqlException $e)
+        {
+            $this->log(LogLevel::ERROR, sprintf("Cannot begin transaction (isolation level '%s').", $this->isolation));
+
+            throw $e;
         }
 
         return $this;
@@ -233,9 +240,15 @@ class Connection implements LoggerAwareInterface
      */
     public function commit()
     {
-        if ($this->executeAnonymousQuery('COMMIT TRANSACTION') === false)
+        try
         {
-            $this->throwConnectionException(sprintf("Cannot commit transaction (isolation level '%s').", $this->isolation), LogLevel::ERROR);
+            $this->executeAnonymousQuery("COMMIT TRANSACTION");
+        }
+        catch(SqlException $e)
+        {
+            $this->log(LogLevel::ERROR, sprintf("Cannot commit transaction (isolation level '%s').", $this->isolation));
+
+            throw $e;
         }
 
         return $this;
@@ -254,18 +267,22 @@ class Connection implements LoggerAwareInterface
      */
     public function rollback($name = null)
     {
-        if (is_null($name))
+        try
         {
-            $ret = $this->executeAnonymousQuery('ROLLBACK TRANSACTION');
+            if (is_null($name))
+            {
+                $ret = $this->executeAnonymousQuery('ROLLBACK TRANSACTION');
+            }
+            else
+            {
+                $ret = $this->executeAnonymousQuery(sprintf("ROLLBACK TO SAVEPOINT %s", $this->escapeIdentifier($name)));
+            }
         }
-        else
+        catch (SqlException $e)
         {
-            $ret = $this->executeAnonymousQuery(sprintf("ROLLBACK TO SAVEPOINT %s", $this->escapeIdentifier($name)));
-        }
+            $this->log(LogLevel::ERROR, sprintf("Failed to rollback transaction (savepoint '%s') with isolation transaction '%s'.", $name, $this->isolation));
 
-        if ($ret === false)
-        {
-            $this->throwConnectionException(sprintf("Cannot rollback transaction (isolation level '%s').", $this->isolation), LogLevel::ERROR);
+            throw $e;
         }
 
         return $this;
@@ -282,9 +299,15 @@ class Connection implements LoggerAwareInterface
      */
     public function setSavepoint($name)
     {
-        if ($this->executeAnonymousQuery(sprintf("SAVEPOINT %s", $this->escapeIdentifier($name))) === false)
+        try
         {
-            throw new ConnectionException(sprintf("Cannot set savepoint '%s'.", $name), LogLevel::ERROR);
+            $this->executeAnonymousQuery(sprintf("SAVEPOINT %s", $this->escapeIdentifier($name)));
+        }
+        catch (SqlException $e)
+        {
+            $this->log(LogLevel::ERROR, sprintf("Failed to create savepoint '%s'.", $name));
+
+            throw $e;
         }
 
         return $this;
@@ -301,9 +324,15 @@ class Connection implements LoggerAwareInterface
      */
     public function releaseSavepoint($name)
     {
-        if ($this->executeAnonymousQuery(sprintf("RELEASE SAVEPOINT %s", $this->escapeIdentifier($name))) === false)
+        try
         {
-            throw new ConnectionException(sprintf("Cannot release savepoint named '%s'.", $name), LogLevel::ERROR);
+            $this->executeAnonymousQuery(sprintf("RELEASE SAVEPOINT %s", $this->escapeIdentifier($name)));
+        }
+        catch (SqlException $e)
+        {
+            $this->log(LogLevel::ERROR, sprintf("Failed to release savepoint '%s'.", $name));
+
+            throw $e;
         }
 
         return $this;
@@ -364,18 +393,22 @@ class Connection implements LoggerAwareInterface
     {
         $name = $this->escapeIdentifier($name);
 
-        if (empty($payload))
+        try
         {
-            $ret = $this->executeAnonymousQuery(sprintf("NOTIFY %s", $name));
+            if (empty($payload))
+            {
+                $ret = $this->executeAnonymousQuery(sprintf("NOTIFY %s", $name));
+            }
+            else
+            {
+                $ret = $this->executeAnonymousQuery(sprintf("NOTIFY %s, %s", $name,  $this->escapeLiteral($payload)));
+            }
         }
-        else
+        catch(SqlException $e)
         {
-            $ret = $this->executeAnonymousQuery(sprintf("NOTIFY %s, %s", $name,  $this->escapeLiteral($payload)));
-        }
+            $this->log(LogLevel::ERROR, sprintf("Could not notify '%s' event.", $name));
 
-        if ($ret === false)
-        {
-            $this->throwConnectionException(sprintf("Could not notify '%s' event.", $name), LogLevel::ERROR);
+            throw $e;
         }
     }
 
@@ -467,8 +500,15 @@ class Connection implements LoggerAwareInterface
     public function executeAnonymousQuery($sql)
     {
         $this->log(LogLevel::NOTICE, sprintf("Anonymous query « %s ».", $sql));
+        $ret = @pg_query($this->getHandler(), $sql);
 
-        return @pg_query($this->getHandler(), $sql);
+        if ($ret === false)
+        {
+            $this->log(LogLevel::ERROR, sprintf("Anonymous query « %s » failed.", $sql));
+            throw new SqlException($ret, $sql);
+        }
+
+        return $ret;
     }
 
     /**
