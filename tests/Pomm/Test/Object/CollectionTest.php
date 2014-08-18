@@ -6,7 +6,7 @@ use Pomm\Connection\Database;
 use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
 use Pomm\Object\Collection;
-use Pomm\Exception\Exception;
+use Pomm\Exception\Exception as PommException;
 use Pomm\Query\Where;
 
 
@@ -104,7 +104,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     {
         $collection = static::$map->findWhere('id < $*', array(5));
 
-        $this->assertEquals(array('Pomm\Test\Object\CollectionEntity' => array(array('id' => 1), array('id' => 2), array('id' => 3), array('id' => 4))), $collection->extract(), 'Extract is an array of extracts.');
+        $this->assertEquals(array('Pomm\Test\Object\CollectionEntity' => array(array('id' => 1, 'data' => 9), array('id' => 2, 'data' => 8), array('id' => 3, 'data' => 7), array('id' => 4, 'data' => 6))), $collection->extract(), 'Extract is an array of extracts.');
 
         return $collection;
     }
@@ -121,6 +121,40 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue($entity['id'] == ($index + 1) * 2, "Check filter");
         }
     }
+
+    /**
+     * @depends testGetCollection
+     */
+    public function testSlice(Collection $collection)
+    {
+        $data1 = $collection->slice('id');
+
+        $this->assertEquals(10, count($data1), 'data1 has 10 rows.');
+        $this->assertEquals(1, $data1[0], 'First id is 1.');
+        $this->assertEquals(10, $data1[9], 'Last id is 10.');
+
+        $data2 = $collection->slice('id');
+
+        $this->assertEquals($data1, $data2, 'Slice is idempotent.');
+
+        $data3 = $collection->slice('data');
+        $this->assertEquals(10, count($data3), 'data3 has 10 rows.');
+        $this->assertEquals(0, $data3[9], 'Last id is 0.');
+
+        try
+        {
+            $collection->slice('pika');
+            $this->fail('slice on non existent field should throw a PommException.');
+        }
+        catch(PommException $e)
+        {
+            $this->assertTrue(true, 'slice on non existent field should throw a PommException.');
+        }
+        catch(Exception $e)
+        {
+            $this->fail(sprintf("slice on non existent field should throw a PommException ('%s' thrown).", get_class($e)));
+        }
+    }
 }
 
 class CollectionEntityMap extends BaseObjectMap
@@ -133,6 +167,14 @@ class CollectionEntityMap extends BaseObjectMap
         $this->addField('id', 'int4');
 
         $this->pk_fields = array('id');
+    }
+
+    public function getSelectFields($alias = null)
+    {
+        $fields = parent::getSelectFields($alias);
+        $fields['data'] = sprintf("10 - %s", $this->aliasField('id', $alias));
+
+        return $fields;
     }
 }
 

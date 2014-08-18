@@ -247,6 +247,26 @@ class Collection implements \Iterator, \Countable
         return array($name => $results);
     }
 
+    /** 
+     * slice
+     *
+     * Extract an array of values for one column.
+     *
+     * @param String $field
+     * @return Array values
+     */
+    public function slice($field)
+    {
+        $field_no = pg_field_num($this->result_resource, $field);
+
+        if ($field_no === -1)
+        {
+            throw new Exception(sprintf("No such field '%s'.", $field));
+        }
+
+        return pg_fetch_all_columns($this->result_resource, $field_no);
+    }
+
     /**
      * registerFilter
      *
