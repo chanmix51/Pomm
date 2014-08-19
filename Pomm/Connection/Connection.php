@@ -132,7 +132,10 @@ class Connection implements LoggerAwareInterface
      */
     public function __destruct()
     {
-        unset($this->handler);
+        if (!isset($this->handler))
+        {
+            pg_close($this->handler);
+        }
     }
 
     /**
