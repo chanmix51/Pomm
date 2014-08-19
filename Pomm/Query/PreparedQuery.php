@@ -18,6 +18,7 @@ class PreparedQuery
 {
     protected $connection;
     protected $stmt;
+    protected $sql;
     private $active = false;
     private $name;
 
@@ -48,6 +49,7 @@ class PreparedQuery
     public function __construct(Connection $connection, $sql)
     {
         $this->connection = $connection;
+        $this->sql = $sql;
         $this->name = static::getSignatureFor($sql);
         $this->stmt = pg_prepare($this->connection->getHandler(), $this->name, $this->escapePlaceHolders($sql));
 
@@ -56,7 +58,6 @@ class PreparedQuery
             $this->connection->throwConnectionException(sprintf("Could not prepare statement «%s».", $sql), LogLevel::ERROR);
         }
 
-        $this->connection->log(LogLevel::INFO, sprintf("Prepared query '%s' => -- %s --", $this->name, $sql));
         $this->active = true;
     }
 
@@ -96,8 +97,6 @@ class PreparedQuery
             $this->connection->throwConnectionException(sprintf("Error while executing prepared statement '%s'.", $this->getName()), LogLevel::ERROR);
         }
 
-        $this->connection->log(LogLevel::DEBUG, sprintf("Execute '%s' (%d results) with values (%s).", $this->name, @pg_num_rows($res), print_r($values, true)));
-
         return $res;
     }
 
@@ -112,6 +111,7 @@ class PreparedQuery
     public function deallocate()
     {
         $res = @pg_execute($this->connection->getHandler(), sprintf("DEALLOCATE %s", $this->connection->escapeIdentifier($this->getName())));
+
         if ($res === false)
         {
             $this->connection->throwConnectionException(sprintf("Could not deallocate statement «%s».", $this->getName()), LogLevel::ERROR);
@@ -132,6 +132,19 @@ class PreparedQuery
     public function getActive()
     {
         return $this->active;
+    }
+
+    /**
+     * getSql
+     *
+     * Get the original SQL query
+     *
+     * @access public 
+     * @return String SQL query
+     */
+    public function getSql()
+    {
+        return $this->sql;
     }
 
     /**

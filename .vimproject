@@ -1,11 +1,18 @@
 Pomm=~/Projects/github/Pomm CD=. {
  Pomm=Pomm {
   Service.php
-  Connection=Connection {
-   Connection.php
-   Database.php
-   Observer.php
-  }
+   Connection=Connection {
+    FilterChain=FilterChain {
+     FilterInterface.php
+      LoggerFilter.php
+      PreparedStatementPoolFilter.php
+      QueryFilter.php
+      QueryFilterChain.php
+    }
+    Connection.php
+     Database.php
+     Observer.php
+   }
   Converter=Converter {
    ConverterInterface.php
    PgArray.php
@@ -48,6 +55,7 @@ Pomm=~/Projects/github/Pomm CD=. {
   }
   Query=Query {
    PreparedQuery.php
+   QueryResult.php
    Where.php
   }
   Tools=Tools {

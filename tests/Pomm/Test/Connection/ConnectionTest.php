@@ -99,14 +99,12 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testPreparedQueries()
+    public function testFilterChain()
     {
-        $sql = "SELECT $1::int";
+        $sql = "SELECT $*::int";
 
-        $this->assertFalse(static::$connection->hasQuery(PreparedQuery::getSignatureFor($sql)));
         $stmt = static::$connection->query($sql, array(1));
         $this->assertEquals(1, pg_num_rows($stmt), "We have one result returned by Postgresql");
-        $this->assertTrue(static::$connection->hasQuery(PreparedQuery::getSignatureFor($sql)));
     }
 
     public function testExecuteAnonymousQuery()

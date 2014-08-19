@@ -7,6 +7,7 @@ use Pomm\Exception\SqlException;
 use Pomm\Connection\Database;
 use Pomm\Identity\IdentityMapperInterface;
 use Pomm\Object\BaseObjectMap;
+use Pomm\Connection\FilterChain;
 use Pomm\Query\PreparedQuery;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -16,7 +17,7 @@ use Psr\Log\LogLevel;
  * Pomm\Connection\Connection
  *
  * Manage a connection to the database.
- * Connection is a pool of Map and PreparedQuery instances. It holds the IdentityMapper.
+ * Connection is a pool of Map instances. It holds the IdentityMapper.
  * Connection also proposes handy methods to deal with transactions.
  *
  * @package Pomm
@@ -35,9 +36,9 @@ class Connection implements LoggerAwareInterface
     protected $database;
     protected $parameter_holder;
     protected $isolation;
+    protected $filter_chain;
     protected $identity_mapper;
     protected $maps = array();
-    protected $queries = array();
     protected $logger;
 
     /**
@@ -75,6 +76,12 @@ class Connection implements LoggerAwareInterface
         {
             $this->identity_mapper = $mapper;
         }
+
+        $this->filter_chain = new FilterChain\QueryFilterChain($this);
+        $this->filter_chain
+            ->registerFilter(new FilterChain\QueryFilter())
+            ->registerFilter(new FilterChain\PreparedStatementPoolFilter())
+            ;
     }
 
     /**
@@ -207,6 +214,7 @@ class Connection implements LoggerAwareInterface
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
+        $this->filter_chain->registerFilter(new FilterChain\LoggerFilter());
     }
 
     /**
@@ -416,18 +424,6 @@ class Connection implements LoggerAwareInterface
     }
 
     /**
-     * createPreparedQuery
-     *
-     * @access public
-     * @param String $sql Statement to prepare.
-     * @return PreparedQuery
-     */
-    public function createPreparedQuery($sql)
-    {
-        return new PreparedQuery($this, $sql);
-    }
-
-    /**
      * getIdentityMapper
      *
      * Get connection's related identity mapper.
@@ -438,6 +434,18 @@ class Connection implements LoggerAwareInterface
     public function getIdentityMapper()
     {
         return $this->identity_mapper;
+    }
+
+    /**
+     * createPreparedQuery
+     *
+     * returns a PreparedQuery instance
+     * @param String $sql
+     * @return \Pomm\Query\PreparedQuery 
+     */
+    public function createPreparedQuery($sql)
+    {
+        return new PreparedQuery($this, $sql);
     }
 
     /**
@@ -452,43 +460,7 @@ class Connection implements LoggerAwareInterface
      */
     public function query($sql, Array $values = array())
     {
-        return $this->getQuery($sql)->execute($values);
-    }
-
-    /**
-     * getquery
-     *
-     * Return a prepared query from a sql signature. If no query match the
-     * signature in the pool, a new query is prepared.
-     *
-     * @access public
-     * @return PreparedQuery
-     */
-    public function getQuery($sql)
-    {
-        $signature = PreparedQuery::getSignatureFor($sql);
-
-        if ($this->hasQuery($signature) === false)
-        {
-            $query = $this->createPreparedQuery($sql);
-            $this->queries[$query->getName()] = $query;
-        }
-
-        return $this->queries[$signature];
-    }
-
-    /**
-     * hasQuery
-     *
-     * Check if a query with the given signature exists in the pool.
-     *
-     * @access public
-     * @param  String $name Query signature.
-     * @return Boolean
-     */
-    public function hasQuery($name)
-    {
-        return (bool) isset($this->queries[$name]);
+        return $this->filter_chain->execute($sql, $values);
     }
 
     /**
