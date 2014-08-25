@@ -282,11 +282,11 @@ class Connection implements LoggerAwareInterface
         {
             if (is_null($name))
             {
-                $ret = $this->executeAnonymousQuery('ROLLBACK TRANSACTION');
+                $this->executeAnonymousQuery('ROLLBACK TRANSACTION');
             }
             else
             {
-                $ret = $this->executeAnonymousQuery(sprintf("ROLLBACK TO SAVEPOINT %s", $this->escapeIdentifier($name)));
+                $this->executeAnonymousQuery(sprintf("ROLLBACK TO SAVEPOINT %s", $this->escapeIdentifier($name)));
             }
         }
         catch (SqlException $e)
@@ -408,11 +408,11 @@ class Connection implements LoggerAwareInterface
         {
             if (empty($payload))
             {
-                $ret = $this->executeAnonymousQuery(sprintf("NOTIFY %s", $name));
+                $this->executeAnonymousQuery(sprintf("NOTIFY %s", $name));
             }
             else
             {
-                $ret = $this->executeAnonymousQuery(sprintf("NOTIFY %s, %s", $name,  $this->escapeLiteral($payload)));
+                $this->executeAnonymousQuery(sprintf("NOTIFY %s, %s", $name,  $this->escapeLiteral($payload)));
             }
         }
         catch(SqlException $e)
