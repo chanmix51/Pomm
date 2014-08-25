@@ -18,7 +18,7 @@ use Pomm\Query\PreparedQuery;
  */
 class PreparedStatementPoolFilter implements FilterInterface
 {
-    protected $filte_chain;
+    protected $filter_chain;
     protected $queries = array();
 
     public function execute(QueryFilterChain $filter_chain)
