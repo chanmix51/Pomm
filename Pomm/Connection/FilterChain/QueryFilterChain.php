@@ -133,7 +133,7 @@ class QueryFilterChain
      */
     public function insertFilter(FilterInterface $filter, $index)
     {
-        if ($index >= count($this->filters) or $index < 0)
+        if ($index >= count($this->filters) || $index < 0)
         {
             throw new \InvalidArgumentException(sprintf("Invalid index value '%d', filter chain has '%d' filters.", $index, count($this->filters)));
         }

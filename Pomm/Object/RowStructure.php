@@ -38,6 +38,8 @@ class RowStructure
     public function addField($name, $type)
     {
         $this->field_definitions[$name] = $type;
+
+        return $this;
     }
 
     /**

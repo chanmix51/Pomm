@@ -55,7 +55,6 @@ Pomm=~/Projects/github/Pomm CD=. {
   }
   Query=Query {
    PreparedQuery.php
-   QueryResult.php
    Where.php
   }
   Tools=Tools {

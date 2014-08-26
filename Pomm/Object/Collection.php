@@ -282,6 +282,8 @@ class Collection implements \Iterator, \Countable
         }
 
         $this->filters[] = $callable;
+
+        return $this;
     }
 
     /**
@@ -292,5 +294,7 @@ class Collection implements \Iterator, \Countable
     public function clearFilters()
     {
         $this->filters = array();
+
+        return $this;
     }
 }

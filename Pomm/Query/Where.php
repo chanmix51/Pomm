@@ -11,7 +11,7 @@ namespace Pomm\Query;
  *
  * @package Pomm
  * @version $id$
- * @copyright 2011 - 2013 Grégoire HUBERT
+ * @copyright 2011 - 2014 Grégoire HUBERT
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
@@ -52,6 +52,7 @@ class Where
         $escape = function ($values) use (&$escape)
             {
                 $escaped_values = array();
+
                 foreach($values as $value)
                 {
                     if (is_array($value))
@@ -103,7 +104,8 @@ class Where
      * setOperator
      *
      * is it an AND or an OR ?
-     * or something else (XOR maybe).
+     * or something else.
+     * XOR can be expressed as "A = !B"
      *
      * @param String $operator
      * @return Where
@@ -303,12 +305,14 @@ class Where
         {
             return array();
         }
+
         if ($this->hasElement())
         {
             return $this->values;
         }
 
         $values = array();
+
         foreach($this->stack as $offset => $where)
         {
             $values = array_merge($values, $where->getValues());

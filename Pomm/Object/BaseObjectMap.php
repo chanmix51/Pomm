@@ -467,7 +467,7 @@ abstract class BaseObjectMap
      * Use this to insert or update an object.
      *
      * @param BaseObject $object
-     * @return BaseObject Saved instance.
+     * @return BaseObjectMap
      */
     public function saveOne(BaseObject &$object)
     {
@@ -493,6 +493,8 @@ abstract class BaseObjectMap
         }
 
         $object->_setStatus(BaseObject::EXIST);
+
+        return $this;
     }
 
     /**
@@ -504,7 +506,7 @@ abstract class BaseObjectMap
      *
      * @param BaseObject $object
      * @param Array                  $fields Only these fields will be updated.
-     * @return BaseObject
+     * @return BaseObjectMap
      */
     public function updateOne(BaseObject &$object, Array $fields)
     {
@@ -546,6 +548,8 @@ abstract class BaseObjectMap
         }
 
         $object->_setStatus(BaseObject::EXIST);
+
+        return $this;
     }
 
     /**
@@ -554,7 +558,7 @@ abstract class BaseObjectMap
      * Delete the record tied with the given entity.
      *
      * @param BaseObject $object
-     * @return BaseObject
+     * @return BaseObjectMap
      */
     public function deleteOne(BaseObject &$object)
     {
@@ -566,6 +570,8 @@ abstract class BaseObjectMap
         }
 
         $object->_setStatus(BaseObject::NONE);
+
+        return $this;
     }
 
     /**
