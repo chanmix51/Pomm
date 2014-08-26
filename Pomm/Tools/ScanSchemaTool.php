@@ -56,6 +56,11 @@ class ScanSchemaTool extends CreateFileTool
 
         $inspector = new Inspector($this->options['database']->getConnection());
 
+        if ($inspector->schemaExists($this->options['schema']) === false)
+        {
+            throw new \InvalidArgumentException(sprintf("Unknown schema '%s'. Existing schemas are {%s}.", $this->options['schema'], join(', ', $inspector->getSchemaList())));
+        }
+
         $no_tables = $this->options->hasParameter('exclude') ?  array_flip($inspector->getTablesOids($this->options['schema'], $this->options['exclude'])) : array();
 
         foreach ($inspector->getTablesInSchema($this->options['schema']) as $table_oid)

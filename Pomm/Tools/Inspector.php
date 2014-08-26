@@ -266,4 +266,41 @@ SQL;
 
         return $sources;
     }
+
+    /**
+     * getSchemaList
+     *
+     * Return the list of schemas in the database
+     *
+     * @return Array schema list
+     */
+    public function getSchemaList()
+    {
+        $sql = "SELECT nspname FROM  pg_catalog.pg_namespace WHERE nspname !~ '^pg_'";
+        $result_handler = pg_query($this->connection->getHandler(), $sql);
+        $schemas = array();
+
+        while ($schema = pg_fetch_assoc($result_handler))
+        {
+            $schemas[] = $schema['nspname'];
+        }
+
+        return $schemas;
+    }
+
+    /**
+     * schemaExists
+     *
+     * Return whatever the given schema exists or not
+     *
+     * @param String schema name
+     * @return Bool 
+     */
+    public function schemaExists($schema)
+    {
+        $sql = sprintf("SELECT true FROM pg_catalog.pg_namespace WHERE nspname = '%s'", $schema);
+        $result_handler = pg_query($this->connection->getHandler(), $sql);
+
+        return (pg_num_rows($result_handler) == 1);
+    }
 }
