@@ -4,14 +4,14 @@ Pomm=~/Projects/github/Pomm CD=. {
    Connection=Connection {
     FilterChain=FilterChain {
      FilterInterface.php
-      LoggerFilter.php
-      PreparedStatementPoolFilter.php
-      QueryFilter.php
-      QueryFilterChain.php
+     LoggerFilter.php
+     PreparedStatementPoolFilter.php
+     QueryFilter.php
+     QueryFilterChain.php
     }
     Connection.php
-     Database.php
-     Observer.php
+    Database.php
+    Observer.php
    }
   Converter=Converter {
    ConverterInterface.php
@@ -108,6 +108,9 @@ Pomm=~/Projects/github/Pomm CD=. {
      ConnectionTest.php
      DatabaseTest.php
      ObserverTest.php
+     FilterChain=FilterChain {
+      FilterChainTest.php
+     }
     }
     Converter=Converter {
      ConverterTest.php

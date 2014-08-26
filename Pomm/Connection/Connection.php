@@ -32,11 +32,12 @@ class Connection implements LoggerAwareInterface
     const ISOLATION_READ_REPEATABLE = "READ REPEATABLE"; // from Pg 9.1
     const ISOLATION_SERIALIZABLE = "SERIALIZABLE";
 
+    public $filter_chain;
+
     protected $handler;
     protected $database;
     protected $parameter_holder;
     protected $isolation;
-    protected $filter_chain;
     protected $identity_mapper;
     protected $maps = array();
     protected $logger;
