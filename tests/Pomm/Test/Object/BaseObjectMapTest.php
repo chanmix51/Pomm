@@ -292,6 +292,22 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_object($pager), 'Pager in an object');
         $this->assertInstanceOf('\Pomm\Object\Pager', $pager, 'Pager is a Pager instance.');
     }
+
+    public function testFormatFields()
+    {
+        $field_list = static::$map->formatFields('getSelectFields');
+        $this->assertEquals('"id", "some data", "bool_data", "ts_data", "name"', $field_list, "Field list is correctly formatted without field alias without table alias.");
+        $field_list = static::$map->formatFields('getSelectFields', 'ts');
+        $this->assertEquals('ts."id", ts."some data", ts."bool_data", ts."ts_data", ts."name"', $field_list, "Field list is correctly formatted without field alias with table alias.");
+        $field_list = static::$map->formatFieldsWithAlias('getSelectFields');
+        $this->assertEquals('"id" AS "id", "some data" AS "some data", "bool_data" AS "bool_data", "ts_data" AS "ts_data", "name" AS "name"', $field_list, "Field list is correctly formatted with field alias without table alias.");
+        $field_list = static::$map->formatFieldsWithAlias('getSelectFields', 'ts');
+        $this->assertEquals('ts."id" AS "id", ts."some data" AS "some data", ts."bool_data" AS "bool_data", ts."ts_data" AS "ts_data", ts."name" AS "name"', $field_list, "Field list is correctly formatted with field alias with table alias.");
+        $field_list = static::$map->formatFields(static::$map->getSelectFields('ts'));
+        $this->assertEquals('ts."id", ts."some data", ts."bool_data", ts."ts_data", ts."name"', $field_list, "Calling 'formatFields' with an array.");
+        $field_list = static::$map->formatFieldsWithAlias(static::$map->getSelectFields('ts'));
+        $this->assertEquals('ts."id" AS "id", ts."some data" AS "some data", ts."bool_data" AS "bool_data", ts."ts_data" AS "ts_data", ts."name" AS "name"', $field_list, "Calling 'formatFieldsWithAlias' with an array.");
+    }
 }
 
 class BaseEntityMap extends BaseObjectMap

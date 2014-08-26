@@ -638,18 +638,14 @@ abstract class BaseObjectMap
      *
      * This is used when queries need to format fields with column aliases.
      *
-     * @param String This current map's getFields() method name.
+     * @param Mixed Either this current map's getFields() method name or an
+     * array of fields.
      * @param String Optional table alias.
      * @return String
      */
-    public function formatFieldsWithAlias($field_method, $table_alias = null)
+    public function formatFieldsWithAlias($fields, $table_alias = null)
     {
-        if (!method_exists($this, $field_method))
-        {
-            throw new Exception(sprintf("'%s' method does not exist.", $field_method));
-        }
-
-        $fields = call_user_func(array($this, $field_method), $table_alias);
+        $fields = $this->getFieldsFrom($fields, $table_alias);
         $connection = $this->connection;
 
         return join(', ', array_map(function($name, $table_alias) use ($connection) { return sprintf("%s AS %s", $name, $connection->escapeIdentifier($table_alias)); }, $fields, array_keys($fields)));
@@ -660,18 +656,16 @@ abstract class BaseObjectMap
      *
      * This is used when queries need formatted fields with no column alias.
      *
-     * @param String This current map's getFields() method name.
+     * @param Mixed Either this current map's getFields() method name or an
+     * array of fields.
      * @param String Optional table alias.
      * @return String
      */
-    public function formatFields($field_method, $table_alias = null)
+    public function formatFields($fields, $table_alias = null)
     {
-        if (!method_exists($this, $field_method))
-        {
-            throw new Exception(sprintf("'%s' method does not exist.", $field_method));
-        }
+        $fields = $this->getFieldsFrom($fields, $table_alias);
 
-        return join(', ', call_user_func(array($this, $field_method), $table_alias));
+        return join(', ', $fields);
     }
 
     /**
@@ -817,5 +811,29 @@ abstract class BaseObjectMap
         {
             throw new Exception(sprintf('Given values "%s" do not match PK definition "%s" using class "%s".', print_r($values, true), print_r($this->getPrimaryKey(), true), get_class($this)));
         }
+    }
+
+    /** getFieldsFrom
+     *
+     * Check if the given parameter is an array or a method name
+     *
+     * @param Mixed fields
+     * @return Array fields
+     */
+    protected function getFieldsFrom($fields, $table_alias = null)
+    {
+        if (!is_array($fields))
+        {
+           if (method_exists($this, $fields))
+           {
+               $fields = call_user_func(array($this, $fields), $table_alias);
+           }
+           else
+           {
+               throw new Exception(sprintf("'%s' is neither an array nor a '%s' method.", $fields, get_class($this)));
+           }
+        }
+
+        return $fields;
     }
 }
