@@ -3,6 +3,9 @@
 namespace Pomm\Query;
 
 use \Pomm\Connection\Connection;
+use \Pomm\Exception\Exception as PommException;
+use \Pomm\Exception\SqlException;
+use \Pomm\Exception\ConnectionException;
 use \Psr\Log\LogLevel;
 
 /**
@@ -17,7 +20,6 @@ use \Psr\Log\LogLevel;
 class PreparedQuery
 {
     protected $connection;
-    protected $stmt;
     protected $sql;
     private $active = false;
     private $name;
@@ -51,13 +53,13 @@ class PreparedQuery
         $this->connection = $connection;
         $this->sql = $sql;
         $this->name = static::getSignatureFor($sql);
-        $this->stmt = pg_prepare($this->connection->getHandler(), $this->name, $this->escapePlaceHolders($sql));
 
-        if ($this->stmt === false)
+        if (pg_send_prepare($this->connection->getHandler(), $this->name, $this->escapePlaceHolders($sql)) === false)
         {
-            $this->connection->throwConnectionException(sprintf("Could not prepare statement «%s».", $sql), LogLevel::ERROR);
+            throw new ConnectionException(sprintf("Could not prepare statement «%s».", $sql));
         }
 
+        $this->connection->getQueryResult();
         $this->active = true;
     }
 
@@ -87,17 +89,15 @@ class PreparedQuery
     {
         if ($this->active === false)
         {
-            $this->connection->throwConnectionException(sprintf("Cannot execute inactive statement '%s'.", $this->getName()), LogLevel::ERROR);
+            throw new PommException(sprintf("Cannot execute inactive statement '%s'.", $this->getName()));
         }
 
-        $res = @pg_execute($this->connection->getHandler(), $this->name, $this->prepareValues($values));
-
-        if ($res === false)
+        if (pg_send_execute($this->connection->getHandler(), $this->name, $this->prepareValues($values)) === false)
         {
-            $this->connection->throwConnectionException(sprintf("Error while executing prepared statement '%s'.", $this->getName()), LogLevel::ERROR);
+            throw new ConnectionException(sprintf("Connection error while executing query '%s'.", $this->name));
         }
 
-        return $res;
+        return $this->connection->getQueryResult($this->sql);
     }
 
     /**

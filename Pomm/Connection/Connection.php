@@ -31,6 +31,8 @@ class Connection implements LoggerAwareInterface
     const ISOLATION_READ_COMMITTED = "READ COMMITTED";
     const ISOLATION_READ_REPEATABLE = "READ REPEATABLE"; // from Pg 9.1
     const ISOLATION_SERIALIZABLE = "SERIALIZABLE";
+    const CONSTRAINTS_DEFERRED = "DEFERRED";
+    const CONSTRAINTS_IMMEDIATE = "IMMEDIATE";
 
     public $filter_chain;
 
@@ -234,7 +236,7 @@ class Connection implements LoggerAwareInterface
         {
             $this->executeAnonymousQuery(sprintf("BEGIN TRANSACTION ISOLATION LEVEL %s", $this->isolation));
         }
-        catch(SqlException $e)
+        catch(ConnectionException $e)
         {
             $this->log(LogLevel::ERROR, sprintf("Cannot begin transaction (isolation level '%s').", $this->isolation));
 
@@ -258,7 +260,7 @@ class Connection implements LoggerAwareInterface
         {
             $this->executeAnonymousQuery("COMMIT TRANSACTION");
         }
-        catch(SqlException $e)
+        catch(ConnectionException $e)
         {
             $this->log(LogLevel::ERROR, sprintf("Cannot commit transaction (isolation level '%s').", $this->isolation));
 
@@ -292,7 +294,7 @@ class Connection implements LoggerAwareInterface
                 $this->executeAnonymousQuery(sprintf("ROLLBACK TO SAVEPOINT %s", $this->escapeIdentifier($name)));
             }
         }
-        catch (SqlException $e)
+        catch (ConnectionException $e)
         {
             $this->log(LogLevel::ERROR, sprintf("Failed to rollback transaction (savepoint '%s') with isolation transaction '%s'.", $name, $this->isolation));
 
@@ -317,7 +319,7 @@ class Connection implements LoggerAwareInterface
         {
             $this->executeAnonymousQuery(sprintf("SAVEPOINT %s", $this->escapeIdentifier($name)));
         }
-        catch (SqlException $e)
+        catch (ConnectionException $e)
         {
             $this->log(LogLevel::ERROR, sprintf("Failed to create savepoint '%s'.", $name));
 
@@ -342,9 +344,57 @@ class Connection implements LoggerAwareInterface
         {
             $this->executeAnonymousQuery(sprintf("RELEASE SAVEPOINT %s", $this->escapeIdentifier($name)));
         }
-        catch (SqlException $e)
+        catch (ConnectionException $e)
         {
             $this->log(LogLevel::ERROR, sprintf("Failed to release savepoint '%s'.", $name));
+
+            throw $e;
+        }
+
+        return $this;
+    }
+
+    /**
+     * setConstraints
+     *
+     * Set constraints deferred or immediate in the current transaction.
+     * Since indicating the schema is recommended, Postgresql will look through
+     * the search path if none is specified in the keys. If the schema name is
+     * specified, it is prepend to the keys names.
+     *
+     * @access public
+     * @param Array contraint names (['ALL'] for all constraints)
+     * @param String the schema name
+     * @param String CONSTRAINTS_IMMEDIATE or CONSTRAINTS_DEFERRED
+     * @return Connection
+     */
+    public function setConstraints(Array $names, $schema = null, $check = null)
+    {
+        if ($check === null)
+        {
+            $check = static::CONSTRAINTS_DEFERRED;
+        }
+
+        if ($schema !== null)
+        {
+            foreach($names as $index => $name)
+            {
+                $names[$index] = sprintf("%s.%s", $schema, $name);
+            }
+        }
+
+        if (!$this->isInTransaction())
+        {
+            throw new ConnectionException(sprintf("Cannot set constraints timing while not in a transaction (%s {%s}).", join(', ', $names), $check));
+        }
+
+        try
+        {
+            $this->executeAnonymousQuery(sprintf("SET CONSTRAINTS %s %s", join(', ', $names), $check));
+        }
+        catch(ConnectionException $e)
+        {
+            $this->log(LogLevel::ERROR, sprintf("Failed to set constraints {%s} to '%s'.", join(', ', $names), $check));
 
             throw $e;
         }
@@ -362,13 +412,38 @@ class Connection implements LoggerAwareInterface
      */
     public function isInTransaction()
     {
-        return (bool) (pg_transaction_status($this->getHandler()) !== \PGSQL_TRANSACTION_IDLE);
+        $status = $this->getTransactionStatus();
+
+        return (bool) ($status === \PGSQL_TRANSACTION_INTRANS || $status === \PGSQL_TRANSACTION_INERROR || $status === \PGSQL_TRANSACTION_ACTIVE);
+    }
+
+    /**
+     * isTransactionValid
+     *
+     * Is the current transaction is a valid state ?
+     *
+     * @return Bool
+     */
+
+    public function isTransactionValid()
+    {
+        $status = $this->getTransactionStatus();
+        $this->executeAnonymousQuery(sprintf("SELECT %d::int as transaction_status", $status));
+
+        return (bool) ($status === \PGSQL_TRANSACTION_INTRANS || $status === \PGSQL_TRANSACTION_ACTIVE);
     }
 
     /**
      * getTransactionStatus
      *
-     * Return the transaction status of the connection.
+     * Return the transaction status of the connection. Because PHP's
+     * documentation is not clear about what constant is what and begging to
+     * know what integer 2 is, here is an array of constants values:
+     * PGSQL_TRANSACTION_IDLE    = 0 ; ready, not in transaction
+     * PGSQL_TRANSACTION_ACTIVE  = 1 ; some computations are deferred to the end of the transaction
+     * PGSQL_TRANSACTION_INTRANS = 2 ; ready, in a transaction
+     * PGSQL_TRANSACTION_INERROR = 3 ; discarded in transaction
+     * PGSQL_TRANSACTION_UNKNOWN = 4 ; meaningful
      *
      * @access public
      * @link   see http://fr2.php.net/manual/en/function.pg-transaction-status.php
@@ -418,7 +493,7 @@ class Connection implements LoggerAwareInterface
                 $this->executeAnonymousQuery(sprintf("NOTIFY %s, %s", $name,  $this->escapeLiteral($payload)));
             }
         }
-        catch(SqlException $e)
+        catch(ConnectionException $e)
         {
             $this->log(LogLevel::ERROR, sprintf("Could not notify '%s' event.", $name));
 
@@ -484,11 +559,40 @@ class Connection implements LoggerAwareInterface
 
         if ($ret === false)
         {
-            $this->log(LogLevel::ERROR, sprintf("Anonymous query « %s » failed.", $sql));
-            throw new SqlException($ret, $sql);
+            $this->throwConnectionException(sprintf("Anonymous query « %s » failed.", $sql), LogLevel::ERROR);
         }
 
         return $ret;
+    }
+
+    /**
+     * getQueryResult
+     *
+     * Get an asynchronous query result.
+     *
+     * @throw  ConnectionException if no response are available.
+     * @throw  SqlException if the result is an error.
+     * @param  String (default null) the SQL query to make informative error
+     * message.
+     * @return Resource query result.
+     */
+    public function getQueryResult($sql = null)
+    {
+        $res = pg_get_result($this->getHandler());
+
+        if ($res === false)
+        {
+            $this->throwConnectionException(sprintf("Query result stack is empty."), LogLevel::ERROR);
+        }
+
+        $status = pg_result_status($res, \PGSQL_STATUS_LONG);
+
+        if ($status !== \PGSQL_COMMAND_OK && $status !== \PGSQL_TUPLES_OK)
+        {
+            throw new SqlException($res, $sql);
+        }
+
+        return $res;
     }
 
     /**
