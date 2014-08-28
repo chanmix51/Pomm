@@ -3,10 +3,12 @@
 namespace Pomm\Test\Converter;
 
 use Pomm\Connection\Database;
+use Pomm\Connection\Service;
 use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
 use Pomm\Exception\Exception;
 use Pomm\Exception\SqlException;
+use Pomm\Exception\ConnectionException;
 use Pomm\Converter;
 use Pomm\Type;
 use Pomm\Type\RangeType;
@@ -17,32 +19,19 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
     protected static $super_cv_map;
     protected static $logger;
     protected static $connection;
+    protected static $service;
 
     public static function setUpBeforeClass()
     {
         $database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
 
         static::$connection = $database->getConnection();
-        static::$connection->begin();
+        static::$service = new ConverterService(static::$connection);
+        static::$cv_map = static::$connection->getMapFor('Pomm\Test\Converter\ConverterEntity');
+        static::$service->createSchema();
 
-        try
-        {
-            $sql = 'CREATE SCHEMA pomm_test';
-            static::$connection->executeAnonymousQuery($sql);
-
-            static::$cv_map = static::$connection->getMapFor('Pomm\Test\Converter\ConverterEntity');
-            static::$cv_map->createTable();
-
-            static::$super_cv_map = static::$connection->getMapFor('Pomm\Test\Converter\SuperConverterEntity');
-            static::$super_cv_map->createTable(static::$cv_map);
-            static::$connection->commit();
-        }
-        catch (Exception $e)
-        {
-            static::$connection->rollback();
-
-            throw $e;
-        }
+        static::$super_cv_map = static::$connection->getMapFor('Pomm\Test\Converter\SuperConverterEntity');
+        static::$super_cv_map->createTable(static::$cv_map);
     }
 
     public static function tearDownAfterClass()
@@ -76,7 +65,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
      **/
     public function testString()
     {
-        static::$cv_map->alterText();
+        static::$service->alterText();
         $entity = static::$cv_map->findAll()->current();
         $values = array('some_char' => 'abcdefghij', 'some_varchar' => '1234567890 abcdefghij', 'some_text' => 'Lorem Ipsum', 'arr_varchar' => array('pika', '{"a","b b \'c"}'));
 
@@ -99,7 +88,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $entity['some_text'], "Empty strings are ok.");
         $this->assertEquals(array(null, '123', null, '', null, 'abc'), $entity['arr_varchar'], "Char arrays can contain nulls and emtpy strings.");
 
-        if (static::$cv_map->alterJson() !== false)
+        if (static::$service->alterJson() !== false)
         {
             $some_json = array('pika' => 'chu', 'lot of' => array(1, 2, 3, 4, 5), 'weird chain' => 'foo\'s as "fool"');
             $entity['some_json'] = $some_json;
@@ -127,7 +116,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
      **/
     public function testDate()
     {
-        static::$cv_map->alterDate();
+        static::$service->alterDate();
         $entity = static::$cv_map->findAll()->current();
         $values = array(
             'some_ts' => '2012-06-20 18:34:16.640044+10',
@@ -161,7 +150,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
      **/
     public function testBool()
     {
-        static::$cv_map->alterBool();
+        static::$service->alterBool();
         $entity = static::$cv_map->findAll()->current();
         $values = array('some_bool' => true, 'arr_bool' => array(true, false, true));
 
@@ -190,7 +179,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
      **/
     public function testBinary()
     {
-        static::$cv_map->alterBinary();
+        static::$service->alterBinary();
         $entity = static::$cv_map->findAll()->current();
         $binary = chr(0).chr(27).chr(92).chr(39).chr(32).chr(13);
         $base64 = <<<_
@@ -222,7 +211,7 @@ _;
      **/
     public function testPoint()
     {
-        static::$cv_map->alterPoint();
+        static::$service->alterPoint();
         $entity = static::$cv_map->findAll()->current();
         $values = array(
             'some_point' => new Type\Point(47.21262, -1.55516),
@@ -261,7 +250,7 @@ _;
      **/
     public function testCircle()
     {
-        static::$cv_map->alterCircle();
+        static::$service->alterCircle();
         $entity = static::$cv_map->findAll()->current();
         $values = array(
             'some_circle' => new Type\Circle(new Type\Point(0.1234E9,-2), 10),
@@ -297,7 +286,7 @@ _;
      **/
     public function testSegment()
     {
-        static::$cv_map->alterSegment();
+        static::$service->alterSegment();
         $entity = static::$cv_map->findAll()->current();
         $values = array(
             'some_lseg' => new Type\Segment(new Type\Point(0.1234E9,-2), new Type\Point(10, -10)),
@@ -330,7 +319,7 @@ _;
      **/
     function testHStore()
     {
-        if (static::$cv_map->alterHStore() === false)
+        if (static::$service->alterHStore() === false)
         {
             $this->markTestSkipped("HStore extension could not be found in Postgres, tests skipped.");
 
@@ -351,7 +340,7 @@ _;
      **/
     public function testLTree()
     {
-        if (static::$cv_map->alterLTree() === false)
+        if (static::$service->alterLTree() === false)
         {
             $this->markTestSkipped("Ltree extension could not be found in Postgres, tests skipped.");
 
@@ -395,7 +384,7 @@ _;
      **/
     public function testTsRange()
     {
-        if (static::$cv_map->alterTsRange() === false)
+        if (static::$service->alterTsRange() === false)
         {
             $this->markTestSkipped("tsrange type could not be found, maybe Postgres version < 9.2. Tests skipped.");
 
@@ -452,7 +441,7 @@ _;
      **/
     public function testNumberRangeConverter()
     {
-        if (static::$cv_map->alterNumberRange() === false)
+        if (static::$service->alterNumberRange() === false)
         {
             $this->markTestSkipped("Range types could not be found, maybe Postgres version < 9.2. Tests skipped.");
 
@@ -488,7 +477,7 @@ _;
      */
     public function testRowConverter()
     {
-        static::$cv_map->alterComposite();
+        static::$service->alterComposite();
 
         $entity = static::$cv_map->findAll()->current();
 
@@ -583,168 +572,15 @@ class ConverterEntityMap extends BaseObjectMap
 
     public function createTable()
     {
-        $sql = sprintf("CREATE TABLE %s (id serial PRIMARY KEY, fixed numeric(5,3), fl float4, arr_fl float4[], not_null_string text NOT NULL)", $this->getTableName());
+        $sql = sprintf("create table %s (id serial primary key, fixed numeric(5,3), fl float4, arr_fl float4[], not_null_string text not null)", $this->getTableName());
         $this->connection->executeAnonymousQuery($sql);
     }
 
-    protected function alterTable(Array $fields)
+    public function addColumn($field, $type)
     {
-        $this->connection->begin();
-        try
-        {
-            foreach($fields as $field => $type)
-            {
-                $sql = sprintf("ALTER TABLE %s ADD COLUMN %s %s", $this->getTableName(), $field, $type);
-                if ($ret = $this->connection->executeAnonymousQuery($sql) === false)
-                {
-                    throw new SqlException($ret, $sql);
-                }
-
-                $this->addField($field, strtok($type, '('));
-            }
-
-            $this->connection->commit();
-        }
-        catch(SqlException $e)
-        {
-            $this->connection->rollback();
-
-            throw $e;
-        }
-    }
-
-    public function checkType($type)
-    {
-        $sql = sprintf("SELECT pg_namespace.nspname FROM pg_type JOIN pg_namespace ON pg_type.typnamespace = pg_namespace.oid WHERE typname = '%s'", $type);
-
-        $result = pg_fetch_assoc($this->connection
-            ->executeAnonymousQuery($sql));
-
-        if ($result === false)
-        {
-            return false;
-        }
-
-        return $result['nspname'];
-    }
-
-    public function alterText()
-    {
-        $this->alterTable(array('some_char' => 'char(10)', 'some_varchar' => 'varchar', 'some_text' => 'text', 'arr_varchar' => 'varchar[]'));
-    }
-
-    public function alterDate()
-    {
-        $this->alterTable(array('some_ts' => 'timestamptz', 'some_intv' => 'interval', 'arr_ts' => 'timestamp[]'));
-    }
-
-    public function alterBool()
-    {
-        $this->alterTable(array('some_bool' => 'bool', 'arr_bool' => 'bool[]'));
-    }
-
-    public function alterBinary()
-    {
-        $this->alterTable(array('some_bin' => 'bytea', 'arr_bin' => 'bytea[]'));
-    }
-
-    public function alterPoint()
-    {
-        $this->alterTable(array('some_point' => 'point', 'arr_point' => 'point[]'));
-
-        $this->connection->getDatabase()
-            ->registerConverter('Point', new Converter\PgPoint(), array('point'));
-    }
-
-    public function alterCircle()
-    {
-        $this->alterTable(array('some_circle' => 'circle', 'arr_circle' => 'circle[]'));
-
-        $this->connection->getDatabase()
-            ->registerConverter('Circle', new Converter\PgCircle(), array('circle'));
-    }
-
-    public function alterSegment()
-    {
-        $this->alterTable(array('some_lseg' => 'lseg', 'arr_lseg' => 'lseg[]'));
-
-        $this->connection->getDatabase()
-            ->registerConverter('Segment', new Converter\PgLseg(), array('lseg'));
-    }
-
-    public function alterHStore()
-    {
-        if ($schema = $this->checkType('hstore') === false)
-        {
-            return false;
-        }
-
-        $this->alterTable(array('some_hstore' => 'hstore'));
-
-        $this->connection->getDatabase()
-            ->registerConverter('HStore', new Converter\PgHStore(), array('hstore', 'public.hstore', $schema.'.hstore'));
-    }
-
-    public function alterLTree()
-    {
-        if ($schema = $this->checkType('ltree') === false)
-        {
-            return false;
-        }
-
-        $this->alterTable(array('some_ltree' => 'ltree', 'arr_ltree' => 'ltree[]'));
-
-        $this->connection->getDatabase()
-            ->registerConverter('LTree', new Converter\PgLTree(), array('ltree', 'public.ltree', $schema.'.ltree'));
-    }
-
-    public function alterTsRange()
-    {
-        if ($schema = $this->checkType('tsrange') === false)
-        {
-            return false;
-        }
-
-        $this->alterTable(array('some_tsrange' => 'tsrange', 'arr_tsrange' => 'tsrange[]'));
-
-        $this->connection->getDatabase()
-            ->registerConverter('tsrange', new Converter\PgTsRange(), array('tsrange', 'public.tsrange', $schema.'.tsrange'));
-    }
-
-    public function alterJson()
-    {
-        if ($schema = $this->checkType('json') === false)
-        {
-            return false;
-        }
-
-        $this->alterTable(array('some_json' => 'json', 'arr_json' => 'json[]'));
-    }
-
-    public function alterNumberRange()
-    {
-        if ($schema = $this->checkType('numrange') === false)
-        {
-            return false;
-        }
-
-        $this->alterTable(array('some_int4range' => 'int4range', 'some_int8range' => 'int8range', 'some_numrange' => 'numrange', 'arr_numrange' => 'numrange[]'));
-    }
-
-    public function alterComposite()
-    {
-        $this->connection->executeAnonymousQuery("CREATE TYPE pomm_test.address AS (place TEXT, postal_code CHAR(5), city varchar)");
-        $this->alterTable(array('a_composite' => 'pomm_test.address', 'arr_composite' => 'pomm_test.address[]'));
-
-        $this->connection->getDatabase()
-            ->registerConverter(
-                'Address',
-                new Converter\PgRow(
-                    $this->connection->getDatabase(),
-                    new \Pomm\Object\RowStructure(array('place' => 'text', 'postal_code' => 'char', 'city' => 'varchar')),
-                    '\Pomm\Test\Converter\AddressType'
-                ),
-                array('pomm_test.address', 'address'));
+        $sql = sprintf("alter table %s add column %s %s", $this->getTableName(), $field, $type);
+        $this->connection->executeAnonymousQuery($sql);
+        $this->addField($field, strtok($type, '('));
     }
 
 }
@@ -881,4 +717,185 @@ class AddressType extends \Pomm\Type\Composite
     public $cedex;
 
     protected $something = 'pika';
+}
+
+class ConverterService extends Service
+{
+    public function createSchema()
+    {
+        $this->begin();
+
+        try
+        {
+            $sql = 'create schema pomm_test';
+            $this->connection->executeAnonymousQuery($sql);
+            $this->connection
+                ->getMapFor('Pomm\Test\Converter\ConverterEntity')
+                ->createTable();
+
+            $this->commit();
+        }
+        catch (ConnectionException $e)
+        {
+            $this->rollback();
+
+            throw $e;
+        }
+    }
+
+    public function addColumnsToConverterEntity(Array $fields)
+    {
+        $this->begin();
+        $map = $this->connection->getMapFor('Pomm\Test\Converter\ConverterEntity');
+        try
+        {
+            foreach($fields as $field => $type)
+            {
+                $map->addColumn($field, $type);
+            }
+
+            $this->commit();
+        }
+        catch(SqlException $e)
+        {
+            $this->rollback();
+
+            throw $e;
+        }
+    }
+
+    protected function checkType($type)
+    {
+        $sql = sprintf("select pg_namespace.nspname from pg_type join pg_namespace on pg_type.typnamespace = pg_namespace.oid where typname = '%s'", $type);
+
+        $result = pg_fetch_assoc($this->connection
+            ->executeAnonymousQuery($sql));
+
+        if ($result === false)
+        {
+            return false;
+        }
+
+        return $result['nspname'];
+    }
+
+    public function alterText()
+    {
+        $this->addColumnsToConverterEntity(array('some_char' => 'char(10)', 'some_varchar' => 'varchar', 'some_text' => 'text', 'arr_varchar' => 'varchar[]'));
+    }
+
+    public function alterDate()
+    {
+        $this->addColumnsToConverterEntity(array('some_ts' => 'timestamptz', 'some_intv' => 'interval', 'arr_ts' => 'timestamp[]'));
+    }
+
+    public function alterBool()
+    {
+        $this->addColumnsToConverterEntity(array('some_bool' => 'bool', 'arr_bool' => 'bool[]'));
+    }
+
+    public function alterBinary()
+    {
+        $this->addColumnsToConverterEntity(array('some_bin' => 'bytea', 'arr_bin' => 'bytea[]'));
+    }
+
+    public function alterPoint()
+    {
+        $this->addColumnsToConverterEntity(array('some_point' => 'point', 'arr_point' => 'point[]'));
+
+        $this->connection->getDatabase()
+            ->registerConverter('Point', new Converter\PgPoint(), array('point'));
+    }
+
+    public function alterCircle()
+    {
+        $this->addColumnsToConverterEntity(array('some_circle' => 'circle', 'arr_circle' => 'circle[]'));
+
+        $this->connection->getDatabase()
+            ->registerConverter('Circle', new Converter\PgCircle(), array('circle'));
+    }
+
+    public function alterSegment()
+    {
+        $this->addColumnsToConverterEntity(array('some_lseg' => 'lseg', 'arr_lseg' => 'lseg[]'));
+
+        $this->connection->getDatabase()
+            ->registerConverter('Segment', new Converter\PgLseg(), array('lseg'));
+    }
+
+    public function alterHStore()
+    {
+        if ($schema = $this->checkType('hstore') === false)
+        {
+            return false;
+        }
+
+        $this->addColumnsToConverterEntity(array('some_hstore' => 'hstore'));
+
+        $this->connection->getDatabase()
+            ->registerConverter('HStore', new Converter\PgHStore(), array('hstore', 'public.hstore', $schema.'.hstore'));
+    }
+
+    public function alterLTree()
+    {
+        if ($schema = $this->checkType('ltree') === false)
+        {
+            return false;
+        }
+
+        $this->addColumnsToConverterEntity(array('some_ltree' => 'ltree', 'arr_ltree' => 'ltree[]'));
+
+        $this->connection->getDatabase()
+            ->registerConverter('LTree', new Converter\PgLTree(), array('ltree', 'public.ltree', $schema.'.ltree'));
+    }
+
+    public function alterTsRange()
+    {
+        if ($schema = $this->checkType('tsrange') === false)
+        {
+            return false;
+        }
+
+        $this->addColumnsToConverterEntity(array('some_tsrange' => 'tsrange', 'arr_tsrange' => 'tsrange[]'));
+
+        $this->connection->getDatabase()
+            ->registerConverter('tsrange', new Converter\PgTsRange(), array('tsrange', 'public.tsrange', $schema.'.tsrange'));
+    }
+
+    public function alterJson()
+    {
+        if ($schema = $this->checkType('json') === false)
+        {
+            return false;
+        }
+
+        $this->addColumnsToConverterEntity(array('some_json' => 'json', 'arr_json' => 'json[]'));
+    }
+
+    public function alterNumberRange()
+    {
+        if ($schema = $this->checkType('numrange') === false)
+        {
+            return false;
+        }
+
+        $this->addColumnsToConverterEntity(array('some_int4range' => 'int4range', 'some_int8range' => 'int8range', 'some_numrange' => 'numrange', 'arr_numrange' => 'numrange[]'));
+    }
+
+    public function alterComposite()
+    {
+        $this->connection->executeAnonymousQuery("create type pomm_test.address as (place text, postal_code char(5), city varchar)");
+        $this->addColumnsToConverterEntity(array('a_composite' => 'pomm_test.address', 'arr_composite' => 'pomm_test.address[]'));
+
+        $this->connection->getDatabase()
+            ->registerConverter(
+                'Address',
+                new Converter\PgRow(
+                    $this->connection->getDatabase(),
+                    new \Pomm\Object\RowStructure(array('place' => 'text', 'postal_code' => 'char', 'city' => 'varchar')),
+                    '\Pomm\Test\Converter\AddressType'
+                ),
+                array('pomm_test.address', 'address'));
+    }
+
 }

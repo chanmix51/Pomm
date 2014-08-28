@@ -3,44 +3,31 @@
 namespace Pomm\Test\Object;
 
 use Pomm\Connection\Database;
+use Pomm\Connection\Service;
 use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
 use Pomm\Exception\Exception;
+use Pomm\Exception\ConnectionException;
 use Pomm\Query\Where;
 
 class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
 {
     protected static $map;
     protected static $logger;
+    protected static $service;
 
     public static function setUpBeforeClass()
     {
         $database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
-
-        if (isset($GLOBALS['dev']) && $GLOBALS['dev'] == 'true') 
-        {
-            static::$logger = new \Pomm\Tools\Logger();
-
-            static::$map = $database
-                ->createConnection()
-                ->registerFilter(new \Pomm\FilterChain\LoggerFilter(static::$logger))
-                ->getMapFor('Pomm\Test\Object\BaseEntity');
-        } 
-        else 
-        {
-            static::$map = $database
-                ->createConnection()
-                ->getMapFor('Pomm\Test\Object\BaseEntity');
-        }
-
-        static::$map->createTable();
+        $connection = $database->getConnection();
+        static::$map = $connection->getMapFor('Pomm\Test\Object\BaseEntity');
+        static::$service = new BaseObjectMapService($connection);
+        static::$service->createSchema();
     }
 
     public static function tearDownAfterClass()
     {
-        static::$map->dropTable();
-
-        !is_null(static::$logger) && print_r(static::$logger);
+        static::$service->dropSchema();
     }
 
     public function testHydrate()
@@ -325,36 +312,27 @@ class BaseEntityMap extends BaseObjectMap
 
     public function createTable()
     {
-        try {
-            $this->connection->begin();
-            $sql = "CREATE SCHEMA pomm_test";
-            $this->connection->executeAnonymousQuery($sql);
-            $sql = sprintf("CREATE TABLE %s (id serial PRIMARY KEY, \"some data\" varchar NOT NULL, bool_data boolean NOT NULL DEFAULT false, ts_data timestamp)", $this->getTableName());
-            $this->connection->executeAnonymousQuery($sql);
-            $this->connection->commit();
-        } catch (Exception $e) {
-            $this->connection->rollback();
-            throw $e;
-        }
+        $sql = sprintf("create table %s (id serial primary key, \"some data\" varchar not null, bool_data boolean not null default false, ts_data timestamp)", $this->getTableName());
+        $this->connection->executeAnonymousQuery($sql);
     }
 
     public function dropTable()
     {
-        $sql = "DROP SCHEMA pomm_test CASCADE";
+        $sql = "drop schema pomm_test cascade";
         $this->connection->executeAnonymousQuery($sql);
     }
 
     public function changeToMultiplePrimaryKey()
     {
-        $sql = sprintf('TRUNCATE TABLE %s', $this->getTableName());
+        $sql = sprintf("truncate table %s", $this->getTableName());
         $this->connection->executeAnonymousQuery($sql);
 
         $this->changeToNoPrimaryKey();
 
-        $sql = sprintf('ALTER TABLE %s ADD COLUMN name varchar NOT NULL', $this->getTableName());;
+        $sql = sprintf("alter table %s add column name varchar not null", $this->getTableName());;
         $this->connection->executeAnonymousQuery($sql);
 
-        $sql = sprintf('ALTER TABLE %s ADD PRIMARY KEY (id, name)', $this->getTableName());
+        $sql = sprintf("alter table %s add primary key (id, name)", $this->getTableName());
         $this->connection->executeAnonymousQuery($sql);
 
         $this->addField('name', 'varchar');
@@ -363,16 +341,16 @@ class BaseEntityMap extends BaseObjectMap
 
     public function changeToNoPrimaryKey()
     {
-        $sql = sprintf('ALTER TABLE %s DROP CONSTRAINT base_entity_pkey', $this->getTableName());;
+        $sql = sprintf("alter table %s drop constraint base_entity_pkey", $this->getTableName());;
         $this->connection->executeAnonymousQuery($sql);
     }
 
     public function insertSomeData()
     {
-        $sql = sprintf('TRUNCATE TABLE %s', $this->getTableName());
+        $sql = sprintf("truncate table %s", $this->getTableName());
         $this->connection->executeAnonymousQuery($sql);
 
-        $sql = sprintf("INSERT INTO %s (id, name, \"some data\", ts_data) VALUES (1, 'echo', 'data', '1975-06-29 21:15:43.123456'), (4, 'bravo', 'data', null), (3, 'charly', 'data', '1986-12-21 18:32:45.123456'), (2, 'dingo', 'data', '1993-06-29 02:45:33.123456'), (5, 'alpha', 'data', '2007-09-08 04:01:00.000000')", $this->getTableName());
+        $sql = sprintf("insert into %s (id, name, \"some data\", ts_data) values (1, 'echo', 'data', '1975-06-29 21:15:43.123456'), (4, 'bravo', 'data', null), (3, 'charly', 'data', '1986-12-21 18:32:45.123456'), (2, 'dingo', 'data', '1993-06-29 02:45:33.123456'), (5, 'alpha', 'data', '2007-09-08 04:01:00.000000')", $this->getTableName());
         $this->connection->executeAnonymousQuery($sql);
     }
 }
@@ -381,3 +359,29 @@ class BaseEntity extends BaseObject
 {
 }
 
+class BaseObjectMapService extends Service
+{
+    public function createSchema()
+    {
+        try {
+            $this->begin();
+            $sql = "create schema pomm_test";
+            $this->connection->executeAnonymousQuery($sql);
+            $this->connection->getMapFor('Pomm\Test\Object\BaseEntity')->createTable();
+            $this->commit();
+        } catch (Exception $e) {
+            $this->connection->rollback();
+            throw $e;
+        }
+
+        return $this;
+    }
+
+    public function dropSchema()
+    {
+            $sql = "drop schema pomm_test cascade";
+            $this->connection->executeAnonymousQuery($sql);
+
+            return $this;
+    }
+}

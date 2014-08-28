@@ -3,6 +3,7 @@
 namespace Pomm\Test\Connection;
 
 use Pomm\Connection\Database;
+use Pomm\Connection\Service;
 
 class ObserverTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,24 +17,24 @@ class ObserverTest extends \PHPUnit_Framework_TestCase
 
     public function testNotify()
     {
-        $connection1 = static::$database->createConnection();
-        $connection2 = static::$database->createConnection();
+        $service1 = new ObserverService(static::$database->createConnection());
+        $service2 = new ObserverService(static::$database->createConnection());
 
-        $observer = $connection1->createObserver()
+        $observer = $service1->createObserver()
             ->listen("plop");
 
         for ($i = 0; $i < 10; $i++)
         {
             if ($i % 3 === 0)
             {
-                $connection2->notify('plop', "data $i");
+                $service2->notify('plop', "data $i");
             }
             else
             {
-                $connection2->notify('other event');
+                $service2->notify('other event');
             }
 
-            sleep(1);
+            sleep(0.8);
             $data = $observer->getNotification();
 
             if ($i % 3 === 0)
@@ -47,9 +48,21 @@ class ObserverTest extends \PHPUnit_Framework_TestCase
             }
         }
 
-        $connection2->notify('plop');
+        $service2->notify('plop');
         $data = $observer->getNotification();
         $this->assertEquals("", $data['payload'], 'When no payload, return an empty string.');
     }
 }
 
+class ObserverService extends Service
+{
+    public function createObserver()
+    {
+        return parent::createObserver();
+    }
+
+    public function notify($event, $payload)
+    {
+        return parent::notify($event, $payload);
+    }
+}
