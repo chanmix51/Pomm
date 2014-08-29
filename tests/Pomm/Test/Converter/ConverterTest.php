@@ -28,16 +28,14 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         static::$connection = $database->getConnection();
         static::$service = new ConverterService(static::$connection);
         static::$cv_map = static::$connection->getMapFor('Pomm\Test\Converter\ConverterEntity');
-        static::$service->createSchema();
-
         static::$super_cv_map = static::$connection->getMapFor('Pomm\Test\Converter\SuperConverterEntity');
-        static::$super_cv_map->createTable(static::$cv_map);
+
+        static::$service->createSchema();
     }
 
     public static function tearDownAfterClass()
     {
-        $sql = 'DROP SCHEMA pomm_test CASCADE';
-        static::$connection->executeAnonymousQuery($sql);
+        static::$service->dropSchema();
     }
 
     public function testInteger()
@@ -604,7 +602,7 @@ class SuperConverterEntityMap extends BaseObjectMap
 
     public function createTable(ConverterEntityMap $map)
     {
-        $sql = sprintf('CREATE TABLE %s (id serial PRIMARY KEY, cv_entities pomm_test.cv_entity[])', $this->getTableName());
+        $sql = sprintf('create table %s (id serial primary key, cv_entities pomm_test.cv_entity[])', $this->getTableName());
         $this->connection
             ->executeAnonymousQuery($sql);
 
@@ -721,17 +719,25 @@ class AddressType extends \Pomm\Type\Composite
 
 class ConverterService extends Service
 {
+    protected function getMapFor($class)
+    {
+        return $this->connection->getMapFor(sprintf("\Pomm\Test\Converter\%s", $class));
+    }
+
     public function createSchema()
     {
         $this->begin();
 
         try
         {
+            $this->dropSchema();
             $sql = 'create schema pomm_test';
             $this->connection->executeAnonymousQuery($sql);
-            $this->connection
-                ->getMapFor('Pomm\Test\Converter\ConverterEntity')
+
+            $this->getMapFor('ConverterEntity')
                 ->createTable();
+            $this->getMapFor('SuperConverterEntity')
+                ->createTable($this->getMapFor('ConverterEntity'));
 
             $this->commit();
         }
@@ -741,6 +747,16 @@ class ConverterService extends Service
 
             throw $e;
         }
+
+        return $this;
+    }
+
+    public function dropSchema()
+    {
+        $sql = 'drop schema if exists pomm_test cascade';
+        $this->connection->executeAnonymousQuery($sql);
+
+        return $this;
     }
 
     public function addColumnsToConverterEntity(Array $fields)
@@ -897,5 +913,4 @@ class ConverterService extends Service
                 ),
                 array('pomm_test.address', 'address'));
     }
-
 }
