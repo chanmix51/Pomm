@@ -51,6 +51,18 @@ class Service
     }
 
     /**
+     * getDatabases
+     * Returns all Database objects
+     *
+     * @access public
+     * @return Array
+     */
+    public function getDatabases()
+    {
+        return $this->databases;
+    }
+
+    /**
      * getDatabase
      * Returns the corresponding Database or the first one if no name is provided
      *
