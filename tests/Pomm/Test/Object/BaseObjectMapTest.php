@@ -316,12 +316,6 @@ class BaseEntityMap extends BaseObjectMap
         $this->connection->executeAnonymousQuery($sql);
     }
 
-    public function dropTable()
-    {
-        $sql = "drop schema pomm_test cascade";
-        $this->connection->executeAnonymousQuery($sql);
-    }
-
     public function changeToMultiplePrimaryKey()
     {
         $sql = sprintf("truncate table %s", $this->getTableName());
@@ -365,8 +359,7 @@ class BaseObjectMapService extends Service
     {
         try {
             $this->begin();
-            $sql = "create schema pomm_test";
-            $this->connection->executeAnonymousQuery($sql);
+            $this->connection->executeAnonymousQuery( 'create schema pomm_test');
             $this->connection->getMapFor('Pomm\Test\Object\BaseEntity')->createTable();
             $this->commit();
         } catch (Exception $e) {

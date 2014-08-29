@@ -5,11 +5,13 @@ namespace Pomm\Test\Tools;
 use Pomm\Connection\Database;
 use Pomm\Exception\Exception;
 use Pomm\Tools\CreateBaseMapTool;
+use Pomm\Connection\Service;
 
 class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
 {
     protected static $connection;
     protected static $tmp_dir;
+    protected static $service;
 
     public static function setUpBeforeClass()
     {
@@ -27,40 +29,13 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
         $database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
 
         static::$connection = $database->createConnection();
-        static::$connection->begin();
-
-        try
-        {
-            $sql = 'CREATE SCHEMA pomm_test';
-            static::$connection->executeAnonymousQuery($sql);
-
-            $sql = 'CREATE TABLE pomm_test.pika (id serial PRIMARY KEY, some_char char(10), some_varchar varchar)';
-            static::$connection->executeAnonymousQuery($sql);
-
-            $sql = 'CREATE TYPE pomm_test.some_type AS (ts timestamp, md5 char(32))';
-            static::$connection->executeAnonymousQuery($sql);
-
-            $sql = 'CREATE TABLE pomm_test.chu (some_some_type pomm_test.some_type) INHERITS (pomm_test.pika)';
-            static::$connection->executeAnonymousQuery($sql);
-
-            $sql = 'ALTER TABLE pomm_test.pika ADD COLUMN fixed_arr numeric(4,3)[]';
-            static::$connection->executeAnonymousQuery($sql);
-
-            static::$connection->commit();
-        }
-        catch (Exception $e)
-        {
-            static::$connection->rollback();
-
-            throw $e;
-        }
+        static::$service = new CreateBaseMapToolService(static::$connection);
+        static::$service->createSchema();
     }
 
     public static function tearDownAfterClass()
     {
-        $sql = 'DROP SCHEMA pomm_test CASCADE';
-        static::$connection->executeAnonymousQuery($sql);
-
+        static::$service->dropSchema();
         exec(sprintf('rm -r %s', static::$tmp_dir.DIRECTORY_SEPARATOR.'TestDb'));
     }
 
@@ -111,5 +86,45 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
             'namespace' => '%dbname%\%schema%Prod',
             'parent_namespace' => '%dbname%\%schema%',
         ));
+    }
+}
+
+class CreateBaseMapToolService extends Service
+{
+    public function createSchema()
+    {
+        $this->begin();
+
+        try
+        {
+            $sql = 'create schema pomm_test';
+            $this->connection->executeAnonymousQuery($sql);
+
+            $sql = 'create table pomm_test.pika (id serial primary key, some_char char(10), some_varchar varchar)';
+            $this->connection->executeAnonymousQuery($sql);
+
+            $sql = 'create type pomm_test.some_type as (ts timestamp, md5 char(32))';
+            $this->connection->executeAnonymousQuery($sql);
+
+            $sql = 'create table pomm_test.chu (some_some_type pomm_test.some_type) inherits (pomm_test.pika)';
+            $this->connection->executeAnonymousQuery($sql);
+
+            $sql = 'alter table pomm_test.pika add column fixed_arr numeric(4,3)[]';
+            $this->connection->executeAnonymousQuery($sql);
+
+            $this->commit();
+        }
+        catch (Exception $e)
+        {
+            $this->rollback();
+
+            throw $e;
+        }
+    }
+
+    public function dropSchema()
+    {
+        $sql = 'drop schema pomm_test cascade';
+        $this->connection->executeAnonymousQuery($sql);
     }
 }

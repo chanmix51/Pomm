@@ -332,6 +332,56 @@ class Connection implements LoggerAwareInterface
     }
 
     /**
+     * createObserver
+     *
+     * Return an observer object. This is a convenient method to create an
+     * observer and chain methods.
+     *
+     * @access public
+     * @return Observer
+     */
+    public function createObserver()
+    {
+        return new Observer($this);
+    }
+
+    /**
+     * notify
+     *
+     * Send a server notification.
+     *
+     * @access public
+     * @link see http://www.postgresql.org/docs/9.0/static/sql-notify.html
+     * @param  String $name the notification name
+     * @param  Sting  $payload optionnal transmitted data
+     * @return Connection
+     */
+    public function notify($name, $payload = null)
+    {
+        $name = $this->escapeIdentifier($name);
+
+        try
+        {
+            if (empty($payload))
+            {
+                $this->executeAnonymousQuery(sprintf("NOTIFY %s", $name));
+            }
+            else
+            {
+                $this->executeAnonymousQuery(sprintf("NOTIFY %s, %s", $name,  $this->escapeLiteral($payload)));
+            }
+        }
+        catch(ConnectionException $e)
+        {
+            $this->log(LogLevel::ERROR, sprintf("Could not notify '%s' event.", $name));
+
+            throw $e;
+        }
+
+        return $this;
+    }
+
+    /**
      * log
      *
      * If a logger is defined, log the given message.

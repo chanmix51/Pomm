@@ -3,6 +3,7 @@
 namespace Pomm\Test\Tools;
 
 use Pomm\Connection\Database;
+use Pomm\Connection\Service;
 use Pomm\Exception\Exception;
 use Pomm\Tools\ScanSchemaTool;
 
@@ -10,6 +11,7 @@ class ScanSchemaToolTest extends \PHPUnit_Framework_TestCase
 {
     protected static $connection;
     protected static $tmp_dir;
+    protected static $service;
 
     public static function setUpBeforeClass()
     {
@@ -28,37 +30,13 @@ class ScanSchemaToolTest extends \PHPUnit_Framework_TestCase
         $database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
 
         static::$connection = $database->createConnection();
-        static::$connection->begin();
-
-        try
-        {
-            $sql = 'CREATE SCHEMA pomm_test';
-            static::$connection->executeAnonymousQuery($sql);
-
-            $sql = 'CREATE TABLE pomm_test.pika1 (pika1_id int4)';
-            static::$connection->executeAnonymousQuery($sql);
-
-            $sql = 'CREATE TABLE pomm_test.pika2 (pika2_id int4)';
-            static::$connection->executeAnonymousQuery($sql);
-
-            $sql = 'CREATE TABLE pomm_test.pika3 (pika3_id int4)';
-            static::$connection->executeAnonymousQuery($sql);
-
-            static::$connection->commit();
-        }
-        catch (Exception $e)
-        {
-            static::$connection->rollback();
-
-            throw $e;
-        }
+        static::$service = new ScanSchemaToolService(static::$connection);
+        static::$service->createSchema();
     }
 
     public static function tearDownAfterClass()
     {
-        $sql = 'DROP SCHEMA pomm_test CASCADE';
-        static::$connection->executeAnonymousQuery($sql);
-
+        static::$service->dropSchema();
         exec(sprintf("rm -r %s", static::$tmp_dir.DIRECTORY_SEPARATOR."TestDb"));
     }
 
@@ -99,5 +77,41 @@ class ScanSchemaToolTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($path.DIRECTORY_SEPARATOR.'Pika2.php');
         $this->assertFileExists($path.DIRECTORY_SEPARATOR.'Pika2Map.php');
         $this->assertFileExists($path.DIRECTORY_SEPARATOR.'Base'.DIRECTORY_SEPARATOR.'Pika2Map.php');
+    }
+}
+
+class ScanSchemaToolService extends Service
+{
+    public function createSchema()
+    {
+        $this->begin();
+        try
+        {
+            $sql = 'create schema pomm_test';
+            $this->connection->executeAnonymousQuery($sql);
+
+            $sql = 'create table pomm_test.pika1 (pika1_id int4)';
+            $this->connection->executeAnonymousQuery($sql);
+
+            $sql = 'create table pomm_test.pika2 (pika2_id int4)';
+            $this->connection->executeAnonymousQuery($sql);
+
+            $sql = 'create table pomm_test.pika3 (pika3_id int4)';
+            $this->connection->executeAnonymousQuery($sql);
+
+            $this->commit();
+        }
+        catch (ConnectionException $e)
+        {
+            $this->rollback();
+
+            throw $e;
+        }
+    }
+
+    public function dropSchema()
+    {
+        $sql = 'drop schema pomm_test cascade';
+        $this->connection->executeAnonymousQuery($sql);
     }
 }
