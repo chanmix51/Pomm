@@ -46,6 +46,9 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
             $sql = 'ALTER TABLE pomm_test.pika ADD COLUMN fixed_arr numeric(4,3)[]';
             static::$connection->executeAnonymousQuery($sql);
 
+            $sql = 'COMMENT ON TABLE pomm_test.chu IS $comment$This is a useful comment on table chu.$comment$';
+            static::$connection->executeAnonymousQuery($sql);
+
             static::$connection->commit();
         }
         catch (Exception $e)

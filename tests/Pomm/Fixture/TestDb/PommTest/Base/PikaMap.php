@@ -5,6 +5,11 @@ namespace TestDb\PommTest\Base;
 use \Pomm\Object\BaseObjectMap;
 use \Pomm\Exception\Exception;
 
+/**
+ * PikaMap
+ *
+ * Structure definition for class PikaMap.
+ */
 abstract class PikaMap extends BaseObjectMap
 {
     public function initialize()

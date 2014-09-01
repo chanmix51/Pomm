@@ -5,6 +5,14 @@ namespace TestDb\PommTestProd\Base;
 use \Pomm\Object\BaseObjectMap;
 use \Pomm\Exception\Exception;
 
+/**
+ * ChuMap
+ *
+ * Structure definition for class ChuMap.
+ *
+ * This is a useful comment on table chu.
+ *
+ */
 abstract class ChuMap extends \TestDb\PommTest\PikaMap
 {
     public function initialize()

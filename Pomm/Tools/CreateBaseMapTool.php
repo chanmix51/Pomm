@@ -95,6 +95,16 @@ class CreateBaseMapTool extends CreateFileTool
         $extends     = $this->options['extends'];
         $primary_key = join(', ', $this->inspector->getTablePrimaryKey($this->options['oid']));
         $map_name   =  sprintf("%sMap", $class_name);
+        $table_infos = $this->inspector->getTableInformation($this->options['oid']);
+
+        if ($table_infos['comment'] !== null)
+        {
+            $class_comment = sprintf(" *\n * %s\n *\n", $table_infos['comment']);
+        }
+        else
+        {
+            $class_comment = '';
+        }
 
         if ($inherits = $this->inspector->getTableParents($this->options['oid']))
         {
@@ -133,6 +143,11 @@ namespace $namespace;
 use \\Pomm\\Object\\BaseObjectMap;
 use \\Pomm\\Exception\\Exception;
 
+/**
+ * $map_name
+ *
+ * Structure definition for class $map_name.
+$class_comment */
 abstract class $map_name extends $extends
 {
     public function initialize()

@@ -107,7 +107,7 @@ SQL;
      */
     public function getTableInformation($oid)
     {
-        $sql = sprintf("SELECT c.oid AS table_oid, n.oid AS schema_oid, n.nspname AS \"schema\", c.relname AS \"table\" FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.oid = %d;", $oid);
+        $sql = sprintf("SELECT c.oid AS table_oid, n.oid AS schema_oid, n.nspname AS \"schema\", c.relname AS \"table\", obj_description(c.oid, 'pg_class') as \"comment\" FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.oid = %d;", $oid);
         $result_handler = pg_query($this->connection->getHandler(), $sql);
 
         $information = pg_fetch_assoc($result_handler);
@@ -302,5 +302,17 @@ SQL;
         $result_handler = pg_query($this->connection->getHandler(), $sql);
 
         return (pg_num_rows($result_handler) == 1);
+    }
+
+    /**
+     * getCommentFor
+     *
+     * Return the comment for the given object.
+     *
+     * @param Integer object's OID
+     * @return String the comment
+     */
+    public function getCommentFor($oid)
+    {
     }
 }
