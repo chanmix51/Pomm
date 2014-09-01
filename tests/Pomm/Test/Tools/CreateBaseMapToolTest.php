@@ -49,6 +49,9 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
             $sql = 'COMMENT ON TABLE pomm_test.chu IS $comment$This is a useful comment on table chu.$comment$';
             static::$connection->executeAnonymousQuery($sql);
 
+            $sql = "COMMENT ON COLUMN pomm_test.chu.some_some_type IS \$comment\$comment on\nsome_some_type\$comment\$";
+            static::$connection->executeAnonymousQuery($sql);
+
             static::$connection->commit();
         }
         catch (Exception $e)

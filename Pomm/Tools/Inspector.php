@@ -168,6 +168,7 @@ SELECT
         a.atthasdef
   ) as defaultval,
   a.attnotnull as notnull,
+  col_description(a.attrelid, a.attnum) as "comment",
   a.attnum as index
 FROM
   pg_catalog.pg_attribute a
@@ -190,7 +191,7 @@ SQL;
         $attributes = array();
         while ($class = pg_fetch_assoc($result_handler))
         {
-            $attributes[] = array('attname' => $class['attname'], 'format_type' => $class['type_namespace'] == 'pg_catalog' ? $class['type'] : sprintf("%s.%s", $class['type_namespace'], $class['type']));
+            $attributes[] = array('attname' => $class['attname'], 'format_type' => $class['type_namespace'] == 'pg_catalog' ? $class['type'] : sprintf("%s.%s", $class['type_namespace'], $class['type']), 'comment' => $class['comment']);
         }
 
         return $attributes;

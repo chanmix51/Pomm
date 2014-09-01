@@ -192,7 +192,8 @@ EOD;
                 $field_type = $attribute['format_type'];
             }
 
-            $fields_definition .= sprintf("        \$this->addField('%s', '%s');\n", $field_name, $field_type);
+            $comment = $attribute['comment'] !== null ? sprintf(" // %s", str_replace("\n", ' ', $attribute['comment'])) : '';
+            $fields_definition .= sprintf("        \$this->addField('%s', '%s');%s\n", $field_name, $field_type, $comment);
         }
 
         return $fields_definition;
