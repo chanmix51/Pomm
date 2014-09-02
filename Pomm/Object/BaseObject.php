@@ -23,6 +23,8 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
     const EXIST    = 1;
     const MODIFIED = 2;
 
+    public static $strict = true;
+
     protected $fields = array();
     protected $status = self::NONE;
 
@@ -58,7 +60,7 @@ abstract class BaseObject implements \ArrayAccess, \IteratorAggregate
             {
                 return $this->fields[$var];
             }
-            else
+            elseif (static::$strict === true)
             {
                 throw new PommException(sprintf("No such key '%s'.", $var));
             }

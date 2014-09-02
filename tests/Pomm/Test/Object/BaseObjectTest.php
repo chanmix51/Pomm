@@ -133,6 +133,19 @@ class BaseObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($entity->offsetExists('plop'), "'plop' exists as an array key.");
         $this->assertTrue(!$entity->has('pika'), "'pika' never exists.");
 
+        BaseObject::$strict = false;
+        try
+        {
+            $ret = $entity->getPika();
+            $this->assertTrue(true, 'When not strict, it does not throw an exception.');
+            $this->assertNull($ret, 'And the result is null');
+        }
+        catch(\Pomm\Exception\Exception $e)
+        {
+            $this->fail('When not strict, it does not throw an exception (exception caught).');
+        }
+
+        BaseObject::$strict = true;
         $entity->getPika();
     }
 
