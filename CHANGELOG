@@ -1,3 +1,14 @@
+=== 1.2.2
+
+ * Better connection closing.
+ * PK definition checking in BaseObjectMap (close #144)
+ * PgTsRange::fromPg must not necessary check for double quotes (A.Buchoux)
+ * Bug in BaseObject::isNew() (A.Buchoux)
+ * Update documentation.html
+ * Update documentation.rst
+ * BaseObject::hydrate returns $this
+ * Escape schema and table names
+
 === 1.2.1
 
  * Fix Pomm\Object\Collection::rewind() (#130)
