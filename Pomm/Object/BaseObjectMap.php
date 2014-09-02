@@ -6,6 +6,7 @@ use \Pomm\Exception\Exception;
 use \Pomm\Query\Where;
 use \Pomm\Connection\Connection;
 use \Pomm\Converter\PgRow;
+use \Pomm\Converter\PgEntity;
 
 /**
  * BaseObjectMap
@@ -72,6 +73,7 @@ abstract class BaseObjectMap
         }
 
         $this->converter = new PgRow($this->connection->getDatabase(), $this->row_structure);
+        $this->connection->getDatabase()->registerConverter($this->object_class, new PgEntity($this), array($this->getTableName()));
     }
 
     /**

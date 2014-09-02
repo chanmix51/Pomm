@@ -198,7 +198,7 @@ class Database
      */
     public function getConverterForType($pg_type)
     {
-        if (isset($this->handled_types[$pg_type]))
+        if ($this->isConverterForType($pg_type))
         {
             $converter_name = $this->handled_types[$pg_type];
 
@@ -231,6 +231,21 @@ class Database
         $this->handled_types[$type] = $converter_name;
 
         return $this;
+    }
+
+    /**
+     * isConverterForType
+     *
+     * Returns true if a converter is registered to handle the given type.
+     * False otherwise.
+     *
+     * @access public
+     * @param String $type
+     * @return Bool
+     */
+    public function isConverterForType($type)
+    {
+        return (bool) isset($this->handled_types[$type]);
     }
 
     /**

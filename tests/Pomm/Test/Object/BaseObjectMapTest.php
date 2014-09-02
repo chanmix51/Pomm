@@ -10,25 +10,26 @@ use Pomm\Query\Where;
 
 class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
 {
+    protected static $database;
     protected static $map;
     protected static $logger;
 
     public static function setUpBeforeClass()
     {
-        $database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
+        static::$database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
 
         if (isset($GLOBALS['dev']) && $GLOBALS['dev'] == 'true') 
         {
             static::$logger = new \Pomm\Tools\Logger();
 
-            static::$map = $database
+            static::$map = static::$database
                 ->createConnection()
                 ->registerFilter(new \Pomm\FilterChain\LoggerFilter(static::$logger))
                 ->getMapFor('Pomm\Test\Object\BaseEntity');
         } 
         else 
         {
-            static::$map = $database
+            static::$map = static::$database
                 ->createConnection()
                 ->getMapFor('Pomm\Test\Object\BaseEntity');
         }
@@ -41,6 +42,12 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
         static::$map->dropTable();
 
         !is_null(static::$logger) && print_r(static::$logger);
+    }
+
+    public function testInitialize()
+    {
+        $this->assertTrue(static::$database->isConverterForType(static::$map->getTableName()), 'After initializing, the entity has a converter');
+        $this->assertInstanceOf('\Pomm\Converter\PgEntity', static::$database->getConverterForType(static::$map->getTableName()), 'The converter is a PgEntity instance');
     }
 
     public function testHydrate()
