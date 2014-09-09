@@ -44,6 +44,12 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $connection->getHandler();
     }
 
+    public function testMultipleConnection()
+    {
+        $database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
+        $connection = $database->createConnection();
+    }
+
     public function testGetMapFor()
     {
         $map1 = static::$connection->getMapFor('\Pomm\Test\Connection\CnxEntity');
