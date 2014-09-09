@@ -33,6 +33,17 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @expectedException \Pomm\Exception\ConnectionException
+     * @expectedExceptionMessage Error connecting to the database with dsn 'user=invalid_user dbname=pomm_test host=127.0.0.1 password=invalid_password'.
+     */
+    public function testInvalidConnection()
+    {
+        $database = new Database(array('dsn' => 'pgsql://invalid_user:invalid_password@127.0.0.1/pomm_test', 'name' => 'invalid_db'));
+        $connection = $database->createConnection();
+        $connection->getHandler();
+    }
+
     public function testGetMapFor()
     {
         $map1 = static::$connection->getMapFor('\Pomm\Test\Connection\CnxEntity');

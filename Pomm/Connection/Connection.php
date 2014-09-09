@@ -113,7 +113,7 @@ class Connection implements LoggerAwareInterface
             $connect_parameters[] = sprintf('password=%s', addslashes($this->parameter_holder['pass']));
         }
 
-        $this->handler = pg_connect(join(' ', $connect_parameters), \PGSQL_CONNECT_FORCE_NEW);
+        $this->handler = @pg_connect(join(' ', $connect_parameters), \PGSQL_CONNECT_FORCE_NEW);
 
         if ($this->handler === false)
         {
