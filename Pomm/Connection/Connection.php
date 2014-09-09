@@ -102,11 +102,15 @@ class Connection implements LoggerAwareInterface
             $connect_parameters[] = sprintf('password=%s', addslashes($this->parameter_holder['pass']));
         }
 
-        $this->handler = pg_connect(join(' ', $connect_parameters), \PGSQL_CONNECT_FORCE_NEW);
+        $handler = @pg_connect(join(' ', $connect_parameters), \PGSQL_CONNECT_FORCE_NEW);
 
-        if ($this->handler === false)
+        if ($handler === false)
         {
             $this->throwConnectionException(sprintf("Error connecting to the database with dsn '%s'.", join(' ', $connect_parameters)), LogLevel::ALERT);
+        }
+        else
+        {
+            $this->handler = $handler;
         }
 
         $sql = '';
@@ -131,7 +135,7 @@ class Connection implements LoggerAwareInterface
      */
     public function __destruct()
     {
-        if (!isset($this->handler))
+        if ($this->handler !== null)
         {
             pg_close($this->handler);
         }
@@ -147,7 +151,7 @@ class Connection implements LoggerAwareInterface
      */
     public function getHandler()
     {
-        if (!isset($this->handler))
+        if ($this->handler === null)
         {
             $this->launch();
         }

@@ -17,7 +17,7 @@ class ConnectionException extends Exception
 {
     public function __construct($message)
     {
-        parent::__construct(sprintf("%s. Driver said «%s».", $message, pg_last_error()));
+        parent::__construct(sprintf("%s. Driver said «%s».", $message, @pg_last_error()));
     }
 }
 
