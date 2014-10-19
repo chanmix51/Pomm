@@ -641,8 +641,8 @@ Whatever is used, the whole structure is saved every time this method is called.
 
   $map->updateOne($entity, array('pika')); // UPDATE ... set pika='...'
 
-  $map->getPika();            // chu
-  $map->getPlop();            // true
+  $entity->getPika();            // chu
+  $entity->getPlop();            // true
 
 In the example above, two fields are set and only one is updated. The result of this is the second field to be **replaced with the value from the database**.
 

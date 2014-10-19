@@ -1093,8 +1093,8 @@ $entity-&gt;setPlop(false);
 
 $map-&gt;updateOne($entity, array('pika')); // UPDATE ... set pika='...'
 
-$map-&gt;getPika();            // chu
-$map-&gt;getPlop();            // true
+$entity-&gt;getPika();            // chu
+$entity-&gt;getPlop();            // true
 </pre>
 <p>In the example above, two fields are set and only one is updated. The result of this is the second field to be <strong>replaced with the value from the database</strong>.</p>
 <pre class="literal-block">
