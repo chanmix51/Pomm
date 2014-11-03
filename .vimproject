@@ -107,6 +107,7 @@ Pomm=~/Projects/github/Pomm CD=. {
      ConnectionTest.php
      DatabaseTest.php
      ObserverTest.php
+     ServiceTest.php
      FilterChain=FilterChain {
       FilterChainTest.php
      }

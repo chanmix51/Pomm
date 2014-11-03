@@ -3,14 +3,17 @@
 namespace Pomm\Test\Identity;
 
 use Pomm\Connection\Database;
+use Pomm\Connection\ModelLayer;
 use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
 use Pomm\Exception\Exception;
+use Pomm\Exception\ConnectionException;
 use Pomm\Identity;
 
 class IdentityMapTest extends \PHPUnit_Framework_TestCase
 {
     protected static $database;
+    protected static $service;
 
     protected static function createConnection(Identity\IdentityMapperInterface $imap = null)
     {
@@ -20,33 +23,14 @@ class IdentityMapTest extends \PHPUnit_Framework_TestCase
     public static function setUpBeforeClass()
     {
         static::$database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
-
         $connection = static::$database->createConnection();
-
-        $connection->begin();
-        try
-        {
-            $sql = 'CREATE SCHEMA pomm_test';
-            $connection->executeAnonymousQuery($sql);
-
-            $map = $connection->getMapFor('Pomm\Test\Identity\Entity');
-            $map->createTable();
-
-            $connection->commit();
-        }
-        catch (Exception $e)
-        {
-            $connection->rollback();
-
-            throw $e;
-        }
+        static::$service = new IdentityMapModelLayer($connection);
+        static::$service->createSchema();
     }
 
     public static function tearDownAfterClass()
     {
-        $sql = 'DROP SCHEMA pomm_test CASCADE';
-        static::$database->createConnection()
-            ->executeAnonymousQuery($sql);
+        static::$service->dropSchema();
     }
 
     public function testNone()
@@ -152,4 +136,35 @@ class EntityMap extends BaseObjectMap
 
 class Entity extends BaseObject
 {
+}
+
+class IdentityMapModelLayer extends ModelLayer
+{
+    public function createSchema()
+    {
+        $this->begin();
+        try
+        {
+            $sql = 'create schema pomm_test';
+            $this->connection->executeAnonymousQuery($sql);
+
+            $map = $this->connection
+                ->getMapFor('Pomm\Test\Identity\Entity')
+                ->createTable();
+
+            $this->commit();
+        }
+        catch (ConnectionException $e)
+        {
+            $this->rollback();
+
+            throw $e;
+        }
+    }
+
+    public function dropSchema()
+    {
+        $sql = 'DROP SCHEMA pomm_test CASCADE';
+        $this->connection->executeAnonymousQuery($sql);
+    }
 }
