@@ -34,7 +34,7 @@ class PgNumberRange implements ConverterInterface
      */
     public function fromPg($data, $type = null)
     {
-        if (!preg_match('/([\[\(])(-?[0-9\.]+),-?([0-9\.]+)([\]\)])/', $data, $matchs))
+        if (!preg_match('/([\[\(])(-?[0-9\.]+), *(-?[0-9\.]+)([\]\)])/', $data, $matchs))
         {
             if ($data === null || $data === '')
             {

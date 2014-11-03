@@ -463,14 +463,14 @@ _;
 
         $entity['some_int4range'] = new Type\NumberRange(-5, 45, RangeType::EXCL_END);
         $entity['some_int8range'] = new Type\NumberRange(4452940833, 4553946490);
-        $entity['some_numrange']  = new Type\NumberRange(29.76607095, 30.44125206, RangeType::EXCL_BOTH);
+        $entity['some_numrange']  = new Type\NumberRange(-30.44125206, -29.76607095, RangeType::EXCL_BOTH);
         $entity['arr_numrange']   = array(new Type\NumberRange(1.1, 1.2), new Type\NumberRange(2.2, 2.4, RangeType::EXCL_START), new Type\NumberRange(3.3, 3.6, RangeType::EXCL_BOTH));
 
         static::$cv_map->updateOne($entity, array('some_int8range', 'some_int4range', 'some_numrange', 'arr_numrange'));
 
         $this->assertEquals(new Type\NumberRange(-5, 45, RangeType::EXCL_END), $entity['some_int4range'], "Int4range is ok.");
         $this->assertEquals(new Type\NumberRange(4452940833, 4553946491, RangeType::EXCL_END), $entity->getSomeInt8range(), "Int8range is ok.");
-        $this->assertEquals(new Type\NumberRange(29.76607095, 30.44125206, RangeType::EXCL_BOTH), $entity['some_numrange'], "Numrange is ok.");
+        $this->assertEquals(new Type\NumberRange(-30.44125206, -29.76607095, RangeType::EXCL_BOTH), $entity['some_numrange'], "Numrange is ok.");
         $this->assertTrue(is_array($entity['arr_numrange']), "'arr_numrange' is an array.");
 
         for($x = 1; $x <= count($entity['arr_numrange']); $x++)
