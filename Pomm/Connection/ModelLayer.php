@@ -7,7 +7,7 @@ use Pomm\Exception\SqlException;
 use Psr\Log\LogLevel;
 
 /**
- * Pomm\Connection\Service
+ * Pomm\Connection\ModelLayer
  *
  * Manage a service layer to handle business transactions and observers.
  *
@@ -17,7 +17,7 @@ use Psr\Log\LogLevel;
  * @author Grégoire HUBERT <hubert.greg@gmail.com>
  * @license X11 {@link http://opensource.org/licenses/mit-license.php}
  */
-class Service
+class ModelLayer
 {
     protected $connection;
 
@@ -32,7 +32,7 @@ class Service
      * Start a new transaction.
      *
      * @access public
-     * @return Service $this
+     * @return ModelLayer $this
      */
     protected function begin()
     {
@@ -56,7 +56,7 @@ class Service
      * Commit a transaction in the database.
      *
      * @access public
-     * @return Service $this
+     * @return ModelLayer $this
      */
     protected function commit()
     {
@@ -83,7 +83,7 @@ class Service
      *
      * @access public
      * @param  String       $name Optional name of the savepoint.
-     * @return Service $this
+     * @return ModelLayer $this
      */
     protected function rollback($name = null)
     {
@@ -115,7 +115,7 @@ class Service
      *
      * @access public
      * @param  String       $name Savepoint's name.
-     * @return Service $this
+     * @return ModelLayer $this
      */
     protected function setSavepoint($name)
     {
@@ -140,7 +140,7 @@ class Service
      *
      * @access public
      * @param  String       $name the savepoint's name.
-     * @return Service $this
+     * @return ModelLayer $this
      */
     protected function releaseSavepoint($name)
     {
@@ -170,7 +170,7 @@ class Service
      * @param Array contraint names (['ALL'] for all constraints)
      * @param String the schema name
      * @param String CONSTRAINTS_IMMEDIATE or CONSTRAINTS_DEFERRED
-     * @return Service
+     * @return ModelLayer
      */
     protected function setConstraints(Array $names, $schema = null, $check = null)
     {

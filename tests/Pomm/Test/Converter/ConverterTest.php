@@ -3,7 +3,7 @@
 namespace Pomm\Test\Converter;
 
 use Pomm\Connection\Database;
-use Pomm\Connection\Service;
+use Pomm\Connection\ModelLayer;
 use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
 use Pomm\Exception\Exception;
@@ -26,7 +26,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
         $database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
 
         static::$connection = $database->getConnection();
-        static::$service = new ConverterService(static::$connection);
+        static::$service = new ConverterModelLayer(static::$connection);
         static::$cv_map = static::$connection->getMapFor('Pomm\Test\Converter\ConverterEntity');
         static::$super_cv_map = static::$connection->getMapFor('Pomm\Test\Converter\SuperConverterEntity');
 
@@ -717,7 +717,7 @@ class AddressType extends \Pomm\Type\Composite
     protected $something = 'pika';
 }
 
-class ConverterService extends Service
+class ConverterModelLayer extends ModelLayer
 {
     protected function getMapFor($class)
     {

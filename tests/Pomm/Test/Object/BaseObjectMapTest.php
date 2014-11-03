@@ -3,7 +3,7 @@
 namespace Pomm\Test\Object;
 
 use Pomm\Connection\Database;
-use Pomm\Connection\Service;
+use Pomm\Connection\ModelLayer;
 use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
 use Pomm\Exception\Exception;
@@ -21,7 +21,7 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
         $database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
         $connection = $database->getConnection();
         static::$map = $connection->getMapFor('Pomm\Test\Object\BaseEntity');
-        static::$service = new BaseObjectMapService($connection);
+        static::$service = new BaseObjectMapModelLayer($connection);
         static::$service->createSchema();
     }
 
@@ -356,7 +356,7 @@ class BaseEntity extends BaseObject
 {
 }
 
-class BaseObjectMapService extends Service
+class BaseObjectMapModelLayer extends ModelLayer
 {
     protected function getBaseEntityMap()
     {

@@ -3,7 +3,7 @@
 namespace Pomm\Test\Tools;
 
 use Pomm\Connection\Database;
-use Pomm\Connection\Service;
+use Pomm\Connection\ModelLayer;
 use Pomm\Exception\Exception;
 use Pomm\Tools\ScanSchemaTool;
 
@@ -30,7 +30,7 @@ class ScanSchemaToolTest extends \PHPUnit_Framework_TestCase
         $database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
 
         static::$connection = $database->createConnection();
-        static::$service = new ScanSchemaToolService(static::$connection);
+        static::$service = new ScanSchemaToolModelLayer(static::$connection);
         static::$service->createSchema();
     }
 
@@ -80,7 +80,7 @@ class ScanSchemaToolTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class ScanSchemaToolService extends Service
+class ScanSchemaToolModelLayer extends ModelLayer
 {
     public function createSchema()
     {

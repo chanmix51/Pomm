@@ -5,7 +5,7 @@ namespace Pomm\Test\Tools;
 use Pomm\Connection\Database;
 use Pomm\Exception\Exception;
 use Pomm\Tools\CreateBaseMapTool;
-use Pomm\Connection\Service;
+use Pomm\Connection\ModelLayer;
 
 class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,7 +29,7 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
         $database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
 
         static::$connection = $database->createConnection();
-        static::$service = new CreateBaseMapToolService(static::$connection);
+        static::$service = new CreateBaseMapToolModelLayer(static::$connection);
         static::$service->createSchema();
     }
 
@@ -89,7 +89,7 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class CreateBaseMapToolService extends Service
+class CreateBaseMapToolModelLayer extends ModelLayer
 {
     public function createSchema()
     {

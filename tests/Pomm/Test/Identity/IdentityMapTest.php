@@ -3,7 +3,7 @@
 namespace Pomm\Test\Identity;
 
 use Pomm\Connection\Database;
-use Pomm\Connection\Service;
+use Pomm\Connection\ModelLayer;
 use Pomm\Object\BaseObject;
 use Pomm\Object\BaseObjectMap;
 use Pomm\Exception\Exception;
@@ -24,7 +24,7 @@ class IdentityMapTest extends \PHPUnit_Framework_TestCase
     {
         static::$database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
         $connection = static::$database->createConnection();
-        static::$service = new IdentityMapService($connection);
+        static::$service = new IdentityMapModelLayer($connection);
         static::$service->createSchema();
     }
 
@@ -138,7 +138,7 @@ class Entity extends BaseObject
 {
 }
 
-class IdentityMapService extends Service
+class IdentityMapModelLayer extends ModelLayer
 {
     public function createSchema()
     {

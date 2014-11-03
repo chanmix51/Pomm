@@ -10,9 +10,9 @@ use Pomm\Converter;
 use Pomm\Type;
 use Pomm\Query\PreparedQuery;
 use Pomm\Connection\Connection;
-use Pomm\Connection\Service;
+use Pomm\Connection\ModelLayer;
 
-class ServiceTest extends \PHPUnit_Framework_TestCase
+class ModelLayerTest extends \PHPUnit_Framework_TestCase
 {
     protected static $service;
     protected static $map;
@@ -21,7 +21,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
     {
         $database = new Database(array('dsn' => $GLOBALS['dsn'], 'name' => 'test_db'));
         $connection = $database->createConnection();
-        static::$service = new MyService($connection);
+        static::$service = new MyModelLayer($connection);
         static::$service->createSchema();
         static::$map = $connection->getMapFor('Pomm\Test\Connection\FkEntity');
     }
@@ -174,7 +174,7 @@ class FkEntity extends \Pomm\Object\BaseObject
 {
 }
 
-class MyService extends Service
+class MyModelLayer extends ModelLayer
 {
 
     public function createSchema()
