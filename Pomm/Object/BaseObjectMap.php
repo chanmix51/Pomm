@@ -442,9 +442,11 @@ abstract class BaseObjectMap
             $this->formatFieldsWithAlias('getSelectFields')
         );
 
-        return $this
+        $result = $this
             ->query($sql, $where->getValues())
-            ->current();
+            ;
+
+        return $result->count() > 0 ? $result->current() : null;
     }
 
     /**
@@ -460,7 +462,9 @@ abstract class BaseObjectMap
         $this->checkValuesOnPK($pk);
         $sql = sprintf('DELETE FROM %s WHERE %s RETURNING %s', $this->object_name, $this->createSqlAndFrom($pk), $this->formatFieldsWithAlias('getSelectFields'));
 
-        return $this->query($sql, array_values($pk))->current();
+        $result = $this->query($sql, array_values($pk));
+
+        return $result->count() > 0 ? $result->current() : null;
     }
 
     /**
