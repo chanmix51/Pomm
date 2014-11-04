@@ -259,9 +259,9 @@ class BaseObjectMapTest extends \PHPUnit_Framework_TestCase
         $limited_res = static::$map->findAll('LIMIT 3');
 
         $this->assertEquals(5, $raw_res->count(), "5 results.");
-
         $this->assertEquals(5, $ordered_res->count(), "5 results.");
-        foreach ($ordered_res as $index => $result) 
+
+        foreach ($ordered_res as $index => $result)
         {
             $this->assertEquals( 5 - $index, $result['id'], "Names are the other way than ids.");
         }

@@ -71,12 +71,14 @@ abstract class CreateFileTool extends BaseTool
      * * %schema%   will be replaced with the schema name.
      *
      * @param string string
+     * @param string schema
      * @return string
      */
-    protected function parseNamespace($string)
+    protected function parseNamespace($string, $schema = null)
     {
+        $schema = $schema === null ? $this->options['schema'] : $schema;
         $string = str_replace('%dbname%', Inflector::camelize($this->options['database']->getName()), $string);
-        $string = str_replace('%schema%', $this->options['schema'] == 'public' ? 'PublicSchema' : Inflector::camelize($this->options['schema']), $string);
+        $string = str_replace('%schema%', $schema == 'public' ? 'PublicSchema' : Inflector::camelize($schema), $string);
 
         return $string;
     }

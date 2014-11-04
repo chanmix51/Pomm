@@ -1,6 +1,6 @@
 <?php
 
-namespace TestDb\PommTestProd;
+namespace TestDb\PommTestBisProd;
 
 use \Pomm\Object\BaseObject;
 use \Pomm\Exception\Exception;

@@ -31,16 +31,19 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
 
         try
         {
+            $sql = 'CREATE SCHEMA pomm_test_bis';
+            static::$connection->executeAnonymousQuery($sql);
+
             $sql = 'CREATE SCHEMA pomm_test';
             static::$connection->executeAnonymousQuery($sql);
 
             $sql = 'CREATE TABLE pomm_test.pika (id serial PRIMARY KEY, some_char char(10), some_varchar varchar)';
             static::$connection->executeAnonymousQuery($sql);
 
-            $sql = 'CREATE TYPE pomm_test.some_type AS (ts timestamp, md5 char(32))';
+            $sql = 'CREATE TYPE pomm_test_bis.some_type AS (ts timestamp, md5 char(32))';
             static::$connection->executeAnonymousQuery($sql);
 
-            $sql = 'CREATE TABLE pomm_test.chu (some_some_type pomm_test.some_type) INHERITS (pomm_test.pika)';
+            $sql = 'CREATE TABLE pomm_test_bis.chu (some_some_type pomm_test_bis.some_type) INHERITS (pomm_test.pika)';
             static::$connection->executeAnonymousQuery($sql);
 
             $sql = 'ALTER TABLE pomm_test.pika ADD COLUMN fixed_arr numeric(4,3)[]';
@@ -58,17 +61,20 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
 
     public static function tearDownAfterClass()
     {
+        $sql = 'DROP SCHEMA pomm_test_bis CASCADE';
+        static::$connection->executeAnonymousQuery($sql);
+
         $sql = 'DROP SCHEMA pomm_test CASCADE';
         static::$connection->executeAnonymousQuery($sql);
 
         exec(sprintf('rm -r %s', static::$tmp_dir.DIRECTORY_SEPARATOR.'TestDb'));
     }
 
-    protected function checkFiles($table, $class, $filenames, $other_options = array())
+    protected function checkFiles($table, $class, $schema, $filenames, $other_options = array())
     {
         $options = array(
             'table' => $table,
-            'schema' => 'pomm_test',
+            'schema' => $schema,
             'database' => static::$connection->getDatabase(),
             'prefix_dir' => static::$tmp_dir,
         );
@@ -92,7 +98,7 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
     {
         $root_dir = static::$tmp_dir.'/TestDb/PommTest';
 
-        $this->checkFiles('pika', 'Pika', array(
+        $this->checkFiles('pika', 'Pika', 'pomm_test', array(
             $root_dir.'/Base/PikaMap.php',
             $root_dir.'/Pika.php',
             $root_dir.'/PikaMap.php',
@@ -101,9 +107,9 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateBaseMapInherits()
     {
-        $root_dir = static::$tmp_dir.'/TestDb/PommTestProd';
+        $root_dir = static::$tmp_dir.'/TestDb/PommTestBisProd';
 
-        $this->checkFiles('chu', 'Chu', array(
+        $this->checkFiles('chu', 'Chu', 'pomm_test_bis', array(
             $root_dir.'/Base/ChuMap.php',
             $root_dir.'/Chu.php',
             $root_dir.'/ChuMap.php',
