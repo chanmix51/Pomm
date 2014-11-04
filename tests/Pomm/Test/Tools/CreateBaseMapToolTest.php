@@ -39,11 +39,11 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
         exec(sprintf('rm -r %s', static::$tmp_dir.DIRECTORY_SEPARATOR.'TestDb'));
     }
 
-    protected function checkFiles($table, $class, $filenames, $other_options = array())
+    protected function checkFiles($table, $class, $schema, $filenames, $other_options = array())
     {
         $options = array(
             'table' => $table,
-            'schema' => 'pomm_test',
+            'schema' => $schema,
             'database' => static::$connection->getDatabase(),
             'prefix_dir' => static::$tmp_dir,
         );
@@ -67,7 +67,7 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
     {
         $root_dir = static::$tmp_dir.'/TestDb/PommTest';
 
-        $this->checkFiles('pika', 'Pika', array(
+        $this->checkFiles('pika', 'Pika', 'pomm_test', array(
             $root_dir.'/Base/PikaMap.php',
             $root_dir.'/Pika.php',
             $root_dir.'/PikaMap.php',
@@ -76,9 +76,9 @@ class CreateBaseMapToolTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateBaseMapInherits()
     {
-        $root_dir = static::$tmp_dir.'/TestDb/PommTestProd';
+        $root_dir = static::$tmp_dir.'/TestDb/PommTestBisProd';
 
-        $this->checkFiles('chu', 'Chu', array(
+        $this->checkFiles('chu', 'Chu', 'pomm_test_bis', array(
             $root_dir.'/Base/ChuMap.php',
             $root_dir.'/Chu.php',
             $root_dir.'/ChuMap.php',
@@ -100,22 +100,25 @@ class CreateBaseMapToolModelLayer extends ModelLayer
             $sql = 'create schema pomm_test';
             $this->connection->executeAnonymousQuery($sql);
 
+            $sql = 'create schema pomm_test_bis';
+            $this->connection->executeAnonymousQuery($sql);
+
             $sql = 'create table pomm_test.pika (id serial primary key, some_char char(10), some_varchar varchar)';
             $this->connection->executeAnonymousQuery($sql);
 
-            $sql = 'create type pomm_test.some_type as (ts timestamp, md5 char(32))';
+            $sql = 'create type pomm_test_bis.some_type as (ts timestamp, md5 char(32))';
             $this->connection->executeAnonymousQuery($sql);
 
-            $sql = 'create table pomm_test.chu (some_some_type pomm_test.some_type) inherits (pomm_test.pika)';
+            $sql = 'create table pomm_test_bis.chu (some_some_type pomm_test_bis.some_type) inherits (pomm_test.pika)';
             $this->connection->executeAnonymousQuery($sql);
 
             $sql = 'alter table pomm_test.pika add column fixed_arr numeric(4,3)[]';
             $this->connection->executeAnonymousQuery($sql);
 
-            $sql = 'COMMENT ON TABLE pomm_test.chu IS $comment$This is a useful comment on table chu.$comment$';
+            $sql = 'comment on table pomm_test_bis.chu IS $comment$This is a useful comment on table chu.$comment$';
             $this->connection->executeAnonymousQuery($sql);
 
-            $sql = "COMMENT ON COLUMN pomm_test.chu.some_some_type IS \$comment\$comment on\nsome_some_type\$comment\$";
+            $sql = "comment on column pomm_test_bis.chu.some_some_type IS \$comment\$comment on\nsome_some_type\$comment\$";
             $this->connection->executeAnonymousQuery($sql);
 
             $this->commit();
@@ -130,6 +133,9 @@ class CreateBaseMapToolModelLayer extends ModelLayer
 
     public function dropSchema()
     {
+        $sql = 'drop schema pomm_test_bis cascade';
+        $this->connection->executeAnonymousQuery($sql);
+
         $sql = 'drop schema pomm_test cascade';
         $this->connection->executeAnonymousQuery($sql);
     }

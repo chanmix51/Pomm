@@ -1,6 +1,6 @@
 <?php
 
-namespace TestDb\PommTestProd\Base;
+namespace TestDb\PommTestBisProd\Base;
 
 use \Pomm\Object\BaseObjectMap;
 use \Pomm\Exception\Exception;
@@ -19,10 +19,10 @@ abstract class ChuMap extends \TestDb\PommTest\PikaMap
     {
         parent::initialize();
 
-        $this->object_class =  'TestDb\PommTestProd\Chu';
-        $this->object_name  =  '"pomm_test"."chu"';
+        $this->object_class =  'TestDb\PommTestBisProd\Chu';
+        $this->object_name  =  '"pomm_test_bis"."chu"';
 
-        $this->addField('some_some_type', 'pomm_test.some_type'); // comment on some_some_type
+        $this->addField('some_some_type', 'pomm_test_bis.some_type'); // comment on some_some_type
 
         $this->pk_fields = array('');
     }
