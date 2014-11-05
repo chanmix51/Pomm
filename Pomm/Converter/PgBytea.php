@@ -20,7 +20,7 @@ class PgBytea implements ConverterInterface
      */
     public function toPg($data, $type = null)
     {
-        return sprintf("bytea E'%s'", addcslashes(pg_escape_bytea($data), '\\'));
+        return sprintf("%s '%s'", $type, preg_replace(["/\\\\/", "/''/"], ["\\", "'"], pg_escape_bytea($data)));
     }
 
     /**

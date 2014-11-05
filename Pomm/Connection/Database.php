@@ -320,7 +320,7 @@ class Database
      */
     protected function initializeConfiguration()
     {
-        $default_configuration = array( 'bytea_output' => 'escape', 'intervalstyle' => 'ISO_8601', 'datestyle' => 'ISO' );
+        $default_configuration = array( 'bytea_output' => 'hex', 'intervalstyle' => 'ISO_8601', 'datestyle' => 'ISO' );
 
         $this->configuration = array_merge($default_configuration, $this->parameter_holder['configuration']);
     }
