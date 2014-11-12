@@ -3,7 +3,7 @@
 namespace Pomm\Converter;
 
 use Pomm\Converter\ConverterInterface;
-use Pomm\Exception\PommException;
+use Pomm\Exception\Exception as PommException;
 
 /**
  * Pomm\Converter\PgPoint - Geometric Point converter
