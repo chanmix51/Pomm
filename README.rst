@@ -15,7 +15,7 @@ POMM: The PHP Object Model Manager for Postgresql
    :target: https://packagist.org/packages/pomm/pomm
 
 .. image:: https://poser.pugx.org/pomm/pomm/license.svg
-   :target https://packagist.org/packages/pomm/pomm
+   :target: https://packagist.org/packages/pomm/pomm
 
 This branch is in relase candidate. It will be noted as stable soon. Use for your next project development or to migrate your 1.2 project. Please report any bugs.
 
