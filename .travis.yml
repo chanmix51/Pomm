@@ -7,8 +7,8 @@ before_script:
   - psql -c 'CREATE DATABASE pomm_test' -U postgres -h 127.0.0.1
   - psql -c 'CREATE EXTENSION hstore' -U postgres -h 127.0.0.1 pomm_test
   - psql -c 'CREATE EXTENSION ltree' -U postgres -h 127.0.0.1 pomm_test
-install: composer install --dev
-script: ./vendor/bin/phpunit --configuration tests/phpunit.travis.xml
+install: composer install --no-dev
+script: phpunit --configuration tests/phpunit.travis.xml
 
 branches:
   only:
