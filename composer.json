@@ -15,5 +15,10 @@
         "phpunit/phpunit": "~4.4"
     },
     "autoload": { "psr-0": { "Pomm": "." } },
-    "minimum-stability": "RC"
+    "minimum-stability": "RC",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.3.x-dev"
+        }
+    }
 }
