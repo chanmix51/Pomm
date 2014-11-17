@@ -1,5 +1,6 @@
 language: php
 php:
+  - "5.3"
   - "5.4"
 services: postgresql
 before_script:
@@ -13,3 +14,4 @@ branches:
   only:
     - "1.1"
     - "1.2"
+    - master

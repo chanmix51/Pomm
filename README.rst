@@ -2,10 +2,24 @@
 POMM: The PHP Object Model Manager for Postgresql
 =================================================
 
-Development branch
-******************
+.. image:: https://secure.travis-ci.org/chanmix51/Pomm.png?branch=master
+   :target: http://travis-ci.org/#!/chanmix51/Pomm
 
-This branch is the development branch of Pomm. It contains experimental undocumented code and might be broken or unstable. Use it for testing or hacking purposes only. If you intend to use Pomm in production, use the `latest stable branch <https://github.com/chanmix51/Pomm/tree/1.2>`_.
+.. image:: https://scrutinizer-ci.com/g/chanmix51/Pomm/badges/quality-score.png?s=5766ac7091629c3af205bbcca8623bd2e8cfe85e
+   :target: https://scrutinizer-ci.com/g/chanmix51/Pomm/
+
+.. image:: https://poser.pugx.org/Pomm/Pomm/version.png
+   :target: https://poser.pugx.org/
+
+.. image:: https://poser.pugx.org/Pomm/Pomm/d/total.png
+   :target: https://packagist.org/packages/pomm/pomm
+
+.. image:: https://poser.pugx.org/pomm/pomm/license.svg
+   :target https://packagist.org/packages/pomm/pomm
+
+[![License]()]()
+
+This branch is the latest stable branch of Pomm.
 
 What is Pomm ?
 **************
