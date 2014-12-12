@@ -122,6 +122,7 @@ abstract class BaseObjectMap
      */
     public function getConverter()
     {
+        $this->converter->setVirtualFields($this->virtual_fields);
         return $this->converter;
     }
 

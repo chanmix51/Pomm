@@ -191,6 +191,11 @@ class PgRow implements ConverterInterface
             $values[$field_name] = stripcslashes(array_shift($elts));
         }
 
+        foreach ($this->virtual_fields as $field_name => $type)
+        {
+            $values[$field_name] = stripcslashes(array_shift($elts));
+        }
+
         if (count($elts) > 0)
         {
             $values['_extra'] = $elts;
