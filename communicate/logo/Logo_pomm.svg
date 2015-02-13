@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 500 500" style="enable-background:new 0 0 500 500;" xml:space="preserve">
+<g id="Calque_1">
+	<g>
+		<text transform="matrix(1 0 0 1 -420.8443 149.921)" style="fill:#403A76; font-family:'Roboto-Thin'; font-size:118.9025;">pomm</text>
+	</g>
+	<rect x="-575.931" y="215.976" style="fill:none;" width="497.331" height="225.671"/>
+	<text transform="matrix(1 0 0 1 -575.9308 230.4134)"><tspan x="0" y="0" style="fill:#403A76; font-family:'Roboto-Thin'; font-size:19.2515;">Pomm is an open source database access framework </tspan><tspan x="0" y="23.102" style="fill:#403A76; font-family:'Roboto-Thin'; font-size:19.2515;">coupled with an Object Model Manager dedicated to the </tspan><tspan x="0" y="46.204" style="fill:#403A76; font-family:'Roboto-Thin'; font-size:19.2515;">Postgresql&#x2122; database. It offers an alternative approach than </tspan><tspan x="0" y="69.306" style="fill:#403A76; font-family:'Roboto-Thin'; font-size:19.2515;">ORM to using database in web developments.</tspan></text>
+	<g>
+		<polygon style="fill:#FFFFFF;" points="-433.997,159.636 -512.115,204.663 -590.169,159.524 -590.104,69.359 -511.986,24.332 
+			-433.932,69.471 		"/>
+		<g>
+			<polygon style="fill:#403A76;" points="-577.532,152.349 -533.875,177.56 -533.875,51.547 -577.525,76.742 			"/>
+			<polygon style="fill:#403A76;" points="-490.226,101.897 -512.051,114.497 -490.226,127.047 			"/>
+			<polygon style="fill:#403A76;" points="-490.226,177.557 -468.404,164.961 -490.226,152.36 			"/>
+		</g>
+		<g>
+			<polygon style="fill:#6A5FA6;" points="-533.875,101.897 -512.051,114.497 -490.226,101.897 -512.051,89.296 			"/>
+		</g>
+		<polyline style="fill:#EA3889;" points="-468.401,89.294 -468.401,164.962 -446.576,152.362 -446.576,76.693 -468.401,89.294 		
+			"/>
+		<polygon style="fill:#6A5FA6;" points="-512.051,38.943 -533.875,51.547 -468.401,89.294 -446.576,76.693 		"/>
+		<polygon style="fill:#EA3889;" points="-490.226,152.36 -512.051,139.758 -512.051,190.155 -490.226,177.557 		"/>
+	</g>
+</g>
+<g id="Calque_2">
+	<rect x="542" style="fill:#353535;" width="500" height="500"/>
+	<g>
+		<polygon style="fill:#FFFFFF;" points="957.155,340.133 791.87,435.401 626.723,339.895 626.86,149.12 792.145,53.851 
+			957.292,149.357 		"/>
+		<g>
+			<polygon style="fill:#403A76;" points="653.46,324.714 745.83,378.056 745.83,111.433 653.475,164.742 			"/>
+			<polygon style="fill:#403A76;" points="838.185,217.966 792.008,244.626 838.185,271.18 			"/>
+			<polygon style="fill:#403A76;" points="838.185,378.05 884.357,351.398 838.185,324.738 			"/>
+		</g>
+		<g>
+			<polygon style="fill:#6A5FA6;" points="745.83,217.966 792.008,244.626 838.185,217.966 792.008,191.305 			"/>
+		</g>
+		<polyline style="fill:#EA3889;" points="884.363,191.299 884.363,351.401 930.54,324.741 930.54,164.639 884.363,191.299 		"/>
+		<polygon style="fill:#6A5FA6;" points="792.008,84.766 745.83,111.433 884.363,191.299 930.54,164.639 		"/>
+		<polygon style="fill:#EA3889;" points="838.185,324.738 792.008,298.074 792.008,404.705 838.185,378.05 		"/>
+	</g>
+	<g>
+		<polygon style="fill:#FFFFFF;" points="415.155,340.133 249.87,435.401 84.723,339.895 84.86,149.12 250.145,53.851 
+			415.292,149.357 		"/>
+		<g>
+			<polygon style="fill:#403A76;" points="111.46,324.714 203.83,378.056 203.83,111.433 111.475,164.742 			"/>
+			<polygon style="fill:#403A76;" points="296.185,217.966 250.008,244.626 296.185,271.18 			"/>
+			<polygon style="fill:#403A76;" points="296.185,378.05 342.357,351.398 296.185,324.738 			"/>
+		</g>
+		<g>
+			<polygon style="fill:#6A5FA6;" points="203.83,217.966 250.008,244.626 296.185,217.966 250.008,191.305 			"/>
+		</g>
+		<polyline style="fill:#EA3889;" points="342.363,191.299 342.363,351.401 388.54,324.741 388.54,164.639 342.363,191.299 		"/>
+		<polygon style="fill:#6A5FA6;" points="250.008,84.766 203.83,111.433 342.363,191.299 388.54,164.639 		"/>
+		<polygon style="fill:#EA3889;" points="296.185,324.738 250.008,298.074 250.008,404.705 296.185,378.05 		"/>
+	</g>
+</g>
+</svg>
