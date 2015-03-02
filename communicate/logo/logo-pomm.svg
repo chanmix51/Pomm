@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1024px" height="1024px" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.2.2 (9983) - http://www.bohemiancoding.com/sketch -->
+    <title>logo-1024</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="logo-1024" sketch:type="MSArtboardGroup">
+            <g id="Logo" sketch:type="MSLayerGroup" transform="translate(70.000000, 2.000000)">
+                <path d="M442.5,0.643176895 L295.204895,85.5427581 L737.090209,340.241502 L884.385314,255.341921 L442.5,0.643176895" id="Fill-1" fill="#6A5FA6" sketch:type="MSShapeGroup"></path>
+                <path d="M442.5,1019.43445 L589.795105,934.534874 L589.795105,764.735711 L442.5,679.83613 L442.5,1019.43445" id="Fill-3" fill="#EB3889" sketch:type="MSShapeGroup"></path>
+                <path d="M737.090209,340.241502 L737.090209,849.635292 L884.385314,764.735711 L884.385314,255.341921 L737.090209,340.241502" id="Fill-4" fill="#EB3889" sketch:type="MSShapeGroup"></path>
+                <path d="M589.795105,934.534874 L737.090209,849.635292 L589.795105,764.735711 L589.795105,934.534874" id="Fill-5" fill="#403A76" sketch:type="MSShapeGroup"></path>
+                <path d="M0.610983264,255.341921 L0.610983264,764.735711 L295.204895,934.534874 L295.204895,85.5427581 L0.610983264,255.341921" id="Fill-6" fill="#403A76" sketch:type="MSShapeGroup"></path>
+                <path d="M295.204895,85.5427581 L295.204895,934.534874 L442.5,1019.43445 L442.5,679.83613 L737.090209,849.635292 L737.090209,340.241502 L295.204895,85.5427581" id="Fill-7" fill="#FFFFFF" sketch:type="MSShapeGroup"></path>
+                <path d="M442.5,510.036968 L589.795105,594.936549 L589.795105,425.141083 L442.5,510.036968" id="Fill-8" fill="#403A76" sketch:type="MSShapeGroup"></path>
+                <path d="M589.795105,425.141083 L442.5,340.241502 L295.204895,425.141083 L442.5,510.036968 L589.795105,425.141083" id="Fill-9" fill="#6A5FA6" sketch:type="MSShapeGroup"></path>
+            </g>
+        </g>
+    </g>
+</svg>
