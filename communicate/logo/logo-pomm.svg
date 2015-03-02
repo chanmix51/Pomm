@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <style>
+    .pomm-violet {fill: #403A76} .pomm-pink {fill: #EB3889} .pomm-lightviolet {fill: #6A5FA6} .pomm-white {fill: #ffffff}
+  </style>
+  <path d="M442.5.6432L295.205 85.5428 737.09 340.2415l147.295-84.8996L442.5.643" class="pomm-lightviolet"/>
+  <path d="M442.5 1019.4344l147.295-84.8995V764.7354L442.5 679.836v339.5984m294.5902-679.193v509.394l147.295-84.8997V255.342l-147.295 84.8995" class="pomm-pink"/>
+  <path d="M589.795 934.535l147.2952-84.8997-147.295-84.8996V934.535M.611 255.342v509.3937L295.205 934.535V85.5427L.611 255.3417" class="pomm-violet"/>
+  <path d="M295.205 85.5428v848.992l147.295 84.8996V679.836l294.5902 169.7993V340.2415L295.205 85.5428" class="pomm-white"/>
+  <path d="M442.5 510.037l147.295 84.8995V425.141L442.5 510.037" class="pomm-violet"/>
+  <path d="M589.795 425.141L442.5 340.2416 295.205 425.141 442.5 510.037l147.295-84.896" class="pomm-lightviolet"/>
+</svg>
