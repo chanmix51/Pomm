@@ -21,6 +21,31 @@ class Collection implements \Iterator, \Countable
     protected $position = 0;
     protected $filters = array();
 
+
+    /**
+     * __sleep
+     * 
+     * clean the object before serializing it
+     * 
+     **/
+    public function __sleep()
+    {
+        return array('position', 'filters', 'fetched');
+    }
+    
+    /**
+     * __destruct 
+     * 
+     * only call the parent function if stmt is set
+     * 
+     **/
+    public function __destruct()
+    {
+        if (isset($this->stmt)) {
+    	    parent::__destruct();
+        }
+    }
+    
     /**
      * __construct
      *
